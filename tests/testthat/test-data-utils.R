@@ -30,6 +30,18 @@ test_that("season_game_ids_from_master filters the master to a season", {
   expect_setequal(ids, c(2L, 3L))
 })
 
+test_that("write_dataset serializes list-columns (nested data) to parquet", {
+  tmp <- withr::local_tempdir()
+  withr::local_dir(tmp)
+  df <- data.frame(game_id = 1L, x = 2)
+  df$participants <- I(list(list(list(id = 1, role = "rusher"), list(id = 2, role = "tackler"))))
+  write_dataset(df, dataset = "nested", season = 2024, stem = "nested")
+  back <- arrow::read_parquet("cfb/nested/parquet/nested_2024.parquet")
+  expect_equal(nrow(back), 1L)
+  expect_type(back$participants, "character")     # list-col JSON-encoded
+  expect_match(back$participants, "rusher")
+})
+
 test_that("bind_games drops NULL/empty frames and unions columns", {
   out <- bind_games(list(
     data.frame(a = 1, b = 2),

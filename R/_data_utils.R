@@ -63,12 +63,29 @@ bind_games <- function(frames) {
   as.data.frame(data.table::rbindlist(frames, fill = TRUE, use.names = TRUE))
 }
 
+# JSON-encode any list-columns (nested participant/name lists) to character so arrow/csv
+# can serialize them. Keeps all data, parquet/csv/rds share one schema.
+stringify_list_cols <- function(df) {
+  for (nm in names(df)) {
+    col <- df[[nm]]
+    if (is.list(col) && !is.data.frame(col)) {
+      df[[nm]] <- vapply(col, function(x) {
+        if (is.null(x) || length(x) == 0 || (length(x) == 1 && is.na(x[[1]]))) return(NA_character_)
+        tryCatch(as.character(jsonlite::toJSON(x, auto_unbox = TRUE, null = "null", na = "null")),
+                 error = function(e) paste(unlist(x), collapse = "|"))
+      }, character(1))
+    }
+  }
+  df
+}
+
 # Write parquet + rds + gzipped csv under cfb/{dataset}/ and append a manifest row.
 write_dataset <- function(df, dataset, season, stem) {
   if (is.null(df) || nrow(df) == 0) {
     cli::cli_alert_info("{dataset} {season}: 0 rows, skipping write")
     return(invisible(NULL))
   }
+  df <- stringify_list_cols(df)
   base <- file.path("cfb", dataset)
   for (sub in c("parquet", "rds", "csv")) dir.create(file.path(base, sub), recursive = TRUE, showWarnings = FALSE)
   arrow::write_parquet(df, file.path(base, "parquet", sprintf("%s_%d.parquet", stem, season)))
@@ -92,7 +109,11 @@ write_dataset <- function(df, dataset, season, stem) {
 }
 
 # Upload one file to BOTH publish repos under a release tag (idempotent overwrite).
+# piggyback memoises pb_releases() (a cachem cache that can persist a stale "no releases"
+# result, even one created earlier in the same workflow run by releases_init) -> bust it
+# first so a just-created release is found.
 pb_upload_both <- function(file, tag, repos = PUBLISH_REPOS, token = Sys.getenv("GITHUB_PAT")) {
+  try(memoise::forget(piggyback::pb_releases), silent = TRUE)
   for (repo in repos) {
     tryCatch(
       piggyback::pb_upload(file = file, repo = repo, tag = tag, overwrite = TRUE, .token = token),

@@ -35,6 +35,27 @@ fetch_final <- function(game_id, tries = 3L) {
   NULL
 }
 
+# One flat dict -> 1-row data.frame: scalars kept, JSON null -> NA, multi-value -> list-col.
+dict_to_row <- function(p) {
+  cells <- lapply(p, function(v) {
+    if (is.null(v) || length(v) == 0) return(NA)
+    if (length(v) == 1) return(v[[1]])
+    I(list(v))
+  })
+  as.data.frame(cells, stringsAsFactors = FALSE, check.names = FALSE)
+}
+
+# A list-of-flat-dicts block (play_participants, rosters, injuries, ...) -> stamped data.frame.
+flat_block_df <- function(block, g) {
+  if (is.null(block) || length(block) == 0) return(data.frame())
+  df <- as.data.frame(
+    data.table::rbindlist(lapply(block, dict_to_row), fill = TRUE, use.names = TRUE),
+    check.names = FALSE)
+  df$game_id <- as.integer(g$id); df$season <- as.integer(g$season)
+  if (!is.null(g$week)) df$week <- as.integer(g$week)
+  df
+}
+
 # Bind a list of per-game data.frames (drift-safe).
 bind_games <- function(frames) {
   frames <- Filter(function(x) !is.null(x) && nrow(x) > 0, frames)

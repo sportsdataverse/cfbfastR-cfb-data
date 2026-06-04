@@ -1,9 +1,9 @@
-# Idempotently create the espn_cfb_* release tags on BOTH publish repos.
+# Idempotently create the espn_cfb_* release tags on the sportsdataverse-data publish repo.
 # Run once (with GITHUB_PAT / SDV_GH_TOKEN that can write to both repos) before the first
 # data run. "Already exists" errors are expected and ignored.
 suppressPackageStartupMessages({ library(piggyback); library(cli) })
 
-REPOS <- c("sportsdataverse/cfbfastR-cfb-data", "sportsdataverse/sportsdataverse-data")
+REPOS <- c("sportsdataverse/sportsdataverse-data")
 
 TAGS <- list(
   espn_cfb_pbp               = "College Football play-by-play (from ESPN, enriched).",

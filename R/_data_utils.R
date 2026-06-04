@@ -2,7 +2,7 @@
 # Pure-ish reshape + IO helpers; network isolated to fetch_* so reshape fns stay testable.
 
 RAW_BASE <- "https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb"
-PUBLISH_REPOS <- c("sportsdataverse/cfbfastR-cfb-data", "sportsdataverse/sportsdataverse-data")
+PUBLISH_REPOS <- c("sportsdataverse/sportsdataverse-data")
 
 read_final_json <- function(path_or_url) {
   jsonlite::fromJSON(path_or_url, simplifyVector = FALSE)

@@ -1,5 +1,5 @@
 source(file.path("..", "..", "R", "_data_utils.R"))
-for (f in c("08_betting", "09_schedules", "10_linescores", "11_power_index")) {
+for (f in c("09_betting", "10_schedules", "11_linescores", "12_power_index")) {
   source(file.path("..", "..", "R", sprintf("espn_cfb_%s_creation.R", f)))
 }
 g <- read_final_json(testthat::test_path("fixtures", "final_401628455.json"))

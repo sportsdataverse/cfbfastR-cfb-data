@@ -17,7 +17,8 @@ Per compiled season, one table per dataset (see **[DATASETS.md](DATASETS.md)** f
 | adv_team / adv_passing / adv_rushing / adv_receiving / adv_defensive / adv_turnover / adv_drives / adv_situational | `espn_cfb_adv_*` | advanced box (EPA/success/explosiveness) |
 | play_participants | `espn_cfb_play_participants` | per-play participants |
 | drives | `espn_cfb_drives` | drive-level |
-| rosters | `espn_cfb_rosters` | game rosters |
+| game_rosters | `espn_cfb_game_rosters` | per-game rosters (one row per athlete per game) |
+| rosters | `espn_cfb_rosters` | season rosters (ESPN-derived, deduped from game_rosters) |
 | betting | `espn_cfb_betting` | resolved odds/lines |
 | schedules | `espn_cfb_schedules` | game meta |
 | linescores | `espn_cfb_linescores` | per-quarter (recent) |

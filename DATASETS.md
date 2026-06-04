@@ -21,7 +21,8 @@ Expected `col_name | col_type | col_description` for each per-game-compiled **se
 | [adv_situational](#adv-situational) | one row per team | 73 | `espn_cfb_adv_situational` |
 | [play_participants](#play-participants) | one row per (play, athlete, role) | 56 | `espn_cfb_play_participants` |
 | [drives](#drives) | one row per drive | 15 | `espn_cfb_drives` |
-| [rosters](#rosters) | one row per rostered athlete | 70 | `espn_cfb_rosters` |
+| [game_rosters](#game-rosters) | one row per rostered athlete per game | 70 | `espn_cfb_game_rosters` |
+| [rosters](#rosters) | one row per rostered athlete per season (deduped) | ~63 | `espn_cfb_rosters` |
 | [betting](#betting) | one row per game | 9 | `espn_cfb_betting` |
 | [schedules](#schedules) | one row per game | 34 | `espn_cfb_schedules` |
 | [linescores](#linescores) | one row per (team, period) | 5 | `espn_cfb_linescores` |
@@ -949,9 +950,10 @@ _Release tag: `espn_cfb_drives`_
 
 ---
 
-### rosters
+### game_rosters
 
-One row per rostered athlete per game (season-wide bind of `g["game_rosters"]`).
+One row per rostered athlete per game — the season-wide bind of each game's
+`g["game_rosters"]` (the full per-game roster compilation).
 
 | col_name | col_type | col_description |
 | --- | --- | --- |
@@ -1025,6 +1027,21 @@ One row per rostered athlete per game (season-wide bind of `g["game_rosters"]`).
 | team_alternate_ids_sdr | character | Alternate SportsDataR team id, e.g. "7014". |
 | logo_href | character | URL to the team logo image. |
 | logo_dark_href | character | URL to the dark-mode team logo image. |
+
+_Release tag: `espn_cfb_game_rosters`_
+
+---
+
+### rosters
+
+One row per rostered athlete **per season** — the [game_rosters](#game-rosters)
+compilation de-duplicated to one row per `(season, team_id, athlete_id)` (the latest
+game's attribute values are kept), with the per-game circumstance fields dropped:
+`game_id`, `week`, `starter`, `did_not_play`, `winner`, `order`, `home_away`. All other
+athlete/team identity, physical, status, and media columns from `game_rosters` are
+retained. Note: this dataset is **ESPN-derived** (it supersedes the prior CFBD-sourced
+`espn_cfb_rosters` schema), so it does not carry CFBD-only fields such as hometown/geo,
+recruiting ids, or class year.
 
 _Release tag: `espn_cfb_rosters`_
 

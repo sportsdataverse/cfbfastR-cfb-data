@@ -25,6 +25,7 @@ SCRIPTS=(
   R/espn_cfb_11_linescores_creation.R
   R/espn_cfb_12_power_index_creation.R
   R/espn_cfb_14_injuries_creation.R
+  R/espn_cfb_15_team_summaries_creation.R
 )
 
 mkdir -p logs

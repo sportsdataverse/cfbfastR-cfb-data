@@ -28,6 +28,19 @@ Expected `col_name | col_type | col_description` for each per-game-compiled **se
 | [linescores](#linescores) | one row per (team, period) | 5 | `espn_cfb_linescores` |
 | [power_index](#power-index) | one row per team (or per game) | 22 | `espn_cfb_power_index` |
 | [injuries](#injuries) | one row per injury entry | 12 | `espn_cfb_injuries` |
+| [team_summaries](#team_summaries) † | one row per team per season | 380 | `espn_cfb_team_summaries` |
+| [passing](#passing) † | one row per (team, passer) per season | 43 | `espn_cfb_passing` |
+| [rushing](#rushing) † | one row per (team, rusher) per season | 28 | `espn_cfb_rushing` |
+| [receiving](#receiving) † | one row per (team, receiver) per season | 32 | `espn_cfb_receiving` |
+| [percentiles](#percentiles) † | one row per percentile (1–99) | 27 | `espn_cfb_percentiles` |
+
+> † **Season-level summary datasets.** Unlike every table above (per-game `final`
+> JSON reshaped into a compiled season), these five are produced by
+> `R/espn_cfb_15_team_summaries_creation.R`, which aggregates a *full season* of
+> enriched play-by-play (`cfbfastR::load_cfb_pbp()`) into season-grained,
+> opponent-adjusted team and player summaries (the "Binion Box Score"). See the
+> [Season-level summary datasets](#season-level-summary-datasets) section at the end
+> of this file.
 
 ---
 
@@ -1183,5 +1196,269 @@ One row per injury entry (one injured athlete per team injury report). Empty (`[
 | week | integer | Week number stamped during compilation when available from the game's competition metadata; may be NA for non-regular-season games. |
 
 _Release tag: `espn_cfb_injuries`_
+
+---
+
+## Season-level summary datasets
+
+The five datasets below are **not** reshaped per-game `final` JSON like every table
+above. They are produced by `R/espn_cfb_15_team_summaries_creation.R`, which loads a
+full season of enriched play-by-play via `cfbfastR::load_cfb_pbp()` and aggregates it
+into season-grained, opponent-adjusted team and player summaries (the "Binion Box
+Score", ported from game-on-paper's `cfb-team-summaries`). Garbage-time plays are
+filtered before aggregation. Schemas are season-invariant; column counts shown are
+from the 2025 season. Because the repo's `cfb/` tree is gitignored, these live only
+in the `sportsdataverse-data` releases.
+
+**Shared identity columns** — present on `team_summaries`, `passing`, `rushing`, and
+`receiving` (the player tables add `player_id` + a `{type}_player_name`):
+
+| col_name | col_type | col_description |
+| --- | --- | --- |
+| team_id | character | ESPN team id of the possession team (e.g. "61", "2390"). |
+| pos_team | character | Team display name (e.g. "Georgia", "Boise State"). |
+| division | character | ESPN division/grouping label joined from the team catalog. |
+| conference | character | Conference name (e.g. "SEC", "Mountain West"). |
+| season | integer | Season year (e.g. 2025). |
+| fbs_class | character | Tier classification derived from conference membership: "P4"/"G6" for 2024+, "P5"/"G5" for ≤2023 (Notre Dame → P4/P5; UConn/UMass handled explicitly). |
+
+---
+
+### team_summaries
+
+One row per FBS team per season (e.g. 136 in 2025). Opponent-adjusted EPA / success /
+explosiveness with per-metric national ranks, for offense, defense, and their margin,
+each split by overall / pass / rush.
+
+**Column-naming grammar.** Most of the 380 columns are one set of base metrics applied
+across a few axes, so a column name decodes as:
+
+```
+{metric}_{side}[_{phase}][_rank]
+```
+
+- **side** — `off` (offense), `def` (defense), or `margin` (offense minus defense; a
+  subset of metrics only).
+- **phase** — omitted = all scrimmage plays; `pass` = pass plays only; `rush` = rush
+  plays only.
+- **`_rank`** — 1–N national rank of that value among FBS teams that season (1 = best;
+  direction is metric- and side-aware, e.g. low defensive EPA ranks 1st). Without
+  `_rank`, the column holds the raw metric value.
+
+Examples: `EPAplay_off` (offensive EPA/play), `success_def_rank` (defensive
+success-rate rank), `explosive_off_pass` (offensive pass explosiveness),
+`EPAgame_margin` (offense-minus-defense EPA/game).
+
+Identity columns: the [shared set](#season-level-summary-datasets) above, plus:
+
+| col_name | col_type | col_description |
+| --- | --- | --- |
+| valid_games | double | Games with non-missing opponent-adjusted offense AND defense EPA (teams with < 2 are dropped). |
+
+**Base metrics** — each appears as `{metric}_off` and `{metric}_def` (and, where noted,
+`{metric}_margin`), optionally suffixed `_pass` / `_rush`, each typically with a `_rank`
+twin:
+
+| metric | col_type | description |
+| --- | --- | --- |
+| plays | integer | Play count. |
+| playsgame | double | Plays per game. |
+| passrate | double | Share of plays that were passes. |
+| rushrate | double | Share of plays that were rushes. |
+| havoc | double | Havoc rate (TFL / pass-breakup / forced-fumble / INT share). |
+| explosive | double | Explosive-play rate (by EPA). |
+| TEPA | double | Total EPA. |
+| EPAplay | double | EPA per play. |
+| EPAdrive | double | EPA per drive. |
+| EPAgame | double | EPA per game. |
+| yards | double | Total yards gained. |
+| yardsplay | double | Yards per play. |
+| yardsgame | double | Yards per game. |
+| play_stuffed | double | Stuffed-play rate (stopped at or behind the line). |
+| drives | integer | Drive count. |
+| drivesgame | double | Drives per game. |
+| yardsdrive | double | Yards per drive. |
+| playsdrive | double | Plays per drive. |
+| success | double | Success rate (positive-EPA share). |
+| red_zone_success | double | Red-zone success rate. |
+| third_down_success | double | Third-down success rate. |
+| third_down_distance | double | Mean third-down distance to go. |
+| late_down_success | double | Late-down (3rd/4th) success rate. |
+| early_down_EPA | double | Mean EPA on early downs (1st/2nd). |
+| start_position | double | Mean drive start field position (yards to goal). |
+| nonExplosiveEpaPerPlay | double | Mean EPA on non-explosive plays. |
+| line_yards | double | Mean offensive-line-credited rushing yards. |
+| opportunity_rate | double | Opportunity-run rate. |
+
+`margin` variants (offense − defense, each with `_rank`) exist for: `TEPA`, `EPAplay`,
+`EPAdrive`, `EPAgame`, `success`, `yardsplay`, and `start_position`, across
+overall/pass/rush where applicable.
+
+**Drive-efficiency columns** (`off` / `def` / `margin`, each with `_rank`):
+
+| col_name | col_type | col_description |
+| --- | --- | --- |
+| total_available_yards_{side} | double | Sum of yards-to-goal available at each drive start. |
+| total_gained_yards_{side} | integer | Sum of net yards gained across drives. |
+| available_yards_pct_{side} | double | `total_gained / total_available` (drive-efficiency rate). |
+
+**Opponent-adjusted (ridge-regression) columns** — the headline EPA numbers, fit with a
+ridge model over team/opponent indicators (home-field-aware) then averaged per season:
+
+| col_name | col_type | col_description |
+| --- | --- | --- |
+| adj_off_epa | double | Opponent-adjusted offensive EPA/play, season mean. |
+| adj_def_epa | double | Opponent-adjusted defensive EPA/play, season mean. |
+| net_adj_epa | double | `adj_off_epa - adj_def_epa`. |
+| def_strength_faced | double | Mean adjusted strength of the defenses this offense faced. |
+| off_strength_faced | double | Mean adjusted strength of the offenses this defense faced. |
+| adj_off_epa_rank | double | National rank of `adj_off_epa` (1 = best). |
+| adj_def_epa_rank | double | National rank of `adj_def_epa` (1 = best). |
+| net_adj_epa_rank | double | National rank of `net_adj_epa` (1 = best). |
+
+_Release tag: `espn_cfb_team_summaries`_
+
+---
+
+### passing
+
+One row per (team, passer) per season (e.g. 750 in 2025; includes non-FBS passers faced
+in FBS games). Identity columns are the [shared set](#season-level-summary-datasets)
+plus `player_id` and `passer_player_name`. `_rank` columns are 1–N national ranks among
+passers (1 = best).
+
+| col_name | col_type | col_description |
+| --- | --- | --- |
+| player_id | double | ESPN athlete id of the passer (completion id, else incompletion id). |
+| passer_player_name | character | Passer display name (`"TEAM"` for team-charged pass plays). |
+| plays | integer | Pass plays (dropbacks counted as plays). |
+| games | integer | Distinct games the passer appeared in. |
+| team_games | integer | Team's games played (leaderboard-minimum denominator). |
+| playsgame | double | Pass plays per game. |
+| TEPA | double | Total EPA on the passer's plays. |
+| EPAplay | double | EPA per play. |
+| EPAgame | double | EPA per game. |
+| yards | double | Passing (receiving) yards on the passer's attempts. |
+| yardsplay | double | Yards per play. |
+| yardsgame | double | Yards per game. |
+| success | double | Success rate (positive-EPA share). |
+| comp | double | Completions. |
+| att | double | Pass attempts. |
+| comppct | double | Completion percentage (mean completion indicator). |
+| passing_td | double | Passing touchdowns. |
+| sacked | double | Sacks taken. |
+| sack_yds | double | Yards lost to sacks. |
+| pass_int | double | Interceptions thrown. |
+| detmer | double | Detmer index: `(yards / (400·games)) · ((TD+INT) / (1 + \|TD−INT\|))` — a TD/INT-weighted volume rating. |
+| detmergame | double | Per-game form of the Detmer index. |
+| dropbacks | double | `att + sacked` (pass attempts plus sacks). |
+| sack_adj_yards | double | `yards − \|sack_yds\|` (sack-adjusted passing yards). |
+| yardsdropback | double | `sack_adj_yards / dropbacks`. |
+| TEPA_rank, EPAgame_rank, EPAplay_rank, success_rank, comppct_rank, yards_rank, yardsplay_rank, yardsgame_rank, sack_adj_yards_rank, yardsdropback_rank, detmer_rank, detmergame_rank | double | National ranks of the like-named metric (1 = best). |
+
+_Release tag: `espn_cfb_passing`_
+
+---
+
+### rushing
+
+One row per (team, rusher) per season (e.g. 1,573 in 2025). Identity columns are the
+[shared set](#season-level-summary-datasets) plus `player_id` and `rusher_player_name`.
+`_rank` columns are 1–N national ranks among rushers (1 = best).
+
+| col_name | col_type | col_description |
+| --- | --- | --- |
+| player_id | double | ESPN athlete id of the rusher. |
+| rusher_player_name | character | Rusher display name. |
+| plays | integer | Carries. |
+| games | integer | Distinct games the rusher appeared in. |
+| team_games | integer | Team's games played (leaderboard-minimum denominator). |
+| playsgame | double | Carries per game. |
+| TEPA | double | Total EPA on the rusher's carries. |
+| EPAplay | double | EPA per carry. |
+| EPAgame | double | EPA per game. |
+| yards | double | Rushing yards. |
+| yardsplay | double | Yards per carry. |
+| yardsgame | double | Yards per game. |
+| success | double | Success rate (positive-EPA share). |
+| rushing_td | double | Rushing touchdowns. |
+| fumbles | double | Fumbles on rush plays. |
+| TEPA_rank, EPAgame_rank, EPAplay_rank, success_rank, yards_rank, yardsplay_rank, yardsgame_rank | double | National ranks of the like-named metric (1 = best). |
+
+_Release tag: `espn_cfb_rushing`_
+
+---
+
+### receiving
+
+One row per (team, receiver) per season (e.g. 2,295 in 2025). Identity columns are the
+[shared set](#season-level-summary-datasets) plus `player_id` and
+`receiver_player_name`. `_rank` columns are 1–N national ranks among receivers
+(1 = best).
+
+| col_name | col_type | col_description |
+| --- | --- | --- |
+| player_id | double | ESPN athlete id of the receiver. |
+| receiver_player_name | character | Receiver display name. |
+| plays | integer | Targets (plays the receiver was involved in). |
+| games | integer | Distinct games the receiver appeared in. |
+| team_games | integer | Team's games played (leaderboard-minimum denominator). |
+| playsgame | double | Targets per game. |
+| TEPA | double | Total EPA on the receiver's targets. |
+| EPAplay | double | EPA per play. |
+| EPAgame | double | EPA per game. |
+| yards | double | Receiving yards. |
+| yardsplay | double | Yards per play. |
+| yardsgame | double | Yards per game. |
+| success | double | Success rate (positive-EPA share). |
+| comp | integer | Receptions (catches). |
+| targets | integer | Targets. |
+| catchpct | double | `comp / targets` (catch rate). |
+| passing_td | double | Receiving touchdowns. |
+| fumbles | double | Fumbles on receiving plays. |
+| TEPA_rank, EPAgame_rank, EPAplay_rank, success_rank, catchpct_rank, yards_rank, yardsplay_rank, yardsgame_rank | double | National ranks of the like-named metric (1 = best). |
+
+_Release tag: `espn_cfb_receiving`_
+
+---
+
+### percentiles
+
+One row per percentile from 1 to 99 (99 rows). For each metric, the column holds that
+metric's value at the row's percentile across all team-games that season — i.e. the
+empirical distribution of the per-game Binion Box Score metrics, used to contextualize a
+team's number against the FBS field. No team identity columns.
+
+| col_name | col_type | col_description |
+| --- | --- | --- |
+| pctile | double | Percentile level (0.01 … 0.99). |
+| GEI | double | Game Excitement Index value at this percentile. |
+| EPAplay | double | EPA per play. |
+| pass_success | double | Pass success rate. |
+| rush_success | double | Rush success rate. |
+| early_down_success | double | Early-down success rate. |
+| early_down_EPA | double | Early-down EPA. |
+| late_down_success | double | Late-down success rate. |
+| success | double | Overall success rate. |
+| yardsplay | double | Yards per play. |
+| dropbacks | double | Dropbacks (count). |
+| rushes | double | Rushes (count). |
+| EPAdropback | double | EPA per dropback. |
+| EPArush | double | EPA per rush. |
+| yardsdropback | double | Yards per dropback. |
+| pass_explosive | double | Pass explosive-play rate. |
+| rush_explosive | double | Rush explosive-play rate. |
+| explosive | double | Overall explosive-play rate. |
+| third_down_success | double | Third-down success rate. |
+| red_zone_success | double | Red-zone success rate. |
+| play_stuffed | double | Stuffed-play rate. |
+| nonExplosiveEpaPerPlay | double | EPA per play on non-explosive plays. |
+| havoc | double | Havoc rate. |
+| yardsrush | double | Yards per rush. |
+| lineyards | double | Offensive-line-credited rushing yards. |
+| opportunity_run | double | Opportunity-run rate. |
+| third_down_distance | double | Third-down distance to go. |
+
+_Release tag: `espn_cfb_percentiles`_
 
 ---

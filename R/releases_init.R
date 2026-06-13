@@ -25,7 +25,12 @@ TAGS <- list(
   espn_cfb_schedules         = "College Football schedules / game meta.",
   espn_cfb_linescores        = "College Football per-quarter linescores.",
   espn_cfb_power_index       = "College Football FPI / power index (recent seasons).",
-  espn_cfb_injuries          = "College Football game injury reports."
+  espn_cfb_injuries          = "College Football game injury reports.",
+  espn_cfb_team_summaries    = "College Football season team summaries (opponent-adjusted EPA/success/explosiveness; 'Binion Box Score').",
+  espn_cfb_passing           = "College Football season passing leaders (per-team, opponent-adjusted).",
+  espn_cfb_rushing           = "College Football season rushing leaders (per-team, opponent-adjusted).",
+  espn_cfb_receiving         = "College Football season receiving leaders (per-team, opponent-adjusted).",
+  espn_cfb_percentiles       = "College Football season per-metric percentiles (team offense)."
 )
 
 token <- Sys.getenv("GITHUB_PAT")

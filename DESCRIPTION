@@ -8,17 +8,21 @@ Depends:
     R (>= 4.1.0)
 Imports:
     arrow (>= 14.0.0),
+    cfbfastR,
     cli,
     curl,
     data.table (>= 1.14.0),
     dplyr (>= 1.1.0),
+    glmnet,
     glue,
+    janitor,
     jsonlite (>= 1.8.0),
     optparse,
     piggyback (>= 0.1.5),
     purrr (>= 1.0.0),
     readr,
-    rlang
+    rlang,
+    stringr
 Suggests:
     testthat (>= 3.0.0),
     withr

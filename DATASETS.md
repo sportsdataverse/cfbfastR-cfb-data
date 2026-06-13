@@ -28,7 +28,7 @@ Expected `col_name | col_type | col_description` for each per-game-compiled **se
 | [linescores](#linescores) | one row per (team, period) | 5 | `espn_cfb_linescores` |
 | [power_index](#power-index) | one row per team (or per game) | 22 | `espn_cfb_power_index` |
 | [injuries](#injuries) | one row per injury entry | 12 | `espn_cfb_injuries` |
-| [team_summaries](#team_summaries) † | one row per team per season | 380 | `espn_cfb_team_summaries` |
+| [team_summaries](#team_summaries) † | one row per team per season | 383 | `espn_cfb_team_summaries` |
 | [passing](#passing) † | one row per (team, passer) per season | 43 | `espn_cfb_passing` |
 | [rushing](#rushing) † | one row per (team, rusher) per season | 28 | `espn_cfb_rushing` |
 | [receiving](#receiving) † | one row per (team, receiver) per season | 32 | `espn_cfb_receiving` |
@@ -1230,7 +1230,7 @@ One row per FBS team per season (e.g. 136 in 2025). Opponent-adjusted EPA / succ
 explosiveness with per-metric national ranks, for offense, defense, and their margin,
 each split by overall / pass / rush.
 
-**Column-naming grammar.** Most of the 380 columns are one set of base metrics applied
+**Column-naming grammar.** Most of the 383 columns are one set of base metrics applied
 across a few axes, so a column name decodes as:
 
 ```

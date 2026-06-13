@@ -1349,10 +1349,10 @@ passers (1 = best).
 | sacked | double | Sacks taken. |
 | sack_yds | double | Yards lost to sacks. |
 | pass_int | double | Interceptions thrown. |
-| detmer | double | Detmer index: `(yards / (400·games)) · ((TD+INT) / (1 + |TD−INT|))` — a TD/INT-weighted volume rating. |
+| detmer | double | Detmer index: `(yards / (400·games)) · ((TD+INT) / (1 + \|TD−INT\|))` — a TD/INT-weighted volume rating. |
 | detmergame | double | Per-game form of the Detmer index. |
 | dropbacks | double | `att + sacked` (pass attempts plus sacks). |
-| sack_adj_yards | double | `yards − |sack_yds|` (sack-adjusted passing yards). |
+| sack_adj_yards | double | `yards − \|sack_yds\|` (sack-adjusted passing yards). |
 | yardsdropback | double | `sack_adj_yards / dropbacks`. |
 | TEPA_rank, EPAgame_rank, EPAplay_rank, success_rank, comppct_rank, yards_rank, yardsplay_rank, yardsgame_rank, sack_adj_yards_rank, yardsdropback_rank, detmer_rank, detmergame_rank | double | National ranks of the like-named metric (1 = best). |
 

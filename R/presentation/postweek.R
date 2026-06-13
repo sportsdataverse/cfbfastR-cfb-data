@@ -19,9 +19,8 @@ if (!exists("read_team_summaries")) source("R/presentation/_summary_paths.R")
 cli::cli_h1("CFB postweek tables + skeets")
 
 current_year <- lubridate::year(Sys.Date())
-data_path <- summary_csv_path("team_summaries", "cfb_team_summaries", current_year)
-file_date <- file.info(data_path)$ctime
-formatted_file_date <- strptime(file_date, format = "%F", tz = "America/New_York")
+# Dataset is republished daily, so label tables with the run date (ET).
+formatted_file_date <- format(Sys.time(), "%F", tz = "America/New_York")
 team.adj <- read_team_summaries(current_year) |>
     dplyr::mutate(
         pos_team = dplyr::case_when(

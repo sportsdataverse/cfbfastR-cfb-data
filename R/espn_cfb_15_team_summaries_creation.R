@@ -236,7 +236,7 @@ summarize_team_df <- function(x, ascending = FALSE, remove_cols = c()) {
                 yards_rank = rank(-yards),
                 yardsplay_rank = rank(-yardsplay),
                 yardsgame_rank = rank(-yardsgame),
-                drivesgame = rank(-drivesgame),
+                drivesgame_rank = rank(-drivesgame),
                 yardsdrive_rank = rank(-yardsdrive),
                 playsdrive_rank = rank(-playsdrive),
                 play_stuffed_rank = rank(play_stuffed), # want low stuff rate on offense

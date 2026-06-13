@@ -7,3 +7,5 @@
 .vscode/
 .claude/
 /tmp/
+# Built dataset artifacts live on sportsdataverse-data release tags, not in git.
+cfb/

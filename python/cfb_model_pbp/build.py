@@ -28,3 +28,27 @@ def build_carry_frame(final_dir, seasons=None) -> pl.DataFrame:
 
 def last_completeness() -> dict:
     return dict(_LAST)
+
+
+def score_cpoe(carry_df: pl.DataFrame, plays_df: pl.DataFrame, cp_model_path, _predict=None) -> pl.DataFrame:
+    """Append completion_prob + cpoe (pass plays only) to carry_df, joined on (game_id, id)."""
+    from cpoe.features import extract_pass_features
+    feats = extract_pass_features(plays_df)  # pass rows only, with id retained
+    if feats.empty:
+        return carry_df.with_columns(completion_prob=pl.lit(None, dtype=pl.Float64),
+                                     cpoe=pl.lit(None, dtype=pl.Float64))
+    if _predict is None:
+        import numpy as np
+        import xgboost as xgb
+        from cpoe.constants import FEATURE_COLS
+        booster = xgb.Booster(); booster.load_model(str(cp_model_path))
+        preds = booster.predict(xgb.DMatrix(feats.select(FEATURE_COLS).to_pandas()))
+        preds = np.asarray(preds).tolist()
+    else:
+        preds = _predict(feats)
+    feats_pl = pl.from_pandas(feats)
+    scored = feats_pl.select("game_id", "id", "completion").with_columns(
+        completion_prob=pl.Series("completion_prob", preds, dtype=pl.Float64),
+    ).with_columns(cpoe=(pl.col("completion").cast(pl.Float64) - pl.col("completion_prob")))
+    return carry_df.join(scored.select("game_id", "id", "completion_prob", "cpoe"),
+                         on=["game_id", "id"], how="left")

@@ -88,8 +88,8 @@ def extract_pass_features(df: pd.DataFrame) -> pd.DataFrame:
         if col in plays.columns:
             plays[col] = plays[col].astype(int)
 
-    # Preserve ``season`` if present so LOSO CV can split by season without
-    # requiring callers to re-join it after the fact.
-    extra_passthrough = [c for c in ("season",) if c in plays.columns]
+    # Preserve join keys + ``season`` if present so callers can rejoin scored
+    # output back to the carry frame without a separate index round-trip.
+    extra_passthrough = [c for c in ("game_id", "id", "season") if c in plays.columns]
     keep = [c for c in FEATURE_COLS + [TARGET_COL] if c in plays.columns] + extra_passthrough
     return plays[keep].reset_index(drop=True)

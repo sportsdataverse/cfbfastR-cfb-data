@@ -1,5 +1,4 @@
 import json
-from pathlib import Path
 from cfb_model_reports.discovery import discover_models
 
 

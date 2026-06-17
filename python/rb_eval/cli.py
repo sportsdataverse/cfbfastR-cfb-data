@@ -26,7 +26,7 @@ def build_parser() -> argparse.ArgumentParser:
     sub = ap.add_subparsers(dest="cmd", required=True)
 
     f = sub.add_parser("features", help="Load rush plays from final.json and compute fo_success.")
-    f.add_argument("--final-dir", default="cfb/json/final")
+    f.add_argument("--final-dir", default=".cache/cfb_final")
     f.add_argument("--out", default="cfb/rb_eval/rush_plays.parquet")
 
     a = sub.add_parser("aggregate", help="Aggregate to per-rusher-season, lag, weight.")

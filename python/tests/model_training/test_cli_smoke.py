@@ -1,10 +1,17 @@
+import os
 import pathlib
 import pytest
 from model_training.cli import main
 
-FINAL = pathlib.Path(__file__).resolve().parents[2] / "cfb" / "json" / "final"
+FINAL = pathlib.Path(
+    os.environ.get(
+        "CFB_FINAL_CACHE",
+        pathlib.Path(__file__).resolve().parents[2] / ".cache" / "cfb_final",
+    )
+)
 
 
+@pytest.mark.integration
 @pytest.mark.skipif(not any(FINAL.glob("*.json")), reason="no backfill final.json")
 def test_ingest_then_train_ep(tmp_path):
     pbp = tmp_path / "pbp_full.parquet"

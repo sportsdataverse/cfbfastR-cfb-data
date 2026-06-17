@@ -1,11 +1,18 @@
+import os
 import pathlib
 import polars as pl
 import pytest
 from model_training.ingest import build_training_frame
 
-FINAL_DIR = pathlib.Path(__file__).resolve().parents[2] / "cfb" / "json" / "final"
+FINAL_DIR = pathlib.Path(
+    os.environ.get(
+        "CFB_FINAL_CACHE",
+        pathlib.Path(__file__).resolve().parents[2] / ".cache" / "cfb_final",
+    )
+)
 
 
+@pytest.mark.integration
 @pytest.mark.skipif(not any(FINAL_DIR.glob("*.json")), reason="no backfill final.json on disk")
 def test_build_frame_has_labels_and_weights():
     df = build_training_frame(FINAL_DIR, seasons=None)

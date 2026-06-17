@@ -3,6 +3,7 @@
 Skipped when no backfill final.json is present on disk.
 """
 import math
+import os
 import pathlib
 
 import polars as pl  # noqa: E402
@@ -11,9 +12,15 @@ import pytest  # noqa: E402
 pytest.importorskip("pygam")     # full pipeline trains a GAM (optional `gam` group)
 pytest.importorskip("plotnine")  # ...and renders a figure (optional `figures` group)
 
-FINAL_DIR = pathlib.Path(__file__).resolve().parents[2] / "cfb" / "json" / "final"
+FINAL_DIR = pathlib.Path(
+    os.environ.get(
+        "CFB_FINAL_CACHE",
+        pathlib.Path(__file__).resolve().parents[2] / ".cache" / "cfb_final",
+    )
+)
 
 
+@pytest.mark.integration
 @pytest.mark.skipif(
     not any(FINAL_DIR.glob("*.json")),
     reason="no backfill final.json on disk; run scrape_cfb_json.py + reprocess_cfb_json.py first",

@@ -588,30 +588,38 @@ git -C "<cfb-data>" commit -m "feat(model_publish): gh-release artifact uploader
 - [ ] **Step 1: Write `R/espn_cfb_16_model_pbp.R`** (read the existing `_data_utils.R` first to match arg/style conventions)
 ```r
 #!/usr/bin/env Rscript
-# Publish the Python-built model-PBP parquet as the espn_cfb_model_pbp dataset
-# (parquet/rds/csv parity via the shared writer). Read-only on the Python side.
-suppressWarnings(suppressMessages({
-  library(optparse); library(arrow)
-}))
-source(file.path(dirname(sys.frame(1)$ofile %||% "R/_data_utils.R"), "_data_utils.R"))
+# Publish the Python-built model-PBP parquet as the espn_cfb_model_pbp dataset.
+# Converts to parquet/rds/gzipped-csv parity via the shared write_dataset() writer.
+# Does NOT re-run any Python model code; reads the pre-built parquet from --parquet.
+suppressPackageStartupMessages({
+  library(arrow); library(optparse); library(cli)
+})
+if (!exists("write_dataset")) source("R/_data_utils.R")
 
-`%||%` <- function(a, b) if (is.null(a)) b else a
+opt <- optparse::parse_args(optparse::OptionParser(option_list = list(
+  optparse::make_option(c("-p", "--parquet"), type = "character",
+                        help = "Path to the Python-built model-PBP parquet file"),
+  optparse::make_option(c("-s", "--season"),  type = "integer",
+                        help = "CFB season year (e.g. 2024)"))))
 
-opt <- parse_args(OptionParser(option_list = list(
-  make_option("--parquet", type = "character"),
-  make_option("--season", type = "integer")
-)))
+if (is.null(opt$parquet) || is.null(opt$season)) {
+  cli::cli_abort("Both --parquet <path> and --season <year> are required.")
+}
 
+cli::cli_alert_info("Reading model-PBP parquet: {opt$parquet}")
 df <- as.data.frame(arrow::read_parquet(opt$parquet))
+cli::cli_alert_info("model_pbp {opt$season}: {nrow(df)} rows, {ncol(df)} cols")
+
 write_dataset(df, "model_pbp", opt$season, "model_pbp")
+
 if (identical(Sys.getenv("CFB_PUBLISH"), "1")) {
   publish_dataset("model_pbp", opt$season, "model_pbp", "espn_cfb_model_pbp")
-  message(sprintf("published model_pbp %d -> espn_cfb_model_pbp", opt$season))
+  cli::cli_alert_success("Published model_pbp {opt$season} -> espn_cfb_model_pbp")
 } else {
-  message(sprintf("wrote model_pbp %d locally (set CFB_PUBLISH=1 to upload)", opt$season))
+  cli::cli_alert_info("Wrote model_pbp {opt$season} locally (set CFB_PUBLISH=1 to upload)")
 }
 ```
-(Adjust the `source()` path + the `write_dataset` signature to match `_data_utils.R` exactly — read it first; the `%||%` helper may already exist there.)
+(Snippet matches the shipped `R/espn_cfb_16_model_pbp.R` exactly — uses `if (!exists("write_dataset")) source("R/_data_utils.R")` instead of the `sys.frame`/`%||%` pattern.)
 
 - [ ] **Step 2: Register the tags** — in `R/releases_init.R`, append `"espn_cfb_model_pbp"` and `"espn_cfb_model_artifacts"` to the tags vector that the script iterates (match the existing list's exact formatting).
 

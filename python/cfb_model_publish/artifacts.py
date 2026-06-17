@@ -4,6 +4,8 @@ import subprocess
 
 from cfb_model_reports.discovery import discover_models
 
+GH_TIMEOUT_SECONDS = 300
+
 
 def plan_uploads(artifacts_dir) -> list:
     files: list = []
@@ -14,12 +16,13 @@ def plan_uploads(artifacts_dir) -> list:
     seen, out = set(), []
     for p in files:
         if p not in seen:
-            seen.add(p); out.append(p)
+            seen.add(p)
+            out.append(p)
     return out
 
 
 def _gh_runner(args: list) -> None:
-    subprocess.run(["gh", *args], check=True)
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
 
 
 def upload_artifacts(artifacts_dir, tag: str, repo: str, *, dry_run: bool = False, runner=None) -> dict:

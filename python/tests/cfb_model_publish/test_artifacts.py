@@ -3,8 +3,10 @@ from cfb_model_publish.artifacts import plan_uploads, upload_artifacts
 
 
 def _seed(tmp_path):
-    (tmp_path / "ep.ubj").write_bytes(b"x"); (tmp_path / "ep.json").write_text(json.dumps({"model_type": "ep"}))
-    (tmp_path / "xrepa_final.pkl").write_bytes(b"y"); (tmp_path / "xrepa_final.json").write_text(json.dumps({"target": "x"}))
+    (tmp_path / "ep.ubj").write_bytes(b"x")
+    (tmp_path / "ep.json").write_text(json.dumps({"model_type": "ep"}))
+    (tmp_path / "xrepa_final.pkl").write_bytes(b"y")
+    (tmp_path / "xrepa_final.json").write_text(json.dumps({"target": "x"}))
     return tmp_path
 
 

@@ -42,7 +42,7 @@ SP2 turns those local outputs into **published, browsable products**, reusing th
 
 ## 4. Components
 
-```
+```text
 cfbfastR-cfb-data/
   python/
     cfb_model_reports/            # NEW — metrics + figures + Markdown report assembly
@@ -71,7 +71,7 @@ cfbfastR-cfb-data/
 
 ## 5. Data flow
 
-```
+```text
 SP1 local outputs:  python/artifacts/{ep.ubj,wp_spread.ubj,wp_naive.ubj,qbr.ubj,cp.ubj,fd.ubj,xrepa.pkl,*.model_card.json}
                     python/artifacts/model_pbp_<season>.parquet ;  python/.cache/cfb_final/ (warmed)
         │

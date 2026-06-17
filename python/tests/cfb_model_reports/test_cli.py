@@ -2,7 +2,6 @@ import json
 from pathlib import Path
 
 import polars as pl
-import pytest
 
 from cfb_model_reports.cli import build_parser, main
 

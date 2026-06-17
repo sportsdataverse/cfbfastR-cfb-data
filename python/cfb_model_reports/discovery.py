@@ -13,7 +13,7 @@ class ModelArtifact:
     card: dict
 
 
-def discover_models(artifacts_dir) -> list:
+def discover_models(artifacts_dir: str | Path) -> list[ModelArtifact]:
     out = []
     for card_path in sorted(Path(artifacts_dir).rglob("*.json")):
         try:

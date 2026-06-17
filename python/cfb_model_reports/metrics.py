@@ -1,8 +1,6 @@
 """Metric runners for model reports — provenance extraction, classification metrics, importance."""
 from __future__ import annotations
 
-from pathlib import Path
-
 
 def provenance_from_card(card: dict) -> dict:
     """Extract provenance fields from a model card, tolerating missing keys.

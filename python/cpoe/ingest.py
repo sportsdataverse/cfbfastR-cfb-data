@@ -16,6 +16,7 @@ from __future__ import annotations
 import json
 import pathlib
 
+import pandas as pd
 import polars as pl
 
 from .features import extract_pass_features
@@ -24,7 +25,7 @@ from .features import extract_pass_features
 def load_season_pass_plays(
     final_dir: pathlib.Path | str,
     seasons: list[int] | None = None,
-) -> pl.DataFrame:
+) -> pd.DataFrame:
     """Load and filter pass plays from all final.json files under ``final_dir``.
 
     Args:
@@ -38,8 +39,6 @@ def load_season_pass_plays(
         Empty (zero rows) DataFrame if no plays files are found or no pass
         plays survive the filter.
     """
-    import pandas as pd
-
     frames: list[pl.DataFrame] = []
     for f in sorted(pathlib.Path(final_dir).glob("*.json")):
         obj = json.loads(f.read_text())

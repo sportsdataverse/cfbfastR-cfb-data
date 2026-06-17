@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from pathlib import Path
-
 import polars as pl
 
 from model_training.ingest import _read_final_plays

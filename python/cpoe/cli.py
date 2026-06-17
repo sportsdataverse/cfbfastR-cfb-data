@@ -92,11 +92,11 @@ def main(argv: list[str] | None = None) -> int:
         print(f"ERROR: final-dir not found: {final_dir}", file=sys.stderr)
         return 1
 
-    print(f"Loading pass plays from {final_dir} (seasons: {seasons}) …")
+    print(f"Loading pass plays from {final_dir} (seasons: {seasons}) ...")
     import pandas as pd
     all_df = load_season_pass_plays(final_dir, seasons=seasons)
     if isinstance(all_df, pd.DataFrame) and all_df.empty:
-        print("ERROR: no data loaded — check --final-dir and --seasons.", file=sys.stderr)
+        print("ERROR: no data loaded -- check --final-dir and --seasons.", file=sys.stderr)
         return 1
 
     print(f"Total pass plays loaded: {len(all_df):,}")
@@ -104,23 +104,23 @@ def main(argv: list[str] | None = None) -> int:
     # --- optional LOSO CV ---
     if args.loso:
         from .loso import run_loso_cv
-        print("Running LOSO cross-validation …")
+        print("Running LOSO cross-validation ...")
         cv_result = run_loso_cv(all_df, nrounds=nrounds)
         cv_path = out_dir / "loso_cv.json"
         cv_path.write_text(json.dumps(cv_result, indent=2), encoding="utf-8")
         print(f"  mean log-loss: {cv_result['summary']['mean_log_loss']:.4f}")
         print(f"  mean Brier:    {cv_result['summary']['mean_brier_score']:.4f}")
-        print(f"  CV results → {cv_path}")
+        print(f"  CV results -> {cv_path}")
 
     # --- full-data training ---
     from .constants import FEATURE_COLS, TARGET_COL
     from .train_cp import save_cp_model, train_cp_model
 
-    print(f"Training on full dataset ({len(all_df):,} plays, nrounds={nrounds}) …")
+    print(f"Training on full dataset ({len(all_df):,} plays, nrounds={nrounds}) ...")
     booster = train_cp_model(all_df[FEATURE_COLS], all_df[TARGET_COL], nrounds=nrounds)
     model_path = out_dir / "cfb_cp_model.ubj"
     save_cp_model(booster, model_path)
-    print(f"  Model saved → {model_path}")
+    print(f"  Model saved -> {model_path}")
 
     return 0
 

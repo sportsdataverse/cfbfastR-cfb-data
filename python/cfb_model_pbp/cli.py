@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import argparse
+from datetime import date
 from pathlib import Path
 
 import polars as pl
 
 from . import __version__
 from .build import build_carry_frame, last_completeness, score_cpoe
-from .schema import PREDICTION_COLS
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -30,6 +30,7 @@ def main(argv=None) -> int:
         cp_model_version=pl.lit(Path(args.cp_model).name),
         ep_model_version=pl.lit("carried:final_json"),
         wp_model_version=pl.lit("carried:final_json"),
+        scored_date=pl.lit(date.today().isoformat()),
     )
     Path(args.out).parent.mkdir(parents=True, exist_ok=True)
     scored.write_parquet(args.out)

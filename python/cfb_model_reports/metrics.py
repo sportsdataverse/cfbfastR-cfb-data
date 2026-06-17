@@ -37,9 +37,13 @@ def compute_classification_metrics(y_true, y_pred) -> dict:
 
     yt = np.asarray(y_true)
     yp = np.asarray(y_pred)
-    out = {"n": int(yt.shape[0]), "log_loss": float(log_loss(yt, yp))}
+    if yt.shape[0] == 0:
+        return {"n": 0}
     if yp.ndim == 1:  # binary
+        out = {"n": int(yt.shape[0]), "log_loss": float(log_loss(yt, yp, labels=[0, 1]))}
         out["brier_score"] = float(np.mean((yp - yt) ** 2))
+    else:  # multiclass
+        out = {"n": int(yt.shape[0]), "log_loss": float(log_loss(yt, yp))}
     return out
 
 

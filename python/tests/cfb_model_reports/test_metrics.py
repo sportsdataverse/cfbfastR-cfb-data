@@ -53,6 +53,21 @@ def test_compute_classification_metrics_values(y, p, expected_brier):
     assert np.isclose(m["brier_score"], expected_brier)
 
 
+def test_compute_classification_metrics_single_class_no_raise():
+    """log_loss with labels=[0,1] doesn't raise when y_true is all-ones."""
+    y = np.array([1, 1, 1])
+    p = np.array([0.8, 0.9, 0.7])
+    m = compute_classification_metrics(y, p)
+    assert np.isfinite(m["log_loss"])
+    assert m["n"] == 3
+
+
+def test_compute_classification_metrics_empty():
+    """Empty arrays return early with {n: 0}."""
+    m = compute_classification_metrics(np.array([]), np.array([]))
+    assert m == {"n": 0}
+
+
 def test_rb_eval_metrics_from_loso(tmp_path):
     """rb_eval_metrics reads parquet and computes weighted_r2 + weighted_cal_error."""
     lp = tmp_path / "xrepa_loso.parquet"

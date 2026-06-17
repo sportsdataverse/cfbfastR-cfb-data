@@ -32,7 +32,7 @@ TAGS <- list(
   espn_cfb_receiving         = "College Football season receiving leaders (per-team, opponent-adjusted).",
   espn_cfb_percentiles       = "College Football season per-metric percentiles (team offense).",
   espn_cfb_model_pbp         = "College Football model play-by-play (EP/WP/QBR enriched; Python-built).",
-  espn_cfb_model_artifacts   = "College Football model artifacts (XGBoost .ubj weights + metadata)."
+  espn_cfb_model_artifacts   = "All CFB model artifacts (EP/WP/QBR/CPOE/fourth-down .ubj + RB-eval .pkl) + model cards."
 )
 
 token <- Sys.getenv("GITHUB_PAT")

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass, field
 
 
@@ -13,10 +14,23 @@ class ModelReport:
     notes: list = field(default_factory=list)
 
 
+def _fmt_cell(v) -> str:
+    """Format a metric/provenance value for a Markdown table cell."""
+    if v is None:
+        return "n/a"
+    if isinstance(v, (list, tuple)):
+        result = ", ".join(str(x) for x in v)
+    elif isinstance(v, dict):
+        result = json.dumps(v, separators=(",", ":"))
+    else:
+        result = str(v)
+    return result.replace("|", "\\|")
+
+
 def _metrics_table(metrics: dict) -> str:
     if not metrics:
         return "_No metrics available._\n"
-    rows = "\n".join(f"| `{k}` | {v} |" for k, v in metrics.items())
+    rows = "\n".join(f"| `{k}` | {_fmt_cell(v)} |" for k, v in metrics.items())
     return f"| metric | value |\n|---|---|\n{rows}\n"
 
 

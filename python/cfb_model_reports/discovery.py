@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -18,7 +19,8 @@ def discover_models(artifacts_dir: str | Path) -> list[ModelArtifact]:
     for card_path in sorted(Path(artifacts_dir).rglob("*.json")):
         try:
             card = json.loads(card_path.read_text())
-        except Exception:  # noqa: BLE001 — skip unreadable cards
+        except Exception as e:  # noqa: BLE001 — skip unreadable cards
+            print(f"warning: skipping unreadable card {card_path}: {e}", file=sys.stderr)
             continue
         ubj = card_path.with_suffix(".ubj")
         pkl = card_path.with_suffix(".pkl")

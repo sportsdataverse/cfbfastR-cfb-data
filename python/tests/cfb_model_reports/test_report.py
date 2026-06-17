@@ -1,4 +1,4 @@
-from cfb_model_reports.report import ModelReport, render_model_report, render_index
+from cfb_model_reports.report import ModelReport, render_model_report, render_index, _fmt_cell
 
 
 def test_render_model_report_has_metrics_figures_provenance():
@@ -21,3 +21,15 @@ def test_render_index_links_each_report():
     rs = [ModelReport("ep", "EP", {}, [], {}, []), ModelReport("cpoe", "CPOE", {}, [], {}, [])]
     idx = render_index(rs)
     assert "[EP](ep.md)" in idx and "[CPOE](cpoe.md)" in idx
+
+
+def test_fmt_cell_list():
+    assert _fmt_cell(["a", "b"]) == "a, b"
+
+
+def test_fmt_cell_none():
+    assert _fmt_cell(None) == "n/a"
+
+
+def test_fmt_cell_pipe_escaped():
+    assert _fmt_cell("has|pipe") == "has\\|pipe"

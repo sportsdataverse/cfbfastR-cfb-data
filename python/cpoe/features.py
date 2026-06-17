@@ -71,6 +71,17 @@ def extract_pass_features(df: pd.DataFrame) -> pd.DataFrame:
         return pd.DataFrame()
 
     # --- rename to flat feature names ---
+    # Real final.json data has both flat columns (e.g. `down`) and their ESPN
+    # dot-notation equivalents (e.g. `start.down`).  When both exist, drop the
+    # flat column first so the rename doesn't produce duplicates that break
+    # xgboost.DMatrix column indexing.
+    cols_to_drop = [
+        target
+        for src, target in _COL_MAP.items()
+        if src in plays.columns and target in plays.columns and src != target
+    ]
+    if cols_to_drop:
+        plays = plays.drop(columns=cols_to_drop)
     plays = plays.rename(columns=_COL_MAP)
 
     # --- build target column (1 = completion) ---

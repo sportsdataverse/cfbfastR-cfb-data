@@ -9,3 +9,11 @@
 /tmp/
 # Built dataset artifacts live on sportsdataverse-data release tags, not in git.
 cfb/
+
+# Python modeling subsystem (python/)
+__pycache__/
+*.pyc
+.pytest_cache/
+python/.venv/
+python/.cache/
+python/artifacts/

@@ -18,8 +18,6 @@ def build_parser() -> argparse.ArgumentParser:
     i.add_argument("--seasons", nargs="*", type=int)
     for name in ("train-ep", "train-wp", "train-qbr"):
         s = sub.add_parser(name)
-        s.add_argument("--final-dir", default=".cache/cfb_final")
-        s.add_argument("--seasons", nargs="*", type=int)
         s.add_argument("--pbp", default="pbp_full.parquet")
         s.add_argument("--out", required=True)
         if name == "train-wp":

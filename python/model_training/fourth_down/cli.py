@@ -2,7 +2,7 @@
 
 Usage:
     uv run python -m model_training.fourth_down.cli train-fd \\
-        --final-dir cfb/json/final \\
+        --final-dir .cache/cfb_final \\
         --out python/model_training/fourth_down/artifacts/fd_model.ubj \\
         --seasons 2014 2015 2016 2017 2018 2019 2020 2021 2022 2023 2024 2025
 """

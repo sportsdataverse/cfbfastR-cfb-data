@@ -66,6 +66,8 @@ PASS_PLAY_TYPES: frozenset[str] = frozenset(
         "Pass",
     }
 )
+# final.json play-type values (dotted key type.text); additive for backward compat.
+PASS_PLAY_TYPES = PASS_PLAY_TYPES | {"Pass Completion", "Interception Return"}
 
 # ---------------------------------------------------------------------------
 # Misc

@@ -2,18 +2,19 @@
 
 Usage
 -----
-Train on 2021–2023 regular season, run LOSO CV, save model::
+Train on 2021–2023, run LOSO CV, save model::
 
     uv run --env-file .env python -m cpoe \\
-        --raw-dir cfb/json/final \\
+        --final-dir .cache/cfb_final \\
         --out-dir artifacts/cpoe \\
         --seasons 2021 2022 2023 \\
         --loso
 
 Args
 ----
---raw-dir    Root of the on-disk processed PBP parquet tree.
-             Layout: <raw-dir>/<season>/<season_type>/<game_id>/plays.parquet
+--final-dir  Directory of per-game final.json files produced by the
+             cfbfastR-cfb-raw scraper (layout: <final-dir>/<game_id>.json).
+             Default: .cache/cfb_final
 --out-dir    Output directory for the trained model (.ubj) and CV results (.json).
 --seasons    One or more integer seasons to include in training.
 --loso       If set, run LOSO cross-validation before full-data training.
@@ -32,7 +33,13 @@ def build_parser() -> argparse.ArgumentParser:
         prog="python -m cpoe",
         description="Train the CFB CP model and compute CPOE.",
     )
-    p.add_argument("--raw-dir", required=True, help="Root of processed PBP parquet tree.")
+    p.add_argument(
+        "--final-dir",
+        default=".cache/cfb_final",
+        help="Directory of per-game final.json files (default: .cache/cfb_final).",
+    )
+    # Keep --raw-dir as a hidden alias so existing callers don't hard-break.
+    p.add_argument("--raw-dir", default=None, help=argparse.SUPPRESS)
     p.add_argument("--out-dir", required=True, help="Output directory for model + CV results.")
     p.add_argument(
         "--seasons",
@@ -69,38 +76,29 @@ def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
 
-    raw_dir = pathlib.Path(args.raw_dir)
+    # --raw-dir is a deprecated alias for --final-dir; prefer --final-dir.
+    final_dir = pathlib.Path(args.raw_dir if args.raw_dir is not None else args.final_dir)
     out_dir = pathlib.Path(args.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
     nrounds = args.nrounds if args.nrounds is not None else XGB_NROUNDS
 
-    # --- collect seasons ---
     seasons = args.seasons
     if not seasons:
         print("ERROR: --seasons must list at least one season.", file=sys.stderr)
         return 1
 
-    import pandas as pd
-    parts = []
-    for season in seasons:
-        season_path = raw_dir / str(season)
-        if not season_path.exists():
-            print(f"  [warn] season dir not found: {season_path}", file=sys.stderr)
-            continue
-        print(f"  Loading season {season} …")
-        df = load_season_pass_plays(season_path)
-        if df.empty:
-            print(f"  [warn] no pass plays found for season {season}", file=sys.stderr)
-            continue
-        df["season"] = season
-        parts.append(df)
-
-    if not parts:
-        print("ERROR: no data loaded — check --raw-dir and --seasons.", file=sys.stderr)
+    if not final_dir.exists():
+        print(f"ERROR: final-dir not found: {final_dir}", file=sys.stderr)
         return 1
 
-    all_df = pd.concat(parts, ignore_index=True)
+    print(f"Loading pass plays from {final_dir} (seasons: {seasons}) …")
+    import pandas as pd
+    all_df = load_season_pass_plays(final_dir, seasons=seasons)
+    if isinstance(all_df, pd.DataFrame) and all_df.empty:
+        print("ERROR: no data loaded — check --final-dir and --seasons.", file=sys.stderr)
+        return 1
+
     print(f"Total pass plays loaded: {len(all_df):,}")
 
     # --- optional LOSO CV ---

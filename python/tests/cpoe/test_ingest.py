@@ -1,4 +1,4 @@
-"""Phase 2 Task 2.3 — ingest module tests."""
+"""Phase 2 Task 2.3 — ingest module tests (final.json layout)."""
 from __future__ import annotations
 
 import json
@@ -10,8 +10,8 @@ import pytest
 from cpoe.constants import FEATURE_COLS, TARGET_COL
 
 # ---------------------------------------------------------------------------
-# Minimal fixture: two pass plays in a cfbfastR-processed plays DataFrame
-# (parquet on disk, per-game subdirectory layout used by cfbfastR-cfb-raw).
+# Minimal fixture: two pass plays + one rush, matching final.json structure
+# (top-level keys: season, plays).
 # ---------------------------------------------------------------------------
 
 _PLAYS_FIXTURE = [
@@ -57,15 +57,18 @@ _PLAYS_FIXTURE = [
 ]
 
 
+def _write_final_json(directory: pathlib.Path, game_id: str, season: int, plays: list) -> None:
+    """Write a minimal final.json file for a game."""
+    directory.mkdir(parents=True, exist_ok=True)
+    payload = {"season": season, "game_id": game_id, "plays": plays}
+    (directory / f"{game_id}.json").write_text(json.dumps(payload), encoding="utf-8")
+
+
 @pytest.fixture()
 def season_dir(tmp_path: pathlib.Path) -> pathlib.Path:
-    """A mock cfbfastR-cfb-raw season/game directory with a plays parquet."""
-    plays_df = pd.DataFrame(_PLAYS_FIXTURE)
-    season_path = tmp_path / "2024" / "regular"
-    game_dir = season_path / "401628455"
-    game_dir.mkdir(parents=True)
-    plays_df.to_parquet(game_dir / "plays.parquet")
-    return season_path
+    """A mock final_dir with one game's final.json."""
+    _write_final_json(tmp_path, "401628455", 2024, _PLAYS_FIXTURE)
+    return tmp_path
 
 
 def test_ingest_imports():
@@ -100,20 +103,26 @@ def test_load_season_has_target_col(season_dir):
 
 def test_load_season_empty_dir_returns_empty(tmp_path):
     from cpoe.ingest import load_season_pass_plays
-    (tmp_path / "empty_season").mkdir()
-    df = load_season_pass_plays(tmp_path / "empty_season")
+    empty = tmp_path / "empty_season"
+    empty.mkdir()
+    df = load_season_pass_plays(empty)
     assert isinstance(df, pd.DataFrame)
     assert len(df) == 0
 
 
 def test_load_season_multiple_games(tmp_path: pathlib.Path):
-    """Two game dirs → combined DataFrame."""
+    """Two game JSON files → combined DataFrame."""
     from cpoe.ingest import load_season_pass_plays
-    plays_df = pd.DataFrame(_PLAYS_FIXTURE)
-    for game_id in ("401628455", "401628456"):
-        gd = tmp_path / game_id
-        gd.mkdir()
-        plays_df["game_id"] = game_id
-        plays_df.to_parquet(gd / "plays.parquet")
+    _write_final_json(tmp_path, "401628455", 2024, _PLAYS_FIXTURE)
+    _write_final_json(tmp_path, "401628456", 2024, _PLAYS_FIXTURE)
     df = load_season_pass_plays(tmp_path)
     assert len(df) == 4  # 2 pass plays × 2 games
+
+
+def test_load_season_filters_by_season(tmp_path: pathlib.Path):
+    """Season filter excludes games from other seasons."""
+    from cpoe.ingest import load_season_pass_plays
+    _write_final_json(tmp_path, "401628455", 2024, _PLAYS_FIXTURE)
+    _write_final_json(tmp_path, "401620001", 2023, _PLAYS_FIXTURE)
+    df = load_season_pass_plays(tmp_path, seasons=[2024])
+    assert len(df) == 2  # only the 2024 game's 2 pass plays

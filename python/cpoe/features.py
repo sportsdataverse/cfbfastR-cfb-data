@@ -1,7 +1,9 @@
 """Feature extraction for the CFB CP model (Approach A, 8 game-state features).
 
-Input: a pandas DataFrame with columns produced by CFBPlayProcess.run_processing_pipeline()
-       (or an equivalent ESPN PBP frame with `start.*` dot-notation columns).
+Input: a pandas or polars DataFrame with columns produced by
+       CFBPlayProcess.run_processing_pipeline() (or an equivalent ESPN PBP frame
+       with `start.*` dot-notation columns, including final.json plays where the
+       play-type column is named ``type.text``).
 
 Output: a pandas DataFrame containing FEATURE_COLS + TARGET_COL, one row per
         pass play (non-pass plays are filtered out).
@@ -27,7 +29,7 @@ _COL_MAP: dict[str, str] = {
 
 def _play_type_col(df: pd.DataFrame) -> str:
     """Return whichever play-type column is present."""
-    for c in ("playType", "play_type", "type"):
+    for c in ("type.text", "playType", "play_type", "type"):
         if c in df.columns:
             return c
     return ""
@@ -46,6 +48,15 @@ def extract_pass_features(df: pd.DataFrame) -> pd.DataFrame:
         reset index, dtypes coerced to float/int.  Empty if no pass plays
         or if input is empty.
     """
+    # Accept polars DataFrames — convert to pandas so the rest of the pipeline
+    # (rename, isin, astype) stays unchanged.
+    try:
+        import polars as pl  # type: ignore[import]
+        if isinstance(df, pl.DataFrame):
+            df = df.to_pandas()
+    except ImportError:
+        pass
+
     if df.empty:
         return pd.DataFrame()
 
@@ -77,5 +88,8 @@ def extract_pass_features(df: pd.DataFrame) -> pd.DataFrame:
         if col in plays.columns:
             plays[col] = plays[col].astype(int)
 
-    keep = [c for c in FEATURE_COLS + [TARGET_COL] if c in plays.columns]
+    # Preserve ``season`` if present so LOSO CV can split by season without
+    # requiring callers to re-join it after the fact.
+    extra_passthrough = [c for c in ("season",) if c in plays.columns]
+    keep = [c for c in FEATURE_COLS + [TARGET_COL] if c in plays.columns] + extra_passthrough
     return plays[keep].reset_index(drop=True)

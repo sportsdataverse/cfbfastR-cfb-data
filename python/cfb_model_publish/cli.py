@@ -20,6 +20,7 @@ def main(argv=None) -> int:
     args = build_parser().parse_args(argv)
     if args.cmd == "artifacts":
         res = upload_artifacts(args.artifacts, args.tag, args.repo, dry_run=args.dry_run)
+        created = " (created release)" if res.get("created_release") else ""
         print(f"publish: uploaded={res['uploaded']} files={len(res['files'])} -> {args.repo}:{res['tag']}"
-              + (" (dry-run)" if args.dry_run else ""))
+              + created + (" (dry-run)" if args.dry_run else ""))
     return 0

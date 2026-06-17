@@ -17,6 +17,8 @@ import pathlib
 import pandas as pd
 import pytest
 
+pytestmark = pytest.mark.integration  # CFBD-network tests; deselected by default
+
 HAS_KEY = bool(os.environ.get("CFB_DATA_API_KEY"))
 skip_no_key = pytest.mark.skipif(not HAS_KEY, reason="CFB_DATA_API_KEY not set")
 

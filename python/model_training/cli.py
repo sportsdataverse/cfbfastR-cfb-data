@@ -13,11 +13,13 @@ def build_parser() -> argparse.ArgumentParser:
     ap.add_argument("--stage", type=int, default=2, choices=[1, 2])
     sub = ap.add_subparsers(dest="cmd", required=True)
     i = sub.add_parser("ingest")
-    i.add_argument("--final-dir", default="cfb/json/final")
+    i.add_argument("--final-dir", default=".cache/cfb_final")
     i.add_argument("--out", default="pbp_full.parquet")
     i.add_argument("--seasons", nargs="*", type=int)
     for name in ("train-ep", "train-wp", "train-qbr"):
         s = sub.add_parser(name)
+        s.add_argument("--final-dir", default=".cache/cfb_final")
+        s.add_argument("--seasons", nargs="*", type=int)
         s.add_argument("--pbp", default="pbp_full.parquet")
         s.add_argument("--out", required=True)
         if name == "train-wp":

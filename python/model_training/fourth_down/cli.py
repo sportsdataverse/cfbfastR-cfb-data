@@ -9,7 +9,6 @@ Usage:
 from __future__ import annotations
 
 import argparse
-import json
 from pathlib import Path
 
 
@@ -18,7 +17,7 @@ def build_parser() -> argparse.ArgumentParser:
     sub = ap.add_subparsers(dest="cmd", required=True)
 
     fd = sub.add_parser("train-fd", help="Train the fourth-down yards-gained model.")
-    fd.add_argument("--final-dir", default="cfb/json/final", help="Directory containing final.json play files.")
+    fd.add_argument("--final-dir", default=".cache/cfb_final", help="Directory containing final.json play files.")
     fd.add_argument("--out", required=True, help="Output path for the trained fd_model.ubj.")
     fd.add_argument("--seasons", nargs="*", type=int, default=None, help="Seasons to include (default: all).")
     fd.add_argument("--nrounds", type=int, default=None, help="Override nrounds (default: 157).")
@@ -32,6 +31,7 @@ def main(argv=None) -> int:
     if args.cmd == "train-fd":
         import polars as pl
 
+        from model_training.ingest import _read_final_plays  # shared final.json reader
         from model_training.model_card import write_xgb_model_card
 
         from .constants import FD_FEATURES, FD_NROUNDS, FD_PARAMS, FD_YARDS_GAINED_COL
@@ -42,22 +42,13 @@ def main(argv=None) -> int:
             print(f"ERROR: --final-dir {final_dir} does not exist.")
             return 1
 
-        frames = []
-        for fpath in sorted(final_dir.glob("*.json")):
-            obj = json.loads(fpath.read_text())
-            season = obj.get("season")
-            if args.seasons is not None and season not in args.seasons:
-                continue
-            plays = obj.get("plays") or []
-            if plays:
-                frames.append(pl.DataFrame(plays, infer_schema_length=None))
+        all_plays = _read_final_plays(final_dir, args.seasons)
 
-        if not frames:
+        if all_plays.is_empty():
             print("ERROR: No plays found. Check --final-dir and --seasons.")
             return 1
 
-        all_plays = pl.concat(frames, how="diagonal_relaxed")
-        print(f"Loaded {all_plays.height} plays from {len(frames)} games.")
+        print(f"Loaded {all_plays.height} plays.")
 
         nrounds = args.nrounds or FD_NROUNDS
         model = train_from_plays(all_plays, nrounds=nrounds)

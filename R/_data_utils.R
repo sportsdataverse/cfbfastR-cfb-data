@@ -108,18 +108,62 @@ write_dataset <- function(df, dataset, season, stem) {
   readr::write_csv(row, f)
 }
 
-# Upload one file to BOTH publish repos under a release tag (idempotent overwrite).
-# piggyback memoises pb_releases() (a cachem cache that can persist a stale "no releases"
-# result, even one created earlier in the same workflow run by releases_init) -> bust it
-# first so a just-created release is found.
+# Upload one file to BOTH publish repos under a release tag (idempotent overwrite),
+# creating the release first if it does not exist. See .ensure_release_visible() for the
+# piggyback cache / eventual-consistency handling that makes a cold self-create reliable.
 pb_upload_both <- function(file, tag, repos = PUBLISH_REPOS, token = Sys.getenv("GITHUB_PAT")) {
-  try(memoise::forget(piggyback::pb_releases), silent = TRUE)
   for (repo in repos) {
-    tryCatch(
-      piggyback::pb_upload(file = file, repo = repo, tag = tag, overwrite = TRUE, .token = token),
-      error = function(e) cli::cli_alert_danger("pb_upload {repo}@{tag} {basename(file)}: {conditionMessage(e)}")
-    )
+    # Make publishing self-sufficient when releases_init has not run: ensure the release
+    # exists AND is visible in the (eventually-consistent, memoised) releases listing
+    # before uploading. pb_upload() looks the release up via that same listing, so the
+    # key is to leave the cache warmed to the CORRECT state -- i.e. poll until the tag
+    # appears, then DON'T bust the cache again before pb_upload(). (Busting it right
+    # before the upload re-fetches a still-propagating empty list -> "Could not find".)
+    if (.ensure_release_visible(repo, tag, token)) {
+      tryCatch(
+        piggyback::pb_upload(file = file, repo = repo, tag = tag, overwrite = TRUE, .token = token),
+        error = function(e) cli::cli_alert_danger("pb_upload {repo}@{tag} {basename(file)}: {conditionMessage(e)}")
+      )
+    } else {
+      cli::cli_alert_danger("pb_upload {repo}@{tag} {basename(file)}: release never became visible")
+    }
   }
+}
+
+# Ensure a release for `tag` exists on `repo` and is visible in pb_releases(), creating
+# it if missing. Returns TRUE once visible (leaving the releases cache warmed to the
+# correct state for an immediate pb_upload), FALSE if it never appears within the budget.
+.ensure_release_visible <- function(repo, tag, token, tries = 24, wait = 5) {
+  # Bust BOTH memoised caches: pb_releases() backs our visibility check, but pb_upload()
+  # resolves the release via pb_info() -- forgetting only pb_releases leaves pb_upload
+  # reading a stale "no release" and failing with "Could not find <tag>".
+  bust <- function() {
+    try(memoise::forget(piggyback::pb_releases), silent = TRUE)
+    try(memoise::forget(piggyback::pb_info), silent = TRUE)
+  }
+  for (i in seq_len(tries)) {
+    bust()
+    visible <- tryCatch(
+      isTRUE(tag %in% suppressWarnings(piggyback::pb_releases(repo = repo, .token = token))$tag_name),
+      error = function(e) FALSE
+    )
+    if (visible) {
+      bust()  # drop the pb_releases read we just cached so pb_upload's pb_info() re-fetches fresh
+      return(TRUE)
+    }
+    # not visible yet: (re)attempt create (422-warns if it actually exists) then wait
+    suppressWarnings(tryCatch(
+      piggyback::pb_release_create(repo = repo, tag = tag, name = tag, .token = token),
+      error = function(e) invisible(NULL)
+    ))
+    if (i == 1L) {
+      cli::cli_alert_info(
+        "Waiting for release {.val {tag}} on {.val {repo}} to propagate (GitHub list lag)..."
+      )
+    }
+    Sys.sleep(wait)
+  }
+  FALSE
 }
 
 # Publish all three formats for a dataset+season to both repos.

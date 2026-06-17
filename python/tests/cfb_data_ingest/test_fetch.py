@@ -21,3 +21,15 @@ def test_fetch_final_writes_cache_and_counts(tmp_path):
     # second run skips cached
     stats2 = fetch_final([2024], cache, schedule=sched, downloader=_fake_downloader)
     assert stats2["skipped"] == 2 and stats2["fetched"] == 0
+
+
+def test_fetch_final_refetches_corrupt_cache(tmp_path):
+    sched = tmp_path / "sched.parquet"
+    pl.DataFrame({"game_id": [10], "season": [2024]}).write_parquet(sched)
+    cache = tmp_path / "cache"
+    cache.mkdir()
+    (cache / "10.json").write_text("not valid json{")   # corrupt cached file
+    stats = fetch_final([2024], cache, schedule=sched, downloader=_fake_downloader)
+    # corrupt cache must trigger a re-fetch (not a skip)
+    assert stats["fetched"] == 1 and stats["skipped"] == 0
+    assert json.loads((cache / "10.json").read_text())  # now valid

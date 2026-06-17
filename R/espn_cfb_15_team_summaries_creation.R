@@ -8,7 +8,10 @@ suppressPackageStartupMessages({
     library(purrr)
     library(stringr)
 })
-if (!exists("write_dataset")) source("R/_data_utils.R")
+# NB: guard on publish_dataset (unique to _data_utils.R), NOT write_dataset — if
+# arrow is ever attached here it exports write_dataset(), making the guard skip the
+# source() and shadow our writer. (Not attached today, but kept robust.)
+if (!exists("publish_dataset")) source("R/_data_utils.R")
 
 # Season-level team + player summaries ("Binion Box Score") aggregated from cfbfastR
 # season play-by-play (cfbfastR::load_cfb_pbp): opponent-adjusted EPA plus success /

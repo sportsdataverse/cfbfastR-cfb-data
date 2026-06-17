@@ -14,7 +14,7 @@ def test_subcommands_present():
 
 
 def test_help_exits_zero():
-    python_dir = str(pathlib.Path(__file__).resolve().parents[2] / "python")
+    python_dir = str(pathlib.Path(__file__).resolve().parents[2])  # == python/ (packages root)
     env = {**os.environ, "PYTHONPATH": python_dir}
     result = subprocess.run(
         [sys.executable, "-m", "pregame_wp", "--help"],

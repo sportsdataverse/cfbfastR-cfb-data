@@ -12,6 +12,7 @@ dependencies = [
     "tqdm>=4.66",
     "scikit-learn>=1.0",
     "xgboost>=2.0",
+    "scipy>=1.10",
 ]
 
 [dependency-groups]

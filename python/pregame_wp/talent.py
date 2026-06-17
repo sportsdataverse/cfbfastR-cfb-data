@@ -25,13 +25,13 @@ def calculate_roster_talent(
         DataFrame with columns ['team', 'talent'].
     """
     sub = recruiting_df[recruiting_df["year"] <= year].copy()
-    # Keep the most recent `window` years per team
-    sub = (
-        sub.sort_values("year")
-        .groupby("team")
-        .apply(lambda g: g.tail(window), include_groups=False)
-        .reset_index(level=0)
-    )
+    # Keep the most recent `window` years per team.
+    # Use GroupBy.tail() (available since pandas 1.1) instead of
+    # apply(lambda g: g.tail(...), include_groups=False).
+    # GroupBy.tail preserves all columns (including "team") and is
+    # compatible with pandas 2.0+ without the include_groups kwarg
+    # that only arrived in pandas 2.2.
+    sub = sub.sort_values("year").groupby("team").tail(window)
     talent = (
         sub.groupby("team")["rating"]
         .mean()
@@ -55,6 +55,9 @@ def calculate_returning_production(
     Returns:
         DataFrame with columns ['team', 'returning_production'].
     """
+    # pandas 2.0-compatible: the lambda only accesses non-key columns
+    # ("weighted", "snap_share"), so dropping include_groups (pandas 2.2+
+    # only) is safe — the group key "team" is never referenced inside it.
     result = (
         returning_df.assign(
             weighted=returning_df["returning"] * returning_df["snap_share"]
@@ -62,7 +65,6 @@ def calculate_returning_production(
         .groupby("team")
         .apply(
             lambda g: g["weighted"].sum() / g["snap_share"].sum(),
-            include_groups=False,
         )
         .reset_index()
         .rename(columns={0: "returning_production"})

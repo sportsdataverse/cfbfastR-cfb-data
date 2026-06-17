@@ -6,12 +6,12 @@ INFEASIBLE — see FEASIBILITY.md for the investigation record.
 Public surface
 --------------
 constants   : feature lists, throw-depth buckets, training hyper-parameters
-features    : extract_pass_features(plays_df) → polars DataFrame
+features    : extract_pass_features(plays_df) → pandas DataFrame
 train_cp    : train_cp_model(X, y) → booster; save/load helpers
-ingest      : load_season_pass_plays(season, ...) → polars DataFrame
+ingest      : load_season_pass_plays(season, ...) → pandas DataFrame
 loso        : run_loso_cv(seasons, raw_dir) → dict with per-fold metrics
-cpoe        : compute_cpoe(plays_df, booster) → polars DataFrame
-validate    : calibration metrics + shapley helpers
+cpoe        : compute_cpoe(plays_df, booster) → pandas DataFrame
+validate    : calibration metrics + feature importance (xgboost built-in)
 figures     : calibration + CPOE distribution plots (plotnine / cfbfastR palette)
 cli         : __main__ entry-point for the full training pipeline
 """

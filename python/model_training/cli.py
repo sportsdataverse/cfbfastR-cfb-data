@@ -65,8 +65,11 @@ def main(argv=None) -> int:
             _mtype, _label = f"wp_{args.variant}", "label"
         else:
             _mtype, _label = "qbr", "qbr"
+        # train-qbr aggregates to per-QB-game rows and inner-joins ESPN QBR,
+        # so df.height (raw PBP rows) is misleading for that branch.
+        _n_rows = None if args.cmd == "train-qbr" else df.height
         write_xgb_model_card(args.out, model_type=_mtype, label=_label, model=model,
-                             n_rows=df.height)
+                             n_rows=_n_rows)
         print(f"saved -> {args.out} (+ model_card.json)")
     elif args.cmd in ("validate", "figures"):
         print(

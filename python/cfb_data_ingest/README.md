@@ -1,55 +1,46 @@
 # cfb_data_ingest
 
-Managed ingest layer for College Football Data API (CFBD) payloads used by the
-`pregame_wp` modeling pipeline.
+URL-fetch ingest layer for per-game CFB JSON. Fetches `final.json` files from
+`raw.githubusercontent.com` — **no API key required**.
 
-## Required secret: `CFB_DATA_API_KEY`
-
-All functions that hit `api.collegefootballdata.com` require a CFBD API bearer
-token. Obtain one at <https://collegefootballdata.com/key> (free registration).
-
-Set the variable before running any live-fetch code:
+## Quick start
 
 ```bash
-# shell
-export CFB_DATA_API_KEY=<your_token>
+python -m cfb_data_ingest --seasons 2023 2024 --cache-dir .cache/cfb_final
 ```
 
-```ini
-# .env file at the project root (loaded automatically by uv run)
-CFB_DATA_API_KEY=<your_token>
-```
-
-If the key is absent, every CFBD call raises immediately with:
+This warms a local cache of per-game JSON files from:
 
 ```
-EnvironmentError: CFB_DATA_API_KEY not set.
-Add it to your .env file or export it before running.
+https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/json/final/{game_id}.json
 ```
 
-The fallback name `CFBD_DATA_API_KEY` is also accepted for backwards
-compatibility.
+The schedule master (also at `raw.githubusercontent.com`) is fetched automatically
+to enumerate `game_id` values for the requested seasons. No authentication is
+needed for either request.
 
-## Test gating
+### Options
 
-All tests in `tests/pregame_wp/test_data_ingest.py` are marked
-`@pytest.mark.integration`. The default test run (`pytest -m "not integration"`)
-skips them entirely so CI never needs a live key. To run the live CFBD tests
-locally:
+| Flag | Default | Description |
+|---|---|---|
+| `--seasons` | all | Space-separated list of seasons to fetch |
+| `--cache-dir` | `.cache/cfb_final` | Directory to write `{game_id}.json` files into |
+| `--schedule` | (RAW_BASE URL) | Local path override for the schedule master parquet |
+| `--refresh` | false | Re-fetch even if a cached file already exists |
 
-```bash
-CFB_DATA_API_KEY=<token> uv run pytest tests/pregame_wp/test_data_ingest.py -m integration -v
-```
-
-## Disk cache
-
-`pregame_wp.data_ingest.fetch_and_cache(game_id, year, week, raw_dir)` fetches
-plays + drives for one game and writes them to:
+## Disk cache layout
 
 ```
-<raw_dir>/<game_id>/plays.json
-<raw_dir>/<game_id>/drives.json
+<cache-dir>/
+  <game_id>.json   # per-game final.json payload
 ```
 
-`load_game_frames(game_id, raw_dir)` reads those cached files back without
-touching the network, enabling offline rebuilds of the `pregame_wp` pipeline.
+`fetch_final()` is fail-soft per game — a missing or non-200 response is
+counted in the `missing` total and does not abort the batch.
+
+## `CFB_DATA_API_KEY` — not used by cfb_data_ingest
+
+`CFB_DATA_API_KEY` is **not** read by this module. The key is only required by
+`pregame_wp`'s separate CFBD ingest (`pregame_wp.data_ingest`), which hits
+`api.collegefootballdata.com` directly for plays and drives data. Obtain a free
+token at <https://collegefootballdata.com/key> if you need that surface.

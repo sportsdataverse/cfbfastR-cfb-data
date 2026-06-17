@@ -42,7 +42,7 @@ def score_cpoe(carry_df: pl.DataFrame, plays_df: pl.DataFrame, cp_model_path, _p
         import xgboost as xgb
         from cpoe.constants import FEATURE_COLS
         booster = xgb.Booster(); booster.load_model(str(cp_model_path))
-        preds = booster.predict(xgb.DMatrix(feats.select(FEATURE_COLS).to_pandas()))
+        preds = booster.predict(xgb.DMatrix(feats[FEATURE_COLS]))
         preds = np.asarray(preds).tolist()
     else:
         preds = _predict(feats)

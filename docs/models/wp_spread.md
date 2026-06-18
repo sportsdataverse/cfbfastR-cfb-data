@@ -5,6 +5,10 @@
 | metric | value |
 |---|---|
 | `importance_top` | ExpScoreDiff_Time_Ratio:3677.0161, pos_score_diff_start:2021.6655, spread_time:1185.6589, period:355.2285, pos_team_receives_2H_kickoff:212.8283, is_home:211.9621, adj_TimeSecsRem:166.3599, yards_to_goal:108.4043 |
+| `loso_log_loss` | 0.3616 |
+| `loso_brier` | 0.1182 |
+| `loso_auc` | 0.9159 |
+| `loso_n` | 2219607 |
 
 
 ## Provenance
@@ -16,8 +20,3 @@
 | `training_seasons` | n/a |
 | `trained_date` | 2026-06-17 |
 | `xgboost_version` | 3.2.0 |
-
-
-## Notes
-
-- Calibration + log-loss/Brier require a warmed --cache; run the integration report for those.

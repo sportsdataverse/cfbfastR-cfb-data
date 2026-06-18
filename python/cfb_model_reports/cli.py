@@ -5,7 +5,7 @@ import re
 from pathlib import Path
 
 from .discovery import discover_models
-from .metrics import provenance_from_card, rb_eval_metrics, xgb_importance
+from .metrics import loso_metrics, provenance_from_card, rb_eval_metrics, xgb_importance
 from .report import ModelReport, render_index, render_model_report
 
 _SAFE_STEM = re.compile(r"[^A-Za-z0-9._-]+")
@@ -32,6 +32,8 @@ def build_parser() -> argparse.ArgumentParser:
     ap.add_argument("--cache", default=None, help="warmed final.json cache for prediction-based metrics (optional)")
     ap.add_argument("--out", default="docs/models")
     ap.add_argument("--rb-loso", default=None, help="path to xrepa_loso.parquet (rb_eval metrics)")
+    ap.add_argument("--loso-dir", default=None,
+                    help="dir with loso_{ep,wp,qbr}_oof.parquet + cpoe/loso_cv.json for real OOF metrics")
     return ap
 
 
@@ -50,9 +52,12 @@ def _build_report(m, args) -> ModelReport:
             metrics["importance_top"] = ", ".join(f"{k}:{v}" for k, v in imp.items())
         except Exception as e:  # noqa: BLE001
             notes.append(f"feature importance unavailable: {e}")
-        if m.model_type == "qbr":
+        lm = loso_metrics(m.model_type, args.loso_dir) if args.loso_dir else {}
+        if lm:
+            metrics.update(lm)
+        if m.model_type == "qbr" and not lm:
             notes.append("QBR correlation/RMSE vs ESPN QBR is integration-only (needs the ESPN QBR frame).")
-        if args.cache is None:
+        if args.cache is None and not lm:
             notes.append("Calibration + log-loss/Brier require a warmed --cache; run the integration report for those.")
     return ModelReport(
         model_type=m.model_type,

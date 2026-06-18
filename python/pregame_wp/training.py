@@ -128,6 +128,38 @@ def build_training_frame(
                 print(f"[build-boxes] season {season}: games fetch failed ({exc}); skipping")
             continue
 
+        # /plays + /drives are week-keyed: fetch each week ONCE (not per game) so
+        # a full-season build issues ~2 calls/week instead of ~3/game (the per-game
+        # path rate-limits CFBD after ~90 games). Each week's plays/drives are then
+        # split to all of that week's games and cached per game.
+        if fetch_missing:
+            from collections import defaultdict
+            by_week: dict[int, list] = defaultdict(list)
+            for g in games:
+                wk = g.get("week")
+                if wk is not None:
+                    by_week[int(wk)].append(g)
+            for wk, wk_games in sorted(by_week.items()):
+                if all(
+                    (raw_dir / str(g.get("id") or g.get("gameId") or "_") / "plays.json").exists()
+                    for g in wk_games
+                ):
+                    continue
+                try:
+                    n = data_ingest.fetch_and_cache_week(
+                        year=season, week=wk, games=wk_games, raw_dir=raw_dir,
+                        season_type=str(
+                            wk_games[0].get("seasonType")
+                            or wk_games[0].get("season_type") or "regular"
+                        ),
+                    )
+                    if verbose:
+                        print(f"[build-boxes] {season} wk{wk}: cached {n} games")
+                except Exception as exc:  # noqa: BLE001
+                    if verbose:
+                        print(f"[build-boxes] {season} wk{wk}: week fetch failed ({exc}); skipping")
+                    continue
+
         # Week order per team is the slot a game occupies in that team's season;
         # the notebook keys opponent_game_ids on a 1-based per-team sequence. The
         # game record's own `week` is the natural, deterministic proxy.
@@ -138,20 +170,6 @@ def build_training_frame(
             home, away = _team_name(game, "home"), _team_name(game, "away")
             home_pts, away_pts = _game_points(game, "home"), _game_points(game, "away")
             week = game.get("week")
-
-            game_dir = raw_dir / gid
-            if fetch_missing and not (game_dir / "plays.json").exists():
-                try:
-                    data_ingest.fetch_and_cache(
-                        game_id=gid, year=season,
-                        week=int(week) if week is not None else 1,
-                        raw_dir=raw_dir,
-                        season_type=str(game.get("seasonType") or game.get("season_type") or "regular"),
-                    )
-                except Exception as exc:  # noqa: BLE001
-                    if verbose:
-                        print(f"[build-boxes] {gid}: fetch_and_cache failed ({exc}); skipping")
-                    continue
 
             try:
                 plays, drives = _load(gid, raw_dir)

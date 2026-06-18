@@ -357,6 +357,54 @@ def fetch_and_cache(
     (game_dir / "drives.json").write_text(json.dumps(game_drives), encoding="utf-8")
 
 
+def fetch_and_cache_week(
+    year: int,
+    week: int,
+    games: list[dict[str, Any]],
+    raw_dir: Path | str,
+    season_type: str = "regular",
+) -> int:
+    """Fetch a whole week's plays + drives ONCE and cache them per game.
+
+    ``/plays`` and ``/drives`` are week-keyed, so fetching them per game (as
+    ``fetch_and_cache`` does — 3 calls/game incl. a redundant ``/games`` lookup)
+    issues thousands of calls across a season and rate-limits CFBD. This fetches
+    each endpoint a single time for the week, then splits the results to every
+    game in ``games`` by its (home, away) teams. ~2 calls/week instead of
+    ~3/game.
+
+    Args:
+        year: Season year.
+        week: Week number.
+        games: The game records for this (year, week) — each must carry ``id``
+            and home/away team names.
+        raw_dir: Per-game JSON cache root.
+        season_type: ``"regular"`` | ``"postseason"``.
+
+    Returns:
+        Number of games written.
+    """
+    raw_dir = Path(raw_dir)
+    week_plays = fetch_plays(year=year, week=week, season_type=season_type)
+    week_drives = fetch_drives(year=year, season_type=season_type, week=week)
+    written = 0
+    for game in games:
+        gid = str(game.get("id") or game.get("gameId") or "")
+        if not gid:
+            continue
+        home, away = _team_key(game, "home"), _team_key(game, "away")
+        game_dir = raw_dir / gid
+        game_dir.mkdir(parents=True, exist_ok=True)
+        (game_dir / "plays.json").write_text(
+            json.dumps(filter_plays_to_game(week_plays, home, away)), encoding="utf-8"
+        )
+        (game_dir / "drives.json").write_text(
+            json.dumps(filter_drives_to_game(week_drives, home, away)), encoding="utf-8"
+        )
+        written += 1
+    return written
+
+
 def load_game_frames(
     game_id: str | int,
     raw_dir: Path | str,

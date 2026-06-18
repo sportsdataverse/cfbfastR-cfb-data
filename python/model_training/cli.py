@@ -27,6 +27,11 @@ def build_parser() -> argparse.ArgumentParser:
     v = sub.add_parser("validate")
     v.add_argument("--model", required=True)
     v.add_argument("--ref", required=True)
+    lo = sub.add_parser("loso", help="leave-one-season-out CV (pooled + per-season metrics)")
+    lo.add_argument("--pbp", default="pbp_full.parquet")
+    lo.add_argument("--model", required=True, choices=["ep", "wp", "qbr"])
+    lo.add_argument("--espn-qbr", help="ESPN QBR reference parquet (required for --model qbr)")
+    lo.add_argument("--oof-out", help="optional path to write the out-of-fold predictions parquet")
     f = sub.add_parser("figures")
     f.add_argument("--table", required=True)
     f.add_argument("--out", required=True)
@@ -71,6 +76,31 @@ def main(argv=None) -> int:
         write_xgb_model_card(args.out, model_type=_mtype, label=_label, model=model,
                              n_rows=_n_rows)
         print(f"saved -> {args.out} (+ model_card.json)")
+    elif args.cmd == "loso":
+        import polars as pl
+
+        from .ingest import add_winner
+        from .validate import loso_cv
+
+        if args.model == "qbr" and not args.espn_qbr:
+            print("loso --model qbr requires --espn-qbr <reference.parquet>", file=sys.stderr)
+            return 2
+        df = add_winner(pl.read_parquet(args.pbp))
+        espn = None
+        if args.espn_qbr:
+            espn = pl.read_parquet(args.espn_qbr).select(
+                pl.col("game_id").cast(pl.Int64),
+                pl.col("passer_player_name"),
+                pl.col("raw_qbr").cast(pl.Float64, strict=False),
+            ).drop_nulls()
+        res = loso_cv(df, args.model, espn_qbr=espn)
+        pooled = " ".join(f"{k}={v:.4f}" if isinstance(v, float) else f"{k}={v}"
+                          for k, v in res["pooled"].items())
+        print(f"LOSO {args.model} POOLED: {pooled}")
+        if args.oof_out and res["oof"].height:
+            Path(args.oof_out).parent.mkdir(parents=True, exist_ok=True)
+            res["oof"].write_parquet(args.oof_out)
+            print(f"wrote out-of-fold predictions -> {args.oof_out}")
     elif args.cmd in ("validate", "figures"):
         print(
             f"{args.cmd}: CLI wiring not yet implemented — "

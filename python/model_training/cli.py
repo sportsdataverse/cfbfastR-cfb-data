@@ -24,17 +24,23 @@ def build_parser() -> argparse.ArgumentParser:
             s.add_argument("--variant", choices=["spread", "naive"], default="spread")
         if name == "train-qbr":
             s.add_argument("--espn-qbr", required=True)
-    v = sub.add_parser("validate")
-    v.add_argument("--model", required=True)
-    v.add_argument("--ref", required=True)
+    v = sub.add_parser("validate", help="prediction-parity of a candidate model vs a reference .ubj")
+    v.add_argument("--model-type", required=True, choices=["ep", "wp", "qbr"])
+    v.add_argument("--model", required=True, help="candidate model .ubj")
+    v.add_argument("--ref", required=True, help="reference model .ubj")
+    v.add_argument("--pbp", default="pbp_full.parquet")
+    v.add_argument("--tol", type=float, default=1e-3)
     lo = sub.add_parser("loso", help="leave-one-season-out CV (pooled + per-season metrics)")
     lo.add_argument("--pbp", default="pbp_full.parquet")
     lo.add_argument("--model", required=True, choices=["ep", "wp", "qbr"])
     lo.add_argument("--espn-qbr", help="ESPN QBR reference parquet (required for --model qbr)")
     lo.add_argument("--oof-out", help="optional path to write the out-of-fold predictions parquet")
-    f = sub.add_parser("figures")
-    f.add_argument("--table", required=True)
-    f.add_argument("--out", required=True)
+    f = sub.add_parser("figures", help="render a calibration plot from a loso OOF parquet")
+    f.add_argument("--oof", required=True, help="out-of-fold predictions parquet (from `loso --oof-out`)")
+    f.add_argument("--out", required=True, help="output path stem (writes <stem>.png/.csv/.parquet)")
+    f.add_argument("--pred-col", default=None, help="prediction column (default: auto-detect wp_pred)")
+    f.add_argument("--title", default="Calibration")
+    f.add_argument("--subtitle", default="LOSO")
     return ap
 
 
@@ -79,7 +85,6 @@ def main(argv=None) -> int:
     elif args.cmd == "loso":
         import polars as pl
 
-        from .ingest import add_winner
         from .validate import loso_cv
 
         if args.model == "qbr" and not args.espn_qbr:
@@ -101,13 +106,44 @@ def main(argv=None) -> int:
             Path(args.oof_out).parent.mkdir(parents=True, exist_ok=True)
             res["oof"].write_parquet(args.oof_out)
             print(f"wrote out-of-fold predictions -> {args.oof_out}")
-    elif args.cmd in ("validate", "figures"):
-        print(
-            f"{args.cmd}: CLI wiring not yet implemented — "
-            f"use the model_training.{args.cmd} library API directly.",
-            file=sys.stderr,
-        )
-        return 2
+    elif args.cmd == "validate":
+        import polars as pl
+        import xgboost as xgb
+
+        from .features import ep_matrix, qbr_matrix, wp_matrix
+        from .validate import prediction_parity
+
+        df = add_winner(pl.read_parquet(args.pbp))
+        if args.model_type == "ep":
+            X, _, _ = ep_matrix(df)
+        elif args.model_type == "wp":
+            X, _, _ = wp_matrix(df, "spread")
+        else:
+            X, _, _ = qbr_matrix(df)
+        cand, ref = xgb.Booster(), xgb.Booster()
+        cand.load_model(args.model)
+        ref.load_model(args.ref)
+        res = prediction_parity(cand, ref, X, tol=args.tol)
+        print(f"validate {args.model_type}: max_abs_diff={res['max_abs_diff']:.3e} "
+              f"within_tol={res['within_tol']} (tol={res['tol']})")
+        return 0 if res["within_tol"] else 1
+    elif args.cmd == "figures":
+        import polars as pl
+
+        from .figures import write_calibration
+        from .validate import calibration_table, weighted_cal_error
+
+        oof = pl.read_parquet(args.oof)
+        pred_col = args.pred_col or next((c for c in ("wp_pred", "pred") if c in oof.columns), None)
+        if pred_col is None or "y" not in oof.columns:
+            print("figures: OOF parquet needs a 'y' column and a prediction column "
+                  "(wp_pred/pred); EP-value calibration is not a probability plot.", file=sys.stderr)
+            return 2
+        by = oof["season"].to_list() if "season" in oof.columns else ["all"] * oof.height
+        tab = calibration_table(oof[pred_col].to_list(), oof["y"].to_list(), by, bin_size=0.05)
+        png, csv = write_calibration(tab, args.out, title=args.title,
+                                     subtitle=args.subtitle, cal_error=weighted_cal_error(tab))
+        print(f"wrote {png} (+ {csv} + .parquet)")
     return 0
 
 

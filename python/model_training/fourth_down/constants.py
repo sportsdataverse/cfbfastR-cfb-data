@@ -49,7 +49,9 @@ FD_SOURCE: dict[str, str] = {
 FD_SPREAD_COL: str = "homeTeamSpread"  # home-team-perspective spread (negative = home favored)
 FD_OVERUNDER_COL: str = "overUnder"  # game total
 FD_IS_HOME_COL: str = "start.is_home"  # 1/True if possessing team is home
-FD_YARDS_GAINED_COL: str = "yardsGained"  # label source
+FD_YARDS_GAINED_COL: str = "statYardage"  # label source: ESPN per-play net yards gained
+# (CFBPlayProcess final.json carries no `yardsGained`; `statYardage` is the unified net-yards
+# column and matches `yds_rushed`/`yds_receiving` exactly on scrimmage plays.)
 FD_RUSH_COL: str = "rush"  # boolean/int — play filter
 FD_PASS_COL: str = "pass"  # boolean/int — play filter
 FD_FIRST_DOWN_PENALTY_COLS: tuple[str, ...] = ("firstD_by_penalty", "start.firstD_by_penalty")

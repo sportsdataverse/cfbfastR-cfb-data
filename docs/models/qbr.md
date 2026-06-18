@@ -1,17 +1,17 @@
-# Expected Points (EP)
+# QBR
 
 ## Metrics
 
 | metric | value |
 |---|---|
-| `importance_top` | TimeSecsRem:322.5803, yards_to_goal:225.2922, down_4:152.7458, down_3:97.367, down_1:83.201, down_2:70.4132, pos_score_diff_start:51.9398, distance:37.1531 |
+| `importance_top` | qbr_epa:178749.4844, pass_epa:77651.4844, spread:18683.5137, sack_epa:3441.6594, pen_epa:2503.3069 |
 
 
 ## Provenance
 
 | metric | value |
 |---|---|
-| `features` | TimeSecsRem, yards_to_goal, distance, down_1, down_2, down_3, down_4, pos_score_diff_start |
+| `features` | qbr_epa, sack_epa, pass_epa, rush_epa, pen_epa, spread |
 | `hyperparameters` | {} |
 | `training_seasons` | n/a |
 | `trained_date` | 2026-06-17 |
@@ -19,5 +19,7 @@
 
 
 ## Notes
+
+- QBR correlation/RMSE vs ESPN QBR is integration-only (needs the ESPN QBR frame).
 
 - Calibration + log-loss/Brier require a warmed --cache; run the integration report for those.

@@ -3,7 +3,6 @@ import pathlib
 
 import numpy as np
 import polars as pl
-import pytest
 
 from model_training.fourth_down.features import fd_features
 
@@ -17,7 +16,7 @@ def _load_plays() -> pl.DataFrame:
 
 def test_filter_keeps_only_3rd_and_4th():
     X, y = fd_features(_load_plays())
-    # play 3 (down=1) and plays 4/5 (null overUnder / null yardsGained) must be dropped
+    # play 3 (down=1) and plays 4/5 (null overUnder / null statYardage) must be dropped
     assert len(X) == 2
 
 
@@ -49,8 +48,8 @@ def test_posteam_spread_passthrough():
 
 
 def test_label_clip_and_offset():
-    # play 1: yardsGained=7 -> clip(-10,65) -> 7 -> +10 -> 17
-    # play 2: yardsGained=-3 -> clip(-10,65) -> -3 -> +10 -> 7
+    # play 1: statYardage=7 -> clip(-10,65) -> 7 -> +10 -> 17
+    # play 2: statYardage=-3 -> clip(-10,65) -> -3 -> +10 -> 7
     X, y = fd_features(_load_plays())
     assert y[0] == 17
     assert y[1] == 7
@@ -77,7 +76,7 @@ def test_clip_low_yields_class_0():
                 "homeTeamSpread": 2.0,
                 "overUnder": 50.0,
                 "start.is_home": 1,
-                "yardsGained": -20.0,
+                "statYardage": -20.0,
                 "rush": True,
                 "pass": False,
                 "firstD_by_penalty": False,
@@ -99,7 +98,7 @@ def test_clip_high_yields_class_75():
                 "homeTeamSpread": -14.0,
                 "overUnder": 60.0,
                 "start.is_home": 1,
-                "yardsGained": 80.0,
+                "statYardage": 80.0,
                 "rush": False,
                 "pass": True,
                 "firstD_by_penalty": False,
@@ -121,7 +120,7 @@ def test_distance_greater_than_yards_to_goal_excluded():
                 "homeTeamSpread": 0.0,
                 "overUnder": 50.0,
                 "start.is_home": 1,
-                "yardsGained": 3.0,
+                "statYardage": 3.0,
                 "rush": True,
                 "pass": False,
                 "firstD_by_penalty": False,
@@ -148,7 +147,7 @@ def test_first_down_penalty_included_without_rush_pass():
                 "homeTeamSpread": -3.0,
                 "overUnder": 50.0,
                 "start.is_home": 0,
-                "yardsGained": 2.0,
+                "statYardage": 2.0,
                 "rush": False,
                 "pass": False,
                 "firstD_by_penalty": True,

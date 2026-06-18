@@ -7,7 +7,7 @@
     "homeTeamSpread": -7.0,
     "overUnder": 55.0,
     "start.is_home": 1,
-    "yardsGained": 7,
+    "statYardage": 7,
     "rush": true,
     "pass": false,
     "firstD_by_penalty": false
@@ -20,7 +20,7 @@
     "homeTeamSpread": -7.0,
     "overUnder": 55.0,
     "start.is_home": 0,
-    "yardsGained": -3,
+    "statYardage": -3,
     "rush": false,
     "pass": true,
     "firstD_by_penalty": false
@@ -33,7 +33,7 @@
     "homeTeamSpread": 0.0,
     "overUnder": 50.0,
     "start.is_home": 1,
-    "yardsGained": 5,
+    "statYardage": 5,
     "rush": true,
     "pass": false,
     "firstD_by_penalty": false
@@ -46,7 +46,7 @@
     "homeTeamSpread": null,
     "overUnder": null,
     "start.is_home": 0,
-    "yardsGained": 2,
+    "statYardage": 2,
     "rush": true,
     "pass": false,
     "firstD_by_penalty": false
@@ -59,7 +59,7 @@
     "homeTeamSpread": -3.0,
     "overUnder": 48.0,
     "start.is_home": 1,
-    "yardsGained": null,
+    "statYardage": null,
     "rush": true,
     "pass": false,
     "firstD_by_penalty": false

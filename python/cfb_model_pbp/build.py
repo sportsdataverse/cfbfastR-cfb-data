@@ -39,7 +39,8 @@ def score_cpoe(carry_df: pl.DataFrame, plays_df: pl.DataFrame, cp_model_path, _p
         import numpy as np
         import xgboost as xgb
         from cpoe.constants import FEATURE_COLS
-        booster = xgb.Booster(); booster.load_model(str(cp_model_path))
+        booster = xgb.Booster()
+        booster.load_model(str(cp_model_path))
         preds = booster.predict(xgb.DMatrix(feats[FEATURE_COLS]))
         preds = np.asarray(preds).tolist()
     else:
@@ -49,9 +50,11 @@ def score_cpoe(carry_df: pl.DataFrame, plays_df: pl.DataFrame, cp_model_path, _p
         completion_prob=pl.Series("completion_prob", preds, dtype=pl.Float64),
     ).with_columns(cpoe=(pl.col("completion").cast(pl.Float64) - pl.col("completion_prob")))
     # Normalize join-key dtypes: pandas round-tripping the scored feats can infer
-    # game_id as f64 (NaN-tainted), which won't join an i64 carry-frame game_id.
-    # Pin both keys to a common dtype on both sides before the left join.
-    _keys = (pl.col("game_id").cast(pl.Int64, strict=False), pl.col("id").cast(pl.Utf8))
+    # game_id / id as f64 (NaN-tainted), which won't join the i64 carry-frame keys.
+    # Both are whole-number ESPN ids (Int64 in final.json), so pin both keys to Int64
+    # on both sides before the left join. (Utf8 would be wrong: a NaN-tainted float
+    # id stringifies as "300010002002.0" and never matches the clean "300010002002".)
+    _keys = (pl.col("game_id").cast(pl.Int64, strict=False), pl.col("id").cast(pl.Int64, strict=False))
     scored = scored.with_columns(*_keys)
     return carry_df.with_columns(*_keys).join(
         scored.select("game_id", "id", "completion_prob", "cpoe"),

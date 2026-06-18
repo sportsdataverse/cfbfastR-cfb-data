@@ -33,7 +33,20 @@ def build_parser() -> argparse.ArgumentParser:
     tr.add_argument("--boxes", default="cfb/pregame_wp/boxes/")
     tr.add_argument("--out", default="cfb/pregame_wp/")
 
-    pm = sub.add_parser("predict-matchup", help="Predict WP for a future matchup.")
+    pm = sub.add_parser(
+        "predict-matchup",
+        help="Predict WP for a future matchup.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=(
+            "Canonical headline config: --week -1 --games 4 (full-season Five-Factors\n"
+            "form + conference strength-of-schedule). Weeks 1-4 additionally apply the\n"
+            "roster-talent x returning-production preseason adjustment.\n\n"
+            "Reference WPs (2012-2025 model, canonical config):\n"
+            "  Ohio State vs Rutgers   2019  ~0.86   (clear favorite)\n"
+            "  Clemson vs Wake Forest  2019  ~0.91   (clear favorite)\n"
+            "  LSU vs Clemson          2019  ~0.50   (two elite teams; coin-flip on form)"
+        ),
+    )
     pm.add_argument("--home", required=True)
     pm.add_argument("--away", required=True)
     pm.add_argument("--year", type=int, required=True)

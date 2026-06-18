@@ -92,12 +92,17 @@ def extract_pass_features(df: pd.DataFrame) -> pd.DataFrame:
             .astype(int)
         )
     else:
+        # `completion` arrives as bool/int/None across seasons; coerce safely and
+        # DROP rows whose target is unknown rather than fabricating a label
+        # (a bare .astype(int) raises TypeError on None — seen on full-history loads).
+        plays["completion"] = pd.to_numeric(plays["completion"], errors="coerce")
+        plays = plays[plays["completion"].notna()].copy()
         plays["completion"] = plays["completion"].astype(int)
 
-    # --- coerce boolean columns to int ---
+    # --- coerce boolean feature columns to int (None -> 0) ---
     for col in ("is_home", "passing_down"):
         if col in plays.columns:
-            plays[col] = plays[col].astype(int)
+            plays[col] = pd.to_numeric(plays[col], errors="coerce").fillna(0).astype(int)
 
     # Preserve join keys + ``season`` if present so callers can rejoin scored
     # output back to the carry frame without a separate index round-trip.

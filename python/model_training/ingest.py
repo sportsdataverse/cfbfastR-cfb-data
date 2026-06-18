@@ -6,6 +6,8 @@ from pathlib import Path
 
 import polars as pl
 
+from cfb_data_ingest.participants import fill_participants_from_text
+
 from .next_score import label_next_score_half
 
 REMOVE_PLAYS = {
@@ -83,6 +85,7 @@ def _read_final_plays(final_dir: Path, seasons) -> pl.DataFrame:
             continue
         plays = obj.get("plays") or []
         if plays:
+            fill_participants_from_text(plays, obj)  # backfill pre-2014 null participants (name + id)
             frames.append(pl.DataFrame(plays, infer_schema_length=None))
     if not frames:
         return pl.DataFrame()

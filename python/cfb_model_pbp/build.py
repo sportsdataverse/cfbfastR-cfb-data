@@ -48,5 +48,12 @@ def score_cpoe(carry_df: pl.DataFrame, plays_df: pl.DataFrame, cp_model_path, _p
     scored = feats_pl.select("game_id", "id", "completion").with_columns(
         completion_prob=pl.Series("completion_prob", preds, dtype=pl.Float64),
     ).with_columns(cpoe=(pl.col("completion").cast(pl.Float64) - pl.col("completion_prob")))
-    return carry_df.join(scored.select("game_id", "id", "completion_prob", "cpoe"),
-                         on=["game_id", "id"], how="left")
+    # Normalize join-key dtypes: pandas round-tripping the scored feats can infer
+    # game_id as f64 (NaN-tainted), which won't join an i64 carry-frame game_id.
+    # Pin both keys to a common dtype on both sides before the left join.
+    _keys = (pl.col("game_id").cast(pl.Int64, strict=False), pl.col("id").cast(pl.Utf8))
+    scored = scored.with_columns(*_keys)
+    return carry_df.with_columns(*_keys).join(
+        scored.select("game_id", "id", "completion_prob", "cpoe"),
+        on=["game_id", "id"], how="left",
+    )

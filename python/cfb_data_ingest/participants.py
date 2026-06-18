@@ -53,24 +53,27 @@ _CATEGORIES = (
 
 # prefix roles -- NAME leads the narrative; a cue word must be present to disambiguate.
 # (column, boxscore_category, cue_substring, leading_regex)
+# The cue is wrapped in a scoped case-insensitive group ``(?i:...)`` while the NAME
+# capture stays case-SENSITIVE -- a global re.I would make ``[A-Z]`` match lowercase
+# and let narrative tails ("for", "and", "at") be folded into the captured name.
 _PREFIX_ROLES = [
-    ("rusher_player_name",   "rushing", "rush",       re.compile(rf"^\s*({_NAME})\s+rush", re.I)),
-    ("passer_player_name",   "passing", "pass",       re.compile(rf"^\s*({_NAME})\s+pass\b", re.I)),
-    ("punter_player_name",   "punting", "punt",       re.compile(rf"^\s*({_NAME})\s+punt", re.I)),
-    ("fg_kicker_player_name", "kicking", "field goal", re.compile(rf"^\s*({_NAME})\s+\d+\s+yard field goal", re.I)),
-    ("kickoff_player_name",  "kicking", "kickoff",    re.compile(rf"^\s*({_NAME})\s+kickoff", re.I)),
+    ("rusher_player_name",   "rushing", "rush",       re.compile(rf"^\s*({_NAME})(?i:\s+rush)")),
+    ("passer_player_name",   "passing", "pass",       re.compile(rf"^\s*({_NAME})(?i:\s+pass\b)")),
+    ("punter_player_name",   "punting", "punt",       re.compile(rf"^\s*({_NAME})(?i:\s+punt)")),
+    ("fg_kicker_player_name", "kicking", "field goal", re.compile(rf"^\s*({_NAME})(?i:\s+\d+\s+yard field goal)")),
+    ("kickoff_player_name",  "kicking", "kickoff",    re.compile(rf"^\s*({_NAME})(?i:\s+kickoff)")),
 ]
 
 # after-connector roles -- NAME follows a fixed phrase.
 # (column, boxscore_category | None, connector_phrase, fallback_regex)
 _AFTER_ROLES = [
-    ("receiver_player_name",     "receiving",     "complete to ",   re.compile(rf"(?:in)?complete to ({_NAME})", re.I)),
-    ("interception_player_name", "interceptions", "intercepted by ", re.compile(rf"intercepted by ({_NAME})", re.I)),
-    ("sack_player_name",         None,            "sacked by ",     re.compile(rf"sacked by ({_NAME})", re.I)),
+    ("receiver_player_name",     "receiving",     "complete to ",   re.compile(rf"(?i:(?:in)?complete to )({_NAME})")),
+    ("interception_player_name", "interceptions", "intercepted by ", re.compile(rf"(?i:intercepted by )({_NAME})")),
+    ("sack_player_name",         None,            "sacked by ",     re.compile(rf"(?i:sacked by )({_NAME})")),
 ]
 
 # returners share the "returned by" connector; kickoff vs punt disambiguates the column.
-_RETURN_RE = re.compile(rf"returned by ({_NAME})", re.I)
+_RETURN_RE = re.compile(rf"(?i:returned by )({_NAME})")
 _RETURN_CATEGORY = {"kickoff_return_player_name": "kickReturns", "punt_return_player_name": "puntReturns"}
 
 
@@ -100,8 +103,53 @@ def _names_longest_first(idx_cat: dict[str, object]) -> list[str]:
     return sorted(idx_cat, key=len, reverse=True)
 
 
+def _norm(name: str) -> str:
+    """Collapse a name to alphanumerics+lowercase for fuzzy id lookup.
+
+    The category boxscore stores ``displayName`` verbatim (exact-matchable), but the
+    game roster and the names some plays carry differ by case / punctuation / spacing
+    ("T.J. Yates" vs "TJ Yates"), so the roster fallback matches on this normal form.
+    """
+    return re.sub(r"[^a-z0-9]", "", name.lower())
+
+
+def _roster_index(raw: dict) -> dict[str, object]:
+    """Game-wide ``{normalized_name: athlete_id}`` from the roster (+ boxscore union).
+
+    Used as the id-pairing fallback when a name is absent from the role's own
+    boxscore category -- chiefly **incomplete-pass targets** (a player targeted on an
+    incompletion has no reception, so is not in the *receiving* boxscore) and the
+    ``sack`` role (no defensive boxscore category exists pre-2014). Names that
+    normalize ambiguously (two distinct athletes -> same key) are dropped so the
+    fallback never guesses between players.
+    """
+    name_to_ids: dict[str, set] = {}
+
+    def _add(name, aid):
+        # game_rosters stores athlete_id as int; the boxscore stores id as str.
+        # Cast to str so the same athlete from both sources isn't read as two ids
+        # (which would flag the name ambiguous) -- and so paired ids stay str-typed.
+        if name and aid is not None:
+            name_to_ids.setdefault(_norm(str(name)), set()).add(str(aid))
+
+    for r in raw.get("game_rosters") or []:
+        aid = r.get("athlete_id") or r.get("id") or (r.get("athlete") or {}).get("id")
+        _add(r.get("athlete_display_name") or r.get("full_name"), aid)
+        _add(r.get("full_name"), aid)
+    # boxscore union -- catches an athlete missing from game_rosters but with a stat line
+    for team in (raw.get("boxscore") or {}).get("players") or []:
+        for stat in team.get("statistics") or []:
+            for a in stat.get("athletes") or []:
+                ath = a.get("athlete") or {}
+                _add(ath.get("displayName"), ath.get("id"))
+    return {k: next(iter(ids)) for k, ids in name_to_ids.items() if len(ids) == 1}
+
+
 def _trim(name: str) -> str:
-    """Drop a trailing short ALL-CAPS token a greedy capture may absorb (e.g. 'TD')."""
+    """Clean a regex-captured name: drop the sentence-terminating punctuation a
+    greedy ``[\\w'.\\-]`` token absorbs ("Brewer." -> "Brewer") and any trailing
+    short ALL-CAPS token ("... TD")."""
+    name = name.strip().rstrip(".,;:")
     toks = name.split()
     while len(toks) > 1 and toks[-1].isupper() and len(toks[-1]) <= 3:
         toks.pop()
@@ -168,14 +216,16 @@ def fill_participants_from_text(plays: list[dict], raw: dict) -> dict[str, int]:
        is null, pair the athlete id by looking the name up in the boxscore.
 
     The second pass is why ids fill for names ``CFBPlayProcess`` already extracted
-    pre-2014 without ids (passer / receiver / kicker / punter). A name absent from
-    the relevant boxscore category (regex fallback, or a lateral / non-listed
-    athlete) keeps a null id. ``sack`` has no boxscore category, so its id is always
-    null.
+    pre-2014 without ids (passer / receiver / kicker / punter). Id resolution tries
+    the role's own boxscore category first (most precise), then falls back to a
+    game-wide normalized roster index -- which recovers **incomplete-pass targets**
+    (absent from the receiving boxscore because they had no reception) and the
+    ``sack`` role (no defensive boxscore category exists pre-2014). A name found in
+    neither keeps a null id.
 
     Args:
         plays: The game's play dicts (mutated in place).
-        raw: The game's ``final.json`` payload (for ``boxscore``).
+        raw: The game's ``final.json`` payload (for ``boxscore`` + ``game_rosters``).
 
     Returns:
         ``{"names": {col: n}, "ids": {col: n}}`` -- counts of names and ids filled.
@@ -183,6 +233,7 @@ def fill_participants_from_text(plays: list[dict], raw: dict) -> dict[str, int]:
     """
     idx = _boxscore_index(raw)
     names = {c: _names_longest_first(idx[c]) for c in _CATEGORIES}
+    roster = _roster_index(raw)
     name_counts: dict[str, int] = {}
     id_counts: dict[str, int] = {}
 
@@ -191,12 +242,15 @@ def fill_participants_from_text(plays: list[dict], raw: dict) -> dict[str, int]:
         name_counts[col] = name_counts.get(col, 0) + 1
 
     def _pair_id(p: dict, col: str, cat: str | None) -> None:
-        if cat is None or not p.get(col):
+        nm = p.get(col)
+        if not nm:
             return
         ic = _id_col(col)
         if p.get(ic):
             return
-        aid = idx[cat].get(p[col])  # None unless the (existing or resolved) name is box-canonical
+        aid = idx[cat].get(nm) if cat is not None else None  # category box: most precise
+        if aid is None:
+            aid = roster.get(_norm(str(nm)))  # game-wide roster fallback (normalized)
         if aid is not None:
             p[ic] = aid
             id_counts[ic] = id_counts.get(ic, 0) + 1

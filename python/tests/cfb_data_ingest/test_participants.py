@@ -128,3 +128,50 @@ def test_no_boxscore_is_safe_noop():
     assert p[0]["rusher_player_name"] == "Mike Kafka"
     assert p[0].get("rusher_player_id") is None
     assert res["ids"] == {}
+
+
+# --- roster-fallback id pairing (incomplete-pass targets, sacks, int->str ids) ---
+
+# game_rosters stores athlete_id as int (vs the boxscore's str ids); the resolver
+# must normalize both to str so the same athlete isn't read as two ambiguous ids.
+RAW_ROSTER = {
+    "boxscore": RAW["boxscore"],
+    "game_rosters": [
+        # an athlete with NO reception (incomplete-pass target) -> absent from the
+        # receiving boxscore, recoverable only via the roster:
+        {"athlete_display_name": "Andrew Brewer", "athlete_id": 480001, "home_away": "home"},
+        # a defender who recorded a sack -> no defensive boxscore category exists:
+        {"athlete_display_name": "Vince Browne", "athlete_id": 480002, "home_away": "away"},
+    ],
+}
+
+
+def test_incomplete_target_id_via_roster():
+    # "incomplete to X": X had no catch, so is not in the receiving boxscore.
+    plays = [{"text": "Chris Todd pass incomplete to Andrew Brewer."}]
+    p = copy.deepcopy(plays)
+    fill_participants_from_text(p, RAW_ROSTER)
+    assert p[0]["receiver_player_name"] == "Andrew Brewer"
+    assert p[0]["receiver_player_id"] == "480001"  # str, from the int roster id
+
+
+def test_sack_id_via_roster():
+    plays = [{"text": "Chris Todd sacked by Vince Browne for a loss of 6 yards."}]
+    p = copy.deepcopy(plays)
+    fill_participants_from_text(p, RAW_ROSTER)
+    assert p[0]["sack_player_name"] == "Vince Browne"
+    assert p[0]["sack_player_id"] == "480002"
+
+
+def test_roster_id_is_normalized_to_str():
+    # the boxscore (str ids) and roster (int ids) for one athlete must not collide
+    # into an "ambiguous" drop -- Mario Fannin is in both here.
+    raw = copy.deepcopy(RAW_ROSTER)
+    raw["game_rosters"].append(
+        {"athlete_display_name": "Mario Fannin", "athlete_id": 480003}
+    )
+    plays = [{"text": "Chris Todd pass complete to Mario Fannin for 8 yards."}]
+    p = copy.deepcopy(plays)
+    fill_participants_from_text(p, raw)
+    # category boxscore wins (str "222"); no ambiguity crash from the int roster id
+    assert p[0]["receiver_player_id"] == "222"

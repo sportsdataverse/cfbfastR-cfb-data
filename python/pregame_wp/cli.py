@@ -1,7 +1,7 @@
 """CLI: build-boxes | train | predict-matchup.
 
 Usage:
-  uv run python -m pregame_wp build-boxes  --seasons 2012:2020 --out cfb/pregame_wp/boxes/
+  uv run python -m pregame_wp build-boxes  --seasons 2012:2020 --raw-dir cfb/pregame_wp/raw/ --out cfb/pregame_wp/boxes/
   uv run python -m pregame_wp train        --boxes cfb/pregame_wp/boxes/ --out cfb/pregame_wp/
   uv run python -m pregame_wp predict-matchup --home "LSU" --away "Clemson" --year 2019
 """
@@ -21,7 +21,13 @@ def build_parser() -> argparse.ArgumentParser:
     bb = sub.add_parser("build-boxes", help="Compute 5FR box scores from CFBD data.")
     bb.add_argument("--seasons", default="2012:2020",
                     help="Season range as A:B (e.g. 2012:2020).")
-    bb.add_argument("--out", default="cfb/pregame_wp/boxes/")
+    bb.add_argument("--raw-dir", default="cfb/pregame_wp/raw/",
+                    help="Per-game JSON cache root ({raw_dir}/{game_id}/plays.json).")
+    bb.add_argument("--out", default="cfb/pregame_wp/boxes/box-scores.parquet",
+                    help="Output parquet path (a directory gets box-scores.parquet appended).")
+    bb.add_argument("--no-fetch", action="store_true",
+                    help="Do not hit CFBD; build only from already-cached JSON.")
+    bb.add_argument("--quiet", action="store_true", help="Suppress per-game progress.")
 
     tr = sub.add_parser("train", help="Train XGBRegressor on stored game boxes.")
     tr.add_argument("--boxes", default="cfb/pregame_wp/boxes/")
@@ -31,13 +37,36 @@ def build_parser() -> argparse.ArgumentParser:
     pm.add_argument("--home", required=True)
     pm.add_argument("--away", required=True)
     pm.add_argument("--year", type=int, required=True)
-    pm.add_argument("--model", default="python/pregame_wp/models/pgwp_model.ubj")
+    pm.add_argument("--boxes", default="cfb/pregame_wp/boxes/box-scores.parquet",
+                    help="Box parquet (file or directory of *.parquet) for season-strength tables.")
+    pm.add_argument("--model", default="cfb/pregame_wp/pgwp_model.ubj")
     pm.add_argument("--games", type=int, default=4,
                     help="Recent games to average for each team's 5FR.")
     pm.add_argument("--week", type=int, default=-1,
-                    help="Week of season (-1 = latest available).")
+                    help="Week of season (-1 = consider all weeks; 0 = preseason / prior year).")
+    pm.add_argument("--neutral-site", action="store_true",
+                    help="Neutral site: no home-field advantage applied.")
+    pm.add_argument("--covid", action="store_true",
+                    help="Use reduced COVID-2020 HFA (+1.0 instead of +2.5).")
 
     return ap
+
+
+def _read_boxes(boxes_arg: str):
+    """Load the box corpus from a parquet file or a directory of *.parquet."""
+    import glob as _glob
+
+    import pandas as pd
+
+    p = Path(boxes_arg)
+    if p.is_dir():
+        files = sorted(_glob.glob(str(p / "*.parquet")))
+        if not files:
+            raise FileNotFoundError(f"no parquet files in {p}")
+        return pd.concat([pd.read_parquet(f) for f in files], ignore_index=True)
+    if not p.exists():
+        raise FileNotFoundError(f"box parquet not found: {p}")
+    return pd.read_parquet(p)
 
 
 def _parse_seasons(seasons_str: str) -> list[int]:
@@ -51,9 +80,33 @@ def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
 
     if args.cmd == "build-boxes":
+        from pregame_wp.ep_curve import load_ep_curve, load_punt_sr
+        from pregame_wp.training import build_training_frame
+
         seasons = _parse_seasons(args.seasons)
-        print(f"build-boxes: seasons {seasons[0]}–{seasons[-1]}, out={args.out}")
-        print("  (requires CFBD data staged locally; see data_ingest.py)")
+        ep_data = load_ep_curve()
+        punt_sr = load_punt_sr()
+        stored = build_training_frame(
+            seasons,
+            raw_dir=args.raw_dir,
+            ep_data=ep_data,
+            punt_sr=punt_sr,
+            fetch_missing=not args.no_fetch,
+            verbose=not args.quiet,
+        )
+        if stored.empty:
+            print("build-boxes: no games processed (no cached/fetched data?)")
+            return 1
+
+        out = Path(args.out)
+        if out.is_dir() or args.out.endswith(("/", "\\")):
+            out = out / "box-scores.parquet"
+        out.parent.mkdir(parents=True, exist_ok=True)
+        stored.to_parquet(out, index=False)
+        print(
+            f"build-boxes: wrote {len(stored)} team-game rows "
+            f"({stored['GameID'].nunique()} games) → {out}"
+        )
 
     elif args.cmd == "train":
         import glob as _glob
@@ -75,20 +128,37 @@ def main(argv: list[str] | None = None) -> int:
         print(f"train: model saved → {out_dir / 'pgwp_model.ubj'} (mu={mu}, std={std:.4f})")
 
     elif args.cmd == "predict-matchup":
-        import xgboost as xgb
-        import json
-        from pregame_wp.predict import five_fr_to_wp
+        from pregame_wp.predict import predict_matchup
+        from pregame_wp.training import load_pgwp_model
 
         model_path = Path(args.model)
         if not model_path.exists():
             print(f"predict-matchup: model not found at {model_path}")
             return 1
-        m = xgb.XGBRegressor()
-        m.load_model(str(model_path))
-        card = json.loads(model_path.with_suffix(".json").read_text())
-        mu, std = float(card["mu"]), float(card["std"])
-        print(f"predict-matchup: {args.home} vs {args.away}, year={args.year}")
-        print("  (requires pre-computed 5FR averages; see box_score.py)")
+        try:
+            stored = _read_boxes(args.boxes)
+        except FileNotFoundError as exc:
+            print(f"predict-matchup: {exc}")
+            return 1
+
+        model, mu, std = load_pgwp_model(str(model_path))
+        win_prob, proj_mov = predict_matchup(
+            args.home, args.away, args.year,
+            week=args.week,
+            games_to_consider=args.games,
+            stored_game_boxes=stored,
+            model=model, mu=mu, std=std,
+            adjust_hfa=not args.neutral_site,
+            adjust_covid=args.covid,
+        )
+        favored = args.home if proj_mov >= 0 else args.away
+        print(
+            f"predict-matchup: {args.away} @ {args.home}, year={args.year}, week={args.week}"
+        )
+        print(
+            f"  proj MOV (home {args.home}): {proj_mov:+.2f} → "
+            f"{favored} favored; P({args.home} win) = {win_prob:.4f}"
+        )
 
     return 0
 

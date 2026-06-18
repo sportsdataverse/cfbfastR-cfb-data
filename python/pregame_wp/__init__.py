@@ -19,7 +19,12 @@ from .box_score import calculate_box_score_from_frames
 from .ep_curve import ep_at, eqppp, load_ep_curve, load_punt_sr
 from .five_factors import calculate_five_factors_rating, translate
 from .play_features import add_play_features
-from .predict import five_fr_to_wp, generate_win_prob
+from .predict import (
+    build_season_strength_tables,
+    five_fr_to_wp,
+    generate_win_prob,
+    predict_matchup,
+)
 from .talent import calculate_returning_production, calculate_roster_talent
 from .team_stats import (
     generate_team_drive_stats,
@@ -27,17 +32,25 @@ from .team_stats import (
     generate_team_st_stats,
     generate_team_turnover_stats,
 )
-from .training import filter_outliers, save_pgwp_model, train_pgwp_model
+from .training import (
+    build_training_frame,
+    filter_outliers,
+    save_pgwp_model,
+    train_pgwp_model,
+)
 
 __all__ = [
     "__version__",
+    "data_ingest",
     "load_ep_curve", "load_punt_sr", "ep_at", "eqppp",
     "add_play_features",
     "generate_team_play_stats", "generate_team_drive_stats",
     "generate_team_turnover_stats", "generate_team_st_stats",
     "translate", "calculate_five_factors_rating",
     "calculate_box_score_from_frames",
+    "build_training_frame",
     "filter_outliers", "train_pgwp_model", "save_pgwp_model",
     "five_fr_to_wp", "generate_win_prob",
+    "build_season_strength_tables", "predict_matchup",
     "calculate_roster_talent", "calculate_returning_production",
 ]

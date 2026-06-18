@@ -19,8 +19,12 @@ import pytest
 
 pytestmark = pytest.mark.integration  # CFBD-network tests; deselected by default
 
-HAS_KEY = bool(os.environ.get("CFB_DATA_API_KEY"))
-skip_no_key = pytest.mark.skipif(not HAS_KEY, reason="CFB_DATA_API_KEY not set")
+HAS_KEY = bool(
+    os.environ.get("CFBD_API_KEY")
+    or os.environ.get("CFB_DATA_API_KEY")
+    or os.environ.get("CFBD_DATA_API_KEY")
+)
+skip_no_key = pytest.mark.skipif(not HAS_KEY, reason="CFBD_API_KEY not set")
 
 # Known game: 2019 CFP National Championship
 _LIVE_GAME_ID = "401135278"

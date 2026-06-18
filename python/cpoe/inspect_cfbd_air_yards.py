@@ -34,9 +34,13 @@ def get_plays(year: int, week: int, team: str, token: str) -> list[dict]:
 
 
 def main() -> None:
-    token = os.environ.get("CFB_DATA_API_KEY") or os.environ.get("CFBD_DATA_API_KEY")
+    token = (
+        os.environ.get("CFBD_API_KEY")
+        or os.environ.get("CFB_DATA_API_KEY")
+        or os.environ.get("CFBD_DATA_API_KEY")
+    )
     if not token:
-        print("ERROR: CFB_DATA_API_KEY not set", file=sys.stderr)
+        print("ERROR: CFBD_API_KEY not set", file=sys.stderr)
         sys.exit(1)
 
     total_pass = 0

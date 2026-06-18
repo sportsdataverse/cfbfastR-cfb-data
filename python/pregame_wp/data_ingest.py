@@ -5,9 +5,11 @@ Fetches games, play-by-play, and drives from the College Football Data API
 shape expected by calculate_box_score_from_frames().
 
 Environment:
-    CFB_DATA_API_KEY  — CFBD API bearer token (required for live fetch).
-                        Can be set in a .env file at the project root;
-                        uv run loads it automatically since uv 0.4.
+    CFBD_API_KEY  — CFBD API bearer token (required for live fetch). This is the
+                    standard SportsDataverse secret name (pkgs / repos / Actions /
+                    ~/.Renviron); CFB_DATA_API_KEY / CFBD_DATA_API_KEY are accepted
+                    as legacy fallbacks. Can be set in a .env file at the project
+                    root; uv run loads it automatically since uv 0.4.
 
 API notes:
     * The CFBD API returns camelCase field names (e.g. ``yardsGained``,
@@ -56,11 +58,18 @@ _DRIVE_KEY_MAP: dict[str, str] = {
 # ---------------------------------------------------------------------------
 
 def _api_key() -> str:
-    key = os.environ.get("CFB_DATA_API_KEY") or os.environ.get("CFBD_DATA_API_KEY")
+    # CFBD_API_KEY is the standard secret name shared across the SportsDataverse
+    # packages / repos / GitHub Actions (and the user's ~/.Renviron); legacy
+    # CFB_DATA_API_KEY / CFBD_DATA_API_KEY are kept as fallbacks.
+    key = (
+        os.environ.get("CFBD_API_KEY")
+        or os.environ.get("CFB_DATA_API_KEY")
+        or os.environ.get("CFBD_DATA_API_KEY")
+    )
     if not key:
         raise EnvironmentError(
-            "CFB_DATA_API_KEY not set. "
-            "Add it to your .env file or export it before running."
+            "CFBD_API_KEY not set. "
+            "Add it to your .Renviron / .env file or export it before running."
         )
     return key
 

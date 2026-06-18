@@ -48,6 +48,8 @@ def build_parser() -> argparse.ArgumentParser:
                     help="Neutral site: no home-field advantage applied.")
     pm.add_argument("--covid", action="store_true",
                     help="Use reduced COVID-2020 HFA (+1.0 instead of +2.5).")
+    pm.add_argument("--no-sos", action="store_true",
+                    help="Skip CFBD SoS fetches (conferences + talent); use raw 5FR only.")
 
     return ap
 
@@ -142,12 +144,43 @@ def main(argv: list[str] | None = None) -> int:
             return 1
 
         model, mu, std = load_pgwp_model(str(model_path))
+
+        # --- strength-of-schedule inputs (CFBD; gracefully skipped on failure) ---
+        conferences = None
+        roster_talent = returning_production = None
+        if not args.no_sos:
+            from pregame_wp import data_ingest as di
+            try:
+                conferences = di.build_conferences(di.fetch_teams(args.year))
+            except Exception as exc:  # noqa: BLE001
+                print(f"predict-matchup: conference SoS skipped ({exc})")
+            # roster-talent x returning-production only feed the weeks 1-4 adjustment.
+            if 0 < args.week <= 4:
+                try:
+                    import pandas as pd
+                    from pregame_wp.talent import calculate_returning_production, calculate_roster_talent
+                    rec = pd.concat(
+                        [di.build_recruiting_df(di.fetch_recruiting_teams(y))
+                         for y in range(args.year - 3, args.year + 1)],
+                        ignore_index=True,
+                    )
+                    tmap = dict(zip(*calculate_roster_talent(rec, args.year)[["team", "talent"]].values.T))
+                    rdf = calculate_returning_production(di.build_returning_df(di.fetch_returning_production(args.year)))
+                    rmap = dict(zip(*rdf[["team", "returning_production"]].values.T))
+                    roster_talent = lambda team, _yr: float(tmap.get(team, 0.0))  # noqa: E731
+                    returning_production = lambda team, _yr: float(rmap.get(team, 0.0))  # noqa: E731
+                except Exception as exc:  # noqa: BLE001
+                    print(f"predict-matchup: talent/returning SoS skipped ({exc})")
+
         win_prob, proj_mov = predict_matchup(
             args.home, args.away, args.year,
             week=args.week,
             games_to_consider=args.games,
             stored_game_boxes=stored,
             model=model, mu=mu, std=std,
+            conferences=conferences,
+            roster_talent=roster_talent,
+            returning_production=returning_production,
             adjust_hfa=not args.neutral_site,
             adjust_covid=args.covid,
         )

@@ -182,6 +182,86 @@ def fetch_drives(
     return _get("/drives", params)
 
 
+def fetch_teams(year: int | None = None) -> list[dict[str, Any]]:
+    """Return CFBD team records ( /teams ): school, conference, classification."""
+    params = {"year": int(year)} if year is not None else None
+    return _get("/teams", params)
+
+
+def build_conferences(teams: list[dict[str, Any]]) -> dict[str, str]:
+    """Map team name -> conference from CFBD /teams records (for SoS layers)."""
+    out: dict[str, str] = {}
+    for t in teams:
+        name = t.get("school") or t.get("team")
+        conf = t.get("conference")
+        if name and conf:
+            out[str(name)] = str(conf)
+    return out
+
+
+def fetch_recruiting_teams(year: int) -> list[dict[str, Any]]:
+    """Return CFBD team recruiting rankings ( /recruiting/teams ) for a year."""
+    return _get("/recruiting/teams", {"year": int(year)})
+
+
+def build_recruiting_df(rows: list[dict[str, Any]]) -> pd.DataFrame:
+    """Normalize /recruiting/teams to the [team, year, rating] shape talent.py wants."""
+    if not rows:
+        return pd.DataFrame(columns=["team", "year", "rating"])
+    df = pd.json_normalize(rows)
+    ren = {}
+    if "team" not in df.columns:
+        for src in ("school",):
+            if src in df.columns:
+                ren[src] = "team"
+    if "rating" not in df.columns:
+        for src in ("points", "rank"):
+            if src in df.columns:
+                ren[src] = "rating"
+                break
+    df = df.rename(columns=ren)
+    for c in ("team", "year", "rating"):
+        if c not in df.columns:
+            df[c] = 0 if c != "team" else ""
+    df["year"] = pd.to_numeric(df["year"], errors="coerce").fillna(0).astype(int)
+    df["rating"] = pd.to_numeric(df["rating"], errors="coerce").fillna(0.0)
+    return df[["team", "year", "rating"]]
+
+
+def fetch_returning_production(year: int) -> list[dict[str, Any]]:
+    """Return CFBD returning-production ( /player/returning ) for a year."""
+    return _get("/player/returning", {"year": int(year)})
+
+
+def build_returning_df(rows: list[dict[str, Any]]) -> pd.DataFrame:
+    """Normalize /player/returning to the [team, returning, snap_share] shape.
+
+    CFBD exposes percent-PPA-style returning metrics; map the overall returning
+    PPA share to ``returning`` and the usage to ``snap_share`` (best-effort —
+    the weeks-1-4 talent adjustment is the only consumer)."""
+    if not rows:
+        return pd.DataFrame(columns=["team", "returning", "snap_share"])
+    df = pd.json_normalize(rows)
+    ren = {}
+    if "team" not in df.columns and "school" in df.columns:
+        ren["school"] = "team"
+    for src in ("percentPPA", "totalPPA", "percent_ppa"):
+        if src in df.columns:
+            ren[src] = "returning"
+            break
+    for src in ("usage", "percentUsage", "totalUsage"):
+        if src in df.columns:
+            ren[src] = "snap_share"
+            break
+    df = df.rename(columns=ren)
+    for c, default in (("team", ""), ("returning", 0.0), ("snap_share", 1.0)):
+        if c not in df.columns:
+            df[c] = default
+    df["returning"] = pd.to_numeric(df["returning"], errors="coerce").fillna(0.0)
+    df["snap_share"] = pd.to_numeric(df["snap_share"], errors="coerce").fillna(1.0).replace(0.0, 1.0)
+    return df[["team", "returning", "snap_share"]]
+
+
 def filter_plays_to_game(
     plays: list[dict[str, Any]],
     home_team: str,

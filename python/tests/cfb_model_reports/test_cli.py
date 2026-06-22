@@ -28,7 +28,18 @@ def test_main_writes_reports_and_index(tmp_path):
         {"exp_rb_epa": [0.1, 0.2, 0.3, 0.4], "target": [0.1, 0.2, 0.3, 0.4]}
     ).write_parquet(art / "xrepa_loso.parquet")
     out = tmp_path / "docs" / "models"
-    rc = main(["--artifacts", str(art), "--out", str(out), "--rb-loso", str(art / "xrepa_loso.parquet")])
+    rc = main(["--artifacts", str(art), "--out", str(out), "--no-figures",
+               "--rb-loso", str(art / "xrepa_loso.parquet")])
     assert rc == 0
     assert (out / "rb_eval.md").exists() and (out / "README.md").exists()
-    assert "weighted_r2" in (out / "rb_eval.md").read_text()
+    body = (out / "rb_eval.md").read_text()
+    assert "weighted_r2" in body
+    # Enriched prose sections injected from narratives for rb_eval.
+    assert "## Overview" in body and "## Recipe & lineage" in body
+    assert "## Discussion" in body and "## Limitations" in body
+    assert "xREPA" in body
+
+
+def test_no_figures_flag_parses():
+    ns = build_parser().parse_args(["--artifacts", "a", "--no-figures"])
+    assert ns.no_figures is True

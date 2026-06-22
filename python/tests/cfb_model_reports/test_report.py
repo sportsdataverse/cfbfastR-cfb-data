@@ -17,6 +17,34 @@ def test_render_model_report_has_metrics_figures_provenance():
     assert "QBR correlation requires" in md             # notes
 
 
+def test_render_model_report_renders_prose_sections():
+    """Overview / Recipe & lineage / Discussion / Limitations render when set."""
+    r = ModelReport(
+        model_type="ep", title="Expected Points (EP)",
+        metrics={"ep_cal_mae": 0.014}, figures=["figures/ep_calibration.png"],
+        provenance={"trained_date": "2026-06-17"}, notes=[],
+        summary="EP estimates next-score value.",
+        recipe="8-feature multiclass softprob.",
+        discussion="LOSO pooled mlogloss 1.2333.",
+        limitations="EP is a start-of-play quantity.",
+    )
+    md = render_model_report(r)
+    assert "## Overview" in md and "EP estimates next-score value." in md
+    assert "## Recipe & lineage" in md and "softprob" in md
+    assert "## Discussion" in md and "1.2333" in md
+    assert "## Limitations" in md and "start-of-play" in md
+    # Section ordering: Overview before Metrics before Discussion before Provenance.
+    assert md.index("## Overview") < md.index("## Metrics") < md.index("## Discussion") < md.index("## Provenance")
+
+
+def test_render_model_report_omits_empty_prose():
+    """A report with no prose still renders metrics/provenance (back-compat)."""
+    r = ModelReport("x", "X", {"a": 1}, [], {})
+    md = render_model_report(r)
+    assert "## Overview" not in md and "## Discussion" not in md
+    assert "## Metrics" in md and "## Provenance" in md
+
+
 def test_render_index_links_each_report():
     rs = [ModelReport("ep", "EP", {}, [], {}, []), ModelReport("cpoe", "CPOE", {}, [], {}, [])]
     idx = render_index(rs)

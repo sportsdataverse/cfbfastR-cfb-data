@@ -1,5 +1,6 @@
 # CPOE
 
+
 ## Metrics
 
 | metric | value |
@@ -16,8 +17,3 @@
 | `training_seasons` | n/a |
 | `trained_date` | 2026-06-17 |
 | `xgboost_version` | 3.2.0 |
-
-
-## Notes
-
-- Calibration + log-loss/Brier require a warmed --cache; run the integration report for those.

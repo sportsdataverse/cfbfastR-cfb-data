@@ -3,7 +3,14 @@ import numpy as np
 import polars as pl
 import pytest
 
-from cfb_model_reports.metrics import provenance_from_card, compute_classification_metrics, rb_eval_metrics
+from cfb_model_reports.metrics import (
+    compute_classification_metrics,
+    ep_loso_metrics,
+    provenance_from_card,
+    qbr_loso_metrics,
+    rb_eval_metrics,
+    wp_loso_metrics,
+)
 
 
 def test_provenance_from_card_tolerates_missing():
@@ -84,3 +91,45 @@ def test_rb_eval_metrics_from_loso(tmp_path):
     assert m["n"] == 4
     assert isinstance(m["weighted_r2"], float)
     assert isinstance(m["weighted_cal_error"], float)
+
+
+def test_ep_loso_metrics(tmp_path):
+    """ep_loso_metrics computes weighted EP calibration MAE + means from OOF."""
+    lp = tmp_path / "loso_ep_oof.parquet"
+    pl.DataFrame(
+        {
+            "season": [2024, 2024, 2024, 2024],
+            "y": [0, 1, 2, 6],
+            "ep_pred": [2.0, 2.0, 1.0, 1.0],
+            "realized": [7.0, -7.0, 3.0, 0.0],
+        }
+    ).write_parquet(lp)
+    m = ep_loso_metrics(lp)
+    assert m["n"] == 4
+    assert {"ep_cal_mae", "mean_pred_ep", "mean_realized"} <= set(m)
+    assert m["mean_pred_ep"] == 1.5
+
+
+def test_wp_loso_metrics(tmp_path):
+    """wp_loso_metrics returns logloss/brier/auc from binary OOF."""
+    lp = tmp_path / "loso_wp_oof.parquet"
+    pl.DataFrame(
+        {"season": [2024] * 4, "y": [1, 0, 1, 0], "wp_pred": [0.9, 0.1, 0.8, 0.2]}
+    ).write_parquet(lp)
+    m = wp_loso_metrics(lp)
+    assert m["n"] == 4
+    assert m["logloss"] > 0 and 0 <= m["brier"] <= 1
+    assert m["auc"] == 1.0  # perfectly separable
+
+
+def test_qbr_loso_metrics(tmp_path):
+    """qbr_loso_metrics returns rmse/mae/r2/corr from regression OOF."""
+    lp = tmp_path / "loso_qbr_oof.parquet"
+    pl.DataFrame(
+        {"season": [2024] * 4, "y": [50.0, 60.0, 70.0, 80.0], "qbr_pred": [52.0, 58.0, 71.0, 79.0]}
+    ).write_parquet(lp)
+    m = qbr_loso_metrics(lp)
+    assert m["n"] == 4
+    assert m["rmse"] > 0 and m["mae"] > 0
+    assert 0.9 < m["r2"] <= 1.0
+    assert 0.9 < m["corr"] <= 1.0

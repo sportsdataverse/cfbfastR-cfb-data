@@ -1,0 +1,38 @@
+project:
+  type: website
+  output-dir: _site
+
+website:
+  title: "CFB Models"
+  description: >-
+    Model cards for the SportsDataverse / cfbfastR college-football models —
+    recipe, metrics, calibration figures, and limitations for each.
+  navbar:
+    background: "#500f1b"
+    left:
+      - href: index.qmd
+        text: Home
+  sidebar:
+    style: docked
+    contents:
+      - index.qmd
+      - section: "Play-level (Track 1)"
+        contents:
+          - ep.md
+          - wp_spread.md
+          - wp_naive.md
+          - qbr.md
+          - cpoe.md
+      - section: "Decision (Track 2)"
+        contents:
+          - fourth_down.md
+      - section: "Player evaluation (Track 3)"
+        contents:
+          - rb_eval.md
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: true
+    toc-depth: 2

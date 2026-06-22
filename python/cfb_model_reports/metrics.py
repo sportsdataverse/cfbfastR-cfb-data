@@ -66,6 +66,165 @@ def xgb_importance(model_path, top_n: int = 15) -> dict:
     return {k: round(float(v), 4) for k, v in top}
 
 
+def _bin_logloss(y, p):
+    import numpy as np
+
+    p = np.clip(p, 1e-15, 1 - 1e-15)
+    return float(-np.mean(y * np.log(p) + (1 - y) * np.log(1 - p)))
+
+
+def _auc(y, p):
+    import numpy as np
+
+    order = np.argsort(p, kind="mergesort")
+    r = np.empty(len(p), float)
+    r[order] = np.arange(1, len(p) + 1)
+    npos, nneg = float(y.sum()), float((1 - y).sum())
+    if npos == 0 or nneg == 0:
+        return float("nan")
+    return float((r[y == 1].sum() - npos * (npos + 1) / 2) / (npos * nneg))
+
+
+def ep_loso_metrics(oof_parquet) -> dict:
+    """Pooled EP metrics from the LOSO out-of-fold parquet.
+
+    Args:
+        oof_parquet: parquet with columns ``ep_pred`` (predicted EP) and
+            ``realized`` (realized next-score points).
+
+    Returns:
+        Dict: ``n``, ``ep_cal_mae`` (weighted, points), ``mean_pred_ep``,
+        ``mean_realized``.
+    """
+    import numpy as np
+    import polars as pl
+
+    df = pl.read_parquet(oof_parquet)
+    ep_pred = df["ep_pred"].to_numpy()
+    realized = df["realized"].to_numpy()
+    b = np.round(ep_pred).astype(int)
+    wsum = werr = 0.0
+    for bb in np.unique(b):
+        mm = b == bb
+        n = int(mm.sum())
+        wsum += n
+        werr += n * abs(ep_pred[mm].mean() - realized[mm].mean())
+    return {
+        "n": int(len(ep_pred)),
+        "ep_cal_mae": round(float(werr / wsum), 4),
+        "mean_pred_ep": round(float(ep_pred.mean()), 4),
+        "mean_realized": round(float(realized.mean()), 4),
+    }
+
+
+def wp_loso_metrics(oof_parquet) -> dict:
+    """Pooled spread-WP metrics from the LOSO out-of-fold parquet.
+
+    Args:
+        oof_parquet: parquet with columns ``y`` (win label) and ``wp_pred``.
+
+    Returns:
+        Dict: ``n``, ``logloss``, ``brier``, ``auc``.
+    """
+    import numpy as np
+    import polars as pl
+
+    df = pl.read_parquet(oof_parquet)
+    y = df["y"].to_numpy().astype(int)
+    p = df["wp_pred"].to_numpy()
+    return {
+        "n": int(len(y)),
+        "logloss": round(_bin_logloss(y, p), 4),
+        "brier": round(float(np.mean((p - y) ** 2)), 4),
+        "auc": round(_auc(y, p), 4),
+    }
+
+
+def qbr_loso_metrics(oof_parquet) -> dict:
+    """Pooled QBR metrics from the LOSO out-of-fold parquet.
+
+    Args:
+        oof_parquet: parquet with columns ``y`` (ESPN raw QBR) and ``qbr_pred``.
+
+    Returns:
+        Dict: ``n``, ``rmse``, ``mae``, ``r2``, ``corr``.
+    """
+    import numpy as np
+    import polars as pl
+
+    df = pl.read_parquet(oof_parquet)
+    y = df["y"].to_numpy()
+    pj = df["qbr_pred"].to_numpy()
+    ss_res = float(np.sum((y - pj) ** 2))
+    ss_tot = float(np.sum((y - y.mean()) ** 2))
+    return {
+        "n": int(len(y)),
+        "rmse": round(float(np.sqrt(np.mean((pj - y) ** 2))), 4),
+        "mae": round(float(np.mean(np.abs(pj - y))), 4),
+        "r2": round((1 - ss_res / ss_tot) if ss_tot else float("nan"), 4),
+        "corr": round(float(np.corrcoef(pj, y)[0, 1]), 4),
+    }
+
+
+def wp_naive_metrics(model_path, pbp_parquet, wp_oof_parquet) -> dict:
+    """In-sample naive-WP calibration + correlation with the spread WP.
+
+    No LOSO OOF is shipped for the naive variant, so this predicts naive WP over
+    the full ``pbp_full`` corpus (the naive feature matrix is deterministic from
+    game state), pairs it with the spread OOF's win label (same season-sorted row
+    order), and reports calibration plus correlation against the spread WP.
+
+    Args:
+        model_path: ``wp_naive.ubj``.
+        pbp_parquet: ``pbp_full.parquet``.
+        wp_oof_parquet: ``loso_wp_oof.parquet`` (supplies ``y`` and ``wp_pred``).
+
+    Returns:
+        Dict: ``n``, ``logloss``, ``brier``, ``corr_vs_spread``,
+        ``q1_abs_div``, ``q4_abs_div`` — or ``{}`` if inputs/deps are missing.
+    """
+    from pathlib import Path
+
+    import numpy as np
+    import polars as pl
+
+    if not (Path(model_path).exists() and Path(pbp_parquet).exists() and Path(wp_oof_parquet).exists()):
+        return {}
+    try:
+        import xgboost as xgb
+
+        import model_training.constants as C
+    except Exception:
+        return {}
+    df = pl.read_parquet(pbp_parquet)
+    oof = pl.read_parquet(wp_oof_parquet)
+    seasons = sorted(df["season"].unique().to_list())
+    df_ord = pl.concat([df.filter(pl.col("season") == s) for s in seasons])
+    if df_ord.height != oof.height:
+        return {}
+    feats = C.WP_NAIVE_FEATURES
+    source = {k: v for k, v in C.WP_SOURCE.items() if k in feats}
+    X = df_ord.select([pl.col(src).alias(name) for name, src in source.items()]).to_pandas()[feats]
+    b = xgb.Booster()
+    b.load_model(str(model_path))
+    p = b.predict(xgb.DMatrix(X))
+    spread = oof["wp_pred"].to_numpy()
+    y = oof["y"].to_numpy().astype(int)
+    period_src = C.WP_SOURCE.get("period", "period")
+    period = df_ord[period_src].to_numpy() if period_src in df_ord.columns else np.zeros(len(p))
+    out = {
+        "n": int(len(p)),
+        "logloss": round(_bin_logloss(y, p), 4),
+        "brier": round(float(np.mean((p - y) ** 2)), 4),
+        "corr_vs_spread": round(float(np.corrcoef(p, spread)[0, 1]), 4),
+    }
+    for q, key in ((1, "q1_abs_div"), (4, "q4_abs_div")):
+        m = period == q
+        if m.sum():
+            out[key] = round(float(np.mean(np.abs(p[m] - spread[m]))), 4)
+    return out
+
+
 def rb_eval_metrics(loso_parquet) -> dict:
     """Compute RB evaluation metrics from LOSO cross-validation parquet.
 

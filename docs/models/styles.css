@@ -1,0 +1,38 @@
+/* cfbfastR garnet theme for the CFB model-card site */
+:root {
+  --cfb-garnet: #500f1b;
+  --cfb-garnet-light: #7a1a2b;
+}
+
+.navbar {
+  background-color: var(--cfb-garnet) !important;
+}
+.navbar .navbar-brand,
+.navbar .nav-link {
+  color: #f5e9ec !important;
+}
+
+h1, h2, h3 {
+  color: var(--cfb-garnet);
+}
+
+a {
+  color: var(--cfb-garnet-light);
+}
+a:hover {
+  color: var(--cfb-garnet);
+}
+
+table {
+  font-size: 0.95rem;
+}
+table thead th {
+  background-color: var(--cfb-garnet);
+  color: #fff;
+}
+
+img {
+  max-width: 100%;
+  border: 1px solid #e3e3e3;
+  border-radius: 4px;
+}

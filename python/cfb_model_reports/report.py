@@ -12,6 +12,11 @@ class ModelReport:
     figures: list  # repo-relative paths, e.g. "figures/cpoe_calibration.png"
     provenance: dict
     notes: list = field(default_factory=list)
+    # Authored prose sections (Markdown). Empty string => section omitted.
+    summary: str = ""
+    recipe: str = ""
+    discussion: str = ""
+    limitations: str = ""
 
 
 def _fmt_cell(v) -> str:
@@ -35,10 +40,31 @@ def _metrics_table(metrics: dict) -> str:
 
 
 def render_model_report(r: ModelReport) -> str:
-    parts = [f"# {r.title}\n", "## Metrics\n", _metrics_table(r.metrics)]
+    """Render an enriched per-model report as Markdown.
+
+    Section order: Overview, Recipe & lineage, Metrics, Figures, Discussion,
+    Limitations, Provenance, Notes. Prose sections are omitted when empty so a
+    minimal (metrics-only) report still renders.
+
+    Args:
+        r: the :class:`ModelReport` to render.
+
+    Returns:
+        A Markdown document string.
+    """
+    parts = [f"# {r.title}\n"]
+    if r.summary:
+        parts += ["## Overview\n", r.summary + "\n"]
+    if r.recipe:
+        parts += ["\n## Recipe & lineage\n", r.recipe + "\n"]
+    parts += ["\n## Metrics\n", _metrics_table(r.metrics)]
     if r.figures:
         parts.append("\n## Figures\n")
         parts += [f"![]({p})\n" for p in r.figures]
+    if r.discussion:
+        parts += ["\n## Discussion\n", r.discussion + "\n"]
+    if r.limitations:
+        parts += ["\n## Limitations\n", r.limitations + "\n"]
     parts.append("\n## Provenance\n")
     parts.append(_metrics_table(r.provenance) if r.provenance else "_n/a_\n")
     if r.notes:
@@ -49,5 +75,11 @@ def render_model_report(r: ModelReport) -> str:
 
 def render_index(reports: list) -> str:
     lines = ["# CFB Model Reports\n", "Per-model metrics, calibration, and provenance.\n", "## Models\n"]
-    lines += [f"- [{r.title}]({r.model_type}.md)" for r in reports]
+    for r in reports:
+        blurb = ""
+        summary = getattr(r, "summary", "")
+        if summary:
+            first = summary.split(". ")[0].rstrip(".")
+            blurb = f" — {first}."
+        lines.append(f"- [{r.title}]({r.model_type}.md){blurb}")
     return "\n".join(lines) + "\n"

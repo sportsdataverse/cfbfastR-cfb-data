@@ -18,6 +18,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     fd = sub.add_parser("train-fd", help="Train the fourth-down yards-gained model.")
     fd.add_argument("--final-dir", default=".cache/cfb_final", help="Directory containing final.json play files.")
+    fd.add_argument("--pbp", default=None,
+                    help="Pre-compiled plays parquet (e.g. artifacts/pbp_full.parquet). "
+                         "Overrides --final-dir; far faster than re-reading every final.json.")
     fd.add_argument("--out", required=True, help="Output path for the trained fd_model.ubj.")
     fd.add_argument("--seasons", nargs="*", type=int, default=None, help="Seasons to include (default: all).")
     fd.add_argument("--nrounds", type=int, default=None, help="Override nrounds (default: 157).")
@@ -37,15 +40,19 @@ def main(argv=None) -> int:
         from .constants import FD_FEATURES, FD_NROUNDS, FD_PARAMS, FD_YARDS_GAINED_COL
         from .train import train_from_plays
 
-        final_dir = Path(args.final_dir)
-        if not final_dir.exists():
-            print(f"ERROR: --final-dir {final_dir} does not exist.")
-            return 1
-
-        all_plays = _read_final_plays(final_dir, args.seasons)
+        if args.pbp:
+            all_plays = pl.read_parquet(args.pbp)
+            if args.seasons:
+                all_plays = all_plays.filter(pl.col("season").is_in(args.seasons))
+        else:
+            final_dir = Path(args.final_dir)
+            if not final_dir.exists():
+                print(f"ERROR: --final-dir {final_dir} does not exist.")
+                return 1
+            all_plays = _read_final_plays(final_dir, args.seasons)
 
         if all_plays.is_empty():
-            print("ERROR: No plays found. Check --final-dir and --seasons.")
+            print("ERROR: No plays found. Check --pbp / --final-dir and --seasons.")
             return 1
 
         print(f"Loaded {all_plays.height} plays.")

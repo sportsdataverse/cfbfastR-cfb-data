@@ -79,11 +79,17 @@ def _read_final_plays(final_dir: Path, seasons) -> pl.DataFrame:
     frames = []
     for f in sorted(Path(final_dir).glob("*.json")):
         obj = json.loads(f.read_text())
-        if seasons is not None and obj.get("season") not in seasons:
+        season = obj.get("season")
+        if seasons is not None and season not in seasons:
             continue
         plays = obj.get("plays") or []
         if plays:
-            frames.append(pl.DataFrame(plays, infer_schema_length=None))
+            frame = pl.DataFrame(plays, infer_schema_length=None)
+            # Stamp the authoritative game-level season on every play row. Play
+            # records don't carry it, and downstream consumers (per-season CV,
+            # the fourth-down era factor) need a reliable season column.
+            frame = frame.with_columns(pl.lit(season).cast(pl.Int64).alias("season"))
+            frames.append(frame)
     if not frames:
         return pl.DataFrame()
     return pl.concat(frames, how="diagonal_relaxed")

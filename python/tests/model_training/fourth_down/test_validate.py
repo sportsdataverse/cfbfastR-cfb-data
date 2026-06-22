@@ -37,6 +37,7 @@ def test_calibration_fd_shape():
             "yards_to_goal": rng.integers(5, 99, 200).astype(float),
             "posteam_total": rng.uniform(20, 70, 200),
             "posteam_spread": rng.uniform(-40, 40, 200),
+            "era": rng.integers(0, 4, 200),
         }
     )
     y_yards = rng.integers(-10, 66, 200)

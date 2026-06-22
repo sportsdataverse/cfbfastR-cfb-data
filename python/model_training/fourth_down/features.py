@@ -19,13 +19,15 @@ import polars as pl
 from .constants import (
     FD_CLIP_HIGH,
     FD_CLIP_LOW,
+    FD_ERA_BOUNDS,
     FD_FEATURES,
     FD_FIRST_DOWN_PENALTY_COLS,
     FD_IS_HOME_COL,
     FD_LABEL_OFFSET,
     FD_OVERUNDER_COL,
+    FD_SEASON_COL,
     FD_SPREAD_COL,
-    FD_YARDS_GAINED_COL,
+    FD_YARDS_GAINED_COLS,
 )
 
 
@@ -35,6 +37,14 @@ def _first_down_penalty_col(df: pl.DataFrame) -> str:
         if name in df.columns:
             return name
     return FD_FIRST_DOWN_PENALTY_COLS[0]
+
+
+def _yards_gained_col(df: pl.DataFrame) -> str:
+    """Return whichever per-play yards-gained column is present (statYardage preferred)."""
+    for name in FD_YARDS_GAINED_COLS:
+        if name in df.columns:
+            return name
+    return FD_YARDS_GAINED_COLS[0]
 
 
 def fd_features(plays: pl.DataFrame) -> tuple:
@@ -53,9 +63,10 @@ def fd_features(plays: pl.DataFrame) -> tuple:
         return pd.DataFrame(columns=FD_FEATURES), np.array([], dtype=np.int32)
 
     fdp_col = _first_down_penalty_col(plays)
+    ygc = _yards_gained_col(plays)
 
     # --- step 1: down filter (keep 3rd and 4th only) ---
-    if "start.down" not in plays.columns:
+    if "start.down" not in plays.columns or FD_SEASON_COL not in plays.columns:
         return pd.DataFrame(columns=FD_FEATURES), np.array([], dtype=np.int32)
     df = plays.filter(pl.col("start.down").is_in([3, 4]))
 
@@ -80,26 +91,37 @@ def fd_features(plays: pl.DataFrame) -> tuple:
         pl.col(FD_SPREAD_COL).is_not_null() & pl.col(FD_OVERUNDER_COL).is_not_null()
     )
 
-    # --- step 5: yardsGained must be present ---
-    df = df.filter(pl.col(FD_YARDS_GAINED_COL).is_not_null())
+    # --- step 5: yards-gained + season must be present ---
+    df = df.filter(
+        pl.col(ygc).is_not_null() & pl.col(FD_SEASON_COL).is_not_null()
+    )
 
     if df.is_empty():
         return pd.DataFrame(columns=FD_FEATURES), np.array([], dtype=np.int32)
 
-    # --- derive posteam_total ---
+    # --- derive posteam_total + the ordinal CFB rule-era factor ---
     home_total = (pl.col(FD_SPREAD_COL) + pl.col(FD_OVERUNDER_COL)) / 2.0
     away_total = (pl.col(FD_OVERUNDER_COL) - pl.col(FD_SPREAD_COL)) / 2.0
+    lo, mid, hi = FD_ERA_BOUNDS
     df = df.with_columns(
         posteam_total=pl.when(pl.col(FD_IS_HOME_COL).cast(pl.Boolean) == True)  # noqa: E712
         .then(home_total)
         .otherwise(away_total),
         posteam_spread=pl.col("start.pos_team_spread"),
+        era=pl.when(pl.col(FD_SEASON_COL) <= lo)
+        .then(0)
+        .when(pl.col(FD_SEASON_COL) <= mid)
+        .then(1)
+        .when(pl.col(FD_SEASON_COL) <= hi)
+        .then(2)
+        .otherwise(3)
+        .cast(pl.Int32),
     )
 
     # --- build label ---
     df = df.with_columns(
         _label=(
-            pl.col(FD_YARDS_GAINED_COL).cast(pl.Float64).clip(FD_CLIP_LOW, FD_CLIP_HIGH)
+            pl.col(ygc).cast(pl.Float64).clip(FD_CLIP_LOW, FD_CLIP_HIGH)
             + FD_LABEL_OFFSET
         ).cast(pl.Int32)
     )
@@ -111,6 +133,7 @@ def fd_features(plays: pl.DataFrame) -> tuple:
         "yards_to_goal": "start.yardsToEndzone",
         "posteam_total": "posteam_total",
         "posteam_spread": "posteam_spread",
+        "era": "era",
     }
     X = df.select([pl.col(col_map[f]).alias(f) for f in FD_FEATURES]).to_pandas()
     y = df["_label"].to_numpy()

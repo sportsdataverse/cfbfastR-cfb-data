@@ -78,6 +78,7 @@ def test_clip_low_yields_class_0():
                 "overUnder": 50.0,
                 "start.is_home": 1,
                 "yardsGained": -20.0,
+                "season": 2018,
                 "rush": True,
                 "pass": False,
                 "firstD_by_penalty": False,
@@ -100,6 +101,7 @@ def test_clip_high_yields_class_75():
                 "overUnder": 60.0,
                 "start.is_home": 1,
                 "yardsGained": 80.0,
+                "season": 2018,
                 "rush": False,
                 "pass": True,
                 "firstD_by_penalty": False,
@@ -122,6 +124,7 @@ def test_distance_greater_than_yards_to_goal_excluded():
                 "overUnder": 50.0,
                 "start.is_home": 1,
                 "yardsGained": 3.0,
+                "season": 2018,
                 "rush": True,
                 "pass": False,
                 "firstD_by_penalty": False,
@@ -149,6 +152,7 @@ def test_first_down_penalty_included_without_rush_pass():
                 "overUnder": 50.0,
                 "start.is_home": 0,
                 "yardsGained": 2.0,
+                "season": 2018,
                 "rush": False,
                 "pass": False,
                 "firstD_by_penalty": True,
@@ -157,3 +161,11 @@ def test_first_down_penalty_included_without_rush_pass():
     )
     X, y = fd_features(df)
     assert len(X) == 1
+
+
+def test_era_factor_binned_from_season():
+    # fixture play 1 season=2005 -> era 0; play 2 season=2020 -> era 3
+    X, y = fd_features(_load_plays())
+    assert "era" in X.columns
+    assert int(X.iloc[0]["era"]) == 0
+    assert int(X.iloc[1]["era"]) == 3

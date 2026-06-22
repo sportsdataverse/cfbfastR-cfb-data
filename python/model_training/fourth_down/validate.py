@@ -25,10 +25,10 @@ def assert_structure(booster: xgb.Booster) -> None:
     objective = cfg["objective"]["name"]
     n_feats = booster.num_features()
 
-    assert n_feats == 5, (
-        f"num_features={n_feats}, expected 5. "
+    assert n_feats == 6, (
+        f"num_features={n_feats}, expected 6. "
         "Confirm the model was trained on [down, distance, yards_to_goal, "
-        "posteam_total, posteam_spread]."
+        "posteam_total, posteam_spread, era]."
     )
     assert num_class == FD_NUM_CLASS, (
         f"num_class={num_class}, expected {FD_NUM_CLASS}. "

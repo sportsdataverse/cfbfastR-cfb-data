@@ -5,14 +5,27 @@ cfb4th:::fd_model tree count: 157 rounds × 76 classes = 11932 trees.
 """
 from __future__ import annotations
 
-# --- feature contract (exact column order, model was trained on these 5 features) ---
+# --- feature contract (exact column order) ---
+# The original cfb4th recipe is 5-feat; we add an ordinal CFB rule-era factor
+# (era, 0..3) as a Stage-2 enhancement so the full-history (2004-2025) model can
+# absorb the secular drift in fourth-down play across rule eras.
 FD_FEATURES: list[str] = [
     "down",
     "distance",
     "yards_to_goal",
     "posteam_total",
     "posteam_spread",
+    "era",
 ]
+
+# --- CFB rule-era factor (ordinal), derived from the play's season ---
+# Boundaries track major clock / targeting / tempo rule changes:
+#   0: <=2006   (pre clock-rule era; 2006 clock experiment)
+#   1: 2007-2013 (post-2006 revert, pre-targeting-ejection)
+#   2: 2014-2017 (targeting + 10-second runoff + up-tempo)
+#   3: >=2018    (modern)
+FD_SEASON_COL: str = "season"
+FD_ERA_BOUNDS: tuple[int, int, int] = (2006, 2013, 2017)
 
 # --- label bounds (clip + offset: label = clip(yardsGained, LOW, HIGH) + OFFSET) ---
 FD_CLIP_LOW: int = -10  # 10-yard loss = class 0
@@ -49,7 +62,12 @@ FD_SOURCE: dict[str, str] = {
 FD_SPREAD_COL: str = "homeTeamSpread"  # home-team-perspective spread (negative = home favored)
 FD_OVERUNDER_COL: str = "overUnder"  # game total
 FD_IS_HOME_COL: str = "start.is_home"  # 1/True if possessing team is home
-FD_YARDS_GAINED_COL: str = "yardsGained"  # label source
+# Label source — per-play yards gained. ESPN enriched final.json (the cfb-raw
+# corpus) carries this as ``statYardage``; the cfb4th/CFBD lineage + the
+# synthetic unit-test fixtures use ``yardsGained``. Resolve whichever is present
+# (statYardage preferred); FD_YARDS_GAINED_COL is the default + model-card label.
+FD_YARDS_GAINED_COLS: tuple[str, ...] = ("statYardage", "yardsGained")
+FD_YARDS_GAINED_COL: str = "statYardage"  # label source (default)
 FD_RUSH_COL: str = "rush"  # boolean/int — play filter
 FD_PASS_COL: str = "pass"  # boolean/int — play filter
 FD_FIRST_DOWN_PENALTY_COLS: tuple[str, ...] = ("firstD_by_penalty", "start.firstD_by_penalty")

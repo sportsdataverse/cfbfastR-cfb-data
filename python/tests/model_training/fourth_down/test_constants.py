@@ -2,11 +2,11 @@ from model_training.fourth_down import constants as C
 
 
 def test_feature_count():
-    assert len(C.FD_FEATURES) == 5
+    assert len(C.FD_FEATURES) == 6
 
 
 def test_feature_order():
-    assert C.FD_FEATURES == ["down", "distance", "yards_to_goal", "posteam_total", "posteam_spread"]
+    assert C.FD_FEATURES == ["down", "distance", "yards_to_goal", "posteam_total", "posteam_spread", "era"]
 
 
 def test_params_objective():

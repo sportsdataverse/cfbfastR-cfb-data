@@ -8,6 +8,7 @@
     "overUnder": 55.0,
     "start.is_home": 1,
     "yardsGained": 7,
+    "season": 2005,
     "rush": true,
     "pass": false,
     "firstD_by_penalty": false
@@ -21,6 +22,7 @@
     "overUnder": 55.0,
     "start.is_home": 0,
     "yardsGained": -3,
+    "season": 2020,
     "rush": false,
     "pass": true,
     "firstD_by_penalty": false
@@ -34,6 +36,7 @@
     "overUnder": 50.0,
     "start.is_home": 1,
     "yardsGained": 5,
+    "season": 2010,
     "rush": true,
     "pass": false,
     "firstD_by_penalty": false
@@ -47,6 +50,7 @@
     "overUnder": null,
     "start.is_home": 0,
     "yardsGained": 2,
+    "season": 2016,
     "rush": true,
     "pass": false,
     "firstD_by_penalty": false
@@ -60,6 +64,7 @@
     "overUnder": 48.0,
     "start.is_home": 1,
     "yardsGained": null,
+    "season": 2008,
     "rush": true,
     "pass": false,
     "firstD_by_penalty": false

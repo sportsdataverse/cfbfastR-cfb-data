@@ -61,6 +61,7 @@ def main(argv: list[str] | None = None) -> int:
 
         from pregame_wp.box_score import calculate_box_score_from_frames
         from pregame_wp.data_ingest import (
+            _norm_team,
             _team_key,
             fetch_and_cache,
             fetch_games,
@@ -99,6 +100,17 @@ def main(argv: list[str] | None = None) -> int:
                     box.insert(0, "game_id", gid)
                     box.insert(0, "week", int(week))
                     box.insert(0, "season", season)
+                    # per-team actual point differential — the pregame-WP train target
+                    home_pts = g.get("homePoints", g.get("home_points"))
+                    away_pts = g.get("awayPoints", g.get("away_points"))
+                    if home_pts is not None and away_pts is not None:
+                        diff_map = {
+                            _norm_team(_team_key(g, "home")): float(home_pts) - float(away_pts),
+                            _norm_team(_team_key(g, "away")): float(away_pts) - float(home_pts),
+                        }
+                        box["PtsDiff"] = box["Team"].map(lambda t: diff_map.get(_norm_team(t)))
+                    else:
+                        box["PtsDiff"] = pd.NA
                     rows.append(box)
                     ok += 1
                 except Exception as e:  # noqa: BLE001 — skip unbuildable games (missing/partial CFBD data)

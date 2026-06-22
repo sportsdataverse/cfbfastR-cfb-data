@@ -342,6 +342,7 @@ def fetch_and_cache(
     season_type: str = "regular",
     home_team: str | None = None,
     away_team: str | None = None,
+    resume: bool = True,
 ) -> None:
     """Fetch plays + drives for one game and write them to disk.
 
@@ -358,10 +359,20 @@ def fetch_and_cache(
         week: Week number within the season.
         raw_dir: Root directory for per-game JSON cache.
         season_type: ``"regular"`` | ``"postseason"``.
+        home_team: Possessing-side home team name (skips a redundant /games call).
+        away_team: Away team name.
+        resume: If True (default) and this game's plays.json + drives.json already
+            exist on disk, return immediately without re-hitting CFBD. Lets an
+            interrupted multi-season sweep resume where it left off.
     """
     raw_dir = Path(raw_dir)
     game_dir = raw_dir / str(game_id)
     game_dir.mkdir(parents=True, exist_ok=True)
+
+    plays_path = game_dir / "plays.json"
+    drives_path = game_dir / "drives.json"
+    if resume and plays_path.exists() and drives_path.exists() and plays_path.stat().st_size > 0:
+        return  # already cached by a prior run — resume without re-fetching
 
     # Step 1: identify the two teams. Prefer the caller-supplied names (the
     # build loop already has them from the once-per-season /games fetch); only

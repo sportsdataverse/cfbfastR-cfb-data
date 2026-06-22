@@ -24,9 +24,14 @@ def build_parser() -> argparse.ArgumentParser:
             s.add_argument("--variant", choices=["spread", "naive"], default="spread")
         if name == "train-qbr":
             s.add_argument("--espn-qbr", required=True)
-    v = sub.add_parser("validate")
-    v.add_argument("--model", required=True)
-    v.add_argument("--ref", required=True)
+    v = sub.add_parser("validate", help="prediction-parity of a retrained model vs a shipped reference")
+    v.add_argument("--model", required=True, help="path to the retrained .ubj")
+    v.add_argument("--ref", required=True, help="path to the shipped reference .ubj")
+    v.add_argument("--type", required=True, choices=["ep", "wp", "wp_naive", "qbr"],
+                   help="feature family used to build the comparison matrix")
+    v.add_argument("--pbp", default="pbp_full.parquet", help="feature source frame")
+    v.add_argument("--tol", type=float, default=1e-3, help="max abs prediction diff to pass")
+    v.add_argument("--sample", type=int, default=0, help="optional row cap for a quick check (0 = all)")
     lo = sub.add_parser("loso", help="leave-one-season-out CV (pooled + per-season metrics)")
     lo.add_argument("--pbp", default="pbp_full.parquet")
     lo.add_argument("--model", required=True, choices=["ep", "wp", "qbr"])
@@ -79,7 +84,6 @@ def main(argv=None) -> int:
     elif args.cmd == "loso":
         import polars as pl
 
-        from .ingest import add_winner
         from .validate import loso_cv
 
         if args.model == "qbr" and not args.espn_qbr:
@@ -101,10 +105,37 @@ def main(argv=None) -> int:
             Path(args.oof_out).parent.mkdir(parents=True, exist_ok=True)
             res["oof"].write_parquet(args.oof_out)
             print(f"wrote out-of-fold predictions -> {args.oof_out}")
-    elif args.cmd in ("validate", "figures"):
+    elif args.cmd == "validate":
+        import polars as pl
+        import xgboost as xgb
+
+        from .features import ep_matrix, qbr_matrix, wp_matrix
+        from .validate import prediction_parity
+
+        df = add_winner(pl.read_parquet(args.pbp))
+        if args.sample:
+            df = df.head(args.sample)
+        if args.type == "ep":
+            X, _, _ = ep_matrix(df)
+        elif args.type in ("wp", "wp_naive"):
+            X, _, _ = wp_matrix(df, "naive" if args.type == "wp_naive" else "spread")
+        else:  # qbr
+            X, _, _ = qbr_matrix(df)
+        new = xgb.Booster()
+        new.load_model(args.model)
+        ref = xgb.Booster()
+        ref.load_model(args.ref)
+        rep = prediction_parity(new, ref, X, tol=args.tol)
+        verdict = "PASS" if rep["within_tol"] else "OUT-OF-TOL"
         print(
-            f"{args.cmd}: CLI wiring not yet implemented — "
-            f"use the model_training.{args.cmd} library API directly.",
+            f"validate {args.type}: max_abs_diff={rep['max_abs_diff']:.6f} "
+            f"tol={rep['tol']:g} n={len(X)} -> {verdict}",
+        )
+        return 0 if rep["within_tol"] else 1
+    elif args.cmd == "figures":
+        print(
+            "figures: CLI wiring not yet implemented — "
+            "use the model_training.figures library API directly.",
             file=sys.stderr,
         )
         return 2

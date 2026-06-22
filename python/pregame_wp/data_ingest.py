@@ -83,6 +83,17 @@ def _team_key(game: dict[str, Any], side: str) -> str:
     return str(game.get(camel) or game.get(snake) or "")
 
 
+def _norm_team(name: Any) -> str:
+    """Normalize a team name for matching across CFBD endpoints (case/whitespace).
+
+    The ``/games`` and ``/plays`` endpoints can spell the same program slightly
+    differently (case, surrounding whitespace); compare on a casefolded, trimmed
+    key so genuine name variants still match. (FCS games whose PBP simply isn't in
+    CFBD are a separate issue and still correctly produce no plays.)
+    """
+    return str(name or "").strip().casefold()
+
+
 # ---------------------------------------------------------------------------
 # Fetch raw data from CFBD API
 # ---------------------------------------------------------------------------
@@ -190,10 +201,10 @@ def filter_plays_to_game(
     Returns:
         Subset of plays involving only those two teams.
     """
-    teams = {home_team, away_team}
+    teams = {_norm_team(home_team), _norm_team(away_team)}
     return [
         p for p in plays
-        if p.get("offense") in teams and p.get("defense") in teams
+        if _norm_team(p.get("offense")) in teams and _norm_team(p.get("defense")) in teams
     ]
 
 
@@ -203,10 +214,10 @@ def filter_drives_to_game(
     away_team: str,
 ) -> list[dict[str, Any]]:
     """Filter a drive list to just the drives from one specific matchup."""
-    teams = {home_team, away_team}
+    teams = {_norm_team(home_team), _norm_team(away_team)}
     return [
         d for d in drives
-        if d.get("offense") in teams and d.get("defense") in teams
+        if _norm_team(d.get("offense")) in teams and _norm_team(d.get("defense")) in teams
     ]
 
 

@@ -22,6 +22,12 @@ def build_parser() -> argparse.ArgumentParser:
     bb.add_argument("--seasons", default="2012:2020",
                     help="Season range as A:B (e.g. 2012:2020).")
     bb.add_argument("--out", default="cfb/pregame_wp/boxes/")
+    bb.add_argument("--raw-dir", default=None,
+                    help="Per-game CFBD JSON cache dir (default: <out>/raw).")
+    bb.add_argument("--season-type", default="regular",
+                    choices=["regular", "postseason", "both"])
+    bb.add_argument("--limit", type=int, default=0,
+                    help="Max games per season to process (0 = all; use a small value to smoke-test).")
 
     tr = sub.add_parser("train", help="Train XGBRegressor on stored game boxes.")
     tr.add_argument("--boxes", default="cfb/pregame_wp/boxes/")
@@ -51,9 +57,51 @@ def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
 
     if args.cmd == "build-boxes":
+        import pandas as pd
+
+        from pregame_wp.box_score import calculate_box_score_from_frames
+        from pregame_wp.data_ingest import fetch_and_cache, fetch_games, load_game_frames
+        from pregame_wp.ep_curve import load_ep_curve, load_punt_sr
+
         seasons = _parse_seasons(args.seasons)
-        print(f"build-boxes: seasons {seasons[0]}–{seasons[-1]}, out={args.out}")
-        print("  (requires CFBD data staged locally; see data_ingest.py)")
+        out_dir = Path(args.out)
+        out_dir.mkdir(parents=True, exist_ok=True)
+        raw_dir = Path(args.raw_dir) if args.raw_dir else out_dir / "raw"
+        ep_data = load_ep_curve()
+        punt_sr = load_punt_sr()
+        print(f"build-boxes: seasons {seasons[0]}–{seasons[-1]}, out={out_dir}, raw={raw_dir}")
+
+        for season in seasons:
+            games = fetch_games(season=season, season_type=args.season_type)
+            if args.limit:
+                games = games[: args.limit]
+            rows, ok, skipped = [], 0, 0
+            for g in games:
+                gid, week = g.get("id"), g.get("week")
+                if gid is None or week is None:
+                    skipped += 1
+                    continue
+                try:
+                    fetch_and_cache(gid, year=season, week=int(week), raw_dir=raw_dir,
+                                    season_type=args.season_type)
+                    plays_df, drives_df = load_game_frames(gid, raw_dir)
+                    box = calculate_box_score_from_frames(plays_df, drives_df, ep_data, punt_sr)
+                    box.insert(0, "game_id", gid)
+                    box.insert(0, "week", int(week))
+                    box.insert(0, "season", season)
+                    rows.append(box)
+                    ok += 1
+                except Exception as e:  # noqa: BLE001 — skip unbuildable games (missing/partial CFBD data)
+                    skipped += 1
+                    print(f"  skip game {gid} ({season} wk {week}): {type(e).__name__}: {e}")
+            if rows:
+                season_df = pd.concat(rows, ignore_index=True)
+                out_path = out_dir / f"boxes_{season}.parquet"
+                season_df.to_parquet(out_path, index=False)
+                print(f"build-boxes {season}: {ok} games -> {out_path} "
+                      f"({len(season_df)} rows); {skipped} skipped")
+            else:
+                print(f"build-boxes {season}: 0 games built ({skipped} skipped)")
 
     elif args.cmd == "train":
         import glob as _glob

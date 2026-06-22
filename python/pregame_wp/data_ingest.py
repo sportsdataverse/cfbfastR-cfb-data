@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import json
 import os
+import time
 from pathlib import Path
 from typing import Any
 
@@ -31,6 +32,9 @@ import requests
 
 _BASE_URL = "https://api.collegefootballdata.com"
 _TIMEOUT = 30
+_MAX_RETRIES = 6          # 429 retry budget per request
+_BACKOFF_BASE = 2.0       # seconds; exponential: 2, 4, 8, ... capped
+_BACKOFF_CAP = 60.0
 
 # CFBD camelCase → pipeline snake_case for plays
 _PLAY_KEY_MAP: dict[str, str] = {
@@ -66,14 +70,35 @@ def _api_key() -> str:
 
 
 def _get(path: str, params: dict[str, Any] | None = None) -> Any:
+    """GET a CFBD endpoint with exponential backoff on 429 (Too Many Requests).
+
+    Honors a numeric ``Retry-After`` header when present, otherwise backs off
+    ``2, 4, 8, ...`` seconds (capped) for up to ``_MAX_RETRIES`` attempts before
+    re-raising. Non-429 errors raise immediately.
+    """
     headers = {
         "Authorization": f"Bearer {_api_key()}",
         "Accept": "application/json",
     }
     url = f"{_BASE_URL}{path}"
-    resp = requests.get(url, headers=headers, params=params, timeout=_TIMEOUT)
-    resp.raise_for_status()
-    return resp.json()
+    resp = None
+    for attempt in range(_MAX_RETRIES):
+        resp = requests.get(url, headers=headers, params=params, timeout=_TIMEOUT)
+        if resp.status_code == 429:
+            retry_after = str(resp.headers.get("Retry-After", "")).strip()
+            wait = (
+                float(retry_after)
+                if retry_after.isdigit()
+                else min(_BACKOFF_BASE * (2 ** attempt), _BACKOFF_CAP)
+            )
+            time.sleep(wait)
+            continue
+        resp.raise_for_status()
+        return resp.json()
+    # retry budget exhausted while still 429 — surface it
+    if resp is not None:
+        resp.raise_for_status()
+    raise RuntimeError(f"CFBD GET {path} failed after {_MAX_RETRIES} retries")
 
 
 def _team_key(game: dict[str, Any], side: str) -> str:
@@ -315,6 +340,8 @@ def fetch_and_cache(
     week: int,
     raw_dir: Path | str,
     season_type: str = "regular",
+    home_team: str | None = None,
+    away_team: str | None = None,
 ) -> None:
     """Fetch plays + drives for one game and write them to disk.
 
@@ -336,13 +363,17 @@ def fetch_and_cache(
     game_dir = raw_dir / str(game_id)
     game_dir.mkdir(parents=True, exist_ok=True)
 
-    # Step 1: get game metadata to identify the two teams
-    games = fetch_games(season=year, season_type=season_type, week=week)
-    target = next((g for g in games if str(g.get("id")) == str(game_id)), None)
-    if target is None:
-        raise ValueError(f"Game {game_id} not found in {year} {season_type} week {week}")
-    home_team = _team_key(target, "home")
-    away_team = _team_key(target, "away")
+    # Step 1: identify the two teams. Prefer the caller-supplied names (the
+    # build loop already has them from the once-per-season /games fetch); only
+    # hit /games here as a fallback. This avoids a redundant /games call per
+    # game — the dominant source of CFBD 429 rate-limiting in a full sweep.
+    if not home_team or not away_team:
+        games = fetch_games(season=year, season_type=season_type, week=week)
+        target = next((g for g in games if str(g.get("id")) == str(game_id)), None)
+        if target is None:
+            raise ValueError(f"Game {game_id} not found in {year} {season_type} week {week}")
+        home_team = _team_key(target, "home")
+        away_team = _team_key(target, "away")
 
     # Step 2–3: fetch plays from both teams (CFBD filters by offense only)
     home_raw = fetch_plays(year=year, week=week, season_type=season_type, offense=home_team)

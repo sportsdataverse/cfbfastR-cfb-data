@@ -60,7 +60,12 @@ def main(argv: list[str] | None = None) -> int:
         import pandas as pd
 
         from pregame_wp.box_score import calculate_box_score_from_frames
-        from pregame_wp.data_ingest import fetch_and_cache, fetch_games, load_game_frames
+        from pregame_wp.data_ingest import (
+            _team_key,
+            fetch_and_cache,
+            fetch_games,
+            load_game_frames,
+        )
         from pregame_wp.ep_curve import load_ep_curve, load_punt_sr
 
         seasons = _parse_seasons(args.seasons)
@@ -72,7 +77,11 @@ def main(argv: list[str] | None = None) -> int:
         print(f"build-boxes: seasons {seasons[0]}–{seasons[-1]}, out={out_dir}, raw={raw_dir}")
 
         for season in seasons:
-            games = fetch_games(season=season, season_type=args.season_type)
+            try:
+                games = fetch_games(season=season, season_type=args.season_type)
+            except Exception as e:  # noqa: BLE001 — a season-level fetch failure shouldn't kill the batch
+                print(f"build-boxes {season}: SKIPPED season (games fetch failed: {type(e).__name__}: {e})")
+                continue
             if args.limit:
                 games = games[: args.limit]
             rows, ok, skipped = [], 0, 0
@@ -83,7 +92,8 @@ def main(argv: list[str] | None = None) -> int:
                     continue
                 try:
                     fetch_and_cache(gid, year=season, week=int(week), raw_dir=raw_dir,
-                                    season_type=args.season_type)
+                                    season_type=args.season_type,
+                                    home_team=_team_key(g, "home"), away_team=_team_key(g, "away"))
                     plays_df, drives_df = load_game_frames(gid, raw_dir)
                     box = calculate_box_score_from_frames(plays_df, drives_df, ep_data, punt_sr)
                     box.insert(0, "game_id", gid)

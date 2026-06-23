@@ -334,7 +334,11 @@ NARRATIVES: dict[str, ModelNarrative] = {
             "the 2021-25 holdout it **decisively beats the legacy 2020 model** (RMSE 16.1 vs 23.2, "
             "R² 0.66 vs 0.29). Because QBR is a continuous bounded target, the calibration figure "
             "is a predicted-vs-actual scatter (2-D bin density) with a y=x reference, not a "
-            "probability-bucket plot."
+            "probability-bucket plot.\n\n"
+            "**Rule-era variant (adopted).** Adding the one-hot era dummies (`era0..era3`, cuts "
+            "2006/2013/2020) is the one *material* era win in the suite — pooled LOSO RMSE "
+            "**17.88 → 17.42** (evaluated on the spread-backfilled frame, since `spread` is a "
+            "feature). Shipped side-by-side as `qbr_era.ubj` (10 features)."
         ),
         importance=(
             "`qbr_epa` overwhelmingly dominates by gain (it *is* the EPA aggregate ESPN's QBR "
@@ -390,13 +394,17 @@ NARRATIVES: dict[str, ModelNarrative] = {
         ),
         model=(
             "**Algorithm.** XGBoost, `objective=multi:softprob` over **76 classes** (integer "
-            "gains -10..65), **157 boosting rounds**. Lineage is the cfb4th yards model plus the "
-            "added ordinal `era` factor. P(first down) for any distance-to-go is recovered by "
+            "gains -10..65), **157 boosting rounds**. Lineage is the cfb4th yards model plus an "
+            "`era` rule-era factor. P(first down) for any distance-to-go is recovered by "
             "summing class probabilities for gains &ge; the distance.\n\n"
             "**Evaluation.** Calibration collapses the 76-class distribution into P(first down) "
             "and compares to the empirical conversion rate over the 2.2M-play corpus (a sampled "
             "subset for the figure). This is a fit/calibration check on the full corpus rather "
-            "than a season-held-out LOSO pass."
+            "than a season-held-out LOSO pass.\n\n"
+            "**Rule-era variant (adopted).** Switching the ordinal `era` factor to the one-hot "
+            "dummies (`era0..era3`) materially improves out-of-fold first-down calibration — "
+            "pooled LOSO cal-MAE **0.0035 → 0.0027**. Shipped side-by-side as `fd_model_era.ubj` "
+            "(9 features, era one-hot replacing the ordinal factor)."
         ),
         importance=(
             "By XGBoost gain: `distance` leads (it *is* the conversion threshold), then "
@@ -505,7 +513,10 @@ NARRATIVES: dict[str, ModelNarrative] = {
             "**Evaluation.** Leave-one-season-out over 2004-2025 (42,589 attempts): train on the "
             "other seasons, predict the held-out one, pool the out-of-fold make probabilities. The "
             "pooled weighted calibration error is **0.0085** — predicted equals actual to three "
-            "decimals at every distance."
+            "decimals at every distance.\n\n"
+            "**Rule-era variant (adopted, modest).** Adding the one-hot era dummies "
+            "(`era0..era3`) gives a small but consistent out-of-fold gain — pooled LOSO logloss "
+            "**0.5258 → 0.5240**. Shipped side-by-side as `fg_era.ubj` (yards_to_goal + era0..era3)."
         ),
         importance=(
             "There is only one feature, so importance is trivial: `yards_to_goal` carries 100% of "

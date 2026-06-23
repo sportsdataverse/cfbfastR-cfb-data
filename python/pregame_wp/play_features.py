@@ -8,56 +8,58 @@ This matches the notebook's np.select conditions exactly.
 """
 from __future__ import annotations
 
-import numpy as np
-import pandas as pd
+import polars as pl
 
 from .constants import EXPLOSIVE_THRESHOLD, SR_DOWN1, SR_DOWN2, SR_DOWN4
-from .ep_curve import eqppp as _eqppp
 
 
 def add_play_features(
-    df: pd.DataFrame,
+    df: pl.DataFrame,
     ep_data: list[float],
     st_types: list[str],
     bad_types: list[str],
-) -> pd.DataFrame:
+) -> pl.DataFrame:
     """Add play_explosive, play_successful, and (optionally) EqPPP columns."""
-    df = df.copy()
+    is_bad = pl.col("play_type").is_in(bad_types)
+    is_st = pl.col("play_type").is_in(st_types)
 
-    is_bad = df["play_type"].isin(bad_types)
-    is_st = df["play_type"].isin(st_types)
-
-    # --- play_explosive ---
-    df["play_explosive"] = np.select(
-        [
-            is_bad,
-            is_st,
-            df["yards_gained"] >= EXPLOSIVE_THRESHOLD,
-        ],
-        [False, False, True],
-        default=False,
+    # --- play_explosive (first-match-wins, mirrors np.select order) ---
+    play_explosive = (
+        pl.when(is_bad).then(False)
+        .when(is_st).then(False)
+        .when(pl.col("yards_gained") >= EXPLOSIVE_THRESHOLD).then(True)
+        .otherwise(False)
+        .alias("play_explosive")
     )
 
     # --- play_successful (3rd down intentionally absent → default False) ---
-    df["play_successful"] = np.select(
-        [
-            is_bad,
-            is_st,
-            (df["down"] == 1) & (df["yards_gained"] >= SR_DOWN1 * df["distance"]),
-            (df["down"] == 2) & (df["yards_gained"] >= SR_DOWN2 * df["distance"]),
-            (df["down"] >= 4) & (df["yards_gained"] >= SR_DOWN4 * df["distance"]),
-        ],
-        [False, False, True, True, True],
-        default=False,
+    play_successful = (
+        pl.when(is_bad).then(False)
+        .when(is_st).then(False)
+        .when((pl.col("down") == 1) & (pl.col("yards_gained") >= SR_DOWN1 * pl.col("distance")))
+        .then(True)
+        .when((pl.col("down") == 2) & (pl.col("yards_gained") >= SR_DOWN2 * pl.col("distance")))
+        .then(True)
+        .when((pl.col("down") >= 4) & (pl.col("yards_gained") >= SR_DOWN4 * pl.col("distance")))
+        .then(True)
+        .otherwise(False)
+        .alias("play_successful")
     )
+
+    df = df.with_columns([play_explosive, play_successful])
 
     # --- EqPPP (zero for ST plays; skipped when ep_data is empty) ---
     if ep_data:
-        df["EqPPP"] = df.apply(
-            lambda x: 0.0
-            if x["play_type"] in st_types
-            else _eqppp(ep_data, int(x["yard_line"]), int(x["yards_gained"])),
-            axis=1,
+        last = len(ep_data) - 1  # EP curve is indexed by clamped yardline [0, 100]
+        ep_list = pl.lit(pl.Series(ep_data, dtype=pl.Float64).implode())
+        src_idx = pl.col("yard_line").clip(0, last).cast(pl.Int64)
+        dst_idx = (pl.col("yard_line") + pl.col("yards_gained")).clip(0, last).cast(pl.Int64)
+        eqppp_expr = ep_list.list.get(dst_idx) - ep_list.list.get(src_idx)
+        df = df.with_columns(
+            pl.when(is_st)
+            .then(0.0)
+            .otherwise(eqppp_expr)
+            .alias("EqPPP")
         )
 
     return df

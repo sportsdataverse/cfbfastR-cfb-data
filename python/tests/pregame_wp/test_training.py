@@ -1,12 +1,12 @@
 import numpy as np
-import pandas as pd
+import polars as pl
 import pytest
 from pregame_wp.training import filter_outliers, train_pgwp_model
 
 
 def _make_training_df(n=500, seed=1):
     rng = np.random.default_rng(seed)
-    return pd.DataFrame({
+    return pl.DataFrame({
         "5FRDiff": rng.normal(0, 2, n),
         "PtsDiff": rng.normal(0, 14, n),
     })
@@ -14,7 +14,10 @@ def _make_training_df(n=500, seed=1):
 
 def test_filter_outliers_removes_extreme_rows():
     df = _make_training_df(200, seed=0)
-    df.loc[0, "5FRDiff"] = 100.0
+    # inject an extreme outlier into the first row's 5FRDiff
+    col = df["5FRDiff"].to_list()
+    col[0] = 100.0
+    df = df.with_columns(pl.Series("5FRDiff", col))
     filtered = filter_outliers(df)
     assert len(filtered) < len(df)
     assert filtered["5FRDiff"].max() < 100.0
@@ -58,5 +61,5 @@ def test_train_std_from_full_training_preds():
     df = _make_training_df(500)
     model, mu, std = train_pgwp_model(df)
     # Verify std matches std of model predictions on the same df
-    preds = model.predict(df[["5FRDiff"]])
+    preds = model.predict(df.select("5FRDiff").to_numpy())
     assert abs(std - float(np.std(preds))) < 1e-6

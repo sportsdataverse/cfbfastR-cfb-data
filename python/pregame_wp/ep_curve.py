@@ -3,29 +3,31 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pandas as pd
+import polars as pl
 
 _ASSETS = Path(__file__).parent / "assets"
 
 
 def load_ep_curve() -> list[float]:
     """Return EP values indexed by integer yardline (ep[yardline], len=101)."""
-    df = pd.read_csv(_ASSETS / "ep.csv", encoding="utf-8")
-    return df["ep"].tolist()
+    df = pl.read_csv(_ASSETS / "ep.csv", encoding="utf-8")
+    return df["ep"].to_list()
 
 
 def load_punt_sr() -> dict[int, float]:
     """Return {yardline: ExpPuntNet} mapping (yardlines 1-100)."""
-    df = pd.read_csv(_ASSETS / "punt_sr.csv", encoding="utf-8")
-    return dict(zip(df["Yardline"].astype(int), df["ExpPuntNet"]))
+    df = pl.read_csv(_ASSETS / "punt_sr.csv", encoding="utf-8")
+    return dict(
+        zip(df["Yardline"].cast(pl.Int64).to_list(), df["ExpPuntNet"].to_list())
+    )
 
 
 def load_fg_sr() -> dict[int, tuple[float, float]]:
     """Return {distance: (accuracy, exp_fg_value)} mapping."""
-    df = pd.read_csv(_ASSETS / "fg_sr.csv", encoding="utf-8")
+    df = pl.read_csv(_ASSETS / "fg_sr.csv", encoding="utf-8")
     return {
         int(row["Distance"]): (float(row["Accuracy"]), float(row["ExpFGValue"]))
-        for _, row in df.iterrows()
+        for row in df.iter_rows(named=True)
     }
 
 

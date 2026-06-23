@@ -4,7 +4,7 @@ Port of win-prob.ipynb cell 24 calculate_box_score.
 """
 from __future__ import annotations
 
-import pandas as pd
+import polars as pl
 
 from .five_factors import calculate_five_factors_rating
 from .play_features import add_play_features
@@ -24,13 +24,13 @@ _BAD_TYPES = ["Interception", "Sack", "Fumble Recovery (Opponent)"]
 
 
 def calculate_box_score_from_frames(
-    plays: pd.DataFrame,
-    drives: pd.DataFrame,
+    plays: pl.DataFrame,
+    drives: pl.DataFrame,
     ep_data: list[float],
     punt_sr: dict[int, float],
     eq_ppp_global_min: float = -2.0,
     eq_ppp_global_max: float = 2.0,
-) -> pd.DataFrame:
+) -> pl.DataFrame:
     """Compute per-team 5FR box score from pre-loaded play/drive frames.
 
     Args:
@@ -48,7 +48,7 @@ def calculate_box_score_from_frames(
         OppRate, OppEff, OppPPD, OppSR, ExpTO, ActualTO, HavocRate, SackRate,
         KickoffEqPPP, PuntEqPPP, PuntReturnEqPPP, 5FR, 5FRDiff.
     """
-    teams = sorted(plays["offense"].unique())
+    teams = sorted(plays["offense"].unique().to_list())
     if len(teams) != 2:
         raise ValueError(f"Expected exactly 2 teams, got {teams}")
 
@@ -58,38 +58,44 @@ def calculate_box_score_from_frames(
     rows = []
     for team in teams:
         opponent = [t for t in teams if t != team][0]
-        play_stats = generate_team_play_stats(plays, team, _OFF_TYPES, _ST_TYPES)
-        drive_stats = generate_team_drive_stats(drives, team)
-        to_stats = generate_team_turnover_stats(plays, team, opponent)
-        st_stats = generate_team_st_stats(plays, team, ep_data, punt_sr)
+        play_stats = generate_team_play_stats(plays, team, _OFF_TYPES, _ST_TYPES).row(0, named=True)
+        drive_stats = generate_team_drive_stats(drives, team).row(0, named=True)
+        to_stats = generate_team_turnover_stats(plays, team, opponent).row(0, named=True)
+        st_stats = generate_team_st_stats(plays, team, ep_data, punt_sr).row(0, named=True)
 
         row = {
             "Team": team,
-            **{c: play_stats[c].iloc[0] for c in ["OffSR", "OffER", "AvgEqPPP", "IsoPPP", "Plays"]},
-            **{c: drive_stats[c].iloc[0] for c in ["OppRate", "OppEff", "OppPPD", "OppSR"]},
-            **{c: to_stats[c].iloc[0] for c in ["ExpTO", "ActualTO", "HavocRate", "SackRate"]},
-            **{c: st_stats[c].iloc[0] for c in [
+            **{c: play_stats[c] for c in ["OffSR", "OffER", "AvgEqPPP", "IsoPPP", "Plays"]},
+            **{c: drive_stats[c] for c in ["OppRate", "OppEff", "OppPPD", "OppSR"]},
+            **{c: to_stats[c] for c in ["ExpTO", "ActualTO", "HavocRate", "SackRate"]},
+            **{c: st_stats[c] for c in [
                 "KickoffSR", "KickoffEqPPP", "KickoffReturnEqPPP",
                 "PuntSR", "PuntEqPPP", "PuntReturnEqPPP",
             ]},
         }
         rows.append(row)
 
-    box = pd.DataFrame(rows)
+    box = pl.DataFrame(rows)
 
-    # Compute per-factor diffs (team - opponent)
-    for stat in ["OffSR", "AvgEqPPP", "OppPPD", "OppRate", "OppSR", "ActualTO",
-                 "SackRate", "HavocRate"]:
-        box[f"{stat}Diff"] = box[stat] - box[stat].iloc[::-1].values
+    # Compute per-factor diffs (team - opponent). For the 2-row frame this is the
+    # antisymmetric reversal: [a, b] -> [a-b, b-a] (== pandas col - col.iloc[::-1]).
+    box = box.with_columns([
+        (pl.col(stat) - pl.col(stat).reverse()).alias(f"{stat}Diff")
+        for stat in ["OffSR", "AvgEqPPP", "OppPPD", "OppRate", "OppSR",
+                     "ActualTO", "SackRate", "HavocRate"]
+    ])
 
     # Attach global EqPPP bounds for explosiveness domain
-    box["_eq_ppp_min"] = eq_ppp_global_min
-    box["_eq_ppp_max"] = eq_ppp_global_max
+    box = box.with_columns([
+        pl.lit(eq_ppp_global_min).alias("_eq_ppp_min"),
+        pl.lit(eq_ppp_global_max).alias("_eq_ppp_max"),
+    ])
 
-    # 5FR composite
-    box["5FR"] = box.apply(calculate_five_factors_rating, axis=1)
+    # 5FR composite (row-wise; mirrors pandas box.apply(..., axis=1))
+    five_fr = [calculate_five_factors_rating(r) for r in box.iter_rows(named=True)]
+    box = box.with_columns(pl.Series("5FR", five_fr, dtype=pl.Float64))
 
     # 5FRDiff is antisymmetric (A's diff = -B's diff)
-    box["5FRDiff"] = box["5FR"] - box["5FR"].iloc[::-1].values
+    box = box.with_columns((pl.col("5FR") - pl.col("5FR").reverse()).alias("5FRDiff"))
 
-    return box.reset_index(drop=True)
+    return box

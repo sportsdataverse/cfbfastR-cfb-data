@@ -14,7 +14,7 @@ import json
 import os
 import pathlib
 
-import pandas as pd
+import polars as pl
 import pytest
 
 pytestmark = pytest.mark.integration  # CFBD-network tests; deselected by default
@@ -107,7 +107,7 @@ _DRIVES_FIXTURE = [
 def test_normalize_plays_returns_dataframe():
     from pregame_wp.data_ingest import normalize_plays
     df = normalize_plays(_PLAYS_FIXTURE)
-    assert isinstance(df, pd.DataFrame)
+    assert isinstance(df, pl.DataFrame)
     assert len(df) == 2
     required = {"offense", "defense", "play_type", "down", "distance", "yards_gained", "yard_line"}
     assert required <= set(df.columns)
@@ -117,7 +117,7 @@ def test_normalize_plays_dtypes():
     from pregame_wp.data_ingest import normalize_plays
     df = normalize_plays(_PLAYS_FIXTURE)
     for col in ("down", "distance", "yards_gained", "yard_line"):
-        assert pd.api.types.is_numeric_dtype(df[col]), f"{col} should be numeric"
+        assert df.schema[col].is_numeric(), f"{col} should be numeric"
 
 
 def test_normalize_plays_camelcase_keys():
@@ -127,15 +127,15 @@ def test_normalize_plays_camelcase_keys():
     assert "play_type" in df.columns
     assert "yards_gained" in df.columns
     assert "yard_line" in df.columns
-    assert df["play_type"].iloc[0] == "Rush"
-    assert df["yards_gained"].iloc[0] == 4
-    assert df["yard_line"].iloc[0] == 65  # yardsToGoal stored as-is in yard_line
+    assert df["play_type"][0] == "Rush"
+    assert df["yards_gained"][0] == 4
+    assert df["yard_line"][0] == 65  # yardsToGoal stored as-is in yard_line
 
 
 def test_normalize_drives_returns_dataframe():
     from pregame_wp.data_ingest import normalize_drives
     df = normalize_drives(_DRIVES_FIXTURE)
-    assert isinstance(df, pd.DataFrame)
+    assert isinstance(df, pl.DataFrame)
     assert len(df) == 2
     required = {"offense", "defense", "drive_start_yardline", "drive_yards", "drive_scoring", "drive_pts"}
     assert required <= set(df.columns)
@@ -144,14 +144,14 @@ def test_normalize_drives_returns_dataframe():
 def test_normalize_plays_empty_input():
     from pregame_wp.data_ingest import normalize_plays
     df = normalize_plays([])
-    assert isinstance(df, pd.DataFrame)
+    assert isinstance(df, pl.DataFrame)
     assert len(df) == 0
 
 
 def test_normalize_drives_empty_input():
     from pregame_wp.data_ingest import normalize_drives
     df = normalize_drives([])
-    assert isinstance(df, pd.DataFrame)
+    assert isinstance(df, pl.DataFrame)
     assert len(df) == 0
 
 
@@ -166,8 +166,8 @@ def test_load_game_frames_from_disk(tmp_path: pathlib.Path):
     (game_dir / "drives.json").write_text(json.dumps(_DRIVES_FIXTURE))
 
     plays, drives = load_game_frames(game_id, raw_dir=tmp_path)
-    assert isinstance(plays, pd.DataFrame)
-    assert isinstance(drives, pd.DataFrame)
+    assert isinstance(plays, pl.DataFrame)
+    assert isinstance(drives, pl.DataFrame)
     assert len(plays) == 2
     assert len(drives) == 2
 
@@ -276,4 +276,4 @@ def test_e2e_box_score_from_live_game(tmp_path: pathlib.Path):
     assert "5FR" in box.columns
     assert "5FRDiff" in box.columns
     # 5FRDiff is antisymmetric
-    assert abs(box["5FRDiff"].iloc[0] + box["5FRDiff"].iloc[1]) < 1e-9
+    assert abs(box["5FRDiff"][0] + box["5FRDiff"][1]) < 1e-9

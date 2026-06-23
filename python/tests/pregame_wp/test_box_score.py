@@ -1,4 +1,4 @@
-import pandas as pd
+import polars as pl
 from pregame_wp.box_score import calculate_box_score_from_frames
 from pregame_wp.ep_curve import load_ep_curve, load_punt_sr
 
@@ -7,11 +7,15 @@ ST_TYPES = ["Kickoff", "Punt"]
 BAD_TYPES = ["Interception", "Sack", "Fumble Recovery (Opponent)"]
 
 
+def _team_val(df: pl.DataFrame, team: str, col: str):
+    return df.filter(pl.col("Team") == team)[col][0]
+
+
 def _make_synthetic_game():
     ep = load_ep_curve()
     punt_sr = load_punt_sr()
 
-    plays = pd.DataFrame([
+    plays = pl.DataFrame([
         # Offense A — 4 successful plays out of 6
         {"offense": "A", "defense": "B", "play_type": "Rush", "down": 1,
          "distance": 10, "yards_gained": 6, "yard_line": 25, "play_text": "rush for 6"},
@@ -40,7 +44,7 @@ def _make_synthetic_game():
          "distance": 10, "yards_gained": 2, "yard_line": 40, "play_text": "rush for 2"},
     ])
 
-    drives = pd.DataFrame([
+    drives = pl.DataFrame([
         # A: one drive reaches scoring opp (start=35, yards=30 → 65), scores 7
         {"offense": "A", "defense": "B", "drive_start_yardline": 35,
          "drive_yards": 30, "drive_scoring": 1, "drive_pts": 7},
@@ -58,7 +62,7 @@ def test_box_has_one_row_per_team():
         plays, drives, ep, punt_sr,
         eq_ppp_global_min=-2.0, eq_ppp_global_max=2.0,
     )
-    assert set(result["Team"]) == {"A", "B"}
+    assert set(result["Team"].to_list()) == {"A", "B"}
 
 
 def test_stronger_team_has_higher_off_sr():
@@ -67,8 +71,8 @@ def test_stronger_team_has_higher_off_sr():
         plays, drives, ep, punt_sr,
         eq_ppp_global_min=-2.0, eq_ppp_global_max=2.0,
     )
-    a_sr = result[result["Team"] == "A"]["OffSR"].iloc[0]
-    b_sr = result[result["Team"] == "B"]["OffSR"].iloc[0]
+    a_sr = _team_val(result, "A", "OffSR")
+    b_sr = _team_val(result, "B", "OffSR")
     assert a_sr > b_sr
 
 
@@ -79,7 +83,7 @@ def test_5fr_present():
         eq_ppp_global_min=-2.0, eq_ppp_global_max=2.0,
     )
     assert "5FR" in result.columns
-    assert result["5FR"].notna().all()
+    assert result["5FR"].is_not_null().all()
 
 
 def test_5fr_diff_present_and_antisymmetric():
@@ -88,6 +92,6 @@ def test_5fr_diff_present_and_antisymmetric():
         plays, drives, ep, punt_sr,
         eq_ppp_global_min=-2.0, eq_ppp_global_max=2.0,
     )
-    a_diff = result[result["Team"] == "A"]["5FRDiff"].iloc[0]
-    b_diff = result[result["Team"] == "B"]["5FRDiff"].iloc[0]
+    a_diff = _team_val(result, "A", "5FRDiff")
+    b_diff = _team_val(result, "B", "5FRDiff")
     assert abs(a_diff + b_diff) < 1e-9  # A's diff + B's diff = 0

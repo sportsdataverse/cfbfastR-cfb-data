@@ -27,7 +27,7 @@ import time
 from pathlib import Path
 from typing import Any
 
-import pandas as pd
+import polars as pl
 import requests
 
 _BASE_URL = "https://api.collegefootballdata.com"
@@ -250,9 +250,24 @@ def filter_drives_to_game(
 # Normalize raw lists → DataFrames
 # ---------------------------------------------------------------------------
 
-def normalize_plays(raw: list[dict[str, Any]]) -> pd.DataFrame:
+def _to_int_col(col: str) -> pl.Expr:
+    """Coerce a column to a non-null Int64 (NaN/null → 0), matching pandas
+    ``pd.to_numeric(errors='coerce').fillna(0).astype(int)``."""
+    return (
+        pl.col(col)
+        .cast(pl.Float64, strict=False)
+        .fill_null(0.0)
+        .fill_nan(0.0)
+        .cast(pl.Int64)
+        .alias(col)
+    )
+
+
+def normalize_plays(raw: list[dict[str, Any]]) -> pl.DataFrame:
     """Normalize CFBD play list to the shape expected by box_score pipeline.
 
+    CFBD's ``/plays`` returns a flat list of dicts, so the frame is built
+    directly with ``pl.DataFrame(raw)`` (no nested flattening needed).
     Handles both camelCase keys (from live CFBD API) and snake_case keys
     (from test fixtures / older ingest versions).
 
@@ -268,28 +283,35 @@ def normalize_plays(raw: list[dict[str, Any]]) -> pd.DataFrame:
         "distance", "yards_gained", "yard_line", "play_text",
     ]
     if not raw:
-        return pd.DataFrame(columns=_required_cols)
+        return pl.DataFrame(schema={c: pl.String for c in _required_cols})
 
-    df = pd.json_normalize(raw)
+    df = pl.DataFrame(raw, infer_schema_length=None)
 
     rename = {k: v for k, v in _PLAY_KEY_MAP.items() if k in df.columns and v not in df.columns}
     if rename:
-        df = df.rename(columns=rename)
+        df = df.rename(rename)
 
-    for col in ("down", "distance", "yards_gained", "yard_line"):
-        if col in df.columns:
-            df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0).astype(int)
+    int_casts = [
+        _to_int_col(col)
+        for col in ("down", "distance", "yards_gained", "yard_line")
+        if col in df.columns
+    ]
+    if int_casts:
+        df = df.with_columns(int_casts)
 
+    add_defaults = []
     if "play_text" not in df.columns:
-        df["play_text"] = ""
+        add_defaults.append(pl.lit("").alias("play_text"))
     if "play_type" not in df.columns:
-        df["play_type"] = ""
+        add_defaults.append(pl.lit("").alias("play_type"))
+    if add_defaults:
+        df = df.with_columns(add_defaults)
 
     available = [c for c in _required_cols if c in df.columns]
-    return df[available].reset_index(drop=True)
+    return df.select(available)
 
 
-def normalize_drives(raw: list[dict[str, Any]]) -> pd.DataFrame:
+def normalize_drives(raw: list[dict[str, Any]]) -> pl.DataFrame:
     """Normalize CFBD drive list to the shape expected by box_score pipeline.
 
     Args:
@@ -304,30 +326,34 @@ def normalize_drives(raw: list[dict[str, Any]]) -> pd.DataFrame:
         "drive_yards", "drive_scoring", "drive_pts",
     ]
     if not raw:
-        return pd.DataFrame(columns=_required_cols)
+        return pl.DataFrame(schema={c: pl.String for c in _required_cols})
 
-    df = pd.json_normalize(raw)
+    df = pl.DataFrame(raw, infer_schema_length=None)
 
     rename = {k: v for k, v in _DRIVE_KEY_MAP.items() if k in df.columns and v not in df.columns}
     if rename:
-        df = df.rename(columns=rename)
+        df = df.rename(rename)
 
     if "drive_pts" not in df.columns:
         for src in ("points", "drivePoints", "drive_points"):
             if src in df.columns:
-                df = df.rename(columns={src: "drive_pts"})
+                df = df.rename({src: "drive_pts"})
                 break
     if "drive_pts" not in df.columns:
-        df["drive_pts"] = 0
+        df = df.with_columns(pl.lit(0).alias("drive_pts"))
 
-    for col in ("drive_start_yardline", "drive_yards", "drive_pts"):
-        if col in df.columns:
-            df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0).astype(int)
+    int_casts = [
+        _to_int_col(col)
+        for col in ("drive_start_yardline", "drive_yards", "drive_pts")
+        if col in df.columns
+    ]
+    if int_casts:
+        df = df.with_columns(int_casts)
     if "drive_scoring" in df.columns:
-        df["drive_scoring"] = df["drive_scoring"].astype(bool)
+        df = df.with_columns(pl.col("drive_scoring").cast(pl.Boolean))
 
     available = [c for c in _required_cols if c in df.columns]
-    return df[available].reset_index(drop=True)
+    return df.select(available)
 
 
 # ---------------------------------------------------------------------------
@@ -404,7 +430,7 @@ def fetch_and_cache(
 def load_game_frames(
     game_id: str | int,
     raw_dir: Path | str,
-) -> tuple[pd.DataFrame, pd.DataFrame]:
+) -> tuple[pl.DataFrame, pl.DataFrame]:
     """Load pre-cached plays + drives JSON from disk.
 
     Args:
@@ -468,7 +494,7 @@ def load_week_game_frames(
     home_team: str,
     away_team: str,
     season_type: str = "regular",
-) -> tuple[pd.DataFrame, pd.DataFrame]:
+) -> tuple[pl.DataFrame, pl.DataFrame]:
     """Load a cached week's plays/drives and slice them to one game's two teams.
 
     Raises:

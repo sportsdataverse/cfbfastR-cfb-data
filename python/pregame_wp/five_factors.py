@@ -9,7 +9,7 @@ and stored but NOT used in any index — consistent with the notebook.
 """
 from __future__ import annotations
 
-import pandas as pd
+from collections.abc import Mapping
 
 from .constants import (
     EFF_DOMAIN,
@@ -44,40 +44,36 @@ def translate(
     return out_min + (value - in_min) / (in_max - in_min) * (out_max - out_min)
 
 
-def create_eff_index(row) -> float:
+def create_eff_index(row: Mapping[str, float]) -> float:
     """Efficiency index [0–10] from OffSRDiff."""
-    return translate(row.OffSRDiff, *EFF_DOMAIN)
+    return translate(row["OffSRDiff"], *EFF_DOMAIN)
 
 
-def create_expl_index(row) -> float:
+def create_expl_index(row: Mapping[str, float]) -> float:
     """Explosiveness index [0–10] from AvgEqPPPDiff (OQ-3: not IsoPPP)."""
-    eq_min = getattr(row, "_eq_ppp_min", None)
-    eq_max = getattr(row, "_eq_ppp_max", None)
-    if eq_min is None:
-        # fall back to row dict access (e.g. pandas Series)
-        eq_min = row["_eq_ppp_min"] if hasattr(row, "__getitem__") else -2.0
-        eq_max = row["_eq_ppp_max"] if hasattr(row, "__getitem__") else 2.0
-    return translate(row.AvgEqPPPDiff, float(eq_min), float(eq_max), 0.0, 10.0)
+    eq_min = row["_eq_ppp_min"] if "_eq_ppp_min" in row else -2.0
+    eq_max = row["_eq_ppp_max"] if "_eq_ppp_max" in row else 2.0
+    return translate(row["AvgEqPPPDiff"], float(eq_min), float(eq_max), 0.0, 10.0)
 
 
-def create_finish_drive_index(row) -> float:
+def create_finish_drive_index(row: Mapping[str, float]) -> float:
     """Finishing drives index [0–10] from PPD + OppRate + OppSR."""
-    ppd = translate(row.OppPPDDiff, *FIN_DRV_PPD_DOMAIN)
-    rate = translate(row.OppRateDiff, *FIN_DRV_RATE_DOMAIN)
-    sr = translate(row.OppSRDiff, *FIN_DRV_SR_DOMAIN)
+    ppd = translate(row["OppPPDDiff"], *FIN_DRV_PPD_DOMAIN)
+    rate = translate(row["OppRateDiff"], *FIN_DRV_RATE_DOMAIN)
+    sr = translate(row["OppSRDiff"], *FIN_DRV_SR_DOMAIN)
     return ppd + rate + sr
 
 
-def create_fp_index(row) -> float:
+def create_fp_index(row: Mapping[str, float]) -> float:
     """Field position index [0–10] from kick/punt EqPPP + SR + TO."""
     # Kick EP diff
-    kick_ep_diff = row.KickoffEqPPP - row.KickoffReturnEqPPP
+    kick_ep_diff = row["KickoffEqPPP"] - row["KickoffReturnEqPPP"]
     # Punt EP diff (OQ-5: PuntReturnEqPPP = PuntEqPPP → this term is always 0)
-    punt_ep_diff = row.PuntEqPPP - row.PuntReturnEqPPP
+    punt_ep_diff = row["PuntEqPPP"] - row["PuntReturnEqPPP"]
     # OffSR contribution (normalized to [0, 1] range)
-    sr_contrib = row.OffSRDiff
+    sr_contrib = row["OffSRDiff"]
     # TO contribution (uses ActualTO sign — positive means fewer turnovers for us)
-    to_contrib = -row.ActualTODiff / max(1, float(row.Plays))
+    to_contrib = -row["ActualTODiff"] / max(1, float(row["Plays"]))
 
     quant = (
         FP_SR_WEIGHT * sr_contrib
@@ -88,16 +84,16 @@ def create_fp_index(row) -> float:
     return translate(quant, *FLD_POS_QUANT_DOMAIN)
 
 
-def create_turnover_index(row) -> float:
+def create_turnover_index(row: Mapping[str, float]) -> float:
     """Turnover index [0–10] from luck (ExpTO-ActualTO), sack rate, havoc rate."""
-    luck_diff = row.ExpTO - row.ActualTO
+    luck_diff = row["ExpTO"] - row["ActualTO"]
     luck = translate(luck_diff, *TRNOVR_LUCK_DOMAIN)
-    sack = translate(row.SackRateDiff, *TRNOVR_SACK_DOMAIN)
-    havoc = translate(row.HavocRateDiff, *TRNOVR_HAVOC_DOMAIN)
+    sack = translate(row["SackRateDiff"], *TRNOVR_SACK_DOMAIN)
+    havoc = translate(row["HavocRateDiff"], *TRNOVR_HAVOC_DOMAIN)
     return luck + sack + havoc
 
 
-def calculate_five_factors_rating(row) -> float:
+def calculate_five_factors_rating(row: Mapping[str, float]) -> float:
     """Composite 5FR = weighted sum of five factor indices."""
     eff = create_eff_index(row)
     expl = create_expl_index(row)

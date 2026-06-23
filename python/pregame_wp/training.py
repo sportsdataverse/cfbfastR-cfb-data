@@ -7,22 +7,23 @@ non-reproducible without a fixed seed.
 from __future__ import annotations
 
 import numpy as np
-import pandas as pd
+import polars as pl
 import xgboost as xgb
 from scipy import stats
 
 from .constants import OUTLIER_Z_5FR, OUTLIER_Z_PTS, XGB_N_ESTIMATORS, XGB_SEED, WP_MU
 
 
-def filter_outliers(df: pd.DataFrame) -> pd.DataFrame:
+def filter_outliers(df: pl.DataFrame) -> pl.DataFrame:
     """Remove rows where 5FRDiff or PtsDiff exceeds the z-score thresholds."""
-    mask_5fr = np.abs(stats.zscore(df["5FRDiff"])) < OUTLIER_Z_5FR
-    mask_pts = np.abs(stats.zscore(df["PtsDiff"])) < OUTLIER_Z_PTS
-    return df[mask_5fr & mask_pts].copy()
+    z_5fr = np.abs(stats.zscore(df["5FRDiff"].to_numpy())) < OUTLIER_Z_5FR
+    z_pts = np.abs(stats.zscore(df["PtsDiff"].to_numpy())) < OUTLIER_Z_PTS
+    mask = z_5fr & z_pts
+    return df.filter(pl.Series(mask))
 
 
 def train_pgwp_model(
-    df: pd.DataFrame,
+    df: pl.DataFrame,
 ) -> tuple[xgb.XGBRegressor, float, float]:
     """Train a 10-tree XGBRegressor on 5FRDiff → PtsDiff.
 
@@ -31,8 +32,9 @@ def train_pgwp_model(
         mu: 0.0 (OQ-7: symmetric by construction)
         std: std of full training-set predictions
     """
-    X = df[["5FRDiff"]].values
-    y = df["PtsDiff"].values
+    # Model boundary stays numpy — XGBoost consumes ndarrays.
+    X = df.select("5FRDiff").to_numpy()
+    y = df["PtsDiff"].to_numpy()
 
     model = xgb.XGBRegressor(
         n_estimators=XGB_N_ESTIMATORS,

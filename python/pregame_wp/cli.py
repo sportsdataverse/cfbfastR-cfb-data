@@ -57,7 +57,7 @@ def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
 
     if args.cmd == "build-boxes":
-        import pandas as pd
+        import polars as pl
 
         from pregame_wp.box_score import calculate_box_score_from_frames
         from collections import defaultdict
@@ -113,9 +113,13 @@ def main(argv: list[str] | None = None) -> int:
                             season_type=args.season_type,
                         )
                         box = calculate_box_score_from_frames(plays_df, drives_df, ep_data, punt_sr)
-                        box.insert(0, "game_id", gid)
-                        box.insert(0, "week", int(week))
-                        box.insert(0, "season", season)
+                        # prepend identifier columns (season, week, game_id)
+                        box = box.select(
+                            pl.lit(season).alias("season"),
+                            pl.lit(int(week)).alias("week"),
+                            pl.lit(gid).alias("game_id"),
+                            pl.all(),
+                        )
                         # per-team actual point differential — the pregame-WP train target
                         home_pts = g.get("homePoints", g.get("home_points"))
                         away_pts = g.get("awayPoints", g.get("away_points"))
@@ -124,18 +128,25 @@ def main(argv: list[str] | None = None) -> int:
                                 _norm_team(_team_key(g, "home")): float(home_pts) - float(away_pts),
                                 _norm_team(_team_key(g, "away")): float(away_pts) - float(home_pts),
                             }
-                            box["PtsDiff"] = box["Team"].map(lambda t: diff_map.get(_norm_team(t)))
+                            box = box.with_columns(
+                                pl.col("Team")
+                                .map_elements(
+                                    lambda t: diff_map.get(_norm_team(t)),
+                                    return_dtype=pl.Float64,
+                                )
+                                .alias("PtsDiff")
+                            )
                         else:
-                            box["PtsDiff"] = pd.NA
+                            box = box.with_columns(pl.lit(None, dtype=pl.Float64).alias("PtsDiff"))
                         rows.append(box)
                         ok += 1
                     except Exception as e:  # noqa: BLE001 — skip unbuildable games (missing/partial CFBD data)
                         skipped += 1
                         print(f"  skip game {gid} ({season} wk {week}): {type(e).__name__}: {e}")
             if rows:
-                season_df = pd.concat(rows, ignore_index=True)
+                season_df = pl.concat(rows, how="vertical_relaxed")
                 out_path = out_dir / f"boxes_{season}.parquet"
-                season_df.to_parquet(out_path, index=False)
+                season_df.write_parquet(out_path)
                 print(f"build-boxes {season}: {ok} games -> {out_path} "
                       f"({len(season_df)} rows); {skipped} skipped")
             else:
@@ -143,15 +154,15 @@ def main(argv: list[str] | None = None) -> int:
 
     elif args.cmd == "train":
         import glob as _glob
-        import pandas as pd
+        import polars as pl
         from pregame_wp.training import filter_outliers, save_pgwp_model, train_pgwp_model
 
         box_files = sorted(_glob.glob(str(Path(args.boxes) / "*.parquet")))
         if not box_files:
             print(f"train: no parquet files found in {args.boxes}")
             return 1
-        frames = [pd.read_parquet(f) for f in box_files]
-        stored = pd.concat(frames, ignore_index=True)
+        frames = [pl.read_parquet(f) for f in box_files]
+        stored = pl.concat(frames, how="vertical_relaxed")
         filtered = filter_outliers(stored)
         model, mu, std = train_pgwp_model(filtered)
         out_dir = Path(args.out)

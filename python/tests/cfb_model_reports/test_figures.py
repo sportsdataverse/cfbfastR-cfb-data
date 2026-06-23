@@ -75,6 +75,7 @@ def test_new_binary_builders_missing_parquet_return_empty(tmp_path):
     assert figmod.build_fg_calibration(missing, tmp_path, tmp_path) == []
     assert figmod.build_xpass_calibration(missing, tmp_path, tmp_path) == []
     assert figmod.build_two_pt_calibration(missing, tmp_path, tmp_path) == []
+    assert figmod.build_pregame_wp_calibration(missing, tmp_path, tmp_path) == []
 
 
 def test_new_binary_builders_require_their_columns(tmp_path):
@@ -88,3 +89,6 @@ def test_new_binary_builders_require_their_columns(tmp_path):
     tp = tmp_path / "loso_two_pt_oof.parquet"
     pl.DataFrame({"season": [2024], "made": [0]}).write_parquet(tp)
     assert figmod.build_two_pt_calibration(tp, tmp_path, tmp_path) == []
+    pg = tmp_path / "loso_pgwp_oof.parquet"
+    pl.DataFrame({"season": [2024], "pred_pts": [3.0]}).write_parquet(pg)
+    assert figmod.build_pregame_wp_calibration(pg, tmp_path, tmp_path) == []

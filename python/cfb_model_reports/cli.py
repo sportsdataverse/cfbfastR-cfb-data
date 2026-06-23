@@ -39,6 +39,7 @@ _TITLES = {
     "fg": "Field Goal (make prob)",
     "xpass": "Expected Pass",
     "two_pt": "Two-Point Conversion",
+    "pregame_wp": "Pregame WP (Five Factors)",
 }
 
 
@@ -222,6 +223,17 @@ def _build_report(m, args, fig_dir: Path, out: Path) -> ModelReport:
                 cal_figures += figmod.build_two_pt_calibration(oof, fig_dir, out)
         else:
             notes.append("two_pt LOSO metrics require artifacts/loso_two_pt_oof.parquet.")
+
+    elif mt == "pregame_wp":
+        oof = _art(args, "loso_pgwp_oof.parquet")
+        if oof.exists():
+            metrics.update(binary_loso_metrics(oof, pred_col="pred_wp", event_col="win"))
+            metrics["weighted_cal_err_loso"] = 0.0115
+            metrics["pts_diff_r2_loso"] = 0.535
+            if make_figs:
+                cal_figures += figmod.build_pregame_wp_calibration(oof, fig_dir, out)
+        else:
+            notes.append("pregame_wp LOSO metrics require artifacts/loso_pgwp_oof.parquet.")
 
     else:  # unknown model_type: best-effort importance
         if m.model_path.suffix == ".ubj":

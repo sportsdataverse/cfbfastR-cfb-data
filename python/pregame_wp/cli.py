@@ -158,7 +158,7 @@ def main(argv: list[str] | None = None) -> int:
         out_dir.mkdir(parents=True, exist_ok=True)
         save_pgwp_model(model, std, out_dir / "pgwp_model.ubj",
                         season_range=None)
-        print(f"train: model saved → {out_dir / 'pgwp_model.ubj'} (mu={mu}, std={std:.4f})")
+        print(f"train: model saved -> {out_dir / 'pgwp_model.ubj'} (mu={mu}, std={std:.4f})")
 
     elif args.cmd == "predict-matchup":
         import xgboost as xgb

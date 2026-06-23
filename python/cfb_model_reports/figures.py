@@ -490,6 +490,46 @@ def build_two_pt_calibration(oof_parquet, fig_dir: Path, out: Path) -> list[str]
     return [_rel(Path(png), out)]
 
 
+def build_pregame_wp_calibration(oof_parquet, fig_dir: Path, out: Path) -> list[str]:
+    """Render the pregame-WP (Five Factors) calibration figure (single panel).
+
+    Bins predicted pregame WP into 0.05 buckets and plots the binned predicted
+    probability against the empirical win rate, point size = ``n_plays``, y=x
+    reference, weighted-calibration-error caption — the same garnet binned style
+    as the FG/two-point figures. The prediction is the Gaussian-transformed
+    ``WP = Phi(pred_PtsDiff / std)`` already stored in ``pred_wp``.
+
+    Args:
+        oof_parquet: ``loso_pgwp_oof.parquet`` with columns ``season``,
+            ``pred_wp`` (predicted pregame WP) and ``win`` (0/1 outcome).
+
+    Returns:
+        ``["figures/pregame_wp_calibration.png"]`` if written, else ``[]``.
+    """
+    p = Path(oof_parquet)
+    if not p.exists():
+        return []
+    try:
+        from model_training.figures import write_calibration
+    except Exception:
+        return []
+    df = pl.read_parquet(p)
+    if not {"pred_wp", "win"}.issubset(df.columns):
+        return []
+    pred = df["pred_wp"].to_numpy().astype(float)
+    win = df["win"].to_numpy().astype(int)
+    facet = np.array(["Pregame WP"] * len(pred), dtype=object)
+    tab, cal_err = _binned_calibration(pred, win, facet, bin_size=0.05)
+    png, _ = write_calibration(
+        tab,
+        fig_dir / "pregame_wp_calibration",
+        title="Pregame WP (Five Factors) — LOSO Calibration",
+        subtitle="Predicted pregame WP vs Empirical win rate",
+        cal_error=round(cal_err, 4),
+    )
+    return [_rel(Path(png), out)]
+
+
 def build_fd_figures(model_path, pbp_parquet, fig_dir: Path, out: Path,
                      *, sample_rows: int = 200_000) -> list[str]:
     """Render fourth-down first-down calibration + feature-importance figures.

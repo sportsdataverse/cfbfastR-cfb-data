@@ -4,7 +4,7 @@ from cfb_model_reports.narratives import NARRATIVES, ModelNarrative
 
 def test_all_expected_models_have_narratives():
     for mt in ("ep", "wp_spread", "wp_naive", "qbr", "fourth_down", "rb_eval",
-               "fg", "xpass", "two_pt"):
+               "fg", "xpass", "two_pt", "pregame_wp"):
         assert mt in NARRATIVES, f"missing narrative for {mt}"
 
 
@@ -33,6 +33,12 @@ def test_lineage_facts_present():
     assert "830" in NARRATIVES["xpass"].importance  # down dominates by gain
     assert "1,622 attempts" in NARRATIVES["two_pt"].recipe
     assert "0.9851" in NARRATIVES["two_pt"].summary  # XP make rate
+    # Track 4 pregame WP (Five Factors) load-bearing facts.
+    assert "37,774" in NARRATIVES["pregame_wp"].recipe
+    assert "5FRDiff" in NARRATIVES["pregame_wp"].summary
+    assert "0.535" in NARRATIVES["pregame_wp"].recipe  # PtsDiff R^2
+    assert "0.0115" in NARRATIVES["pregame_wp"].recipe  # WP cal-err
+    assert "16.46" in NARRATIVES["pregame_wp"].model  # Gaussian std
 
 
 def test_new_heads_have_methodology_sections():

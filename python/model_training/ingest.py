@@ -103,7 +103,16 @@ def _coerce_scoring_bools(df: pl.DataFrame) -> pl.DataFrame:
     return df
 
 
-def build_training_frame(final_dir, seasons=None) -> pl.DataFrame:
+def build_training_frame(final_dir, seasons=None, *, odds_path=None) -> pl.DataFrame:
+    """Build the pbp_full training frame.
+
+    When ``odds_path`` is given (the ``cfb_line_odds`` parquet), the consensus
+    spread backfill is applied as the final step — filling ``homeTeamSpread`` /
+    ``start.pos_team_spread`` / ``start.spread_time`` for the games ESPN ships no
+    line for (mostly 2006-2011), so every spread-dependent model (WP-spread, QBR,
+    two-point, fourth-down) trains on a real spread instead of the flat default.
+    Default ``None`` keeps the legacy behavior byte-identical.
+    """
     df = _read_final_plays(final_dir, seasons)
     if df.is_empty():
         return df
@@ -111,11 +120,15 @@ def build_training_frame(final_dir, seasons=None) -> pl.DataFrame:
     df = _coerce_scoring_bools(df)
     df = label_next_score_half(df)
     df = add_weights(df)
+    if odds_path is not None:
+        from .spread_backfill import apply_spread_backfill, load_consensus_spreads
+        df, stats = apply_spread_backfill(df, load_consensus_spreads(odds_path))
+        print(f"spread backfill applied: {stats}")
     return df
 
 
-def write_training_frame(final_dir, out_path, seasons=None) -> int:
-    df = build_training_frame(final_dir, seasons)
+def write_training_frame(final_dir, out_path, seasons=None, *, odds_path=None) -> int:
+    df = build_training_frame(final_dir, seasons, odds_path=odds_path)
     Path(out_path).parent.mkdir(parents=True, exist_ok=True)
     df.write_parquet(out_path)
     return df.height

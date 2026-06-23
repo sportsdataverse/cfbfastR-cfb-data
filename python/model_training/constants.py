@@ -72,9 +72,28 @@ QBR_PARAMS = dict(booster="gbtree", objective="reg:squarederror", eta=0.1,
 QBR_NROUNDS = 45  # matches shipped qbr_model.ubj tree count
 
 # --- Ordinal CFB rule-era factor (shared FG/xPass/two-pt helper) ---------------
-# Boundaries track major clock / targeting / tempo rule changes (matches the
-# fourth_down ordinal era exactly): 0:<=2006  1:2007-2013  2:2014-2017  3:>=2018.
-ERA_BOUNDS: tuple[int, int, int] = (2006, 2013, 2017)
+# Boundaries track major clock / targeting / tempo / modern-tempo rule changes
+# (matches the fourth_down ordinal era exactly):
+#   0: 2004-2006   1: 2007-2013   2: 2014-2020   3: 2021+.
+ERA_BOUNDS: tuple[int, int, int] = (2006, 2013, 2020)
+
+# --- One-hot CFB rule-era dummies (era-experiment encoding) ---------------------
+# nflfastR-style 0/1 dummy columns derived from ERA_BOUNDS (one column per bucket).
+# CFB data starts in 2004, so there is no pre-2004 bucket — len(ERA_BOUNDS)+1 = 4
+# columns era0..era3. This is the encoding evaluated by era_experiment.py; the
+# ordinal `era` factor (above) remains the shipped FG/xPass/two-pt/fourth-down
+# convention until a one-hot retrain is promoted.
+ERA_ONEHOT_COLS: list[str] = [f"era{i}" for i in range(len(ERA_BOUNDS) + 1)]  # era0..era3
+
+
+def with_era_onehot(feats: list[str]) -> list[str]:
+    """Return ``feats`` with any ordinal ``era`` swapped for the one-hot era columns.
+
+    Used by the era experiment to derive the augmented feature order from a base
+    feature list (drops a pre-existing ordinal ``era`` so the two encodings are
+    never both present).
+    """
+    return [f for f in feats if f != "era"] + ERA_ONEHOT_COLS
 
 # --- FG model (fg_model.ubj) — single-feature make-probability surface ---------
 FG_FEATURES: list[str] = ["yards_to_goal"]  # <- start.yardsToEndzone, attempts in [1,55]

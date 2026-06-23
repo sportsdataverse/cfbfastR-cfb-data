@@ -4,6 +4,7 @@ import polars as pl
 import pytest
 
 from cfb_model_reports.metrics import (
+    binary_loso_metrics,
     compute_classification_metrics,
     ep_loso_metrics,
     provenance_from_card,
@@ -120,6 +121,35 @@ def test_wp_loso_metrics(tmp_path):
     assert m["n"] == 4
     assert m["logloss"] > 0 and 0 <= m["brier"] <= 1
     assert m["auc"] == 1.0  # perfectly separable
+
+
+def test_binary_loso_metrics(tmp_path):
+    """binary_loso_metrics returns logloss/brier/auc/base_rate/weighted_cal_err."""
+    lp = tmp_path / "loso_fg_oof.parquet"
+    pl.DataFrame(
+        {
+            "season": [2024] * 4,
+            "yards_to_goal": [18.0, 25.0, 40.0, 50.0],
+            "made": [1, 1, 0, 0],
+            "fg_pred": [0.9, 0.8, 0.2, 0.1],
+        }
+    ).write_parquet(lp)
+    m = binary_loso_metrics(lp, pred_col="fg_pred", event_col="made")
+    assert m["n"] == 4
+    assert m["logloss"] > 0 and 0 <= m["brier"] <= 1
+    assert m["auc"] == 1.0  # perfectly separable
+    assert m["base_rate"] == 0.5
+    assert m["weighted_cal_err"] >= 0.0
+
+
+def test_binary_loso_metrics_custom_cols(tmp_path):
+    """The pred/event column names are parameterised (xpass uses is_pass/xpass)."""
+    lp = tmp_path / "loso_xpass_oof.parquet"
+    pl.DataFrame(
+        {"season": [2024] * 4, "down": [1.0, 2.0, 3.0, 1.0], "is_pass": [1, 0, 1, 0], "xpass": [0.8, 0.3, 0.7, 0.2]}
+    ).write_parquet(lp)
+    m = binary_loso_metrics(lp, pred_col="xpass", event_col="is_pass")
+    assert m["n"] == 4 and "weighted_cal_err" in m and "base_rate" in m
 
 
 def test_qbr_loso_metrics(tmp_path):

@@ -225,6 +225,54 @@ def wp_naive_metrics(model_path, pbp_parquet, wp_oof_parquet) -> dict:
     return out
 
 
+def _weighted_cal_err(pred, event, *, bin_size: float = 0.05) -> float:
+    """Single-facet weighted calibration error: bin the predicted prob into
+    ``bin_size`` buckets and weight ``|bin - empirical|`` by per-bin ``n``."""
+    import numpy as np
+
+    b = np.round(pred / bin_size) * bin_size
+    wsum = werr = 0.0
+    for bb in np.unique(b):
+        mm = b == bb
+        n = int(mm.sum())
+        wsum += n
+        werr += n * abs(float(bb) - float(event[mm].mean()))
+    return float(werr / wsum) if wsum else float("nan")
+
+
+def binary_loso_metrics(oof_parquet, *, pred_col: str, event_col: str) -> dict:
+    """Pooled binary-classifier LOSO metrics from an out-of-fold parquet.
+
+    Shared runner for the fg / xpass / two_pt heads — each ships an OOF parquet
+    with a predicted-probability column and a 0/1 outcome column. Returns the
+    pooled log-loss, Brier, AUC, base rate, and the binned weighted calibration
+    error (the same 0.05-bucket recipe the calibration figures use).
+
+    Args:
+        oof_parquet: parquet with the prediction + event columns.
+        pred_col: predicted-probability column name (e.g. ``fg_pred``).
+        event_col: 0/1 outcome column name (e.g. ``made``).
+
+    Returns:
+        Dict: ``n``, ``logloss``, ``brier``, ``auc``, ``base_rate``,
+        ``weighted_cal_err``.
+    """
+    import numpy as np
+    import polars as pl
+
+    df = pl.read_parquet(oof_parquet)
+    y = df[event_col].to_numpy().astype(int)
+    p = df[pred_col].to_numpy().astype(float)
+    return {
+        "n": int(len(y)),
+        "logloss": round(_bin_logloss(y, p), 4),
+        "brier": round(float(np.mean((p - y) ** 2)), 4),
+        "auc": round(_auc(y, p), 4),
+        "base_rate": round(float(y.mean()), 4),
+        "weighted_cal_err": round(_weighted_cal_err(p, y), 4),
+    }
+
+
 def rb_eval_metrics(loso_parquet) -> dict:
     """Compute RB evaluation metrics from LOSO cross-validation parquet.
 

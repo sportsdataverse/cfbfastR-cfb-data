@@ -97,27 +97,32 @@ def write_calibration(
 
     pdf = table.to_pandas()
 
-    p = (
-        ggplot(pdf, aes("bin", "actual"))
-        + geom_abline(slope=1, intercept=0, linetype="dashed", color="black")
-        + geom_point(aes(size="n_plays"), color=GARNET)
-        + geom_smooth(method=_SMOOTHER, se=False, color=GARNET, size=0.5)
-        + facet_wrap("~by")
-        + labs(
-            title=title,
-            subtitle=subtitle,
-            caption=f"Overall Weighted Calibration Error: {cal_error}",
-            x="Estimated probability",
-            y="Observed probability",
-            size="Number of plays",
+    def _build(smoother):
+        return (
+            ggplot(pdf, aes("bin", "actual"))
+            + geom_abline(slope=1, intercept=0, linetype="dashed", color="black")
+            + geom_point(aes(size="n_plays"), color=GARNET)
+            + geom_smooth(method=smoother, se=False, color=GARNET, size=0.5)
+            + facet_wrap("~by")
+            + labs(
+                title=title,
+                subtitle=subtitle,
+                caption=f"Overall Weighted Calibration Error: {cal_error}",
+                x="Estimated probability",
+                y="Observed probability",
+                size="Number of plays",
+            )
+            + theme_bw()
+            + theme(
+                text=element_text(family=FONT),
+                plot_background=element_rect(fill=GREY99, color="black"),
+                panel_background=element_rect(fill=GREY95),
+                legend_position="bottom",
+            )
         )
-        + theme_bw()
-        + theme(
-            text=element_text(family=FONT),
-            plot_background=element_rect(fill=GREY99, color="black"),
-            panel_background=element_rect(fill=GREY95),
-            legend_position="bottom",
-        )
-    )
-    p.save(png, width=6, height=4, dpi=200, verbose=False)
+
+    try:
+        _build(_SMOOTHER).save(png, width=6, height=4, dpi=200, verbose=False)
+    except Exception:  # noqa: BLE001 — loess can hit singularities on sparse/collinear bins; fall back to OLS
+        _build("lm").save(png, width=6, height=4, dpi=200, verbose=False)
     return png, csv

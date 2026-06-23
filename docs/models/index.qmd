@@ -2,13 +2,19 @@
 title: "CFB Models"
 ---
 
-Model cards for the SportsDataverse / cfbfastR college-football models — each
-page covers the model's **recipe & lineage**, **metrics**, **calibration
-figures**, a **discussion** of how to read it, and honest **limitations**.
+Model cards for the SportsDataverse / cfbfastR college-football models. Each
+card reads like a methodology write-up — descended from the nflfastR EP/WP/CP
+post and the cfbscrapR `EPA_WPA/` notebooks — and flows **Overview → Model
+features → The model → Calibration Results → Feature importance → Limitations →
+Provenance**.
 
 The metrics are computed from honest out-of-sample evidence: the play-level
 models report **leave-one-season-out (LOSO)** out-of-fold values, and the
 fourth-down model reports first-down calibration on the full 2.2M-play corpus.
+The signature calibration figures follow the cfbscrapR recipe exactly — the
+**EP plot facets the 7 next-score classes**, and the **WP plots facet by
+quarter** (predicted-probability bins vs empirical rate, point size = sample
+count, loess fit, y=x reference, weighted-calibration-error caption).
 
 ## Models
 

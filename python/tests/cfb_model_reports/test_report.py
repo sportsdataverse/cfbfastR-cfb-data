@@ -51,6 +51,43 @@ def test_render_index_links_each_report():
     assert "[EP](ep.md)" in idx and "[CPOE](cpoe.md)" in idx
 
 
+def test_render_methodology_sections_and_figure_routing():
+    """nflfastR-post structure: Model features / The model / Calibration Results
+    (with the calibration figure) / Feature importance (with its figure)."""
+    r = ModelReport(
+        model_type="ep", title="Expected Points (EP)",
+        metrics={"ep_cal_mae": 0.014},
+        figures=["figures/ep_class_calibration.png", "figures/ep_importance.png"],
+        provenance={"trained_date": "2026-06-17"}, notes=[],
+        summary="EP estimates next-score value.",
+        recipe="8-feature multiclass softprob.",
+        discussion="Binned predicted class prob vs empirical rate.",
+        limitations="Start-of-play quantity.",
+        features="| Feature | Type | What it encodes |\n|---|---|---|\n| `x` | n | y |",
+        model="XGBoost multi:softprob, 525 rounds, leave-one-season-out CV.",
+        importance="yards_to_goal dominates by gain.",
+        calibration_figures=["figures/ep_class_calibration.png"],
+        importance_figures=["figures/ep_importance.png"],
+    )
+    md = render_model_report(r)
+    for h in ("## Model features", "## The model", "## Calibration Results",
+              "## Feature importance"):
+        assert h in md, f"missing section {h}"
+    # The calibration figure renders under Calibration Results, the importance
+    # figure under Feature importance.
+    assert "![](figures/ep_class_calibration.png)" in md
+    assert "![](figures/ep_importance.png)" in md
+    # Ordering: features -> the model -> metrics -> calibration -> importance -> limitations.
+    order = [
+        "## Model features", "## The model", "## Metrics", "## Calibration Results",
+        "## Feature importance", "## Limitations", "## Provenance",
+    ]
+    idxs = [md.index(h) for h in order]
+    assert idxs == sorted(idxs), f"section order wrong: {idxs}"
+    # A routed figure is NOT duplicated into a generic Figures section.
+    assert "## Figures" not in md
+
+
 def test_fmt_cell_list():
     assert _fmt_cell(["a", "b"]) == "a, b"
 

@@ -5,9 +5,31 @@
 The QBR model reconstructs an ESPN-Total-QBR-style 0-100 quarterback rating from EPA components, so a QBR can be produced for any game in the corpus without an ESPN QBR feed. It is a per-(quarterback, game) regression onto ESPN's published raw QBR.
 
 
+## Model features
+
+**6 features**, one row per (quarterback, game). Each EPA component is the per-game weighted mean of that component over the QB's plays (the same weighting `CFBPlayProcess.__process_qbr` uses).
+
+| Feature | Type | What it encodes |
+|---|---|---|
+| `qbr_epa` | numeric | Total QBR-attributable EPA per game — the dominant driver. |
+| `sack_epa` | numeric | EPA lost to sacks. |
+| `pass_epa` | numeric | EPA from pass attempts. |
+| `rush_epa` | numeric | EPA from QB rushes. |
+| `pen_epa` | numeric | EPA from penalties on the QB's plays. |
+| `spread` | numeric | Possession-team pregame spread (context for garbage-time deflation). |
+
+
+
 ## Recipe & lineage
 
 A 6-feature XGBoost regression, **45 trees**, full-history retrain. Features are the per-game weighted-mean EPA components that drive QBR: `qbr_epa`, `sack_epa`, `pass_epa`, `rush_epa`, `pen_epa`, plus the posteam `spread`. The EPA components come from the same EP model documented above, so QBR sits one layer above EP/EPA.
+
+
+## The model
+
+**Algorithm.** XGBoost regression (squared-error objective), **45 boosting rounds**, full-history retrain. The target is ESPN's *published raw QBR* for the quarterback-game; the EPA components come from the EP model documented above, so QBR sits one layer above EP/EPA.
+
+**Evaluation.** Leave-one-season-out over 22,833 quarterback-games (2005-2025). On the 2021-25 holdout it **decisively beats the legacy 2020 model** (RMSE 16.1 vs 23.2, R² 0.66 vs 0.29). Because QBR is a continuous bounded target, the calibration figure is a predicted-vs-actual scatter (2-D bin density) with a y=x reference, not a probability-bucket plot.
 
 
 ## Metrics
@@ -21,7 +43,7 @@ A 6-feature XGBoost regression, **45 trees**, full-history retrain. Features are
 | `corr` | 0.7651 |
 
 
-## Figures
+## Calibration Results
 
 ![](figures/qbr_calibration.png)
 
@@ -29,6 +51,11 @@ A 6-feature XGBoost regression, **45 trees**, full-history retrain. Features are
 ## Discussion
 
 LOSO pooled over 22,833 quarterback-games (2005-2025): RMSE 17.87, MAE 13.90, R² 0.585, correlation 0.765. It **decisively beats the legacy 2020 model**: on the 2021-25 holdout, RMSE 16.1 vs 23.2 and R² 0.66 vs 0.29. The earlier (pre-2014) seasons carry most of the residual error — fold RMSEs run ~19-24 before 2014 and ~16 after — consistent with sparser / noisier early ESPN QBR labels. The scatter figure plots predicted QBR against ESPN raw QBR with the y=x reference.
+
+
+## Feature importance
+
+`qbr_epa` overwhelmingly dominates by gain (it *is* the EPA aggregate ESPN's QBR tracks), with `pass_epa` and `rush_epa` next; `spread` contributes a small garbage-time / leverage correction.
 
 
 ## Limitations

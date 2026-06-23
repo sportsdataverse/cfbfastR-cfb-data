@@ -75,23 +75,29 @@ def write_fd_figures(
     cal_table.to_csv(out / "fd_calibration.csv", index=False)
     importance.to_csv(out / "fd_feature_importance.csv", index=False)
 
-    cal_p = (
-        ggplot(cal_table, aes("pred_fd_prob", "empirical_fd_rate"))
-        + geom_abline(slope=1, intercept=0, linetype="dashed", color="black")
-        + geom_point(aes(size="n_plays"), color=GARNET)
-        + geom_smooth(method=_SMOOTHER, se=False, color=GARNET, size=0.5)
-        + scale_x_continuous(limits=[0, 1])
-        + labs(
-            title="Fourth-Down Yards Model — First-Down Calibration",
-            subtitle="Predicted P(first down) vs Empirical First-Down Rate",
-            caption=f"Weighted Calibration Error: {cal_error:.4f}",
-            x="Predicted P(first down)",
-            y="Empirical first-down rate",
-            size="Number of plays",
+    def _cal(smoother):
+        return (
+            ggplot(cal_table, aes("pred_fd_prob", "empirical_fd_rate"))
+            + geom_abline(slope=1, intercept=0, linetype="dashed", color="black")
+            + geom_point(aes(size="n_plays"), color=GARNET)
+            + geom_smooth(method=smoother, se=False, color=GARNET, size=0.5)
+            + scale_x_continuous(limits=[0, 1])
+            + labs(
+                title="Fourth-Down Yards Model — First-Down Calibration",
+                subtitle="Predicted P(first down) vs Empirical First-Down Rate",
+                caption=f"Weighted Calibration Error: {cal_error:.4f}",
+                x="Predicted P(first down)",
+                y="Empirical first-down rate",
+                size="Number of plays",
+            )
+            + _theme_fd()
         )
-        + _theme_fd()
-    )
-    cal_png = _save(cal_p, out / "fd_calibration.png")
+
+    cal_png = out / "fd_calibration.png"
+    try:
+        _save(_cal(_SMOOTHER), cal_png)
+    except Exception:  # noqa: BLE001 — loess can hit singularities on sparse/collinear bins; fall back to OLS
+        _save(_cal("lm"), cal_png)
 
     imp_sorted = importance.sort_values("Gain", ascending=True).copy()
     imp_p = (

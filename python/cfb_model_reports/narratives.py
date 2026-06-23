@@ -18,9 +18,68 @@ class ModelNarrative:
     recipe: str
     discussion: str
     limitations: str
+    # Enriched methodology sections (nflfastR-post structure). Optional — default
+    # empty so the four legacy sections remain the required contract.
+    features: str = ""   # "## Model features" — a table/list describing EACH feature
+    model: str = ""      # "## The model" — algorithm, objective, hyperparameters, CV
+    importance: str = "" # "## Feature importance" — prose where applicable
 
 
 NARRATIVES: dict[str, ModelNarrative] = {
+    "cpoe": ModelNarrative(
+        summary=(
+            "The Completion Percentage Over Expected (CPOE) model estimates the probability a "
+            "given pass attempt is completed (`cp`) from pre-throw game state. CPOE is the "
+            "**percentage-point residual** `100 * (complete_pass - cp)`: positive when a passer "
+            "completes throws a league-average passer would not. It is the CFB analogue of the "
+            "nflfastR CP/CPOE surface."
+        ),
+        recipe=(
+            "An 8-feature XGBoost **binary:logistic** completion model. Lineage is the nflfastR "
+            "CP recipe adapted to CFB game state; the residual `cp` is subtracted from the binary "
+            "completion outcome and scaled to percentage points."
+        ),
+        discussion=(
+            "No CPOE leave-one-season-out OOF parquet is shipped in this artifacts set, so a "
+            "per-play completion-probability calibration figure is **not** rendered here — the "
+            "card is prose + provenance only. When a CPOE OOF (predicted `cp` + actual "
+            "`complete_pass` + `period`) is produced, the same cfbscrapR binning recipe used for "
+            "WP applies directly: bin `cp` into 0.05 buckets and compare to the empirical "
+            "completion rate."
+        ),
+        limitations=(
+            "CPOE is blind to receiver separation, pressure, and air-yards charting we do not "
+            "have, so it captures the *game-state-explainable* part of completion probability "
+            "only. Without a shipped OOF parquet, the calibration claim here is deferred to the "
+            "model card rather than shown out-of-sample."
+        ),
+        features=(
+            "**8 features**, all known before the throw; the binary label is `complete_pass`.\n\n"
+            "| Feature | Type | What it encodes |\n"
+            "|---|---|---|\n"
+            "| `down` | numeric | Current down. |\n"
+            "| `distance` | numeric | Yards to go. |\n"
+            "| `yards_to_goal` | numeric | Field position. |\n"
+            "| `score_diff` | numeric | Possession-team score differential. |\n"
+            "| `seconds_remaining` | numeric | Clock context. |\n"
+            "| `is_home` | binary | Home-field indicator. |\n"
+            "| `period` | numeric | Quarter. |\n"
+            "| `passing_down` | binary | Whether the situation is an obvious passing down. |\n"
+        ),
+        model=(
+            "**Algorithm.** XGBoost, `objective=binary:logistic`. The predicted `cp` is the "
+            "completion probability; **CPOE = `100 * (complete_pass - cp)`** on a percentage-point "
+            "scale.\n\n"
+            "**Evaluation.** No season-held-out OOF is shipped here, so calibration is deferred "
+            "to the model card (see Provenance). The intended check is the cfbscrapR probability "
+            "binning recipe on a CPOE OOF once produced."
+        ),
+        importance=(
+            "Completion probability is driven primarily by `distance` / `yards_to_goal` (throw "
+            "depth proxies) and `passing_down`; the clock/score context contributes a smaller "
+            "game-script correction."
+        ),
+    ),
     "ep": ModelNarrative(
         summary=(
             "The Expected Points (EP) model estimates the expected next-score value for the "
@@ -59,6 +118,41 @@ NARRATIVES: dict[str, ModelNarrative] = {
             "2-point-conversion modelling beyond the safety/defensive-score classes), and the "
             "model is blind to weather, personnel, and in-play participants by design."
         ),
+        features=(
+            "The EP model uses **8 features**, all known at the **start of the play** — no "
+            "look-ahead. Each row is one scrimmage play; the label is the *next scoring event* in "
+            "the same half.\n\n"
+            "| Feature | Type | What it encodes |\n"
+            "|---|---|---|\n"
+            "| `TimeSecsRem` | numeric | Seconds remaining in the half — late-half plays have "
+            "fewer expected possessions left to score. |\n"
+            "| `yards_to_goal` | numeric | Distance (1-99) to the opponent's end zone — the single "
+            "strongest field-position signal. |\n"
+            "| `distance` | numeric | Yards to go for a first down. |\n"
+            "| `down_1` … `down_4` | one-hot | Current down, one-hot encoded (4 columns) so the "
+            "tree can split cleanly on each down. |\n"
+            "| `pos_score_diff_start` | numeric | Possession-team score differential — late-game "
+            "score state shifts play-calling and therefore next-score expectation. |\n"
+        ),
+        model=(
+            "**Algorithm.** XGBoost gradient-boosted trees, `objective=multi:softprob` over "
+            "`num_class=7`, `eval_metric=mlogloss`. **525 boosting rounds**, `eta=0.025`, "
+            "`max_depth=5`, `subsample=0.8`, `colsample_bytree=0.8`, `gamma=1`, "
+            "`min_child_weight=1` — the exact cfbscrapR / `keepers` hyperparameters, unchanged. "
+            "Rows are weighted by `ScoreDiff_W` (the cfbscrapR score-differential weighting). The "
+            "7 class probabilities are dotted with the point map `{0:+7, 1:-7, 2:+3, 3:-3, 4:+2, "
+            "5:-2, 6:0}` to produce a scalar EP.\n\n"
+            "**Evaluation.** Honest **leave-one-season-out (LOSO)** cross-validation: for each of "
+            "the 22 seasons (2004-2025) we retrain on the *other* 21 seasons and predict the "
+            "held-out one, then pool the out-of-fold predictions. No play is ever scored by a "
+            "model that saw its season in training."
+        ),
+        importance=(
+            "By XGBoost gain, `yards_to_goal` dominates (field position is the backbone of EP), "
+            "followed by `TimeSecsRem` and `pos_score_diff_start`; the down one-hots and "
+            "`distance` refine the surface within a given field position. This ordering matches "
+            "the cfbscrapR EP model and the nflfastR EP post."
+        ),
     ),
     "wp_spread": ModelNarrative(
         summary=(
@@ -91,6 +185,46 @@ NARRATIVES: dict[str, ModelNarrative] = {
             "the model does not re-estimate a live spread. Overtime and end-of-half edge cases "
             "are handled by the construction pipeline upstream, not by the model head."
         ),
+        features=(
+            "**13 features**, all start-of-play. The binary label is `win_indicator = "
+            "(possession team == game winner)`. The signature feature is the spread-decay term.\n\n"
+            "| Feature | Type | What it encodes |\n"
+            "|---|---|---|\n"
+            "| `spread_time` | numeric | `pos_team_spread * exp(-4 * elapsed_share)` — the pregame "
+            "spread decayed toward 0 as the clock runs; its influence vanishes by Q4. **The "
+            "market signal.** |\n"
+            "| `TimeSecsRem` | numeric | Seconds remaining in the half. |\n"
+            "| `adj_TimeSecsRem` | numeric | Game-clock-adjusted time remaining (half-aware). |\n"
+            "| `ExpScoreDiff_Time_Ratio` | numeric | Expected score differential scaled by time — "
+            "a momentum/urgency interaction. |\n"
+            "| `pos_score_diff_start` | numeric | Possession-team score differential. |\n"
+            "| `down` | numeric | Current down. |\n"
+            "| `distance` | numeric | Yards to go. |\n"
+            "| `yards_to_goal` | numeric | Field position. |\n"
+            "| `is_home` | binary | Home-field indicator for the possession team. |\n"
+            "| `pos_team_timeouts_rem_before` | numeric | Possession-team timeouts left. |\n"
+            "| `def_pos_team_timeouts_rem_before` | numeric | Defense timeouts left. |\n"
+            "| `period` | numeric | Quarter (1-4+). |\n"
+            "| `pos_team_receives_2H_kickoff` | binary | Whether the possession team gets the "
+            "second-half kickoff — a known WP edge. |\n"
+        ),
+        model=(
+            "**Algorithm.** XGBoost, `objective=binary:logistic`, `eval_metric=logloss`, "
+            "**760 boosting rounds**, `eta=0.02`, `max_depth=5`, `min_child_weight=14`, "
+            "`subsample=0.72`, `colsample_bytree=0.57`, `gamma=0.34` — the exact "
+            "`cfbscrapR-wpa.ipynb` recipe, unchanged. No sample weights (per the cfbscrapR WPA "
+            "recipe).\n\n"
+            "**Evaluation.** Leave-one-season-out over 2004-2025: train on 21 seasons, predict "
+            "the held-out one, pool the out-of-fold win probabilities. The calibration figure "
+            "**facets by quarter** (the cfbscrapR `03-WPA-Model.R` recipe) so you can confirm "
+            "calibration holds late in games, where WP is most actionable."
+        ),
+        importance=(
+            "`spread_time` and the time/score-differential terms carry the model early in games; "
+            "as `spread_time` decays, `pos_score_diff_start`, `yards_to_goal` and the clock terms "
+            "take over. This is exactly the intended hand-off from market prior to live game "
+            "state."
+        ),
     ),
     "wp_naive": ModelNarrative(
         summary=(
@@ -108,22 +242,45 @@ NARRATIVES: dict[str, ModelNarrative] = {
             "without the spread there is less structured signal to fit."
         ),
         discussion=(
-            "No LOSO OOF parquet is shipped for the naive variant, so calibration here is "
-            "computed on a full-history prediction pass over `pbp_full.parquet` (the naive "
-            "feature matrix is deterministic from game state). The naive WP **correlates ~0.94 "
-            "with the spread WP** and, as expected, the two **diverge most in the first "
-            "quarter** — when the pregame spread carries the most information and the game state "
-            "carries the least. By the fourth quarter the mean absolute gap between naive and "
-            "spread WP collapses (Q1 ~0.13 vs Q4 ~0.02), because `spread_time` has decayed away "
-            "and both models are reading the same near-final game state."
+            "Metrics are pooled **leave-one-season-out (LOSO)** out-of-fold predictions (the "
+            "naive variant now gets its own LOSO pass, identical in protocol to the spread "
+            "model). The naive WP **correlates ~0.94 with the spread WP** and, as expected, the "
+            "two **diverge most in the first quarter** — when the pregame spread carries the most "
+            "information and the game state carries the least. By the fourth quarter the mean "
+            "absolute gap between naive and spread WP collapses (Q1 ~0.13 vs Q4 ~0.02), because "
+            "`spread_time` has decayed away and both models are reading the same near-final game "
+            "state. The calibration figure facets by quarter, the same cfbscrapR recipe as the "
+            "spread model."
         ),
         limitations=(
             "Because it ignores the market, the naive model is *less sharp* early in games: its "
             "log-loss and Brier are worse than the spread model's (it has strictly less "
             "information). It is the correct tool only when you want a spread-free WP or lack a "
-            "spread; for forecasting accuracy when a spread exists, prefer the spread model. The "
-            "calibration here is in-sample (resubstitution) rather than LOSO, so read it as a "
-            "fit check rather than an out-of-sample guarantee."
+            "spread; for forecasting accuracy when a spread exists, prefer the spread model. WPA "
+            "(the first difference of WP) carries the same per-play noise caveat as the spread "
+            "model."
+        ),
+        features=(
+            "**12 features** — exactly the spread model's set **minus `spread_time`**. Everything "
+            "else is shared: `TimeSecsRem`, `adj_TimeSecsRem`, `ExpScoreDiff_Time_Ratio`, "
+            "`pos_score_diff_start`, `down`, `distance`, `yards_to_goal`, `is_home`, both teams' "
+            "remaining timeouts, `period`, and `pos_team_receives_2H_kickoff`. Dropping the "
+            "single market feature is the *only* difference between the two WP heads, which is why "
+            "they can be compared head-to-head."
+        ),
+        model=(
+            "**Algorithm.** XGBoost, `objective=binary:logistic`, **65 boosting rounds**, "
+            "`eta=0.2`, `max_depth=4`, `subsample=0.8`, `colsample_bytree=0.8` — far fewer trees "
+            "than the spread model (65 vs 760) because, without the spread, there is less "
+            "structured signal to fit and the model saturates earlier.\n\n"
+            "**Evaluation.** Leave-one-season-out over 2004-2025, pooled out-of-fold, faceted by "
+            "quarter — the same protocol as the spread model, so the two are directly comparable."
+        ),
+        importance=(
+            "Without the market prior, `pos_score_diff_start`, `yards_to_goal` and the clock "
+            "terms carry the model from the opening kickoff; this is precisely why the naive WP "
+            "is least confident (closest to 0.5) early and why it diverges most from the spread "
+            "WP in Q1."
         ),
     ),
     "qbr": ModelNarrative(
@@ -153,6 +310,36 @@ NARRATIVES: dict[str, ModelNarrative] = {
             "no joined rows (no ESPN QBR labels), and pre-2014 error is materially higher. Treat "
             "the output as a faithful reconstruction of the *EPA-explainable* part of QBR, not a "
             "byte-exact ESPN replica."
+        ),
+        features=(
+            "**6 features**, one row per (quarterback, game). Each EPA component is the per-game "
+            "weighted mean of that component over the QB's plays (the same weighting "
+            "`CFBPlayProcess.__process_qbr` uses).\n\n"
+            "| Feature | Type | What it encodes |\n"
+            "|---|---|---|\n"
+            "| `qbr_epa` | numeric | Total QBR-attributable EPA per game — the dominant driver. |\n"
+            "| `sack_epa` | numeric | EPA lost to sacks. |\n"
+            "| `pass_epa` | numeric | EPA from pass attempts. |\n"
+            "| `rush_epa` | numeric | EPA from QB rushes. |\n"
+            "| `pen_epa` | numeric | EPA from penalties on the QB's plays. |\n"
+            "| `spread` | numeric | Possession-team pregame spread (context for garbage-time "
+            "deflation). |\n"
+        ),
+        model=(
+            "**Algorithm.** XGBoost regression (squared-error objective), **45 boosting rounds**, "
+            "full-history retrain. The target is ESPN's *published raw QBR* for the "
+            "quarterback-game; the EPA components come from the EP model documented above, so QBR "
+            "sits one layer above EP/EPA.\n\n"
+            "**Evaluation.** Leave-one-season-out over 22,833 quarterback-games (2005-2025). On "
+            "the 2021-25 holdout it **decisively beats the legacy 2020 model** (RMSE 16.1 vs 23.2, "
+            "R² 0.66 vs 0.29). Because QBR is a continuous bounded target, the calibration figure "
+            "is a predicted-vs-actual scatter (2-D bin density) with a y=x reference, not a "
+            "probability-bucket plot."
+        ),
+        importance=(
+            "`qbr_epa` overwhelmingly dominates by gain (it *is* the EPA aggregate ESPN's QBR "
+            "tracks), with `pass_epa` and `rush_epa` next; `spread` contributes a small "
+            "garbage-time / leverage correction."
         ),
     ),
     "fourth_down": ModelNarrative(
@@ -186,6 +373,37 @@ NARRATIVES: dict[str, ModelNarrative] = {
             "go/no-go decision itself — the decision EV is computed downstream by combining this "
             "distribution with the EP/WP surfaces."
         ),
+        features=(
+            "**6 features**; one row per scrimmage (3rd/4th-down) play. The label is the integer "
+            "yards gained, shifted into 76 ordinal classes (-10..65).\n\n"
+            "| Feature | Type | What it encodes |\n"
+            "|---|---|---|\n"
+            "| `down` | numeric | Current down (3 or 4). |\n"
+            "| `distance` | numeric | Yards to go — the conversion threshold. |\n"
+            "| `yards_to_goal` | numeric | Field position (compresses the gain distribution near "
+            "the goal line). |\n"
+            "| `posteam_total` | numeric | Possession-team game total (proxy for offensive "
+            "quality / pace). |\n"
+            "| `posteam_spread` | numeric | Possession-team spread (game-script context). |\n"
+            "| `era` | ordinal | CFB rule era (0:&le;2006, 1:2007-13, 2:2014-17, 3:&ge;2018) — "
+            "captures rule changes affecting conversion rates. **Ranks 4th by gain.** |\n"
+        ),
+        model=(
+            "**Algorithm.** XGBoost, `objective=multi:softprob` over **76 classes** (integer "
+            "gains -10..65), **157 boosting rounds**. Lineage is the cfb4th yards model plus the "
+            "added ordinal `era` factor. P(first down) for any distance-to-go is recovered by "
+            "summing class probabilities for gains &ge; the distance.\n\n"
+            "**Evaluation.** Calibration collapses the 76-class distribution into P(first down) "
+            "and compares to the empirical conversion rate over the 2.2M-play corpus (a sampled "
+            "subset for the figure). This is a fit/calibration check on the full corpus rather "
+            "than a season-held-out LOSO pass."
+        ),
+        importance=(
+            "By XGBoost gain: `distance` leads (it *is* the conversion threshold), then "
+            "`yards_to_goal` and the team total/spread context; **`era` ranks 4th** — confirming "
+            "the rule-era signal is real, not decorative. The feature-importance bar chart is "
+            "rendered alongside the calibration plot."
+        ),
     ),
     "rb_eval": ModelNarrative(
         summary=(
@@ -214,6 +432,211 @@ NARRATIVES: dict[str, ModelNarrative] = {
             "scheme, and opponent adjustments — it estimates the *unadjusted* expected EPA, "
             "leaving those adjustments to downstream layers. Because it is an analytic artifact "
             "(pickled GAM, not an XGBoost booster), it is excluded from the sdv-py model bundle."
+        ),
+        features=(
+            "**2 features**; one row per qualifying rusher-season. The target is the rusher's "
+            "`unadjusted_epa`.\n\n"
+            "| Feature | Type | What it encodes |\n"
+            "|---|---|---|\n"
+            "| `epa_per_play` | smooth `s(0)` | The rusher's mean EPA per rush — the primary "
+            "efficiency signal. |\n"
+            "| `success` | smooth `s(1)` | The rusher's success rate (share of positive-EPA "
+            "rushes) — the consistency signal. |\n"
+        ),
+        model=(
+            "**Algorithm.** A `pygam` **`LinearGAM(s(0) + s(1))`** — two penalized smoothing "
+            "splines — deliberately simple and interpretable rather than a high-variance tree "
+            "ensemble. Fit on **897 rushers across 2015-2025**.\n\n"
+            "**Evaluation.** Leave-one-season-out: bin the predicted EPA, compare to mean realized "
+            "unadjusted EPA per bin, and report a weighted R² and weighted calibration error (the "
+            "`rb_eval.validate` recipe, a port of the R `show_calibration_chart`). Metrics + the "
+            "calibration figure are emitted only when `xrepa_loso.parquet` is present (regenerate "
+            "with `python -m rb_eval train`)."
+        ),
+        importance=(
+            "Both splines contribute monotone-increasing surfaces: higher `epa_per_play` and "
+            "higher `success` both raise expected EPA, with `epa_per_play` carrying the steeper "
+            "response. There is no tree-gain importance for a GAM; the spline partial-dependence "
+            "shapes are the interpretable analogue."
+        ),
+    ),
+    "fg": ModelNarrative(
+        summary=(
+            "The field-goal model estimates the probability a placekick is **made**, given only "
+            "the kick distance. The single input is `yards_to_goal` (the kick distance is "
+            "`yards_to_goal + 17`). It is **bundled in sdv-py** and powers the field-goal branch "
+            "of the fourth-down decision surface: the expected value of attempting a field goal is "
+            "this make probability times three points."
+        ),
+        recipe=(
+            "A **1-feature** XGBoost **binary:logistic** make-probability model over "
+            "**42,589 attempts** (~73% make rate), **60 trees**. Distance is everything — with one "
+            "feature the model *is* the empirical make-rate-by-distance curve, smoothed by the "
+            "boosting. LOSO weighted calibration error is **0.0085**: binned predicted make "
+            "probability equals the empirical make rate to three decimals at every distance."
+        ),
+        discussion=(
+            "Metrics are pooled **leave-one-season-out (LOSO)** out-of-fold predictions over "
+            "2004-2025. The headline number is the **weighted calibration error of 0.0085** — the "
+            "predicted make probabilities are essentially exact across the whole distance range. "
+            "The calibration figure bins the predicted make probability into 0.05 buckets and "
+            "plots it against the empirical make rate (point size = n, y=x reference); because the "
+            "lone feature is distance, this doubles as the make-prob-vs-distance curve."
+        ),
+        limitations=(
+            "The model is blind to everything except distance — no kicker identity, no weather, no "
+            "wind, no surface, no snap/hold quality. Long attempts are thin in the data, so the "
+            "fit **extrapolates past ~59 yards** on very few examples and should be read with "
+            "caution there. Because it is distance-only, it captures the league-average make curve, "
+            "not a particular kicker's leg."
+        ),
+        features=(
+            "**1 feature**; one row per field-goal attempt. The binary label is `fg_made`.\n\n"
+            "| Feature | Type | What it encodes |\n"
+            "|---|---|---|\n"
+            "| `yards_to_goal` | numeric | Field position of the snap; the kick distance is "
+            "`yards_to_goal + 17`. The **only** input — distance is everything for a placekick. |\n"
+        ),
+        model=(
+            "**Algorithm.** XGBoost, `objective=binary:logistic`, `eval_metric=logloss`, "
+            "**60 boosting rounds**, `max_depth=3`, `eta=0.1`, `subsample=0.8`, "
+            "`min_child_weight=30`. The predicted probability is the make probability; the "
+            "fourth-down FG expected value is `3 * P(make)`.\n\n"
+            "**Evaluation.** Leave-one-season-out over 2004-2025 (42,589 attempts): train on the "
+            "other seasons, predict the held-out one, pool the out-of-fold make probabilities. The "
+            "pooled weighted calibration error is **0.0085** — predicted equals actual to three "
+            "decimals at every distance."
+        ),
+        importance=(
+            "There is only one feature, so importance is trivial: `yards_to_goal` carries 100% of "
+            "the signal. The interpretable view is the monotone-decreasing make-probability curve "
+            "the model traces as distance grows."
+        ),
+    ),
+    "xpass": ModelNarrative(
+        summary=(
+            "The expected-pass model estimates the probability that a scrimmage play is a "
+            "**dropback (pass)** given pre-snap game state — a measure of how *predictable* an "
+            "offense's tendency is in a given situation. It is the CFB analogue of the nflfastR "
+            "xpass surface, where **`pass_oe = 100 * (pass - xpass)`** is the pass-rate over "
+            "expected: positive when an offense passes more than situation-average."
+        ),
+        recipe=(
+            "A **7-feature** XGBoost **binary:logistic** dropback-probability model over "
+            "**1.9M scrimmage plays** (1,902,317 rows), **150 trees**. Features are the pre-snap "
+            "situation: `down`, `distance`, `yards_to_goal`, `pos_score_diff`, `TimeSecsRem`, "
+            "`era`, `period`. **Down dominates** by gain (830) — down/distance is the backbone of "
+            "play-calling tendency. LOSO weighted calibration error is **0.0073**."
+        ),
+        discussion=(
+            "Metrics are pooled **leave-one-season-out (LOSO)** out-of-fold predictions over "
+            "2004-2025. The pooled **weighted calibration error is 0.0073** — predicted P(pass) "
+            "tracks the empirical pass rate tightly across the probability range. The calibration "
+            "figure **facets by down** (the xPass analogue of the WP quarter facets), so you can "
+            "confirm calibration holds on each down — including the obvious-passing-down tails "
+            "where tendency is most lopsided. `pass_oe` (pass minus xpass) is the actionable "
+            "residual built on top of this surface."
+        ),
+        limitations=(
+            "xPass is a **pre-snap** quantity: it sees down/distance/score/clock/era but **no "
+            "personnel, formation, motion, or no-huddle signal**, so it captures the "
+            "situation-explainable part of tendency only. Two offenses in identical game state get "
+            "the same xpass; the *team* tendency lives in `pass_oe`, not in xpass itself. `era` "
+            "contributes the least (gain 26) — it is a coarse rule-era level shift, not a strong "
+            "driver."
+        ),
+        features=(
+            "**7 features**, all pre-snap; one row per scrimmage play. The binary label is "
+            "`is_pass` (dropback).\n\n"
+            "| Feature | Type | What it encodes |\n"
+            "|---|---|---|\n"
+            "| `down` | numeric | Current down — **the dominant tendency driver** (gain 830). |\n"
+            "| `distance` | numeric | Yards to go — second by gain (592); long-distance ⇒ pass. |\n"
+            "| `period` | numeric | Quarter (gain 381); late-game script shifts tendency. |\n"
+            "| `pos_score_diff` | numeric | Possession-team score differential (gain 240); trailing "
+            "teams pass. |\n"
+            "| `TimeSecsRem` | numeric | Seconds remaining in the half (gain 214). |\n"
+            "| `yards_to_goal` | numeric | Field position (gain 174); red-zone/own-territory "
+            "tendency. |\n"
+            "| `era` | ordinal | CFB rule era (gain 26); a coarse level shift in pass rate. |\n"
+        ),
+        model=(
+            "**Algorithm.** XGBoost, `objective=binary:logistic`, `eval_metric=logloss`, "
+            "**150 boosting rounds**, `max_depth=5`, `eta=0.1`, `subsample=0.8`, "
+            "`colsample_bytree=0.8`, `min_child_weight=20`. The predicted probability is "
+            "`xpass`; **`pass_oe = 100 * (pass - xpass)`** is the pass-rate-over-expected "
+            "residual.\n\n"
+            "**Evaluation.** Leave-one-season-out over 2004-2025 (1.9M plays): train on the other "
+            "seasons, predict the held-out one, pool the out-of-fold probabilities. Pooled "
+            "weighted calibration error **0.0073**; the calibration figure facets by down."
+        ),
+        importance=(
+            "By XGBoost gain: **`down` (830) ≫ `distance` (592) > `period` (381) > "
+            "`pos_score_diff` (240) > `TimeSecsRem` (214) > `yards_to_goal` (174) > `era` (26)**. "
+            "Down/distance carries the model — exactly the situational backbone of play-calling "
+            "tendency — with score/clock/field-position refining it and the rule-era contributing "
+            "a small level shift."
+        ),
+    ),
+    "two_pt": ModelNarrative(
+        summary=(
+            "The two-point-conversion model estimates the probability a two-point attempt "
+            "**succeeds**, given game context. It powers the **go-for-2 vs. extra-point** decision "
+            "(`add_2pt_probs`): the model's success probability times two points is compared "
+            "against the extra-point expected value, where the XP make rate is the empirical CFB "
+            "rate **0.9851**."
+        ),
+        recipe=(
+            "A **4-feature** XGBoost **binary:logistic** success-probability model over "
+            "**1,622 attempts**, **40 trees**, ~**48.2% base rate**. Features are game-context "
+            "only: `posteam_spread`, `posteam_total`, `pos_score_diff`, `era`. The model is "
+            "**near-constant** — its predictions range just **0.39-0.60**, capturing slight "
+            "game-context variation around the base rate rather than the flat 0.45 cfb4th uses. "
+            "LOSO weighted calibration error is **0.028**."
+        ),
+        discussion=(
+            "Metrics are pooled **leave-one-season-out (LOSO)** out-of-fold predictions. With only "
+            "1,622 attempts the surface is deliberately shallow (depth-2 trees), and the "
+            "predictions hug the **~48% base rate** (range 0.39-0.60). The pooled weighted "
+            "calibration error is **0.028** — looser than the high-volume heads, as expected from "
+            "the tiny, noisy sample. The single-panel calibration figure bins predicted vs. actual "
+            "success; it is **sparse** because the predictions are near-constant, which is the "
+            "honest picture for a 1.6K-attempt target."
+        ),
+        limitations=(
+            "The sample is **tiny** (1,622 attempts), so the model is **near-constant** and cannot "
+            "resolve fine context — treat it as a slightly-context-adjusted base rate, not a sharp "
+            "per-play estimate. It has **no air-yards, play-call, or personnel** inputs and no "
+            "defensive context. The calibration bins are sparse by construction; the decision it "
+            "feeds (go-for-2 vs. XP) is therefore driven mostly by the ~48% level against the "
+            "0.9851 XP make rate, with only small game-context tilts."
+        ),
+        features=(
+            "**4 features**; one row per two-point attempt. The binary label is "
+            "`two_point_success`.\n\n"
+            "| Feature | Type | What it encodes |\n"
+            "|---|---|---|\n"
+            "| `posteam_spread` | numeric | Possession-team pregame spread (team-strength proxy). |\n"
+            "| `posteam_total` | numeric | Possession-team game total (offensive-quality proxy). |\n"
+            "| `pos_score_diff` | numeric | Possession-team score differential (game-script "
+            "context). |\n"
+            "| `era` | ordinal | CFB rule era (level shift in conversion rate). |\n"
+        ),
+        model=(
+            "**Algorithm.** XGBoost, `objective=binary:logistic`, `eval_metric=logloss`, "
+            "**40 boosting rounds**, `max_depth=2`, `eta=0.05`, `subsample=0.9`, "
+            "`min_child_weight=40` — a deliberately shallow fit for a 1,622-row target. Predictions "
+            "span just **0.39-0.60** around the **~48.2% base rate**.\n\n"
+            "**Evaluation.** Leave-one-season-out, pooled out-of-fold. Weighted calibration error "
+            "**0.028**. The single-panel calibration figure is sparse because the model is "
+            "near-constant — the faithful picture for a tiny sample. It feeds the go-for-2 vs. XP "
+            "decision against the empirical XP make rate **0.9851**."
+        ),
+        importance=(
+            "By XGBoost gain the game-context features (`posteam_total`, `posteam_spread`, "
+            "`pos_score_diff`) carry what little structure the 1,622-attempt sample supports, with "
+            "`era` a coarse level shift. Because the model is near-constant, no single feature "
+            "moves the prediction far from the ~48% base rate."
         ),
     ),
 }

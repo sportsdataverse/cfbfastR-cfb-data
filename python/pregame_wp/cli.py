@@ -60,12 +60,14 @@ def main(argv: list[str] | None = None) -> int:
         import pandas as pd
 
         from pregame_wp.box_score import calculate_box_score_from_frames
+        from collections import defaultdict
+
         from pregame_wp.data_ingest import (
             _norm_team,
             _team_key,
-            fetch_and_cache,
             fetch_games,
-            load_game_frames,
+            fetch_week_and_cache,
+            load_week_game_frames,
         )
         from pregame_wp.ep_curve import load_ep_curve, load_punt_sr
 
@@ -86,36 +88,50 @@ def main(argv: list[str] | None = None) -> int:
             if args.limit:
                 games = games[: args.limit]
             rows, ok, skipped = [], 0, 0
+            # Group this season's games by week, then fetch each week's plays +
+            # drives ONCE (two CFBD calls) and slice to games client-side —
+            # ~50x fewer API calls than the old per-game fetch.
+            by_week: dict[int, list] = defaultdict(list)
             for g in games:
-                gid, week = g.get("id"), g.get("week")
-                if gid is None or week is None:
+                if g.get("id") is not None and g.get("week") is not None:
+                    by_week[int(g["week"])].append(g)
+                else:
                     skipped += 1
-                    continue
+            for week in sorted(by_week):
                 try:
-                    fetch_and_cache(gid, year=season, week=int(week), raw_dir=raw_dir,
-                                    season_type=args.season_type,
-                                    home_team=_team_key(g, "home"), away_team=_team_key(g, "away"))
-                    plays_df, drives_df = load_game_frames(gid, raw_dir)
-                    box = calculate_box_score_from_frames(plays_df, drives_df, ep_data, punt_sr)
-                    box.insert(0, "game_id", gid)
-                    box.insert(0, "week", int(week))
-                    box.insert(0, "season", season)
-                    # per-team actual point differential — the pregame-WP train target
-                    home_pts = g.get("homePoints", g.get("home_points"))
-                    away_pts = g.get("awayPoints", g.get("away_points"))
-                    if home_pts is not None and away_pts is not None:
-                        diff_map = {
-                            _norm_team(_team_key(g, "home")): float(home_pts) - float(away_pts),
-                            _norm_team(_team_key(g, "away")): float(away_pts) - float(home_pts),
-                        }
-                        box["PtsDiff"] = box["Team"].map(lambda t: diff_map.get(_norm_team(t)))
-                    else:
-                        box["PtsDiff"] = pd.NA
-                    rows.append(box)
-                    ok += 1
-                except Exception as e:  # noqa: BLE001 — skip unbuildable games (missing/partial CFBD data)
-                    skipped += 1
-                    print(f"  skip game {gid} ({season} wk {week}): {type(e).__name__}: {e}")
+                    fetch_week_and_cache(season, week, raw_dir, season_type=args.season_type)
+                except Exception as e:  # noqa: BLE001 — a week fetch failure skips the week, not the batch
+                    print(f"  skip week {season} wk{week} (fetch failed: {type(e).__name__}: {e})")
+                    skipped += len(by_week[week])
+                    continue
+                for g in by_week[week]:
+                    gid = g.get("id")
+                    try:
+                        plays_df, drives_df = load_week_game_frames(
+                            season, week, raw_dir,
+                            _team_key(g, "home"), _team_key(g, "away"),
+                            season_type=args.season_type,
+                        )
+                        box = calculate_box_score_from_frames(plays_df, drives_df, ep_data, punt_sr)
+                        box.insert(0, "game_id", gid)
+                        box.insert(0, "week", int(week))
+                        box.insert(0, "season", season)
+                        # per-team actual point differential — the pregame-WP train target
+                        home_pts = g.get("homePoints", g.get("home_points"))
+                        away_pts = g.get("awayPoints", g.get("away_points"))
+                        if home_pts is not None and away_pts is not None:
+                            diff_map = {
+                                _norm_team(_team_key(g, "home")): float(home_pts) - float(away_pts),
+                                _norm_team(_team_key(g, "away")): float(away_pts) - float(home_pts),
+                            }
+                            box["PtsDiff"] = box["Team"].map(lambda t: diff_map.get(_norm_team(t)))
+                        else:
+                            box["PtsDiff"] = pd.NA
+                        rows.append(box)
+                        ok += 1
+                    except Exception as e:  # noqa: BLE001 — skip unbuildable games (missing/partial CFBD data)
+                        skipped += 1
+                        print(f"  skip game {gid} ({season} wk {week}): {type(e).__name__}: {e}")
             if rows:
                 season_df = pd.concat(rows, ignore_index=True)
                 out_path = out_dir / f"boxes_{season}.parquet"

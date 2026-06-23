@@ -431,3 +431,57 @@ def load_game_frames(
     drives = json.loads(drives_path.read_text(encoding="utf-8"))
 
     return normalize_plays(plays), normalize_drives(drives)
+
+
+def fetch_week_and_cache(
+    year: int,
+    week: int,
+    raw_dir: Path | str,
+    season_type: str = "regular",
+    resume: bool = True,
+) -> None:
+    """Fetch ALL plays + drives for one week in TWO calls and cache them.
+
+    CFBD's ``/plays`` and ``/drives`` are per-week endpoints, so one call each
+    returns every game in the week. Fetching once per week (then slicing to games
+    client-side via :func:`load_week_game_frames`) is ~50x fewer API calls than
+    fetching per game-and-offense, and stays well under the rate limit. With
+    ``resume=True`` an already-cached week is skipped.
+    """
+    raw_dir = Path(raw_dir)
+    week_dir = raw_dir / f"{year}_wk{week}_{season_type}"
+    week_dir.mkdir(parents=True, exist_ok=True)
+    plays_path = week_dir / "plays.json"
+    drives_path = week_dir / "drives.json"
+    if resume and plays_path.exists() and drives_path.exists() and plays_path.stat().st_size > 0:
+        return
+    plays = fetch_plays(year=year, week=week, season_type=season_type)
+    drives = fetch_drives(year=year, season_type=season_type, week=week)
+    plays_path.write_text(json.dumps(plays), encoding="utf-8")
+    drives_path.write_text(json.dumps(drives), encoding="utf-8")
+
+
+def load_week_game_frames(
+    year: int,
+    week: int,
+    raw_dir: Path | str,
+    home_team: str,
+    away_team: str,
+    season_type: str = "regular",
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Load a cached week's plays/drives and slice them to one game's two teams.
+
+    Raises:
+        FileNotFoundError: if the week's cache is missing — call
+            :func:`fetch_week_and_cache` first.
+    """
+    week_dir = Path(raw_dir) / f"{year}_wk{week}_{season_type}"
+    plays_path = week_dir / "plays.json"
+    drives_path = week_dir / "drives.json"
+    if not plays_path.exists():
+        raise FileNotFoundError(f"week plays.json not found: {plays_path}")
+    plays = json.loads(plays_path.read_text(encoding="utf-8"))
+    drives = json.loads(drives_path.read_text(encoding="utf-8"))
+    game_plays = filter_plays_to_game(plays, home_team, away_team)
+    game_drives = filter_drives_to_game(drives, home_team, away_team)
+    return normalize_plays(game_plays), normalize_drives(game_drives)

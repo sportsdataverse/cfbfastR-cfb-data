@@ -73,5 +73,14 @@ PASS_PLAY_TYPES = PASS_PLAY_TYPES | {"Pass Completion", "Interception Return"}
 # Misc
 # ---------------------------------------------------------------------------
 
-MIN_SEASON: int = 2014
+# Training-window floor. Approach A uses ONLY game-state features (down, distance,
+# yards_to_goal, score_diff, seconds_remaining, is_home, period, passing_down) plus
+# the `completion` target — all of which are 100% populated for every ESPN season
+# back to 2004 (verified: completion non-null == 1.000 and a sane 0.50-0.59 rate per
+# season 2004-2025). The previous 2014 floor was a LEGACY artifact of the abandoned
+# air-yards "Approach B" (CFBD air_yards only had usable coverage from ~2014; that
+# approach was found INFEASIBLE — see __init__/FEASIBILITY). Approach A has no such
+# constraint, so the floor is 2004 (3x more training data, and the rule-era factor
+# now spans all four buckets instead of collapsing to era2/era3).
+MIN_SEASON: int = 2004
 MODEL_FILENAME: str = "cfb_cp_model.ubj"

@@ -80,13 +80,23 @@ def loso_cv(df: pl.DataFrame, model_type: str, espn_qbr: pl.DataFrame | None = N
     import xgboost as xgb
 
     from . import constants as C
-    from .features import ep_matrix, qbr_matrix, wp_matrix
+    from .features import (
+        ep_matrix,
+        fg_matrix,
+        qbr_matrix,
+        two_pt_matrix,
+        wp_matrix,
+        xpass_matrix,
+    )
     from .train_ep import train_ep
+    from .train_fg import train_fg
     from .train_qbr import train_qbr
+    from .train_two_pt import train_two_pt
     from .train_wp import train_wp
+    from .train_xpass import train_xpass
 
-    if model_type not in ("ep", "wp", "qbr"):
-        raise ValueError(f"model_type must be ep|wp|qbr, got {model_type!r}")
+    if model_type not in ("ep", "wp", "qbr", "fg", "xpass", "two_pt"):
+        raise ValueError(f"model_type must be ep|wp|qbr|fg|xpass|two_pt, got {model_type!r}")
     if model_type == "qbr" and espn_qbr is None:
         raise ValueError("model_type='qbr' requires espn_qbr reference")
     seasons = sorted(df["season"].unique().to_list())
@@ -115,6 +125,35 @@ def loso_cv(df: pl.DataFrame, model_type: str, espn_qbr: pl.DataFrame | None = N
             row = {"season": s, "n": int(len(y)), "logloss": _bin_logloss(y, p),
                    "brier": float(np.mean((p - y) ** 2)), "auc": _auc(y, p)}
             frames.append(pl.DataFrame({"season": np.full(len(y), s), "y": y, "wp_pred": p}))
+        elif model_type == "fg":
+            m = train_fg(tr)
+            X, y, _ = fg_matrix(te)
+            y = y.astype(int)
+            p = m.predict(xgb.DMatrix(X))
+            row = {"season": s, "n": int(len(y)), "logloss": _bin_logloss(y, p),
+                   "brier": float(np.mean((p - y) ** 2)), "auc": _auc(y, p)}
+            frames.append(pl.DataFrame({"season": np.full(len(y), s),
+                                        "yards_to_goal": X["yards_to_goal"].to_numpy(),
+                                        "made": y, "fg_pred": p}))
+        elif model_type == "xpass":
+            m = train_xpass(tr)
+            X, y, _ = xpass_matrix(te)
+            y = y.astype(int)
+            p = m.predict(xgb.DMatrix(X))
+            row = {"season": s, "n": int(len(y)), "logloss": _bin_logloss(y, p),
+                   "brier": float(np.mean((p - y) ** 2)), "auc": _auc(y, p)}
+            frames.append(pl.DataFrame({"season": np.full(len(y), s),
+                                        "down": X["down"].to_numpy(),
+                                        "is_pass": y, "xpass": p}))
+        elif model_type == "two_pt":
+            m = train_two_pt(tr)
+            X, y, _ = two_pt_matrix(te)
+            y = y.astype(int)
+            p = m.predict(xgb.DMatrix(X))
+            row = {"season": s, "n": int(len(y)), "logloss": _bin_logloss(y, p),
+                   "brier": float(np.mean((p - y) ** 2)), "auc": _auc(y, p)}
+            frames.append(pl.DataFrame({"season": np.full(len(y), s),
+                                        "made": y, "two_pt_pred": p}))
         else:  # qbr
             m = train_qbr(tr, espn_qbr)
             X, _, keys = qbr_matrix(te)
@@ -157,6 +196,13 @@ def loso_cv(df: pl.DataFrame, model_type: str, espn_qbr: pl.DataFrame | None = N
         tab = calibration_table(p.tolist(), y.tolist(), oof["season"].to_list(), bin_size=0.05)
         pooled = {"logloss": _bin_logloss(y, p), "brier": float(np.mean((p - y) ** 2)),
                   "auc": _auc(y, p), "weighted_cal_err": weighted_cal_error(tab)}
+    elif model_type in ("fg", "xpass", "two_pt") and oof.height:
+        _pred_col = {"fg": "fg_pred", "xpass": "xpass", "two_pt": "two_pt_pred"}[model_type]
+        _y_col = {"fg": "made", "xpass": "is_pass", "two_pt": "made"}[model_type]
+        y = oof[_y_col].to_numpy().astype(int)
+        p = oof[_pred_col].to_numpy()
+        pooled = {"logloss": _bin_logloss(y, p), "brier": float(np.mean((p - y) ** 2)),
+                  "auc": _auc(y, p)}
     elif model_type == "qbr" and oof.height:
         y, pj = oof["y"].to_numpy(), oof["qbr_pred"].to_numpy()
         ss_res, ss_tot = float(np.sum((y - pj) ** 2)), float(np.sum((y - y.mean()) ** 2))

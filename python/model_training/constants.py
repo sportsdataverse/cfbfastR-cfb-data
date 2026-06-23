@@ -71,6 +71,31 @@ QBR_PARAMS = dict(booster="gbtree", objective="reg:squarederror", eta=0.1,
                   subsample=0.8, colsample_bytree=0.8, max_depth=4, min_child_weight=1)
 QBR_NROUNDS = 45  # matches shipped qbr_model.ubj tree count
 
+# --- Ordinal CFB rule-era factor (shared FG/xPass/two-pt helper) ---------------
+# Boundaries track major clock / targeting / tempo rule changes (matches the
+# fourth_down ordinal era exactly): 0:<=2006  1:2007-2013  2:2014-2017  3:>=2018.
+ERA_BOUNDS: tuple[int, int, int] = (2006, 2013, 2017)
+
+# --- FG model (fg_model.ubj) — single-feature make-probability surface ---------
+FG_FEATURES: list[str] = ["yards_to_goal"]  # <- start.yardsToEndzone, attempts in [1,55]
+FG_PARAMS = dict(objective="binary:logistic", eval_metric="logloss", max_depth=3,
+                 eta=0.1, subsample=0.8, min_child_weight=30)
+FG_NROUNDS = 60
+
+# --- xPass model (xpass_model.ubj) — pass-vs-rush tendency surface (7 feats) ----
+XPASS_FEATURES: list[str] = [
+    "down", "distance", "yards_to_goal", "pos_score_diff", "TimeSecsRem", "era", "period",
+]
+XPASS_PARAMS = dict(objective="binary:logistic", eval_metric="logloss", max_depth=5,
+                    eta=0.1, subsample=0.8, colsample_bytree=0.8, min_child_weight=20)
+XPASS_NROUNDS = 150
+
+# --- two-point model (two_pt_model.ubj) — 2pt-conversion-success surface (4) ----
+TWO_PT_FEATURES: list[str] = ["posteam_spread", "posteam_total", "pos_score_diff", "era"]
+TWO_PT_PARAMS = dict(objective="binary:logistic", eval_metric="logloss", max_depth=2,
+                     eta=0.05, subsample=0.9, min_child_weight=40)
+TWO_PT_NROUNDS = 40
+
 # Known-bad games excluded by keepers 02/03 + model_training.R (ESPN data defects).
 BAD_GAME_IDS: set[int] = {
     400603838, 401020760, 400933849, 400547737, 400547739, 401012806,

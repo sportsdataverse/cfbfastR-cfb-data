@@ -43,10 +43,10 @@ A 13-feature XGBoost **binary:logistic** model, **760 trees**, a faithful port o
 
 | metric | value |
 |---|---|
-| `n` | 2219607 |
-| `logloss` | 0.3616 |
-| `brier` | 0.1182 |
-| `auc` | 0.9159 |
+| `n` | 2219660 |
+| `logloss` | 0.3486 |
+| `brier` | 0.1135 |
+| `auc` | 0.9223 |
 | `weighted_cal_err_pooled` | 0.0147 |
 
 

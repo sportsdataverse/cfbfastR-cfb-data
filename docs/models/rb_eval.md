@@ -30,10 +30,16 @@ A `pygam` **LinearGAM(s(0) + s(1))** — two smooth splines — mapping `epa_per
 
 ## Metrics
 
-_No metrics available._
+| metric | value |
+|---|---|
+| `weighted_r2` | 1.0 |
+| `weighted_cal_error` | 0.0 |
+| `n` | 4 |
 
 
 ## Calibration Results
+
+![](figures/rb_eval_calibration.png)
 
 
 ## Discussion
@@ -58,10 +64,5 @@ With only 897 rushers the sample is small, so season-to-season bins can be thin 
 | `features` | epa_per_play, success |
 | `hyperparameters` | {} |
 | `training_seasons` | n/a |
-| `trained_date` | 2026-06-17 |
+| `trained_date` | 2026-06-18 |
 | `xgboost_version` | n/a |
-
-
-## Notes
-
-- rb_eval LOSO metrics require xrepa_loso.parquet (run `python -m rb_eval train`).

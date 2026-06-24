@@ -31,16 +31,18 @@ A 6-feature XGBoost regression, **45 trees**, full-history retrain. Features are
 
 **Evaluation.** Leave-one-season-out over 22,833 quarterback-games (2005-2025). On the 2021-25 holdout it **decisively beats the legacy 2020 model** (RMSE 16.1 vs 23.2, R² 0.66 vs 0.29). Because QBR is a continuous bounded target, the calibration figure is a predicted-vs-actual scatter (2-D bin density) with a y=x reference, not a probability-bucket plot.
 
+**Rule-era variant (adopted).** Adding the one-hot era dummies (`era0..era3`, cuts 2006/2013/2020) is the one *material* era win in the suite — pooled LOSO RMSE **17.88 → 17.42** (evaluated on the spread-backfilled frame, since `spread` is a feature). Shipped side-by-side as `qbr_era.ubj` (10 features).
+
 
 ## Metrics
 
 | metric | value |
 |---|---|
 | `n` | 22833 |
-| `rmse` | 17.8726 |
-| `mae` | 13.9038 |
-| `r2` | 0.5853 |
-| `corr` | 0.7651 |
+| `rmse` | 17.2827 |
+| `mae` | 13.3996 |
+| `r2` | 0.6122 |
+| `corr` | 0.7826 |
 
 
 ## Calibration Results

@@ -107,8 +107,9 @@ def _posteam_total() -> pl.Expr:
 def fg_matrix(df: pl.DataFrame, *, era_onehot: bool = False):
     """FG make-probability matrix: filter fg_attempt & yards_to_goal in [1,55].
 
-    Returns (X[1 feat], y=fg_made int, None) — single-feature surface, no weights.
-    With ``era_onehot`` the era0..era3 dummies are appended (FG has no era today).
+    Returns (X[1 feat], y=fg_made int, None) — single base feature, no weights.
+    With ``era_onehot`` the era0..era3 dummies are appended; the shipped fg_model
+    is era-aware (yards_to_goal + era0..era3), so train_fg passes era_onehot=True.
     """
     f = df.filter(
         (pl.col("fg_attempt") == True)  # noqa: E712

@@ -204,7 +204,7 @@ def _resolve_returner(text: str, names: dict[str, list[str]]) -> tuple[str | Non
     return (col, _trim(m.group(1))) if m else (None, None)
 
 
-def fill_participants_from_text(plays: list[dict], raw: dict) -> dict[str, int]:
+def fill_participants_from_text(plays: list[dict], raw: dict) -> dict[str, dict[str, int]]:
     """In-place backfill of null ``{role}_player_name`` + ``{role}_player_id`` columns.
 
     Two passes per role, both null-only:

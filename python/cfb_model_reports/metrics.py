@@ -102,14 +102,15 @@ def loso_metrics(model_type: str, loso_dir) -> dict:
 
     import polars as pl
     df = pl.read_parquet(d / fname)
+    if df.height == 0:  # present-but-empty OOF: avoid log_loss/0-row + EP wsum==0 div
+        return {}
     if model_type == "wp_spread":
-        from sklearn.metrics import log_loss
+        from sklearn.metrics import log_loss, roc_auc_score
         y = df["y"].to_numpy().astype(int)
         p = np.clip(df["wp_pred"].to_numpy(), 1e-15, 1 - 1e-15)
-        order = np.argsort(p, kind="mergesort")
-        r = np.empty(len(p)); r[order] = np.arange(1, len(p) + 1)
         npos, nneg = float(y.sum()), float((1 - y).sum())
-        auc = (r[y == 1].sum() - npos * (npos + 1) / 2) / (npos * nneg) if npos and nneg else float("nan")
+        # roc_auc_score handles tied probabilities correctly (the manual rank AUC did not)
+        auc = float(roc_auc_score(y, p)) if npos and nneg else float("nan")
         return {"loso_log_loss": round(float(log_loss(y, p, labels=[0, 1])), 4),
                 "loso_brier": round(float(np.mean((p - y) ** 2)), 4),
                 "loso_auc": round(float(auc), 4), "loso_n": int(len(y))}

@@ -124,7 +124,7 @@ jobs:
         working-directory: .
         run: |
           git config --local user.email "action@github.com"
-          git config --local user.name "Github Action"
+          git config --local user.name "GitHub Action"
           git add docs/models
           git commit -m "ci(models): regenerate CFB model reports" || echo "no report changes"
           git push || echo "nothing to push"

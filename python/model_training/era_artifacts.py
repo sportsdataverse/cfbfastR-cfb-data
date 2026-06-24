@@ -88,7 +88,13 @@ def main(argv=None) -> int:
     out = Path(args.artifacts)
     targets = {t.strip() for t in args.only.split(",") if t.strip()} or {"qbr", "fg", "fourth_down", "wp_spread"}
 
-    backfilled = pl.read_parquet(args.backfilled)
+    # Only qbr/fourth_down/wp_spread consume the backfilled frame; lazy-load it so
+    # `--only fg` (which uses --canonical) doesn't require the backfill parquet.
+    backfilled = (
+        pl.read_parquet(args.backfilled)
+        if targets & {"qbr", "fourth_down", "wp_spread"}
+        else None
+    )
     print("fitting side-by-side artifacts (no canonical overwrite):")
     if "fg" in targets:
         fit_fg_era(pl.read_parquet(args.canonical), out)

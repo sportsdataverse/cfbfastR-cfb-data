@@ -122,6 +122,19 @@ def build_report(canon: dict, back: dict) -> str:
     neutral = [m for m, d in decisions.items() if d["cls"] == "neutral"]
     nope = [m for m, d in decisions.items() if d["cls"] == "no"]
     pend = [m for m, d in decisions.items() if d["cls"] == "pending"]
+    # Derive the headline from the computed verdict so it can't drift from the table.
+    wp_cb = (canon.get("wp_spread", {}).get("verdict", {}) or {}).get("baseline")
+    wp_bb = (back.get("wp_spread", {}).get("verdict", {}) or {}).get("baseline")
+    head = (
+        f"era is a *material* OOF win for **{', '.join(material)}**"
+        if material
+        else "era is not a *material* OOF win for any model"
+    ) + "; elsewhere it is noise-level or a calibration regression."
+    if wp_cb is not None and wp_bb is not None:
+        head += (
+            f" The **spread backfill** moves **wp_spread** baseline by "
+            f"{wp_bb - wp_cb:+.4f} — independent of era."
+        )
     lines += ["", "## Verdict", "",
               f"- **Keep era — material OOF gain:** {', '.join(material) or 'none'}",
               f"- **Neutral — era wins only at noise level (keep shipped recipe, era optional):** "
@@ -129,9 +142,7 @@ def build_report(canon: dict, back: dict) -> str:
               f"- **Drop era — no OOF gain (or calibration regression):** {', '.join(nope) or 'none'}",
               f"- **Not evaluated:** {', '.join(pend) or 'none'} "
               "(rb_eval: local cache too small; pregame_wp: single-feature pregame model)", "",
-              "**Headline:** era is a *material* win only for **QBR**; elsewhere it is noise-level "
-              "or (EP) a calibration regression. The **spread backfill** is the larger, real win for "
-              "**wp_spread** (logloss −0.0098) — independent of era.", ""]
+              f"**Headline:** {head}", ""]
     return "\n".join(lines)
 
 

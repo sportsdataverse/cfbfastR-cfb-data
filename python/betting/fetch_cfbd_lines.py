@@ -59,7 +59,13 @@ def _get(session: requests.Session, year: int, week: int, season_type: str,
     delay = 1.0
     last = None
     for _ in range(max_retries):
-        resp = session.get(f"{_BASE_URL}/lines", params=params, timeout=45)
+        try:
+            resp = session.get(f"{_BASE_URL}/lines", params=params, timeout=45)
+        except requests.RequestException as exc:  # connect/read timeout, conn reset, DNS, ...
+            last = f"transport error: {exc}"
+            time.sleep(delay)
+            delay = min(delay * 2, 30.0)
+            continue
         if resp.status_code == 200:
             return resp.json()
         last = f"HTTP {resp.status_code}: {resp.text[:150]}"

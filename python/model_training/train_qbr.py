@@ -3,6 +3,7 @@
 Features = per-QB-game qbr_vars (from features.qbr_matrix); target = ESPN raw QBR joined
 on (game_id, passer_player_name). The ESPN QBR is produced by python/scrape_cfb_qbr.py.
 """
+
 from __future__ import annotations
 
 import pandas as pd
@@ -19,11 +20,15 @@ def train_qbr_from_matrix(X: pd.DataFrame, y, nrounds: int = C.QBR_NROUNDS) -> x
 
 
 def train_qbr(df: pl.DataFrame, espn_qbr: pl.DataFrame, nrounds: int = C.QBR_NROUNDS) -> xgb.Booster:
-    X, _, keys = qbr_matrix(df)
+    # era_onehot=True: QBR_FEATURES == mv.qbr_vars includes era0..era3 (the shipped
+    # qbr_model is era-aware), so the matrix must carry the era dummies for the
+    # joined.select(QBR_FEATURES) below.
+    X, _, keys = qbr_matrix(df, era_onehot=True)
     feat = pl.from_pandas(keys).hstack(pl.from_pandas(X))
     joined = feat.join(
         espn_qbr.select(["game_id", "passer_player_name", "raw_qbr"]),
-        on=["game_id", "passer_player_name"], how="inner",
+        on=["game_id", "passer_player_name"],
+        how="inner",
     ).drop_nulls("raw_qbr")
     Xj = joined.select(C.QBR_FEATURES).to_pandas()
     yj = joined["raw_qbr"].to_numpy()

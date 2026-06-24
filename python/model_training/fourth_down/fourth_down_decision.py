@@ -156,7 +156,10 @@ def _predict_wp(state: pd.DataFrame, ep: np.ndarray, wp_model: xgb.Booster) -> n
     exp_score_diff = pos_diff + ep
     exp_ratio = exp_score_diff / (adj + 1.0)
     elapsed_share = (3600.0 - adj) / 3600.0
-    spread_time = (-1.0 * state["pos_team_spread"].to_numpy().astype(float)) * np.exp(
+    # spread_time MUST match the trained-on convention: pbp_full's start.spread_time is
+    # +pos_team_spread * exp(-4 * elapsed_share) (verified MAE 0.0 against the training
+    # frame). The previous `-1.0 *` form fed the WP model a sign-inverted spread.
+    spread_time = state["pos_team_spread"].to_numpy().astype(float) * np.exp(
         -4.0 * elapsed_share
     )
     X = pd.DataFrame(

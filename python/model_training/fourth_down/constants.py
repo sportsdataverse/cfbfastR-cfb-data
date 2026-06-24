@@ -20,12 +20,16 @@ FD_FEATURES: list[str] = [
 
 # --- CFB rule-era factor (ordinal), derived from the play's season ---
 # Boundaries track major clock / targeting / tempo rule changes:
-#   0: <=2006   (pre clock-rule era; 2006 clock experiment)
+#   0: 2004-2006 (pre clock-rule era; 2006 clock experiment)
 #   1: 2007-2013 (post-2006 revert, pre-targeting-ejection)
-#   2: 2014-2017 (targeting + 10-second runoff + up-tempo)
-#   3: >=2018    (modern)
+#   2: 2014-2020 (targeting + 10-second runoff + up-tempo)
+#   3: 2021+     (modern / post-2020)
 FD_SEASON_COL: str = "season"
-FD_ERA_BOUNDS: tuple[int, int, int] = (2006, 2013, 2017)
+FD_ERA_BOUNDS: tuple[int, int, int] = (2006, 2013, 2020)
+# One-hot era dummies (era-experiment encoding) — one column per bucket.
+FD_ERA_ONEHOT_COLS: list[str] = [f"era{i}" for i in range(len(FD_ERA_BOUNDS) + 1)]  # era0..era3
+# The 6-feat one-hot variant feature order (ordinal `era` swapped for era0..era3).
+FD_FEATURES_ERA_ONEHOT: list[str] = [f for f in FD_FEATURES if f != "era"] + FD_ERA_ONEHOT_COLS
 
 # --- label bounds (clip + offset: label = clip(yardsGained, LOW, HIGH) + OFFSET) ---
 FD_CLIP_LOW: int = -10  # 10-yard loss = class 0

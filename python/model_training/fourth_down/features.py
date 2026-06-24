@@ -20,7 +20,9 @@ from .constants import (
     FD_CLIP_HIGH,
     FD_CLIP_LOW,
     FD_ERA_BOUNDS,
+    FD_ERA_ONEHOT_COLS,
     FD_FEATURES,
+    FD_FEATURES_ERA_ONEHOT,
     FD_FIRST_DOWN_PENALTY_COLS,
     FD_IS_HOME_COL,
     FD_LABEL_OFFSET,
@@ -47,27 +49,30 @@ def _yards_gained_col(df: pl.DataFrame) -> str:
     return FD_YARDS_GAINED_COLS[0]
 
 
-def fd_features(plays: pl.DataFrame) -> tuple:
+def fd_features(plays: pl.DataFrame, *, era_onehot: bool = False) -> tuple:
     """Filter plays and build the (X, y) pair for the fourth-down yards-gained model.
 
     Args:
         plays: polars DataFrame of final.json play records (all downs, all play types).
+        era_onehot: if True, replace the ordinal ``era`` factor with the era0..era3
+            one-hot dummies (the era-experiment encoding).
 
     Returns:
-        X: pandas DataFrame with exactly the 5 columns in FD_FEATURES order.
+        X: pandas DataFrame with the FD_FEATURES (or FD_FEATURES_ERA_ONEHOT) columns.
         y: integer ndarray of class labels (0..75).
     """
     import pandas as pd
 
+    out_cols = FD_FEATURES_ERA_ONEHOT if era_onehot else FD_FEATURES
     if plays.is_empty() or len(plays.columns) == 0:
-        return pd.DataFrame(columns=FD_FEATURES), np.array([], dtype=np.int32)
+        return pd.DataFrame(columns=out_cols), np.array([], dtype=np.int32)
 
     fdp_col = _first_down_penalty_col(plays)
     ygc = _yards_gained_col(plays)
 
     # --- step 1: down filter (keep 3rd and 4th only) ---
     if "start.down" not in plays.columns or FD_SEASON_COL not in plays.columns:
-        return pd.DataFrame(columns=FD_FEATURES), np.array([], dtype=np.int32)
+        return pd.DataFrame(columns=out_cols), np.array([], dtype=np.int32)
     df = plays.filter(pl.col("start.down").is_in([3, 4]))
 
     # --- step 2: play-type filter (rush | pass | first-down-by-penalty) ---
@@ -97,7 +102,7 @@ def fd_features(plays: pl.DataFrame) -> tuple:
     )
 
     if df.is_empty():
-        return pd.DataFrame(columns=FD_FEATURES), np.array([], dtype=np.int32)
+        return pd.DataFrame(columns=out_cols), np.array([], dtype=np.int32)
 
     # --- derive posteam_total + the ordinal CFB rule-era factor ---
     home_total = (pl.col(FD_SPREAD_COL) + pl.col(FD_OVERUNDER_COL)) / 2.0
@@ -117,6 +122,14 @@ def fd_features(plays: pl.DataFrame) -> tuple:
         .otherwise(3)
         .cast(pl.Int32),
     )
+    if era_onehot:
+        s = pl.col(FD_SEASON_COL)
+        df = df.with_columns(
+            era0=(s <= lo).cast(pl.Int32),
+            era1=((s > lo) & (s <= mid)).cast(pl.Int32),
+            era2=((s > mid) & (s <= hi)).cast(pl.Int32),
+            era3=(s > hi).cast(pl.Int32),
+        )
 
     # --- build label ---
     df = df.with_columns(
@@ -126,7 +139,7 @@ def fd_features(plays: pl.DataFrame) -> tuple:
         ).cast(pl.Int32)
     )
 
-    # --- select the 5 feature columns (in exact model order) ---
+    # --- select the feature columns (in exact model order) ---
     col_map = {
         "down": "start.down",
         "distance": "start.distance",
@@ -134,7 +147,8 @@ def fd_features(plays: pl.DataFrame) -> tuple:
         "posteam_total": "posteam_total",
         "posteam_spread": "posteam_spread",
         "era": "era",
+        **{c: c for c in FD_ERA_ONEHOT_COLS},
     }
-    X = df.select([pl.col(col_map[f]).alias(f) for f in FD_FEATURES]).to_pandas()
+    X = df.select([pl.col(col_map[f]).alias(f) for f in out_cols]).to_pandas()
     y = df["_label"].to_numpy()
     return X, y

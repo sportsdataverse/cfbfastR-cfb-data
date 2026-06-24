@@ -22,6 +22,8 @@ def _synth_fg_frame(n=400):
         "fg_attempt": [True] * n,
         "start.yardsToEndzone": rng.integers(1, 56, n),
         "fg_made": rng.integers(0, 2, n),
+        # season is required by era-aware fg_matrix(era_onehot=True) -> era0..era3.
+        "season": rng.integers(2004, 2026, n),
     })
 
 
@@ -122,11 +124,15 @@ def test_two_pt_posteam_total_home_vs_away():
 
 # --- trainers: structure matches the shipped binary:logistic artifacts --------
 
-def test_train_fg_is_1feat_logistic():
+def test_train_fg_is_era_logistic():
+    # train_fg is era-aware to match the shipped era fg_model: the base
+    # yards_to_goal feature plus the era0..era3 one-hot dummies, i.e.
+    # with_era_onehot(C.FG_FEATURES) == ["yards_to_goal", "era0", ..., "era3"].
     m = train_fg(_synth_fg_frame(), nrounds=5)
     cfg = json.loads(m.save_config())["learner"]
-    assert m.num_features() == 1
-    assert m.feature_names == C.FG_FEATURES
+    fg_era_feats = C.with_era_onehot(C.FG_FEATURES)
+    assert m.num_features() == len(fg_era_feats)
+    assert m.feature_names == fg_era_feats
     assert cfg["objective"]["name"] == "binary:logistic"
 
 

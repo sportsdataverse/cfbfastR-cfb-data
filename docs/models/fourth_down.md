@@ -27,9 +27,11 @@ A 6-feature XGBoost **multiclass softprob** over **76 classes** (integer gains -
 
 ## The model
 
-**Algorithm.** XGBoost, `objective=multi:softprob` over **76 classes** (integer gains -10..65), **157 boosting rounds**. Lineage is the cfb4th yards model plus the added ordinal `era` factor. P(first down) for any distance-to-go is recovered by summing class probabilities for gains &ge; the distance.
+**Algorithm.** XGBoost, `objective=multi:softprob` over **76 classes** (integer gains -10..65), **157 boosting rounds**. Lineage is the cfb4th yards model plus an `era` rule-era factor. P(first down) for any distance-to-go is recovered by summing class probabilities for gains &ge; the distance.
 
 **Evaluation.** Calibration collapses the 76-class distribution into P(first down) and compares to the empirical conversion rate over the 2.2M-play corpus (a sampled subset for the figure). This is a fit/calibration check on the full corpus rather than a season-held-out LOSO pass.
+
+**Rule-era variant (adopted).** Switching the ordinal `era` factor to the one-hot dummies (`era0..era3`) materially improves out-of-fold first-down calibration — pooled LOSO cal-MAE **0.0035 → 0.0027**. Shipped side-by-side as `fd_model_era.ubj` (9 features, era one-hot replacing the ordinal factor).
 
 
 ## Metrics

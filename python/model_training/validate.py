@@ -1,4 +1,5 @@
 """Validation: prediction-parity vs reference models + LOSO calibration tables."""
+
 from __future__ import annotations
 
 import numpy as np
@@ -7,8 +8,7 @@ import polars as pl
 import xgboost as xgb
 
 
-def prediction_parity(model_a: xgb.Booster, model_b: xgb.Booster, X: pd.DataFrame,
-                      tol: float = 1e-3) -> dict:
+def prediction_parity(model_a: xgb.Booster, model_b: xgb.Booster, X: pd.DataFrame, tol: float = 1e-3) -> dict:
     d = xgb.DMatrix(X)
     pa, pb = model_a.predict(d), model_b.predict(d)
     max_abs = float(np.max(np.abs(pa - pb)))
@@ -40,6 +40,7 @@ def weighted_cal_error(table: pl.DataFrame) -> float:
 # and predict the held-out season s, then pool the out-of-fold predictions. The
 # shipped XGBoost params/rounds (constants.py) are used unchanged.
 
+
 def _mc_logloss(y, P) -> float:
     P = np.clip(P, 1e-15, 1 - 1e-15)
     return float(-np.mean(np.log(P[np.arange(len(y)), y])))
@@ -60,8 +61,7 @@ def _auc(y, p) -> float:
     return float((r[y == 1].sum() - npos * (npos + 1) / 2) / (npos * nneg))
 
 
-def loso_cv(df: pl.DataFrame, model_type: str, espn_qbr: pl.DataFrame | None = None,
-            log=print) -> dict:
+def loso_cv(df: pl.DataFrame, model_type: str, espn_qbr: pl.DataFrame | None = None, log=print) -> dict:
     """Leave-one-season-out CV for ``model_type`` in {ep, wp, qbr}.
 
     Args:
@@ -113,50 +113,81 @@ def loso_cv(df: pl.DataFrame, model_type: str, espn_qbr: pl.DataFrame | None = N
             P = m.predict(xgb.DMatrix(X))
             scores = np.array([C.EP_CLASS_TO_SCORE[c] for c in range(7)], float)
             ep_pred = P @ scores
-            row = {"season": s, "n": int(len(y)),
-                   "mlogloss": _mc_logloss(y, P), "accuracy": float(np.mean(P.argmax(1) == y))}
-            frames.append(pl.DataFrame({"season": np.full(len(y), s), "y": y,
-                                        "ep_pred": ep_pred, "realized": scores[y]}))
+            row = {
+                "season": s,
+                "n": int(len(y)),
+                "mlogloss": _mc_logloss(y, P),
+                "accuracy": float(np.mean(P.argmax(1) == y)),
+            }
+            frames.append(
+                pl.DataFrame({"season": np.full(len(y), s), "y": y, "ep_pred": ep_pred, "realized": scores[y]})
+            )
         elif model_type == "wp":
             m = train_wp(tr, variant="spread", stage=2)
             X, y, _ = wp_matrix(te, "spread")
             y = y.astype(int)
             p = m.predict(xgb.DMatrix(X))
-            row = {"season": s, "n": int(len(y)), "logloss": _bin_logloss(y, p),
-                   "brier": float(np.mean((p - y) ** 2)), "auc": _auc(y, p)}
+            row = {
+                "season": s,
+                "n": int(len(y)),
+                "logloss": _bin_logloss(y, p),
+                "brier": float(np.mean((p - y) ** 2)),
+                "auc": _auc(y, p),
+            }
             frames.append(pl.DataFrame({"season": np.full(len(y), s), "y": y, "wp_pred": p}))
         elif model_type == "fg":
             m = train_fg(tr)
-            X, y, _ = fg_matrix(te)
+            X, y, _ = fg_matrix(te, era_onehot=True)  # match era-aware shipped fg_model
             y = y.astype(int)
             p = m.predict(xgb.DMatrix(X))
-            row = {"season": s, "n": int(len(y)), "logloss": _bin_logloss(y, p),
-                   "brier": float(np.mean((p - y) ** 2)), "auc": _auc(y, p)}
-            frames.append(pl.DataFrame({"season": np.full(len(y), s),
-                                        "yards_to_goal": X["yards_to_goal"].to_numpy(),
-                                        "made": y, "fg_pred": p}))
+            row = {
+                "season": s,
+                "n": int(len(y)),
+                "logloss": _bin_logloss(y, p),
+                "brier": float(np.mean((p - y) ** 2)),
+                "auc": _auc(y, p),
+            }
+            frames.append(
+                pl.DataFrame(
+                    {
+                        "season": np.full(len(y), s),
+                        "yards_to_goal": X["yards_to_goal"].to_numpy(),
+                        "made": y,
+                        "fg_pred": p,
+                    }
+                )
+            )
         elif model_type == "xpass":
             m = train_xpass(tr)
             X, y, _ = xpass_matrix(te)
             y = y.astype(int)
             p = m.predict(xgb.DMatrix(X))
-            row = {"season": s, "n": int(len(y)), "logloss": _bin_logloss(y, p),
-                   "brier": float(np.mean((p - y) ** 2)), "auc": _auc(y, p)}
-            frames.append(pl.DataFrame({"season": np.full(len(y), s),
-                                        "down": X["down"].to_numpy(),
-                                        "is_pass": y, "xpass": p}))
+            row = {
+                "season": s,
+                "n": int(len(y)),
+                "logloss": _bin_logloss(y, p),
+                "brier": float(np.mean((p - y) ** 2)),
+                "auc": _auc(y, p),
+            }
+            frames.append(
+                pl.DataFrame({"season": np.full(len(y), s), "down": X["down"].to_numpy(), "is_pass": y, "xpass": p})
+            )
         elif model_type == "two_pt":
             m = train_two_pt(tr)
             X, y, _ = two_pt_matrix(te)
             y = y.astype(int)
             p = m.predict(xgb.DMatrix(X))
-            row = {"season": s, "n": int(len(y)), "logloss": _bin_logloss(y, p),
-                   "brier": float(np.mean((p - y) ** 2)), "auc": _auc(y, p)}
-            frames.append(pl.DataFrame({"season": np.full(len(y), s),
-                                        "made": y, "two_pt_pred": p}))
+            row = {
+                "season": s,
+                "n": int(len(y)),
+                "logloss": _bin_logloss(y, p),
+                "brier": float(np.mean((p - y) ** 2)),
+                "auc": _auc(y, p),
+            }
+            frames.append(pl.DataFrame({"season": np.full(len(y), s), "made": y, "two_pt_pred": p}))
         else:  # qbr
             m = train_qbr(tr, espn_qbr)
-            X, _, keys = qbr_matrix(te)
+            X, _, keys = qbr_matrix(te, era_onehot=True)  # match era-aware shipped qbr_model
             feat = pl.from_pandas(keys).hstack(pl.from_pandas(X))
             j = feat.join(espn_qbr, on=["game_id", "passer_player_name"], how="inner").drop_nulls("raw_qbr")
             if j.height == 0:
@@ -166,12 +197,18 @@ def loso_cv(df: pl.DataFrame, model_type: str, espn_qbr: pl.DataFrame | None = N
                 continue
             pj = m.predict(xgb.DMatrix(j.select(C.QBR_FEATURES).to_pandas()))
             yj = j["raw_qbr"].to_numpy()
-            row = {"season": s, "n": int(len(yj)),
-                   "rmse": float(np.sqrt(np.mean((pj - yj) ** 2))), "mae": float(np.mean(np.abs(pj - yj)))}
+            row = {
+                "season": s,
+                "n": int(len(yj)),
+                "rmse": float(np.sqrt(np.mean((pj - yj) ** 2))),
+                "mae": float(np.mean(np.abs(pj - yj))),
+            }
             frames.append(pl.DataFrame({"season": np.full(len(yj), s), "y": yj, "qbr_pred": pj}))
         per_season.append(row)
-        log(f"[{model_type}] fold {s}: " + " ".join(f"{k}={v:.4f}" if isinstance(v, float) else f"{k}={v}"
-                                                    for k, v in row.items() if k != "season"))
+        log(
+            f"[{model_type}] fold {s}: "
+            + " ".join(f"{k}={v:.4f}" if isinstance(v, float) else f"{k}={v}" for k, v in row.items() if k != "season")
+        )
 
     oof = pl.concat(frames) if frames else pl.DataFrame()
     pooled: dict = {}
@@ -186,27 +223,37 @@ def loso_cv(df: pl.DataFrame, model_type: str, espn_qbr: pl.DataFrame | None = N
             wsum += n
             werr += n * abs(ep_pred[mm].mean() - realized[mm].mean())
         # rebuild full prob matrix is unnecessary; report pooled accuracy/mlogloss per-season-weighted
-        pooled = {"mlogloss": float(np.average([r["mlogloss"] for r in per_season], weights=[r["n"] for r in per_season])),
-                  "accuracy": float(np.average([r["accuracy"] for r in per_season], weights=[r["n"] for r in per_season])),
-                  "ep_cal_mae": float(werr / wsum), "mean_pred_ep": float(ep_pred.mean()),
-                  "mean_realized": float(realized.mean())}
+        pooled = {
+            "mlogloss": float(np.average([r["mlogloss"] for r in per_season], weights=[r["n"] for r in per_season])),
+            "accuracy": float(np.average([r["accuracy"] for r in per_season], weights=[r["n"] for r in per_season])),
+            "ep_cal_mae": float(werr / wsum),
+            "mean_pred_ep": float(ep_pred.mean()),
+            "mean_realized": float(realized.mean()),
+        }
     elif model_type == "wp" and oof.height:
         y = oof["y"].to_numpy().astype(int)
         p = oof["wp_pred"].to_numpy()
         tab = calibration_table(p.tolist(), y.tolist(), oof["season"].to_list(), bin_size=0.05)
-        pooled = {"logloss": _bin_logloss(y, p), "brier": float(np.mean((p - y) ** 2)),
-                  "auc": _auc(y, p), "weighted_cal_err": weighted_cal_error(tab)}
+        pooled = {
+            "logloss": _bin_logloss(y, p),
+            "brier": float(np.mean((p - y) ** 2)),
+            "auc": _auc(y, p),
+            "weighted_cal_err": weighted_cal_error(tab),
+        }
     elif model_type in ("fg", "xpass", "two_pt") and oof.height:
         _pred_col = {"fg": "fg_pred", "xpass": "xpass", "two_pt": "two_pt_pred"}[model_type]
         _y_col = {"fg": "made", "xpass": "is_pass", "two_pt": "made"}[model_type]
         y = oof[_y_col].to_numpy().astype(int)
         p = oof[_pred_col].to_numpy()
-        pooled = {"logloss": _bin_logloss(y, p), "brier": float(np.mean((p - y) ** 2)),
-                  "auc": _auc(y, p)}
+        pooled = {"logloss": _bin_logloss(y, p), "brier": float(np.mean((p - y) ** 2)), "auc": _auc(y, p)}
     elif model_type == "qbr" and oof.height:
         y, pj = oof["y"].to_numpy(), oof["qbr_pred"].to_numpy()
         ss_res, ss_tot = float(np.sum((y - pj) ** 2)), float(np.sum((y - y.mean()) ** 2))
-        pooled = {"n": int(len(y)), "rmse": float(np.sqrt(np.mean((pj - y) ** 2))),
-                  "mae": float(np.mean(np.abs(pj - y))), "r2": (1 - ss_res / ss_tot) if ss_tot else float("nan"),
-                  "corr": float(np.corrcoef(pj, y)[0, 1])}
+        pooled = {
+            "n": int(len(y)),
+            "rmse": float(np.sqrt(np.mean((pj - y) ** 2))),
+            "mae": float(np.mean(np.abs(pj - y))),
+            "r2": (1 - ss_res / ss_tot) if ss_tot else float("nan"),
+            "corr": float(np.corrcoef(pj, y)[0, 1]),
+        }
     return {"model": model_type, "pooled": pooled, "per_season": per_season, "oof": oof}

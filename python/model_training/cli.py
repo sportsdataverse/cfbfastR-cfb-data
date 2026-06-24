@@ -16,6 +16,8 @@ def build_parser() -> argparse.ArgumentParser:
     i.add_argument("--final-dir", default=".cache/cfb_final")
     i.add_argument("--out", default="pbp_full.parquet")
     i.add_argument("--seasons", nargs="*", type=int)
+    i.add_argument("--odds", default=None,
+                   help="cfb_line_odds parquet; applies the consensus spread backfill to the frame")
     for name in ("train-ep", "train-wp", "train-qbr", "train-fg", "train-xpass", "train-two-pt"):
         s = sub.add_parser(name)
         s.add_argument("--pbp", default="pbp_full.parquet")
@@ -47,7 +49,7 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv=None) -> int:
     args = build_parser().parse_args(argv)
     if args.cmd == "ingest":
-        n = write_training_frame(args.final_dir, args.out, args.seasons)
+        n = write_training_frame(args.final_dir, args.out, args.seasons, odds_path=args.odds)
         print(f"wrote {n} rows -> {args.out}")
     elif args.cmd in ("train-ep", "train-wp", "train-qbr", "train-fg", "train-xpass",
                       "train-two-pt"):

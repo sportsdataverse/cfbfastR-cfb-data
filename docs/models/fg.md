@@ -26,17 +26,19 @@ A **1-feature** XGBoost **binary:logistic** make-probability model over **42,589
 
 **Evaluation.** Leave-one-season-out over 2004-2025 (42,589 attempts): train on the other seasons, predict the held-out one, pool the out-of-fold make probabilities. The pooled weighted calibration error is **0.0085** — predicted equals actual to three decimals at every distance.
 
+**Rule-era variant (adopted, modest).** Adding the one-hot era dummies (`era0..era3`) gives a small but consistent out-of-fold gain — pooled LOSO logloss **0.5258 → 0.5240**. Shipped side-by-side as `fg_era.ubj` (yards_to_goal + era0..era3).
+
 
 ## Metrics
 
 | metric | value |
 |---|---|
-| `n` | 42589 |
-| `logloss` | 0.5258 |
-| `brier` | 0.1753 |
-| `auc` | 0.7056 |
-| `base_rate` | 0.7334 |
-| `weighted_cal_err` | 0.0085 |
+| `n` | 42615 |
+| `logloss` | 0.5247 |
+| `brier` | 0.1749 |
+| `auc` | 0.7106 |
+| `base_rate` | 0.733 |
+| `weighted_cal_err` | 0.008 |
 | `weighted_cal_err_loso` | 0.0085 |
 
 

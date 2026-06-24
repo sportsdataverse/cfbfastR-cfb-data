@@ -164,8 +164,9 @@ def test_first_down_penalty_included_without_rush_pass():
 
 
 def test_era_factor_binned_from_season():
-    # fixture play 1 season=2005 -> era 0; play 2 season=2020 -> era 3
+    # Era cuts (2006/2013/2020): play 1 season=2005 -> era 0;
+    # play 2 season=2020 -> era 2 (the 2014-2020 bucket). era 3 is 2021+.
     X, y = fd_features(_load_plays())
     assert "era" in X.columns
     assert int(X.iloc[0]["era"]) == 0
-    assert int(X.iloc[1]["era"]) == 3
+    assert int(X.iloc[1]["era"]) == 2

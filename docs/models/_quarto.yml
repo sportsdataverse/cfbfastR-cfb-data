@@ -16,6 +16,7 @@ website:
     style: docked
     contents:
       - index.qmd
+      - era_model_refresh.md
       - section: "Play-level (Track 1)"
         contents:
           - ep.md

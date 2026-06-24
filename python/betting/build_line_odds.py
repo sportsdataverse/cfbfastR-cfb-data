@@ -178,8 +178,6 @@ def normalize_cfbd() -> pl.DataFrame:
                     rows.append({**base, "market_type": "money_line", "abbr": away,
                                  "lines": None, "odds": int(aml),
                                  "opening_lines": None, "opening_odds": None, "book": book})
-    if not rows:
-        return pl.DataFrame()
     # explicit schema: list-of-dicts inference trips over None-then-float columns
     # (e.g. money_line rows carry lines=None before a spread row's float appears).
     schema = {
@@ -190,6 +188,10 @@ def normalize_cfbd() -> pl.DataFrame:
         "odds": pl.Int64, "opening_lines": pl.Float64, "opening_odds": pl.Int64,
         "book": pl.Utf8,
     }
+    # empty cache (no chunks fetched): return the full schema with 0 rows so build()'s
+    # downstream .drop()/join/_shape don't crash on a 0-column frame.
+    if not rows:
+        return pl.DataFrame(schema=schema)
     # the team ids CFBD ships are its own; override with ESPN ids via game_id below.
     return pl.DataFrame(rows, schema=schema)
 

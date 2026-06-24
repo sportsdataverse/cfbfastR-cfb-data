@@ -102,7 +102,13 @@ def _missing_mask() -> pl.Expr:
     return (
         pl.col("homeTeamSpread").is_null()
         | (pl.col("gameSpreadAvailable").cast(pl.Boolean) == False)  # noqa: E712
-        | ((pl.col("gameSpread") == 2.5) & (pl.col("overUnder") == 55.5))
+        # injected (2.5, 55.5) default fingerprint -- but only when the spread is NOT
+        # genuinely available, so a real ESPN 2.5/55.5 line isn't overwritten.
+        | (
+            (pl.col("gameSpread") == 2.5)
+            & (pl.col("overUnder") == 55.5)
+            & (pl.col("gameSpreadAvailable").cast(pl.Boolean).fill_null(False) == False)  # noqa: E712
+        )
     )
 
 

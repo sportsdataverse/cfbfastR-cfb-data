@@ -53,6 +53,17 @@ jobs:
             sportsdataverse/cfbfastR
             ropensci/piggyback
 
+      # Python builders (cfb_data_build) own the per-game reshape datasets;
+      # R above is retained only for team_summaries (espn_cfb_15) + run_summary.
+      - name: Set up uv + Python
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install Python deps
+        working-directory: python
+        run: uv sync
+
       - name: Extract years from repository_dispatch
         if: ${{ github.event.client_payload.event_name == 'daily_cfb_data' }}
         env:
@@ -72,5 +83,6 @@ jobs:
 
       - name: Update CFB Data ${{ env.START_YEAR }}-${{ env.END_YEAR }}
         env:
-          GITHUB_PAT: ${{ secrets.SDV_GH_TOKEN }}
-        run: bash scripts/daily_cfb_R_processor.sh -s ${{ env.START_YEAR }} -e ${{ env.END_YEAR }}
+          GITHUB_PAT: ${{ secrets.SDV_GH_TOKEN }}   # R piggyback (team_summaries)
+          GH_TOKEN: ${{ secrets.SDV_GH_TOKEN }}      # gh CLI publish (cfb_data_build)
+        run: bash scripts/daily_cfb_processor.sh -s ${{ env.START_YEAR }} -e ${{ env.END_YEAR }}

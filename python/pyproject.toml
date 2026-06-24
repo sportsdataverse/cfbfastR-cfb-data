@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "CFB modeling subsystem (EP/WP/QBR, CPOE, fourth-down, RB-eval) + URL-fetch ingest + model-PBP build."
 requires-python = ">=3.11"
 dependencies = [
-    "sportsdataverse>=0.0.70",
+    "sportsdataverse>=0.0.71",
     "pandas>=2.0",
     "polars>=1.0",
     "pyarrow>=15.0",

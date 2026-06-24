@@ -8,12 +8,14 @@ seasons, which is why this dataset's CI step stays on R for now). It produces 5
 released tables: ``percentiles``, ``team_summaries``, ``passing``, ``rushing``,
 ``receiving``.
 
-Parity caveat: the deterministic aggregations match R exactly, but
-``adjust_epa`` is a ridge regression (R uses ``glmnet`` at the grid's largest
-lambda; here ``sklearn`` ridge on standardized opponent dummies). The two
-solvers do not byte-match, so the opponent-adjusted EPA columns
-(``adj_off_epa`` / ``adj_def_epa`` / ``net_adj_epa`` + strengths/ranks) are held
-to a **correlation** bar, not exact equality (see the integration parity test).
+Opponent-adjusted EPA is delegated to the shared
+:func:`sportsdataverse.cfb.cfb_adjusted_epa` primitive (single owner since sdv-py
+0.0.71; was a local copy here). Parity caveat: the deterministic aggregations
+match R exactly, but that ridge regression (R uses ``glmnet`` at the grid's
+largest lambda; sdv-py uses ``sklearn`` ridge on standardized opponent dummies)
+does not byte-match, so the opponent-adjusted EPA columns (``adj_off_epa`` /
+``adj_def_epa`` / ``net_adj_epa`` + strengths/ranks) are held to a
+**correlation** bar, not exact equality (see the integration parity test).
 
 Input contract: a ``plays`` frame already schedule-joined, FBS/FBS + pass/rush
 filtered, kneel-down filtered, and ``clean_play_text``-ed (R build lines
@@ -25,6 +27,7 @@ from __future__ import annotations
 
 import numpy as np
 import polars as pl
+from sportsdataverse.cfb import cfb_adjusted_epa
 
 # Explosive-play EPA thresholds (R build lines 604-608).
 _EXPLOSIVE_PASS_EPA = 2.4
@@ -473,136 +476,6 @@ def prepare_percentiles(df: pl.DataFrame) -> pl.DataFrame:
     return pl.DataFrame(rows)
 
 
-def adjust_epa(plays: pl.DataFrame) -> pl.DataFrame:
-    """Opponent-adjusted EPA via ridge (sklearn) -- correlation-parity port of ``adjust_epa``.
-
-    R uses ``glmnet`` ridge at lambda=325 on ``~ hfa + pos_team_id + def_pos_team_id``
-    one-hot dummies. We standardize the dummies and fit ``sklearn`` Ridge with the
-    equivalent penalty; coefficients won't byte-match but the team strength ranking
-    correlates closely. Returns one row per team with adj off/def/net EPA + ranks.
-    """
-    from sklearn.linear_model import Ridge
-
-    base = plays.filter(
-        pl.col("EPA").is_not_null() & ((pl.col("pass") == 1) | (pl.col("rush") == 1))
-    ).with_columns(
-        pos_team_id=pl.col("pos_team_id").cast(pl.Utf8),
-        def_pos_team_id=pl.col("def_pos_team_id").cast(pl.Utf8),
-    )
-    clean = base.filter(
-        (pl.col("wp_before") >= 0.1) & (pl.col("wp_before") <= 0.9)
-    ).with_columns(
-        hfa=pl.when(pl.col("neutral_site") == True)  # noqa: E712
-        .then(pl.lit(0))
-        .when(pl.col("pos_team") == pl.col("home"))
-        .then(pl.lit(1))
-        .otherwise(pl.lit(-1))
-    )
-    off_ids = sorted(clean["pos_team_id"].drop_nulls().unique().to_list())
-    def_ids = sorted(clean["def_pos_team_id"].drop_nulls().unique().to_list())
-    # model.matrix drops the first factor level (reference); mirror that.
-    off_dummy = off_ids[1:]
-    def_dummy = def_ids[1:]
-    cdf = clean.select("pos_team_id", "def_pos_team_id", "hfa", "EPA").to_pandas()
-    import numpy as _np
-
-    n = len(cdf)
-    feats = [cdf["hfa"].to_numpy(dtype=float).reshape(-1, 1)]
-    for t in off_dummy:
-        feats.append((cdf["pos_team_id"].to_numpy() == t).astype(float).reshape(-1, 1))
-    for t in def_dummy:
-        feats.append(
-            (cdf["def_pos_team_id"].to_numpy() == t).astype(float).reshape(-1, 1)
-        )
-    X = _np.hstack(feats)
-    y = cdf["EPA"].to_numpy(dtype=float)
-    # glmnet objective (1/2n)RSS + lambda*||b||^2/2 with internal standardization;
-    # sklearn Ridge minimizes RSS + alpha*||b||^2. Standardize X and scale alpha.
-    mu = X.mean(axis=0)
-    sd = X.std(axis=0)
-    sd[sd == 0] = 1.0
-    Xs = (X - mu) / sd
-    model = Ridge(alpha=_RIDGE_LAMBDA * n, fit_intercept=True)
-    model.fit(Xs, y)
-    coef_std = model.coef_ / sd  # back to original scale
-    intercept = float(model.intercept_ - (coef_std * mu).sum())
-    names = (
-        ["hfa"]
-        + [f"pos_team_id{t}" for t in off_dummy]
-        + [f"def_pos_team_id{t}" for t in def_dummy]
-    )
-    coef = dict(zip(names, coef_std))
-    # model.matrix drops the reference (first) level: that team gets NO coefficient
-    # and is absent from the off/def tables, so games involving it yield NA adj EPA
-    # (which `valid_games` excludes). Only the dummy (non-reference) levels appear.
-    off_coef = {t: coef[f"pos_team_id{t}"] + intercept for t in off_dummy}
-    def_coef = {t: coef[f"def_pos_team_id{t}"] + intercept for t in def_dummy}
-    offense = pl.DataFrame(
-        {"team_id": list(off_coef), "adjmodelOff": list(off_coef.values())}
-    )
-    defense = pl.DataFrame(
-        {"team_id": list(def_coef), "adjmodelDef": list(def_coef.values())}
-    )
-
-    off_game = (
-        base.group_by(["game_id", "pos_team_id", "def_pos_team_id"])
-        .agg(pos_team=pl.col("pos_team").last(), rawOffEPA=pl.col("EPA").mean())
-        .join(defense, left_on="def_pos_team_id", right_on="team_id", how="left")
-        .with_columns(adjOffEPA=pl.col("rawOffEPA") - pl.col("adjmodelDef"))
-        .select(
-            "game_id",
-            "pos_team_id",
-            "pos_team",
-            "adjmodelDef",
-            "rawOffEPA",
-            "adjOffEPA",
-        )
-    )
-    def_game = (
-        base.group_by(["game_id", "def_pos_team_id", "pos_team_id"])
-        .agg(rawDefEPA=pl.col("EPA").mean())
-        .join(offense, left_on="pos_team_id", right_on="team_id", how="left")
-        .with_columns(adjDefEPA=pl.col("rawDefEPA") - pl.col("adjmodelOff"))
-        .select("game_id", "def_pos_team_id", "adjmodelOff", "rawDefEPA", "adjDefEPA")
-    )
-    opp = off_game.join(
-        def_game,
-        left_on=["game_id", "pos_team_id"],
-        right_on=["game_id", "def_pos_team_id"],
-        how="left",
-    )
-    team = (
-        opp.group_by("pos_team_id")
-        .agg(
-            pos_team=pl.col("pos_team").last(),
-            valid_games=(
-                pl.col("adjOffEPA").is_not_null() & pl.col("adjDefEPA").is_not_null()
-            ).sum(),
-            adjOffEPA=pl.col("adjOffEPA").mean(),
-            adjDefEPA=pl.col("adjDefEPA").mean(),
-            off_strength_faced=pl.col("adjmodelOff").mean(),
-            def_strength_faced=pl.col("adjmodelDef").mean(),
-        )
-        .filter(
-            pl.col("adjOffEPA").is_not_null()
-            & pl.col("adjDefEPA").is_not_null()
-            & (pl.col("valid_games") >= 2)
-        )
-        .with_columns(net_adj_epa=pl.col("adjOffEPA") - pl.col("adjDefEPA"))
-    )
-    return team.with_columns(
-        adj_off_epa_rank=_rank("adjOffEPA", descending=True),
-        adj_def_epa_rank=_rank("adjDefEPA", descending=False),
-        net_adj_epa_rank=_rank("net_adj_epa", descending=True),
-    ).rename(
-        {
-            "pos_team_id": "team_id",
-            "adjOffEPA": "adj_off_epa",
-            "adjDefEPA": "adj_def_epa",
-        }
-    )
-
-
 def _build_schools(plays: pl.DataFrame) -> pl.DataFrame:
     """Distinct team -> (pos_team, division, conference) lookup (R build lines 916-923)."""
     is_home = pl.col("home_team_id").cast(pl.Utf8) == pl.col("pos_team_id")
@@ -911,8 +784,10 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
     )
 
     schools = _build_schools(plays)
+    # Opponent-adjusted EPA via the shared sdv-py primitive (was a local copy;
+    # sportsdataverse.cfb.cfb_adjusted_epa is the single owner as of sdv-py 0.0.71).
     team_data = _prepare_for_write(team_data, yr, schools).join(
-        adjust_epa(plays).drop("pos_team"), on="team_id", how="left"
+        cfb_adjusted_epa(plays).drop("pos_team"), on="team_id", how="left"
     )
     qb_out = _prepare_for_write(qb_data, yr, schools).rename(
         {"passer_player_id": "player_id"}

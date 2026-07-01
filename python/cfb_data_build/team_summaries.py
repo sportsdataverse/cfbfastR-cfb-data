@@ -604,25 +604,53 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
         qb_base.filter((pl.col("pass") == 1) & pl.col("passer_player_id").is_not_null()).pipe(_add_team_games),
         by=["pos_team_id", "passer_player_id"],
     )
-    # sack/INT plays carry no passer_player_id (filtered out above) -> aggregate them
-    # separately, keyed by the sacked QB / the QB who threw the pick.
-    # Both sack_taken_player_id and interception_thrown_player_id are Float64, matching
-    # passer_player_id (derived from completion_player_id / incompletion_player_id, also Float64).
+    # sack/INT plays carry no derived passer_player_id (filtered out of qb_data above)
+    # -> aggregate them separately, attributed to the sacked QB / the QB who threw
+    # the pick.
+    #
+    # ESPN populates the sack_taken_player_id / interception_thrown_player_id sidecar
+    # for only ~29% of these plays (377/1300 INT, 3130/3185 sack in 2023), so a bare
+    # id-keyed aggregation drops most of the INT count. The source-frame
+    # ``passer_player_name`` column, however, is populated on ~92% of them (1199/1300
+    # INT, 3161/3185 sack) -- ESPN charts the QB's *name* on the play even when it
+    # omits the numeric id. We recover the missing attribution with a within-dataset
+    # (pos_team_id, passer_player_name) -> passer_player_id map built from the attempts
+    # leaderboard (each QB's name+id co-occur on their own completions/incompletions).
+    #
+    # Only UNAMBIGUOUS (team, name) pairs are kept: any name mapping to >1 id in the
+    # season is dropped (anti-join) so a future collision can never mis-resolve -- those
+    # plays then fall back to clean-id only. The resolved QB id is
+    # coalesce(clean sidecar id, name-mapped id); rows where BOTH are null (the QB name
+    # itself is absent, e.g. TEAM plays) are dropped and remain unattributed.
+    #
+    # ``team_off`` already carries the source ``passer_player_name`` column, so it is
+    # used directly as the name key (no rename -- that would DuplicateError).
+    id_map = qb_base.select(["pos_team_id", "passer_player_name", "passer_player_id"]).drop_nulls().unique()
+    _ambig = id_map.group_by(["pos_team_id", "passer_player_name"]).len().filter(pl.col("len") > 1)
+    id_map = id_map.join(
+        _ambig.select(["pos_team_id", "passer_player_name"]),
+        on=["pos_team_id", "passer_player_name"],
+        how="anti",
+    )
     sack_counts = (
-        team_off.filter(
-            (pl.col("pass") == 1) & (pl.col("sack_vec") == 1) & pl.col("sack_taken_player_id").is_not_null()
-        )
-        .group_by(["pos_team_id", "sack_taken_player_id"])
+        team_off.filter((pl.col("pass") == 1) & (pl.col("sack_vec") == 1))
+        .select(["pos_team_id", "passer_player_name", "sack_taken_player_id", "yds_sacked"])
+        .join(id_map, on=["pos_team_id", "passer_player_name"], how="left")
+        .with_columns(qb_id=pl.coalesce(pl.col("sack_taken_player_id"), pl.col("passer_player_id")))
+        .filter(pl.col("qb_id").is_not_null())
+        .group_by(["pos_team_id", "qb_id"])
         .agg(sacked=pl.len(), sack_yds=pl.col("yds_sacked").sum())
-        .rename({"sack_taken_player_id": "passer_player_id"})
+        .rename({"qb_id": "passer_player_id"})
     )
     int_counts = (
-        team_off.filter(
-            (pl.col("pass") == 1) & (pl.col("int") == 1) & pl.col("interception_thrown_player_id").is_not_null()
-        )
-        .group_by(["pos_team_id", "interception_thrown_player_id"])
+        team_off.filter((pl.col("pass") == 1) & (pl.col("int") == 1))
+        .select(["pos_team_id", "passer_player_name", "interception_thrown_player_id"])
+        .join(id_map, on=["pos_team_id", "passer_player_name"], how="left")
+        .with_columns(qb_id=pl.coalesce(pl.col("interception_thrown_player_id"), pl.col("passer_player_id")))
+        .filter(pl.col("qb_id").is_not_null())
+        .group_by(["pos_team_id", "qb_id"])
         .agg(pass_int=pl.len())
-        .rename({"interception_thrown_player_id": "passer_player_id"})
+        .rename({"qb_id": "passer_player_id"})
     )
     qb_data = (
         qb_data.join(sack_counts, on=["pos_team_id", "passer_player_id"], how="left")

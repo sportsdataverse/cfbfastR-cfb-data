@@ -702,23 +702,63 @@ build_team_summaries_season <- function(yr, publish = TRUE) {
         ) |>
         summarize_passer_df(by = c(pos_team_id, passer_player_id))
 
-    # sack/INT plays carry no passer_player_id -> aggregate separately.
+    # sack/INT plays carry no derived passer_player_id -> aggregate separately,
+    # attributed to the sacked QB / the QB who threw the pick.
+    #
+    # ESPN populates the sack_taken_player_id / interception_thrown_player_id sidecar
+    # for only ~29% of these plays, so a bare id-keyed aggregation drops most of the
+    # INT count. The source-frame `passer_player_name` column is populated on ~92% of
+    # them, so we recover the missing attribution with a within-dataset
+    # (pos_team_id, passer_player_name) -> passer_player_id map built from the attempts
+    # (each QB's name+id co-occur on their completions/incompletions). Only UNAMBIGUOUS
+    # (team, name) pairs are kept -- any name mapping to >1 id in the season is dropped
+    # (anti-join) so a future collision can never mis-resolve. The resolved QB id is
+    # coalesce(clean sidecar id, name-mapped id); rows where both are NA (the QB name
+    # itself is absent) are dropped and remain unattributed.
+    qb_id_map <- plays |>
+        dplyr::mutate(
+            passer_player_id = dplyr::case_when(
+                !is.na(completion_player_id) ~ completion_player_id,
+                .default = incompletion_player_id
+            ),
+            passer_player_name = dplyr::case_when(
+                !is.na(completion_player_id) ~ completion_player,
+                .default = incompletion_player
+            )
+        ) |>
+        dplyr::filter(!is.na(passer_player_name), !is.na(passer_player_id)) |>
+        dplyr::distinct(pos_team_id, passer_player_name, passer_player_id)
+    qb_id_ambig <- qb_id_map |>
+        dplyr::count(pos_team_id, passer_player_name) |>
+        dplyr::filter(n > 1) |>
+        dplyr::select(pos_team_id, passer_player_name)
+    qb_id_map <- qb_id_map |>
+        dplyr::anti_join(qb_id_ambig, by = dplyr::join_by(pos_team_id, passer_player_name))
+
     qb_sacks <- plays |>
-        dplyr::filter(pass == 1, sack_vec == 1, !is.na(sack_taken_player_id)) |>
+        dplyr::filter(pass == 1, sack_vec == 1) |>
+        dplyr::select(pos_team_id, passer_player_name, sack_taken_player_id, yds_sacked) |>
+        dplyr::left_join(qb_id_map, by = dplyr::join_by(pos_team_id, passer_player_name)) |>
+        dplyr::mutate(qb_id = dplyr::coalesce(sack_taken_player_id, passer_player_id)) |>
+        dplyr::filter(!is.na(qb_id)) |>
         dplyr::summarize(
             sacked = dplyr::n(),
             sack_yds = sum(yds_sacked, na.rm = TRUE),
-            .by = c(pos_team_id, sack_taken_player_id)
+            .by = c(pos_team_id, qb_id)
         ) |>
-        dplyr::rename(passer_player_id = sack_taken_player_id)
+        dplyr::rename(passer_player_id = qb_id)
 
     qb_ints <- plays |>
-        dplyr::filter(pass == 1, int == 1, !is.na(interception_thrown_player_id)) |>
+        dplyr::filter(pass == 1, int == 1) |>
+        dplyr::select(pos_team_id, passer_player_name, interception_thrown_player_id) |>
+        dplyr::left_join(qb_id_map, by = dplyr::join_by(pos_team_id, passer_player_name)) |>
+        dplyr::mutate(qb_id = dplyr::coalesce(interception_thrown_player_id, passer_player_id)) |>
+        dplyr::filter(!is.na(qb_id)) |>
         dplyr::summarize(
             pass_int = dplyr::n(),
-            .by = c(pos_team_id, interception_thrown_player_id)
+            .by = c(pos_team_id, qb_id)
         ) |>
-        dplyr::rename(passer_player_id = interception_thrown_player_id)
+        dplyr::rename(passer_player_id = qb_id)
 
     team_qb_data <- team_qb_data |>
         dplyr::left_join(qb_sacks, by = dplyr::join_by(pos_team_id, passer_player_id)) |>

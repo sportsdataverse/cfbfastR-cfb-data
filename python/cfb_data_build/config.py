@@ -109,6 +109,18 @@ REGISTRY: dict[str, DatasetSpec] = {
         "espn_cfb_adv_situational",
         block=("advBoxScore", "situational"),
     ),
+    "adv_defensive_players": DatasetSpec(
+        "adv_defensive_players",
+        "adv_defensive_players",
+        "espn_cfb_adv_defensive_players",
+        block=("advBoxScore", "defensive_players"),
+    ),
+    "adv_specialists": DatasetSpec(
+        "adv_specialists",
+        "adv_specialists",
+        "espn_cfb_adv_specialists",
+        block=("advBoxScore", "specialists"),
+    ),
     # --- bespoke per-game reshapers --------------------------------------
     "pbp": DatasetSpec("pbp", "play_by_play", "espn_cfb_pbp", reshaper="pbp"),
     "team_box": DatasetSpec(

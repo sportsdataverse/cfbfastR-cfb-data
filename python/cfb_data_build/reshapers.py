@@ -259,7 +259,11 @@ def reshape_linescores(game: dict[str, Any]) -> pl.DataFrame:
         return pl.DataFrame()
     rows: list[dict[str, Any]] = []
     for tid, obj in tbe.items():
-        ls = (obj or {}).get("linescores")
+        # cfb-raw stamps game_id/season/week scalars alongside the team-id-keyed
+        # dicts; skip anything that isn't a team block.
+        if not isinstance(obj, dict):
+            continue
+        ls = obj.get("linescores")
         if not ls:
             continue
         for i, item in enumerate(ls, start=1):
@@ -276,15 +280,14 @@ def reshape_linescores(game: dict[str, Any]) -> pl.DataFrame:
 
 # --- power_index (R/espn_cfb_12) ----------------------------------------------
 def reshape_power_index(game: dict[str, Any]) -> pl.DataFrame:
-    """Flatten the FPI ``items`` (or the wrapper itself when no ``items`` key)."""
+    """Flatten the FPI ``items`` list; a no-FPI game yields an empty frame."""
     pidx = game.get("power_index")
     if not pidx:
         return pl.DataFrame()
-    items = (
-        pidx.get("items")
-        if isinstance(pidx, dict) and pidx.get("items") is not None
-        else pidx
-    )
+    # A populated game carries the FPI rows under ``items``; a no-FPI game ships
+    # a dict of only the stamped game_id/season/week scalars (no ``items``) ->
+    # empty frame. Never iterate that dict as a block (its keys are strings).
+    items = pidx.get("items") if isinstance(pidx, dict) else pidx
     if not items:
         return pl.DataFrame()
     return flat_block_frame(items, game)

@@ -1,0 +1,124 @@
+name: CFB Ratings
+
+# Refreshes the `cfb_ratings` dataset release on sportsdataverse-data: one row
+# per team per season (opponent-adjusted off/def/ST EPA + FEI + tempo + ranks),
+# built by sdv-py's `cfb_ratings()` over the RELEASED `espn_cfb_pbp` asset.
+#
+# Runs after daily_cfb.yml (11:00 UTC) so the season's pbp is already published
+# — this reads that release, it does not scrape.
+#
+# Credential scoping: the cross-repo publish PAT (SDV_GH_TOKEN) is NOT exported
+# job-wide; it is set only on the build+publish step. That one step both builds
+# and uploads because `cfb_model_publish ratings` does them in a single
+# invocation (a mid-run failure aborts before any upload, so the tag is never
+# left half-published). Season resolution uses the default GITHUB_TOKEN — the
+# pbp release it reads is public.
+
+on:
+  workflow_dispatch:
+    inputs:
+      seasons:
+        description: 'Season or inclusive range (e.g. 2025 or 2004:2025). Default: the newest published pbp season.'
+        required: false
+        type: string
+      dry_run:
+        description: 'Build only; plan the uploads without publishing'
+        required: false
+        type: boolean
+        default: false
+  schedule:
+    # Mirrors daily_cfb.yml's season windows, offset +2h so the pbp it consumes
+    # is published first.
+    - cron: '0 13 * 8 *'      # August (preseason)
+    - cron: '0 13 * 9-11 *'   # September-November (regular season)
+    - cron: '0 13 1-20 12 *'  # early-mid December
+    - cron: '0 13 1-20 1 *'   # early January (bowls + CFP)
+
+permissions:
+  contents: read
+
+env:
+  PUBLISH_REPO: sportsdataverse/sportsdataverse-data
+  PBP_TAG: espn_cfb_pbp
+
+jobs:
+  ratings:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: python
+    steps:
+      - name: Checkout cfb-data
+        uses: actions/checkout@v5
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: python/uv.lock
+
+      - name: Sync deps
+        run: uv sync --frozen
+
+      # The pinned `sportsdataverse` release does NOT ship cfb/cfb_ratings.py at
+      # all — the module landed after 0.0.71, same as the nfl-data producer
+      # surface. Install from git until a release carries it.
+      # TODO: re-pin to a PyPI release once one ships `cfb_ratings`.
+      - name: Install sportsdataverse from git (main)
+        run: |
+          uv pip install \
+            "sportsdataverse @ git+https://github.com/sportsdataverse/sportsdataverse-py.git@main"
+
+      # Canary. Every `uv run` below MUST pass --no-sync: a bare `uv run`
+      # re-syncs the environment from uv.lock and silently REVERTS the git
+      # install above (measured: 47 cfb modules -> 18, sportsdataverse back to
+      # the pinned release). This step fails loudly and in seconds if that
+      # regresses, instead of the publish dying ~10 minutes in.
+      - name: Verify the ratings surface imports
+        run: |
+          uv run --no-sync python -c "
+          from sportsdataverse.cfb import cfb_ratings
+          import importlib.metadata as md
+          print('cfb_ratings OK (sportsdataverse', md.version('sportsdataverse'), 'from git@main)')
+          "
+
+      # Ratings can only be built for a season that HAS published pbp, so derive
+      # the target from the pbp release itself rather than from the calendar.
+      # That keeps the cron self-synchronising: in-season it tracks the current
+      # season, off-season it idempotently refreshes the newest complete one
+      # (uploads are --clobber), and it can never ask for a season whose pbp does
+      # not exist (which the builder would reject as an empty tag).
+      - name: Resolve seasons
+        env:
+          GH_TOKEN: ${{ github.token }}
+          # Via env, not `${{ }}` inline in the script: a dispatch input
+          # interpolated straight into `run:` is a shell-injection sink.
+          SEASONS_INPUT: ${{ inputs.seasons }}
+        run: |
+          if [ -n "$SEASONS_INPUT" ]; then
+            SEASONS="$SEASONS_INPUT"
+          else
+            YR=$(gh release view "$PBP_TAG" --repo "$PUBLISH_REPO" --json assets \
+              --jq '[.assets[].name
+                     | select(startswith("play_by_play_") and endswith(".parquet"))
+                     | ltrimstr("play_by_play_") | rtrimstr(".parquet") | tonumber]
+                    | max')
+            if [ -z "$YR" ] || [ "$YR" = "null" ]; then
+              echo "::error::could not resolve a season from $PUBLISH_REPO:$PBP_TAG"
+              exit 1
+            fi
+            SEASONS="$YR"
+          fi
+          echo "SEASONS=$SEASONS" >> $GITHUB_ENV
+          echo "building cfb_ratings for seasons: $SEASONS"
+
+      - name: Build + publish cfb_ratings ${{ env.SEASONS }}
+        env:
+          GH_TOKEN: ${{ secrets.SDV_GH_TOKEN }}
+        run: |
+          uv run --no-sync python -m cfb_model_publish ratings \
+            --seasons "$SEASONS" \
+            --out out/cfb_ratings \
+            --tag cfb_ratings \
+            --repo "$PUBLISH_REPO" \
+            ${{ inputs.dry_run && '--dry-run' || '' }}

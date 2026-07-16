@@ -86,22 +86,12 @@ def add_derived_metrics(plays: pl.DataFrame) -> pl.DataFrame:
         epa_success=pl.col("epa_success").cast(pl.Float64),
     )
     df = df.with_columns(
-        red_zone_success=pl.when(pl.col("red_zone"))
-        .then(pl.col("epa_success"))
-        .otherwise(None),
-        third_down_success=pl.when(pl.col("down") == 3)
-        .then(pl.col("epa_success"))
-        .otherwise(None),
-        late_down_success=pl.when(pl.col("down") >= 3)
-        .then(pl.col("epa_success"))
-        .otherwise(None),
-        third_down_distance=pl.when(pl.col("down") == 3)
-        .then(pl.col("distance"))
-        .otherwise(None),
+        red_zone_success=pl.when(pl.col("red_zone")).then(pl.col("epa_success")).otherwise(None),
+        third_down_success=pl.when(pl.col("down") == 3).then(pl.col("epa_success")).otherwise(None),
+        late_down_success=pl.when(pl.col("down") >= 3).then(pl.col("epa_success")).otherwise(None),
+        third_down_distance=pl.when(pl.col("down") == 3).then(pl.col("distance")).otherwise(None),
         early_down_EPA=pl.when(pl.col("down") <= 2).then(pl.col("EPA")).otherwise(None),
-        early_down_success=pl.when(pl.col("down") <= 2)
-        .then(pl.col("epa_success"))
-        .otherwise(None),
+        early_down_success=pl.when(pl.col("down") <= 2).then(pl.col("epa_success")).otherwise(None),
         havoc=(
             (pl.col("sack_vec") == True)  # noqa: E712
             | (pl.col("int") == True)  # noqa: E712
@@ -126,17 +116,9 @@ def add_derived_metrics(plays: pl.DataFrame) -> pl.DataFrame:
     df = df.with_columns(
         line_yards=pl.when((pl.col("rush") == 1) & (pl.col("yds_rushed") < 0))
         .then(1.2 * pl.col("adj_rush_yardage"))
-        .when(
-            (pl.col("rush") == 1)
-            & (pl.col("yds_rushed") >= 0)
-            & (pl.col("yds_rushed") <= 4)
-        )
+        .when((pl.col("rush") == 1) & (pl.col("yds_rushed") >= 0) & (pl.col("yds_rushed") <= 4))
         .then(pl.col("adj_rush_yardage"))
-        .when(
-            (pl.col("rush") == 1)
-            & (pl.col("yds_rushed") >= 5)
-            & (pl.col("yds_rushed") <= 10)
-        )
+        .when((pl.col("rush") == 1) & (pl.col("yds_rushed") >= 5) & (pl.col("yds_rushed") <= 10))
         .then(0.5 * pl.col("adj_rush_yardage"))
         .when((pl.col("rush") == 1) & (pl.col("yds_rushed") >= 11))
         .then(pl.lit(0.0))
@@ -152,18 +134,14 @@ def add_derived_metrics(plays: pl.DataFrame) -> pl.DataFrame:
         .then(pl.lit(0.0))
         .otherwise(None),
     )
-    df = df.with_columns(
-        highlight_yards=pl.col("second_level_yards") + pl.col("open_field_yards")
-    )
+    df = df.with_columns(highlight_yards=pl.col("second_level_yards") + pl.col("open_field_yards"))
     df = df.with_columns(
         opp_highlight_yards=pl.when(pl.col("opportunity_run") == True)  # noqa: E712
         .then(pl.col("highlight_yards"))
         .when((pl.col("opportunity_run") == False) & (pl.col("rush") == 1))  # noqa: E712
         .then(pl.lit(0.0))
         .otherwise(None),
-        nonExplosiveEpa=pl.when(
-            pl.col("EPA").is_not_null() & (pl.col("explosive") == False)
-        )  # noqa: E712
+        nonExplosiveEpa=pl.when(pl.col("EPA").is_not_null() & (pl.col("explosive") == False))  # noqa: E712
         .then(pl.col("EPA"))
         .otherwise(None),
     )
@@ -209,9 +187,7 @@ def _summarize_team(
         playsdrive=pl.col("plays") / pl.col("n_drives"),
     ).drop("n_games", "n_drives")
 
-    g = g.sort(
-        group
-    )  # dplyr group_by+summarize returns key-sorted; needed for na.last ranks
+    g = g.sort(group)  # dplyr group_by+summarize returns key-sorted; needed for na.last ranks
     d = ascending  # ascending=True -> rank(x); else rank(-x)
     g = g.with_columns(
         playsgame_rank=_rank("playsgame", descending=not d),
@@ -261,26 +237,13 @@ _MARGIN_BASES = [
 
 def _mutate_summary_margins(df: pl.DataFrame) -> pl.DataFrame:
     """Port of ``mutate_summary_df`` -- off/def margins + their ranks."""
-    out = df.with_columns(
-        [
-            (pl.col(f"{b}_off") - pl.col(f"{b}_def")).alias(f"{m}_margin")
-            for b, m in _MARGIN_BASES
-        ]
-    )
-    out = out.with_columns(
-        [
-            _rank(f"{m}_margin", descending=True).alias(f"{m}_margin_rank")
-            for _, m in _MARGIN_BASES
-        ]
-    )
+    out = df.with_columns([(pl.col(f"{b}_off") - pl.col(f"{b}_def")).alias(f"{m}_margin") for b, m in _MARGIN_BASES])
+    out = out.with_columns([_rank(f"{m}_margin", descending=True).alias(f"{m}_margin_rank") for _, m in _MARGIN_BASES])
     if "start_position_off" in df.columns:
         out = out.with_columns(
-            start_position_margin=(100 - pl.col("start_position_off"))
-            - (100 - pl.col("start_position_def"))
+            start_position_margin=(100 - pl.col("start_position_off")) - (100 - pl.col("start_position_def"))
         )
-        out = out.with_columns(
-            start_position_margin_rank=_rank("start_position_margin", descending=True)
-        )
+        out = out.with_columns(start_position_margin_rank=_rank("start_position_margin", descending=True))
     return out
 
 
@@ -290,7 +253,17 @@ def _suffix_nonkey(df: pl.DataFrame, key: str, suffix: str) -> pl.DataFrame:
 
 
 def summarize_passer(df: pl.DataFrame, by: list[str]) -> pl.DataFrame:
-    """Port of ``summarize_passer_df``."""
+    """Port of ``summarize_passer_df`` (attempt-based metrics only).
+
+    The count-based columns ``sacked``, ``sack_yds``, ``pass_int``, and the
+    five derived columns that depend on them (``detmer``, ``detmergame``,
+    ``dropbacks``, ``sack_adj_yards``, ``yardsdropback``) are intentionally
+    absent here.  The caller computes those separately from the FULL offensive
+    frame (keyed by ``sack_taken_player_id`` / ``interception_thrown_player_id``)
+    and joins them after this call.  This is necessary because sack and
+    interception plays carry no ``passer_player_id`` and are therefore dropped
+    by the passer filter before reaching this function.
+    """
     g = df.group_by(by).agg(
         passer_player_name=pl.col("passer_player_name").drop_nulls().first(),
         plays=pl.len(),
@@ -304,40 +277,13 @@ def summarize_passer(df: pl.DataFrame, by: list[str]) -> pl.DataFrame:
         att=pl.col("pass_attempt").sum(),
         comppct=pl.col("completion").mean(),
         passing_td=pl.col("pass_td").sum(),
-        sacked=pl.col("sack_vec").sum(),
-        sack_yds=pl.col("yds_sacked").sum(),
-        pass_int=pl.col("int").sum(),
     )
-    g = g.with_columns(
+    return g.with_columns(
         playsgame=pl.col("plays") / pl.col("games"),
         EPAgame=pl.col("TEPA") / pl.col("games"),
         yardsplay=pl.col("yards") / pl.col("plays"),
         yardsgame=pl.col("yards") / pl.col("games"),
     )
-    g = g.with_columns(
-        detmer=(pl.col("yards") / (400 * pl.col("games")))
-        * (
-            (pl.col("passing_td") + pl.col("pass_int"))
-            / (1 + (pl.col("passing_td") - pl.col("pass_int")).abs())
-        ),
-        detmergame=(pl.col("yardsgame") / 400)
-        * (
-            (
-                (pl.col("passing_td") / pl.col("games"))
-                + (pl.col("pass_int") / pl.col("games"))
-            )
-            / (
-                1
-                + (
-                    (pl.col("passing_td") / pl.col("games"))
-                    - (pl.col("pass_int") / pl.col("games"))
-                ).abs()
-            )
-        ),
-        dropbacks=pl.col("att") + pl.col("sacked"),
-        sack_adj_yards=pl.col("yards") - pl.col("sack_yds").abs(),
-    )
-    return g.with_columns(yardsdropback=pl.col("sack_adj_yards") / pl.col("dropbacks"))
 
 
 def summarize_rusher(df: pl.DataFrame, by: list[str]) -> pl.DataFrame:
@@ -374,10 +320,7 @@ def summarize_receiver(df: pl.DataFrame, by: list[str]) -> pl.DataFrame:
         yards=pl.col("yds_receiving").sum(),
         success=pl.col("epa_success").mean(),
         comp=pl.col("reception_player_id").is_not_null().sum(),
-        targets=(
-            pl.col("target_player_id").is_not_null()
-            | pl.col("reception_player_id").is_not_null()
-        ).sum(),
+        targets=(pl.col("target_player_id").is_not_null() | pl.col("reception_player_id").is_not_null()).sum(),
         passing_td=pl.col("pass_td").sum(),
         fumbles=pl.col("fumble_vec").sum(),
     )
@@ -430,13 +373,8 @@ def prepare_percentiles(df: pl.DataFrame) -> pl.DataFrame:
         .otherwise(pl.col("sum_pos_EPA_rush") / pl.col("rushes")),
         yardsdropback=pl.when(pl.col("dropbacks") == 0)
         .then(pl.lit(0.0))
-        .otherwise(
-            (pl.col("sum_yds_receiving") + pl.col("sum_yds_sacked"))
-            / pl.col("dropbacks")
-        ),
-    ).drop(
-        "sum_pos_EPA_pass", "sum_pos_EPA_rush", "sum_yds_receiving", "sum_yds_sacked"
-    )
+        .otherwise((pl.col("sum_yds_receiving") + pl.col("sum_yds_sacked")) / pl.col("dropbacks")),
+    ).drop("sum_pos_EPA_pass", "sum_pos_EPA_rush", "sum_yds_receiving", "sum_yds_sacked")
 
     # metric columns in the R `reframe` order (everything except game_id/pos_team)
     metric_cols = [
@@ -500,16 +438,12 @@ def _clean_rank_columns(df: pl.DataFrame) -> pl.DataFrame:
     ``TEPA_rank_off`` -> ``TEPA_off_rank`` (after the join ``_off``/``_pass``
     suffixes land mid-name). No-op for plain ``X_rank`` leaderboard columns.
     """
-    renames = {
-        c: c.replace("_rank", "", 1) + "_rank" for c in df.columns if "_rank" in c
-    }
+    renames = {c: c.replace("_rank", "", 1) + "_rank" for c in df.columns if "_rank" in c}
     renames = {k: v for k, v in renames.items() if k != v}
     return df.rename(renames) if renames else df
 
 
-def _prepare_for_write(
-    df: pl.DataFrame, yr: int, schools: pl.DataFrame
-) -> pl.DataFrame:
+def _prepare_for_write(df: pl.DataFrame, yr: int, schools: pl.DataFrame) -> pl.DataFrame:
     """Port of ``prepare_for_write`` -- clean rank cols, join schools, identity-first, fbs_class."""
     df = _clean_rank_columns(df)
     # R computes fbs_class AFTER the select-rename, so reference the renamed cols.
@@ -530,25 +464,14 @@ def _prepare_for_write(
     tid = pl.col("team_id")
     fbs_class = (
         pl.when(
-            (pl.col("season") >= 2024)
-            & conf.is_not_null()
-            & (conf.is_in(p4) | (pl.col("pos_team") == "Notre Dame"))
+            (pl.col("season") >= 2024) & conf.is_not_null() & (conf.is_in(p4) | (pl.col("pos_team") == "Notre Dame"))
         )
         .then(pl.lit("P4"))
-        .when(
-            (pl.col("season") >= 2024) & (conf.is_not_null() | tid.is_in(["41", "113"]))
-        )
+        .when((pl.col("season") >= 2024) & (conf.is_not_null() | tid.is_in(["41", "113"])))
         .then(pl.lit("G6"))
-        .when(
-            (pl.col("season") <= 2023)
-            & conf.is_not_null()
-            & (conf.is_in(p5) | (pl.col("pos_team") == "Notre Dame"))
-        )
+        .when((pl.col("season") <= 2023) & conf.is_not_null() & (conf.is_in(p5) | (pl.col("pos_team") == "Notre Dame")))
         .then(pl.lit("P5"))
-        .when(
-            (pl.col("season") <= 2023)
-            & (conf.is_not_null() | tid.is_in(["349", "41", "113"]))
-        )
+        .when((pl.col("season") <= 2023) & (conf.is_not_null() | tid.is_in(["349", "41", "113"])))
         .then(pl.lit("G5"))
         .otherwise(None)
     )
@@ -562,30 +485,23 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
     """Build the 5 season tables from a cleaned cfbfastR pbp frame (R build lines 554-958)."""
     plays = add_derived_metrics(plays_input)
     team_off = plays.filter(
-        pl.col("EPA").is_not_null()
-        & pl.col("success").is_not_null()
-        & pl.col("epa_success").is_not_null()
+        pl.col("EPA").is_not_null() & pl.col("success").is_not_null() & pl.col("epa_success").is_not_null()
     )
 
     # percentiles
     pctls = team_off.with_columns(
-        GEI=(pl.col("wpa").abs().sum().over("game_id"))
-        * (_GEI_NORM / pl.len().over("game_id"))
+        GEI=(pl.col("wpa").abs().sum().over("game_id")) * (_GEI_NORM / pl.len().over("game_id"))
     )
     percentiles = prepare_percentiles(pctls)
 
     # team off/def overall + pass + rush + drives
-    off = _suffix_nonkey(
-        _summarize_team(team_off, "pos_team_id", ascending=False), "pos_team_id", "_off"
-    )
+    off = _suffix_nonkey(_summarize_team(team_off, "pos_team_id", ascending=False), "pos_team_id", "_off")
     def_ = _suffix_nonkey(
         _summarize_team(team_off, "def_pos_team_id", ascending=True),
         "def_pos_team_id",
         "_def",
     )
-    overall = _mutate_summary_margins(
-        off.join(def_, left_on="pos_team_id", right_on="def_pos_team_id", how="left")
-    )
+    overall = _mutate_summary_margins(off.join(def_, left_on="pos_team_id", right_on="def_pos_team_id", how="left"))
 
     rc = ("start_position", "start_position_rank")
     off_pass = _suffix_nonkey(
@@ -609,9 +525,7 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
         "_def",
     )
     pass_data = _mutate_summary_margins(
-        off_pass.join(
-            def_pass, left_on="pos_team_id", right_on="def_pos_team_id", how="left"
-        )
+        off_pass.join(def_pass, left_on="pos_team_id", right_on="def_pos_team_id", how="left")
     )
     off_rush = _suffix_nonkey(
         _summarize_team(
@@ -634,9 +548,7 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
         "_def",
     )
     rush_data = _mutate_summary_margins(
-        off_rush.join(
-            def_rush, left_on="pos_team_id", right_on="def_pos_team_id", how="left"
-        )
+        off_rush.join(def_rush, left_on="pos_team_id", right_on="def_pos_team_id", how="left")
     )
 
     def _drives(group: str, ascending: bool) -> pl.DataFrame:
@@ -652,40 +564,24 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
             total_available_yards=pl.col("total_available_yards").sum(),
             total_gained_yards=pl.col("total_gained_yards").sum(),
         )
-        agg = agg.with_columns(
-            available_yards_pct=pl.col("total_gained_yards")
-            / pl.col("total_available_yards")
-        ).sort(group)
-        return agg.with_columns(
-            available_yards_pct_rank=_rank(
-                "available_yards_pct", descending=not ascending
-            )
+        agg = agg.with_columns(available_yards_pct=pl.col("total_gained_yards") / pl.col("total_available_yards")).sort(
+            group
         )
+        return agg.with_columns(available_yards_pct_rank=_rank("available_yards_pct", descending=not ascending))
 
     off_dr = _suffix_nonkey(_drives("pos_team_id", False), "pos_team_id", "_off")
     def_dr = _suffix_nonkey(_drives("def_pos_team_id", True), "def_pos_team_id", "_def")
     drives_data = (
-        off_dr.join(
-            def_dr, left_on="pos_team_id", right_on="def_pos_team_id", how="left"
+        off_dr.join(def_dr, left_on="pos_team_id", right_on="def_pos_team_id", how="left")
+        .with_columns(
+            total_available_yards_margin=pl.col("total_available_yards_off") - pl.col("total_available_yards_def"),
+            total_gained_yards_margin=pl.col("total_gained_yards_off") - pl.col("total_gained_yards_def"),
+            available_yards_pct_margin=pl.col("available_yards_pct_off") - pl.col("available_yards_pct_def"),
         )
         .with_columns(
-            total_available_yards_margin=pl.col("total_available_yards_off")
-            - pl.col("total_available_yards_def"),
-            total_gained_yards_margin=pl.col("total_gained_yards_off")
-            - pl.col("total_gained_yards_def"),
-            available_yards_pct_margin=pl.col("available_yards_pct_off")
-            - pl.col("available_yards_pct_def"),
-        )
-        .with_columns(
-            total_available_yards_margin_rank=_rank(
-                "total_available_yards_margin", descending=True
-            ),
-            total_gained_yards_margin_rank=_rank(
-                "total_gained_yards_margin", descending=True
-            ),
-            available_yards_pct_margin_rank=_rank(
-                "available_yards_pct_margin", descending=True
-            ),
+            total_available_yards_margin_rank=_rank("total_available_yards_margin", descending=True),
+            total_gained_yards_margin_rank=_rank("total_gained_yards_margin", descending=True),
+            available_yards_pct_margin_rank=_rank("available_yards_pct_margin", descending=True),
         )
     )
 
@@ -696,18 +592,102 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
     )
 
     # leaderboards
+    qb_base = team_off.with_columns(
+        passer_player_id=pl.when(pl.col("completion_player_id").is_not_null())
+        .then(pl.col("completion_player_id"))
+        .otherwise(pl.col("incompletion_player_id")),
+        passer_player_name=pl.when(pl.col("completion_player_id").is_not_null())
+        .then(pl.col("completion_player"))
+        .otherwise(pl.col("incompletion_player")),
+    )
     qb_data = summarize_passer(
-        team_off.with_columns(
-            passer_player_id=pl.when(pl.col("completion_player_id").is_not_null())
-            .then(pl.col("completion_player_id"))
-            .otherwise(pl.col("incompletion_player_id")),
-            passer_player_name=pl.when(pl.col("completion_player_id").is_not_null())
-            .then(pl.col("completion_player"))
-            .otherwise(pl.col("incompletion_player")),
-        )
-        .filter((pl.col("pass") == 1) & pl.col("passer_player_id").is_not_null())
-        .pipe(_add_team_games),
+        qb_base.filter((pl.col("pass") == 1) & pl.col("passer_player_id").is_not_null()).pipe(_add_team_games),
         by=["pos_team_id", "passer_player_id"],
+    )
+    # sack/INT plays carry no derived passer_player_id (filtered out of qb_data above)
+    # -> aggregate them separately, attributed to the sacked QB / the QB who threw
+    # the pick.
+    #
+    # ESPN populates the sack_taken_player_id / interception_thrown_player_id sidecar
+    # for only ~29% of these plays (377/1300 INT, 3130/3185 sack in 2023), so a bare
+    # id-keyed aggregation drops most of the INT count. The source-frame
+    # ``passer_player_name`` column, however, is populated on ~92% of them (1199/1300
+    # INT, 3161/3185 sack) -- ESPN charts the QB's *name* on the play even when it
+    # omits the numeric id. We recover the missing attribution with a within-dataset
+    # (pos_team_id, passer_player_name) -> passer_player_id map built from the attempts
+    # leaderboard (each QB's name+id co-occur on their own completions/incompletions).
+    #
+    # Only UNAMBIGUOUS (team, name) pairs are kept: any name mapping to >1 id in the
+    # season is dropped (anti-join) so a future collision can never mis-resolve -- those
+    # plays then fall back to clean-id only. The resolved QB id is
+    # coalesce(clean sidecar id, name-mapped id); rows where BOTH are null (the QB name
+    # itself is absent, e.g. TEAM plays) are dropped and remain unattributed.
+    #
+    # ``plays`` already carries the source ``passer_player_name`` column, so it is
+    # used directly as the name key (no rename -- that would DuplicateError).
+    #
+    # R PARITY: the map and both aggregations below read the FULL ``plays`` frame, not
+    # the EPA-filtered ``team_off``. R applies the EPA/success filter only to the
+    # attempts leaderboard (inline: `filter(pass == 1 & !is.na(EPA) & ...)`) and builds
+    # `qb_id_map`/`qb_sacks`/`qb_ints` from `plays`. Sourcing these from `team_off`
+    # would drop every sack/INT play whose EPA/success/epa_success is null, and lose the
+    # (team, name) -> id mappings contributed by attempts the EPA filter removed --
+    # undercounting the very columns this revives.
+    qb_id_base = plays.with_columns(
+        passer_player_id=pl.when(pl.col("completion_player_id").is_not_null())
+        .then(pl.col("completion_player_id"))
+        .otherwise(pl.col("incompletion_player_id")),
+        passer_player_name=pl.when(pl.col("completion_player_id").is_not_null())
+        .then(pl.col("completion_player"))
+        .otherwise(pl.col("incompletion_player")),
+    )
+    id_map = qb_id_base.select(["pos_team_id", "passer_player_name", "passer_player_id"]).drop_nulls().unique()
+    _ambig = id_map.group_by(["pos_team_id", "passer_player_name"]).len().filter(pl.col("len") > 1)
+    id_map = id_map.join(
+        _ambig.select(["pos_team_id", "passer_player_name"]),
+        on=["pos_team_id", "passer_player_name"],
+        how="anti",
+    )
+    sack_counts = (
+        plays.filter((pl.col("pass") == 1) & (pl.col("sack_vec") == 1))
+        .select(["pos_team_id", "passer_player_name", "sack_taken_player_id", "yds_sacked"])
+        .join(id_map, on=["pos_team_id", "passer_player_name"], how="left")
+        .with_columns(qb_id=pl.coalesce(pl.col("sack_taken_player_id"), pl.col("passer_player_id")))
+        .filter(pl.col("qb_id").is_not_null())
+        .group_by(["pos_team_id", "qb_id"])
+        .agg(sacked=pl.len(), sack_yds=pl.col("yds_sacked").sum())
+        .rename({"qb_id": "passer_player_id"})
+    )
+    int_counts = (
+        plays.filter((pl.col("pass") == 1) & (pl.col("int") == 1))
+        .select(["pos_team_id", "passer_player_name", "interception_thrown_player_id"])
+        .join(id_map, on=["pos_team_id", "passer_player_name"], how="left")
+        .with_columns(qb_id=pl.coalesce(pl.col("interception_thrown_player_id"), pl.col("passer_player_id")))
+        .filter(pl.col("qb_id").is_not_null())
+        .group_by(["pos_team_id", "qb_id"])
+        .agg(pass_int=pl.len())
+        .rename({"qb_id": "passer_player_id"})
+    )
+    qb_data = (
+        qb_data.join(sack_counts, on=["pos_team_id", "passer_player_id"], how="left")
+        .join(int_counts, on=["pos_team_id", "passer_player_id"], how="left")
+        .with_columns(
+            sacked=pl.col("sacked").fill_null(0),
+            sack_yds=pl.col("sack_yds").fill_null(0),
+            pass_int=pl.col("pass_int").fill_null(0),
+        )
+        .with_columns(
+            detmer=(pl.col("yards") / (400 * pl.col("games")))
+            * ((pl.col("passing_td") + pl.col("pass_int")) / (1 + (pl.col("passing_td") - pl.col("pass_int")).abs())),
+            detmergame=(pl.col("yardsgame") / 400)
+            * (
+                ((pl.col("passing_td") / pl.col("games")) + (pl.col("pass_int") / pl.col("games")))
+                / (1 + ((pl.col("passing_td") / pl.col("games")) - (pl.col("pass_int") / pl.col("games"))).abs())
+            ),
+            dropbacks=pl.col("att") + pl.col("sacked"),
+            sack_adj_yards=pl.col("yards") - pl.col("sack_yds").abs(),
+        )
+        .with_columns(yardsdropback=pl.col("sack_adj_yards") / pl.col("dropbacks"))
     )
     qb_data = _attach_leader_ranks(
         qb_data,
@@ -730,9 +710,7 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
     )
 
     rb_data = summarize_rusher(
-        team_off.filter(
-            (pl.col("rush") == 1) & pl.col("rush_player_id").is_not_null()
-        ).pipe(_add_team_games),
+        team_off.filter((pl.col("rush") == 1) & pl.col("rush_player_id").is_not_null()).pipe(_add_team_games),
         by=["pos_team_id", "rush_player_id"],
     )
     rb_data = _attach_leader_ranks(
@@ -789,15 +767,9 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
     team_data = _prepare_for_write(team_data, yr, schools).join(
         cfb_adjusted_epa(plays).drop("pos_team"), on="team_id", how="left"
     )
-    qb_out = _prepare_for_write(qb_data, yr, schools).rename(
-        {"passer_player_id": "player_id"}
-    )
-    rb_out = _prepare_for_write(rb_data, yr, schools).rename(
-        {"rush_player_id": "player_id"}
-    )
-    wr_out = _prepare_for_write(wr_data, yr, schools).rename(
-        {"receiver_player_id": "player_id"}
-    )
+    qb_out = _prepare_for_write(qb_data, yr, schools).rename({"passer_player_id": "player_id"})
+    rb_out = _prepare_for_write(rb_data, yr, schools).rename({"rush_player_id": "player_id"})
+    wr_out = _prepare_for_write(wr_data, yr, schools).rename({"receiver_player_id": "player_id"})
 
     return {
         "percentiles": percentiles,
@@ -818,7 +790,5 @@ def _attach_leader_ranks(
 ) -> pl.DataFrame:
     """Compute leaderboard ranks among qualifiers, left-joined back (R rank blocks)."""
     qual = data.filter(min_expr)
-    ranks = qual.select(
-        *keys, *[_rank(c, descending=True).alias(f"{c}_rank") for c in rank_cols]
-    )
+    ranks = qual.select(*keys, *[_rank(c, descending=True).alias(f"{c}_rank") for c in rank_cols])
     return data.join(ranks, on=keys, how="left")

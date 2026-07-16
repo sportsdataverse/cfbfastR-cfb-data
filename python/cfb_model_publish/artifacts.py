@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import subprocess
+from pathlib import Path
 
 from cfb_model_reports.discovery import discover_models
 
@@ -15,6 +16,12 @@ _RELEASE_BODY = {
     ),
     "espn_cfb_model_pbp": (
         "College Football model play-by-play (EP/WP/QBR enriched; Python-built)."
+    ),
+    "cfb_ratings": (
+        "College Football opponent-adjusted team ratings, one row per team per "
+        "season (SP+-style): offensive/defensive/special-teams EPA, FEI, tempo, "
+        "dense ranks, and a net z-score. Built by sdv-py `cfb_ratings()` over the "
+        "released `espn_cfb_pbp` play-by-play."
     ),
 }
 
@@ -52,6 +59,7 @@ def upload_artifacts(
     tag: str,
     repo: str,
     *,
+    pattern: str | None = None,
     dry_run: bool = False,
     runner=None,
     exists_check=None,
@@ -61,10 +69,20 @@ def upload_artifacts(
     The release is created if it does not already exist (``gh release upload``
     does not create one), so a single call is self-sufficient. ``runner`` and
     ``exists_check`` are injectable for hermetic testing.
+
+    Args:
+        pattern: When given, upload ``artifacts_dir.glob(pattern)`` (sorted)
+            instead of running model discovery. Dataset tags publish parquet +
+            a card sidecar, which ``discover_models`` -- which looks for model
+            files -- would not find. Omit for the model-artifacts path.
     """
     run = runner or _gh_runner
     exists = exists_check or _gh_release_exists
-    files = plan_uploads(artifacts_dir)
+    files = (
+        sorted(Path(artifacts_dir).glob(pattern))
+        if pattern
+        else plan_uploads(artifacts_dir)
+    )
     created_release = False
     if dry_run:
         print(f"[dry-run] would ensure release {repo}:{tag} exists")

@@ -623,9 +623,25 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
     # coalesce(clean sidecar id, name-mapped id); rows where BOTH are null (the QB name
     # itself is absent, e.g. TEAM plays) are dropped and remain unattributed.
     #
-    # ``team_off`` already carries the source ``passer_player_name`` column, so it is
+    # ``plays`` already carries the source ``passer_player_name`` column, so it is
     # used directly as the name key (no rename -- that would DuplicateError).
-    id_map = qb_base.select(["pos_team_id", "passer_player_name", "passer_player_id"]).drop_nulls().unique()
+    #
+    # R PARITY: the map and both aggregations below read the FULL ``plays`` frame, not
+    # the EPA-filtered ``team_off``. R applies the EPA/success filter only to the
+    # attempts leaderboard (inline: `filter(pass == 1 & !is.na(EPA) & ...)`) and builds
+    # `qb_id_map`/`qb_sacks`/`qb_ints` from `plays`. Sourcing these from `team_off`
+    # would drop every sack/INT play whose EPA/success/epa_success is null, and lose the
+    # (team, name) -> id mappings contributed by attempts the EPA filter removed --
+    # undercounting the very columns this revives.
+    qb_id_base = plays.with_columns(
+        passer_player_id=pl.when(pl.col("completion_player_id").is_not_null())
+        .then(pl.col("completion_player_id"))
+        .otherwise(pl.col("incompletion_player_id")),
+        passer_player_name=pl.when(pl.col("completion_player_id").is_not_null())
+        .then(pl.col("completion_player"))
+        .otherwise(pl.col("incompletion_player")),
+    )
+    id_map = qb_id_base.select(["pos_team_id", "passer_player_name", "passer_player_id"]).drop_nulls().unique()
     _ambig = id_map.group_by(["pos_team_id", "passer_player_name"]).len().filter(pl.col("len") > 1)
     id_map = id_map.join(
         _ambig.select(["pos_team_id", "passer_player_name"]),
@@ -633,7 +649,7 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
         how="anti",
     )
     sack_counts = (
-        team_off.filter((pl.col("pass") == 1) & (pl.col("sack_vec") == 1))
+        plays.filter((pl.col("pass") == 1) & (pl.col("sack_vec") == 1))
         .select(["pos_team_id", "passer_player_name", "sack_taken_player_id", "yds_sacked"])
         .join(id_map, on=["pos_team_id", "passer_player_name"], how="left")
         .with_columns(qb_id=pl.coalesce(pl.col("sack_taken_player_id"), pl.col("passer_player_id")))
@@ -643,7 +659,7 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
         .rename({"qb_id": "passer_player_id"})
     )
     int_counts = (
-        team_off.filter((pl.col("pass") == 1) & (pl.col("int") == 1))
+        plays.filter((pl.col("pass") == 1) & (pl.col("int") == 1))
         .select(["pos_team_id", "passer_player_name", "interception_thrown_player_id"])
         .join(id_map, on=["pos_team_id", "passer_player_name"], how="left")
         .with_columns(qb_id=pl.coalesce(pl.col("interception_thrown_player_id"), pl.col("passer_player_id")))

@@ -13,6 +13,9 @@ dependencies = [
     "scikit-learn>=1.0",
     "xgboost>=2.0",
     "scipy>=1.10",
+    # cfb_recruiting_projection's 247 RDB feed fingerprint-blocks plain
+    # requests -- sdv-py raises ImportError without curl_cffi installed.
+    "curl-cffi>=0.15.0",
 ]
 
 [dependency-groups]

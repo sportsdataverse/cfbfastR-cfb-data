@@ -1,0 +1,90 @@
+name: tests
+
+# This repo had NO test CI. The R reshape suite and the Python model/publish
+# suite both ran only on a contributor's machine, which is how two real bugs
+# reached production and stayed:
+#
+#   * the passing leaderboard shipped sacked/sack_yds/pass_int all-zero from
+#     2014-2025 (cfbfastR-cfb-data#18) -- the parity test that would have caught
+#     it is integration-marked and skips without a large cached input, so nobody
+#     ran it;
+#   * `pb_upload_both` swallowed upload failures, so a publish cron could report
+#     success while dropping a season (#23) -- nothing covered the upload path.
+#
+# Both suites are offline and fast (Python ~25s, R ~30s). The `integration`
+# marker is deselected by default via addopts, and `live` needs CFB_LIVE_TESTS=1,
+# so nothing here touches the network or needs a CFBD key.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# A newer push to the same ref makes the in-flight run irrelevant.
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python:
+    name: pytest (python/)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: python
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: python/uv.lock
+
+      # --frozen: CI must fail on a stale lockfile rather than silently re-resolve.
+      - name: Sync deps
+        run: uv sync --frozen
+
+      # --no-sync: `uv run` would otherwise re-sync and undo the --frozen install
+      # (the same revert that silently reverted a git@main pin in the crons).
+      - name: Run tests
+        run: uv run --no-sync pytest -q
+
+  r:
+    name: testthat (R)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: release
+          use-public-rspm: true
+
+      # Exactly the package closure of the R files the tests source (_data_utils
+      # + creation scripts 01-12/14, resolved by walking their :: and library()
+      # calls) -- NOT the whole toolchain. Notably absent: cfbfastR and glmnet,
+      # which only script 15 (team_summaries) needs, and no test sources it.
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          packages: |
+            any::testthat
+            any::withr
+            any::arrow
+            any::cli
+            any::curl
+            any::data.table
+            any::dplyr
+            any::jsonlite
+            any::memoise
+            any::optparse
+            any::piggyback
+            any::readr
+            any::stringr
+
+      - name: Run testthat
+        run: Rscript -e 'testthat::test_dir("tests/testthat", stop_on_failure = TRUE)'

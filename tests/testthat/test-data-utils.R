@@ -51,3 +51,61 @@ test_that("bind_games drops NULL/empty frames and unions columns", {
   expect_equal(nrow(out), 2L)
   expect_true(all(c("a", "b", "c") %in% names(out)))
 })
+
+# --- pb_upload_both: a failed upload must NOT be silent -----------------------
+# Regression for the 2026-07-16 team_summaries re-backfill, which exited 0 with two
+# parquet silently un-uploaded (the release kept 5-week-old bytes). The upload error
+# was caught and logged, so every caller -- including the daily publish cron -- read
+# that as success. These are source()d globals rather than package functions, so the
+# seams are stubbed by rebinding where pb_upload_both actually resolves them.
+
+# Swap a binding in `env` for the duration of `code`, then restore it.
+with_stub <- function(name, fn, env, code) {
+  had <- exists(name, envir = env, inherits = FALSE)
+  orig <- if (had) get(name, envir = env) else NULL
+  locked <- environmentIsLocked(env) && had && bindingIsLocked(name, env)
+  if (locked) unlockBinding(name, env)
+  assign(name, fn, envir = env)
+  on.exit({
+    if (had) assign(name, orig, envir = env) else rm(list = name, envir = env)
+    if (locked) lockBinding(name, env)
+  }, add = TRUE)
+  force(code)
+}
+
+test_that("pb_upload_both retries a transient upload failure, then succeeds", {
+  attempts <- 0L
+  res <- with_stub(".ensure_release_visible", function(...) TRUE, globalenv(),
+    with_stub("pb_upload", function(...) {
+      attempts <<- attempts + 1L
+      # the exact transient seen in the re-backfill: a rate-limited HTML error page
+      if (attempts < 2L) stop('Unexpected content type "text/html".')
+      TRUE
+    }, asNamespace("piggyback"),
+      pb_upload_both("f.parquet", "some_tag", repos = "o/r", token = "t", wait = 0)
+    )
+  )
+
+  expect_true(res)
+  expect_identical(attempts, 2L)   # failed once, succeeded on the retry
+})
+
+test_that("pb_upload_both RAISES when the upload never succeeds (no silent success)", {
+  expect_error(
+    with_stub(".ensure_release_visible", function(...) TRUE, globalenv(),
+      with_stub("pb_upload", function(...) stop("boom"), asNamespace("piggyback"),
+        pb_upload_both("f.parquet", "some_tag", repos = "o/r", token = "t", tries = 2L, wait = 0)
+      )
+    ),
+    "FAILED after 2 attempts"
+  )
+})
+
+test_that("pb_upload_both RAISES when the release never becomes visible", {
+  expect_error(
+    with_stub(".ensure_release_visible", function(...) FALSE, globalenv(),
+      pb_upload_both("f.parquet", "some_tag", repos = "o/r", token = "t", wait = 0)
+    ),
+    "never became visible"
+  )
+})

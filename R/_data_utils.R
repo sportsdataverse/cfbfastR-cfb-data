@@ -111,7 +111,16 @@ write_dataset <- function(df, dataset, season, stem) {
 # Upload one file to BOTH publish repos under a release tag (idempotent overwrite),
 # creating the release first if it does not exist. See .ensure_release_visible() for the
 # piggyback cache / eventual-consistency handling that makes a cold self-create reliable.
-pb_upload_both <- function(file, tag, repos = PUBLISH_REPOS, token = Sys.getenv("GITHUB_PAT")) {
+#
+# RETRIES, THEN RAISES. This used to log the failure and carry on, which made a failed
+# upload invisible: the driver exited 0 having published nothing for that file. A
+# 2014-2025 team_summaries re-backfill (2026-07-16) exited 0 with two parquet silently
+# missing -- one "release never became visible", one an HTML error page from a rate-limited
+# API -- and the release kept 5-week-old bytes while the log claimed success. Both were
+# transient, so the fix is two-part: retry the transient class, and make an exhausted
+# upload a hard error so a publish cron cannot report success while dropping data.
+pb_upload_both <- function(file, tag, repos = PUBLISH_REPOS, token = Sys.getenv("GITHUB_PAT"),
+                           tries = 3L, wait = 5) {
   for (repo in repos) {
     # Make publishing self-sufficient when releases_init has not run: ensure the release
     # exists AND is visible in the (eventually-consistent, memoised) releases listing
@@ -119,15 +128,38 @@ pb_upload_both <- function(file, tag, repos = PUBLISH_REPOS, token = Sys.getenv(
     # key is to leave the cache warmed to the CORRECT state -- i.e. poll until the tag
     # appears, then DON'T bust the cache again before pb_upload(). (Busting it right
     # before the upload re-fetches a still-propagating empty list -> "Could not find".)
-    if (.ensure_release_visible(repo, tag, token)) {
-      tryCatch(
-        piggyback::pb_upload(file = file, repo = repo, tag = tag, overwrite = TRUE, .token = token),
-        error = function(e) cli::cli_alert_danger("pb_upload {repo}@{tag} {basename(file)}: {conditionMessage(e)}")
+    if (!.ensure_release_visible(repo, tag, token)) {
+      stop(sprintf("pb_upload %s@%s %s: release never became visible", repo, tag, basename(file)))
+    }
+    ok <- FALSE
+    last_err <- NA_character_
+    for (i in seq_len(tries)) {
+      ok <- tryCatch(
+        {
+          piggyback::pb_upload(file = file, repo = repo, tag = tag, overwrite = TRUE, .token = token)
+          TRUE
+        },
+        error = function(e) {
+          last_err <<- conditionMessage(e)
+          FALSE
+        }
       )
-    } else {
-      cli::cli_alert_danger("pb_upload {repo}@{tag} {basename(file)}: release never became visible")
+      if (ok) break
+      if (i < tries) {
+        cli::cli_alert_warning(
+          "pb_upload {repo}@{tag} {basename(file)}: attempt {i}/{tries} failed ({last_err}); retrying in {wait}s"
+        )
+        Sys.sleep(wait)
+      }
+    }
+    if (!ok) {
+      stop(sprintf(
+        "pb_upload %s@%s %s: FAILED after %d attempts: %s",
+        repo, tag, basename(file), tries, last_err
+      ))
     }
   }
+  invisible(TRUE)
 }
 
 # Ensure a release for `tag` exists on `repo` and is visible in pb_releases(), creating

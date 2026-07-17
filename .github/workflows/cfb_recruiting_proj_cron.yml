@@ -1,0 +1,109 @@
+name: CFB Recruiting Projections
+
+# Refreshes the `cfb_recruiting_proj` dataset release on sportsdataverse-data:
+# one row per team per target season (predicted wins / scoring margin), built
+# by sdv-py's `cfb_recruiting_projection()` from preseason roster features.
+#
+# Unlike cfb_ratings this does NOT read a published pbp release -- its inputs
+# are live at build time (the 247 RDB recruit feed + cfbfastR-data
+# player_stats parquet + released schedule/crosswalk loaders). No API key.
+#
+# Credential scoping: the cross-repo publish PAT (SDV_GH_TOKEN) is NOT exported
+# job-wide; it is set only on the build+publish step (a mid-run failure aborts
+# before any upload, so the tag is never left half-published).
+
+on:
+  workflow_dispatch:
+    inputs:
+      seasons:
+        description: 'Target season or inclusive range (e.g. 2025 or 2016:2025). Default: the upcoming season.'
+        required: false
+        type: string
+      dry_run:
+        description: 'Build only; plan the uploads without publishing'
+        required: false
+        type: boolean
+        default: false
+  schedule:
+    # Monthly through the recruiting cycle + preseason: early-signing (Dec),
+    # signing day + transfer window (Jan-Apr), preseason (May-Aug). The
+    # projection is preseason-known by construction, so there is nothing to
+    # refresh in-season.
+    - cron: '0 12 5 12 *'   # December (early signing period)
+    - cron: '0 12 5 1-8 *'  # January-August (signing day through preseason)
+
+permissions:
+  contents: read
+
+env:
+  PUBLISH_REPO: sportsdataverse/sportsdataverse-data
+
+jobs:
+  recruiting:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: python
+    steps:
+      - name: Checkout cfb-data
+        uses: actions/checkout@v5
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: python/uv.lock
+
+      - name: Sync deps
+        run: uv sync --frozen
+
+      # The pinned `sportsdataverse` release does not ship the recruiting
+      # projection surface -- install from git until a release carries it.
+      # TODO: re-pin to a PyPI release once one ships `cfb_recruiting_projection`.
+      - name: Install sportsdataverse from git (main)
+        run: |
+          uv pip install \
+            "sportsdataverse @ git+https://github.com/sportsdataverse/sportsdataverse-py.git@main"
+
+      # Canary. Every `uv run` below MUST pass --no-sync: a bare `uv run`
+      # re-syncs from uv.lock and silently REVERTS the git install above. This
+      # fails loudly in seconds instead of the publish dying minutes in.
+      - name: Verify the projection surface imports
+        run: |
+          uv run --no-sync python -c "
+          from sportsdataverse.cfb import cfb_recruiting_projection
+          import importlib.metadata as md
+          print('cfb_recruiting_projection OK (sportsdataverse', md.version('sportsdataverse'), 'from git@main)')
+          "
+
+      # The projection targets the UPCOMING season: in December the early
+      # signing period opens the next season's cycle, so the target rolls to
+      # calendar year + 1; every other scheduled month targets the calendar
+      # year itself (its season has not been played yet when this cron runs).
+      - name: Resolve target season
+        env:
+          # Via env, not `${{ }}` inline in the script: a dispatch input
+          # interpolated straight into `run:` is a shell-injection sink.
+          SEASONS_INPUT: ${{ inputs.seasons }}
+        run: |
+          if [ -n "$SEASONS_INPUT" ]; then
+            SEASONS="$SEASONS_INPUT"
+          else
+            SEASONS=$(date -u +%Y)
+            if [ "$(date -u +%m)" = "12" ]; then
+              SEASONS=$((SEASONS + 1))
+            fi
+          fi
+          echo "SEASONS=$SEASONS" >> $GITHUB_ENV
+          echo "building cfb_recruiting_proj for seasons: $SEASONS"
+
+      - name: Build + publish cfb_recruiting_proj ${{ env.SEASONS }}
+        env:
+          GH_TOKEN: ${{ secrets.SDV_GH_TOKEN }}
+        run: |
+          uv run --no-sync python -m cfb_model_publish recruiting \
+            --seasons "$SEASONS" \
+            --out out/cfb_recruiting_proj \
+            --tag cfb_recruiting_proj \
+            --repo "$PUBLISH_REPO" \
+            ${{ inputs.dry_run && '--dry-run' || '' }}

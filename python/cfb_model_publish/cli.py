@@ -3,7 +3,12 @@ from __future__ import annotations
 import argparse
 
 from .artifacts import upload_artifacts
-from .builders import build_ratings, write_ratings_card
+from .builders import (
+    build_ratings,
+    build_recruiting,
+    write_ratings_card,
+    write_recruiting_card,
+)
 
 
 def _seasons(spec: str) -> list[int]:
@@ -39,6 +44,24 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="write parquet + card, skip the upload",
     )
+
+    p = sub.add_parser(
+        "recruiting", help="build + publish preseason recruiting-based projections"
+    )
+    p.add_argument(
+        "--seasons",
+        required=True,
+        help="a target season (2025) or an inclusive range (2016:2025)",
+    )
+    p.add_argument("--out", default="out/cfb_recruiting_proj")
+    p.add_argument("--tag", default="cfb_recruiting_proj")
+    p.add_argument("--repo", default="sportsdataverse/sportsdataverse-data")
+    p.add_argument("--dry-run", action="store_true")
+    p.add_argument(
+        "--build-only",
+        action="store_true",
+        help="write parquet + card, skip the upload",
+    )
     return ap
 
 
@@ -68,6 +91,29 @@ def main(argv=None) -> int:
             args.tag,
             args.repo,
             pattern="cfb_ratings_*.*",
+            dry_run=args.dry_run,
+        )
+        created = " (created release)" if res.get("created_release") else ""
+        print(
+            f"publish: seasons={len(results)} rows={total} uploaded={res['uploaded']} "
+            f"-> {args.repo}:{res['tag']}"
+            + created
+            + (" (dry-run)" if args.dry_run else "")
+        )
+    elif args.cmd == "recruiting":
+        results = build_recruiting(_seasons(args.seasons), args.out)
+        write_recruiting_card(results, args.out)
+        total = sum(r["rows"] for r in results)
+        if args.build_only:
+            print(
+                f"recruiting: built seasons={len(results)} rows={total} -> {args.out} (build-only)"
+            )
+            return 0
+        res = upload_artifacts(
+            args.out,
+            args.tag,
+            args.repo,
+            pattern="cfb_recruiting_proj_*.*",
             dry_run=args.dry_run,
         )
         created = " (created release)" if res.get("created_release") else ""

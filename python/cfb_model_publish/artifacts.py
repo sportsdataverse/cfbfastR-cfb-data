@@ -23,6 +23,12 @@ _RELEASE_BODY = {
         "dense ranks, and a net z-score. Built by sdv-py `cfb_ratings()` over the "
         "released `espn_cfb_pbp` play-by-play."
     ),
+    "cfb_recruiting_proj": (
+        "College Football preseason team projections, one row per team per "
+        "target season: predicted wins and scoring margin from an as-of ridge "
+        "on roster features (247 talent composite, blue-chip ratio, returning "
+        "production, prior wins). Built by sdv-py `cfb_recruiting_projection()`."
+    ),
 }
 
 

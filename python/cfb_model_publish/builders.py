@@ -100,3 +100,103 @@ def write_ratings_card(results: list[dict], out_dir) -> Path:
     path.write_text(json.dumps(card, indent=2) + "\n", encoding="utf-8")
     print(f"card: {path}")
     return path
+
+
+# cfbfastR-data's player_stats floor is 2014, returning production needs the
+# prior season's stats, and the ridge needs at least one trainable prior
+# season -- so 2016 is the earliest target that can produce a projection.
+MIN_SEASON_RECRUITING = 2016
+
+
+def build_recruiting(seasons: list[int], out_dir, *, compute=None) -> list[dict]:
+    """Build per-season projections and write ``cfb_recruiting_proj_{season}.parquet``.
+
+    Args:
+        seasons: Target seasons to project (one parquet per season).
+        out_dir: Output directory (created if absent).
+        compute: Injectable ``cfb_recruiting_projection``-shaped callable, for
+            hermetic tests. Defaults to
+            ``sportsdataverse.cfb.cfb_recruiting_projection``.
+
+    Returns:
+        List of ``{"season": int, "rows": int, "path": str}`` dicts, one per
+        season, in input order.
+
+    Raises:
+        ValueError: If a season is below :data:`MIN_SEASON_RECRUITING`, or if a
+            season yields zero rows (no trainable history / no recruit feed --
+            publishing it would ship a silently-empty tag).
+    """
+    if compute is None:
+        from sportsdataverse.cfb import cfb_recruiting_projection as compute
+
+    too_old = [s for s in seasons if s < MIN_SEASON_RECRUITING]
+    if too_old:
+        raise ValueError(
+            f"cfb_recruiting_proj: seasons {too_old} predate the "
+            f"{MIN_SEASON_RECRUITING} floor (player_stats starts 2014 and the "
+            "as-of ridge needs a trainable prior season)"
+        )
+
+    out_dir = Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    results: list[dict] = []
+    for season in seasons:
+        df = compute(season)
+        if df.height == 0:
+            raise ValueError(
+                f"cfb_recruiting_proj: season {season} produced 0 rows -- "
+                "refusing to publish an empty tag"
+            )
+        path = out_dir / f"cfb_recruiting_proj_{season}.parquet"
+        df.write_parquet(path)
+        results.append({"season": season, "rows": df.height, "path": str(path)})
+        print(f"recruiting: season={season} rows={df.height} -> {path}")
+    return results
+
+
+def write_recruiting_card(results: list[dict], out_dir) -> Path:
+    """Write the ``cfb_recruiting_proj`` model card next to the season parquet.
+
+    Carries the T2.2 gate anchors and the documented data caveats so a consumer
+    can tell what this tag's projections were validated against.
+    """
+    out_dir = Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    card = {
+        "tag": "cfb_recruiting_proj",
+        "grain": "one row per team per target season",
+        "source": (
+            "sdv-py sportsdataverse.cfb.cfb_recruiting_projection() -- an as-of "
+            "ridge from preseason roster features to team-season outcomes"
+        ),
+        "features": [
+            "talent_composite",
+            "blue_chip_ratio",
+            "off_returning",
+            "def_returning",
+            "prior_wins",
+        ],
+        "seasons": [r["season"] for r in results],
+        "rows_by_season": {str(r["season"]): r["rows"] for r in results},
+        "gate_anchors_t22": {
+            "note": "T2.2 oracle gates; wins MAE gated on the FBS 2018-2023 backtest window",
+            "talent_spearman": 0.896,
+            "retention_spearman": 0.229,
+            "wins_mae_floor": 2.35,
+        },
+        "notes": [
+            "pred_net_epa is null by design -- the adjusted-EPA target's hosted"
+            " pbp source 404s (documented data block, not faked).",
+            "The fit is strictly as-of: projecting season S trains only on"
+            " seasons < S, so early seasons (2016-2017) train on fewer than the"
+            " default six prior seasons and sit outside the validated window.",
+            "Inputs are live at build time: the 247 RDB recruit feed (talent /"
+            " blue-chip) and cfbfastR-data player_stats parquet (returning"
+            " production); no API key required.",
+        ],
+    }
+    path = out_dir / "cfb_recruiting_proj_card.json"
+    path.write_text(json.dumps(card, indent=2) + "\n", encoding="utf-8")
+    print(f"card: {path}")
+    return path

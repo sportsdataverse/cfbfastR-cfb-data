@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import gzip
 from pathlib import Path
 
 import polars as pl
@@ -10,23 +9,30 @@ import polars as pl
 from cfb_data_build.io import _append_manifest, write_dataset
 
 
-def test_write_dataset_writes_parquet_csv_and_manifest(tmp_path: Path) -> None:
+def test_write_dataset_writes_parquet_rds_csv_and_manifest(tmp_path: Path) -> None:
     df = pl.DataFrame({"game_id": [1, 2], "x": [10.0, 20.0]})
     out = write_dataset(df, "demo", 2024, "demo", base=tmp_path)
 
     assert out is not None
     assert (tmp_path / "demo" / "parquet" / "demo_2024.parquet").exists()
-    assert (tmp_path / "demo" / "csv" / "demo_2024.csv.gz").exists()
+    # all three released formats, matching R (parquet + rds + plain csv)
+    assert (tmp_path / "demo" / "rds" / "demo_2024.rds").exists()
+    assert (tmp_path / "demo" / "csv" / "demo_2024.csv").exists()
+    assert not (tmp_path / "demo" / "csv" / "demo_2024.csv.gz").exists()
 
     # parquet round-trips identically
     back = pl.read_parquet(tmp_path / "demo" / "parquet" / "demo_2024.parquet")
     assert back.shape == (2, 2)
 
-    # csv.gz is gzip and decodes to a header + 2 rows
-    with gzip.open(tmp_path / "demo" / "csv" / "demo_2024.csv.gz", "rt") as fh:
-        lines = fh.read().strip().splitlines()
+    # csv is PLAIN text (not gzipped): header + 2 rows
+    lines = (
+        (tmp_path / "demo" / "csv" / "demo_2024.csv").read_text().strip().splitlines()
+    )
     assert lines[0] == "game_id,x"
     assert len(lines) == 3
+
+    # rds is a real (gzip-compressed) RDS payload, non-empty
+    assert (tmp_path / "demo" / "rds" / "demo_2024.rds").stat().st_size > 0
 
     # manifest row
     m = pl.read_csv(tmp_path / "demo" / "cfb_demo_in_data_repo.csv")

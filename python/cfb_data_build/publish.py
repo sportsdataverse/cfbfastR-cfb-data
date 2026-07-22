@@ -22,11 +22,16 @@ PUBLISH_REPOS: list[str] = ["sportsdataverse/sportsdataverse-data"]
 
 
 def _dataset_files(spec: DatasetSpec, season: int, base: str | Path) -> list[Path]:
-    """The on-disk release files for one dataset+season (parquet + csv.gz)."""
+    """The on-disk release files for one dataset+season (parquet + rds + csv).
+
+    All three released formats ship to the tag — the release is the distribution
+    channel (rds/csv are not committed to this repo).
+    """
     root = Path(base) / spec.dataset
     candidates = [
         root / "parquet" / f"{spec.stem}_{season}.parquet",
-        root / "csv" / f"{spec.stem}_{season}.csv.gz",
+        root / "rds" / f"{spec.stem}_{season}.rds",
+        root / "csv" / f"{spec.stem}_{season}.csv",
     ]
     return [f for f in candidates if f.exists()]
 

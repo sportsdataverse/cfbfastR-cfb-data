@@ -47,19 +47,13 @@ _ALIASES: dict[str, str] = {
 }
 
 
-def prepare_plays_input(
-    pbp: pl.DataFrame, schedule: pl.DataFrame, season: int
-) -> pl.DataFrame:
+def prepare_plays_input(pbp: pl.DataFrame, schedule: pl.DataFrame, season: int) -> pl.DataFrame:
     """Released pbp + schedule -> the ``build_team_summaries`` input frame."""
     df = pbp.with_columns(pl.col("game_id").cast(pl.Utf8))
     sched = schedule.with_columns(pl.col("game_id").cast(pl.Utf8))
 
     # --- aliases (only when the canonical name is absent) ---
-    ren = {
-        src: dst
-        for src, dst in _ALIASES.items()
-        if dst not in df.columns and src in df.columns
-    }
+    ren = {src: dst for src, dst in _ALIASES.items() if dst not in df.columns and src in df.columns}
     df = df.rename(ren)
 
     # --- old-era releases (2004+) ship down/distance ~96% null with the
@@ -81,13 +75,7 @@ def prepare_plays_input(
         "rush_player_id",
         "pass_breakup_player_name",
     )
-    df = df.with_columns(
-        [
-            pl.lit(None, dtype=pl.Utf8).alias(c)
-            for c in _ATHLETE_FALLBACKS
-            if c not in df.columns
-        ]
-    )
+    df = df.with_columns([pl.lit(None, dtype=pl.Utf8).alias(c) for c in _ATHLETE_FALLBACKS if c not in df.columns])
 
     # --- schedule join: divisions / conferences / neutral flag ---
     sched_cols = ["game_id"]
@@ -100,9 +88,7 @@ def prepare_plays_input(
     ):
         if c in sched.columns and c not in df.columns:
             sched_cols.append(c)
-    df = df.join(
-        sched.select(sched_cols).unique(subset=["game_id"]), on="game_id", how="left"
-    )
+    df = df.join(sched.select(sched_cols).unique(subset=["game_id"]), on="game_id", how="left")
     if "home_division" in df.columns:
         df = df.rename(
             {
@@ -118,19 +104,22 @@ def prepare_plays_input(
             }
         )
 
-    # --- cfbfastR home/away are the same namespace as pos_team (ids here) ---
-    exprs: list[pl.Expr] = []
-    if "home" not in df.columns:
-        exprs.append(pl.col("home_id").cast(pl.Utf8).alias("home"))
-    if "away" not in df.columns:
-        exprs.append(pl.col("away_id").cast(pl.Utf8).alias("away"))
-    df = df.with_columns(exprs) if exprs else df
+    # --- cfbfastR pos_team/home/away are SCHOOL NAMES; the release pbp ships
+    # pos_team as an id. homeTeamName matches R's namespace 100% (2024 check),
+    # and _prepare_for_write's fbs_class needs pos_team == "Notre Dame". ---
     df = df.with_columns(
-        pl.col("pos_team").cast(pl.Utf8),
         pl.col("pos_team_id").cast(pl.Utf8),
         pl.col("home_id").cast(pl.Utf8),
         pl.col("away_id").cast(pl.Utf8),
         pl.lit(season, dtype=pl.Int64).alias("season"),
+    )
+    if "home" not in df.columns:
+        df = df.with_columns(
+            pl.col("homeTeamName").cast(pl.Utf8).alias("home"),
+            pl.col("awayTeamName").cast(pl.Utf8).alias("away"),
+        )
+    df = df.with_columns(
+        pos_team=pl.when(pl.col("pos_team_id") == pl.col("home_id")).then(pl.col("home")).otherwise(pl.col("away"))
     )
     # R pbp carries BOTH home_id and home_team_id; the release ships one.
     if "home_team_id" not in df.columns:
@@ -154,13 +143,7 @@ def prepare_plays_input(
         "rush_td",
         "epa_success",
     )
-    df = df.with_columns(
-        [
-            pl.col(c).cast(pl.Float64)
-            for c in _FLAGS
-            if c in df.columns and df.schema[c] != pl.Float64
-        ]
-    )
+    df = df.with_columns([pl.col(c).cast(pl.Float64) for c in _FLAGS if c in df.columns and df.schema[c] != pl.Float64])
 
     # --- scrimmage + FBS/FBS + bad games ---
     df = df.filter(
@@ -174,9 +157,9 @@ def prepare_plays_input(
     text = pl.col("text").cast(pl.Utf8)
     clock = pl.col("start.adj_TimeSecsRem").cast(pl.Float64)
     half_end = ((clock <= 1860) & (clock >= 1800)) | ((clock <= 60) & (clock >= 0))
-    kneel = text.str.contains(_KNEEL_TEXT).fill_null(False) | (
-        half_end & text.str.contains(_KNEEL_TEAM_RUN)
-    ).fill_null(False)
+    kneel = text.str.contains(_KNEEL_TEXT).fill_null(False) | (half_end & text.str.contains(_KNEEL_TEAM_RUN)).fill_null(
+        False
+    )
     df = df.filter((pl.col("pass") == 1) | (kneel == False))  # noqa: E712
 
     # --- rule-based success (cfbfastR `success`; absent from the release) ---
@@ -214,12 +197,7 @@ def prepare_plays_input(
     # charged separately (interception_thrown / sack_taken), so incompletion
     # excludes them — the builder revives those via its name-map aggregation.
     psr, psr_id = pl.col("passer_player_name"), pl.col("passer_player_id")
-    is_incomp = (
-        (pl.col("pass_attempt") == 1)
-        & ~is_comp
-        & (pl.col("int") == 0)
-        & (pl.col("sack_vec") == 0)
-    )
+    is_incomp = (pl.col("pass_attempt") == 1) & ~is_comp & (pl.col("int") == 0) & (pl.col("sack_vec") == 0)
     df = df.with_columns(
         pl.when(is_target).then(recv).alias("target_player"),
         pl.when(is_target).then(recv_id).alias("target_player_id"),
@@ -229,12 +207,8 @@ def prepare_plays_input(
         pl.when(is_incomp).then(psr_id).alias("incompletion_player_id"),
         pl.when(is_comp).then(recv).alias("reception_player"),
         pl.when(is_comp).then(recv_id).alias("reception_player_id"),
-        pl.when(pl.col("int") == 1)
-        .then(pl.col("passer_player_id"))
-        .alias("interception_thrown_player_id"),
-        pl.when(pl.col("sack_vec") == 1)
-        .then(pl.col("passer_player_id"))
-        .alias("sack_taken_player_id"),
+        pl.when(pl.col("int") == 1).then(pl.col("passer_player_id")).alias("interception_thrown_player_id"),
+        pl.when(pl.col("sack_vec") == 1).then(pl.col("passer_player_id")).alias("sack_taken_player_id"),
     )
 
     # --- drive start position: possession-oriented yards-to-goal from the
@@ -245,9 +219,7 @@ def prepare_plays_input(
     if "drive_start_yards_to_goal" not in df.columns:
         yard = pl.col("drive.start.yardLine").cast(pl.Float64)
         df = df.with_columns(
-            drive_start_yards_to_goal=pl.when(
-                pl.col("pos_team_id") == pl.col("home_id")
-            )
+            drive_start_yards_to_goal=pl.when(pl.col("pos_team_id") == pl.col("home_id"))
             .then(100 - yard)
             .otherwise(yard)
         )

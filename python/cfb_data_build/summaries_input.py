@@ -62,6 +62,33 @@ def prepare_plays_input(
     }
     df = df.rename(ren)
 
+    # --- old-era releases (2004+) ship down/distance ~96% null with the
+    # start.* variants fully populated — coalesce so success/third-down
+    # families survive ---
+    if "start.down" in df.columns:
+        df = df.with_columns(
+            pl.coalesce(pl.col("down"), pl.col("start.down")).alias("down"),
+            pl.coalesce(pl.col("distance"), pl.col("start.distance")).alias("distance"),
+        )
+
+    # --- pre-participants-era releases (2004-13) ship player NAMES but no
+    # per-play athlete ids (and no pass_breakup_player_name). Null-fill so the
+    # team tables build; the player tables filter to non-null ids and come out
+    # empty for those seasons (write_dataset skips empty frames, matching R). ---
+    _ATHLETE_FALLBACKS = (
+        "receiver_player_id",
+        "passer_player_id",
+        "rush_player_id",
+        "pass_breakup_player_name",
+    )
+    df = df.with_columns(
+        [
+            pl.lit(None, dtype=pl.Utf8).alias(c)
+            for c in _ATHLETE_FALLBACKS
+            if c not in df.columns
+        ]
+    )
+
     # --- schedule join: divisions / conferences / neutral flag ---
     sched_cols = ["game_id"]
     for c in (

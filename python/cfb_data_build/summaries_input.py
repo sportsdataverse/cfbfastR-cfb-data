@@ -209,13 +209,24 @@ def prepare_plays_input(
     recv, recv_id = pl.col("receiver_player_name"), pl.col("receiver_player_id")
     is_target = pl.col("target") == 1
     is_comp = pl.col("completion") == 1
+    # CFBD stat-type semantics (cfbd_play.R pivot): completion/incompletion are
+    # charged to the QB; reception/target to the receiver. INTs and sacks are
+    # charged separately (interception_thrown / sack_taken), so incompletion
+    # excludes them — the builder revives those via its name-map aggregation.
+    psr, psr_id = pl.col("passer_player_name"), pl.col("passer_player_id")
+    is_incomp = (
+        (pl.col("pass_attempt") == 1)
+        & ~is_comp
+        & (pl.col("int") == 0)
+        & (pl.col("sack_vec") == 0)
+    )
     df = df.with_columns(
         pl.when(is_target).then(recv).alias("target_player"),
         pl.when(is_target).then(recv_id).alias("target_player_id"),
-        pl.when(is_comp).then(recv).alias("completion_player"),
-        pl.when(is_comp).then(recv_id).alias("completion_player_id"),
-        pl.when(is_target & ~is_comp).then(recv).alias("incompletion_player"),
-        pl.when(is_target & ~is_comp).then(recv_id).alias("incompletion_player_id"),
+        pl.when(is_comp).then(psr).alias("completion_player"),
+        pl.when(is_comp).then(psr_id).alias("completion_player_id"),
+        pl.when(is_incomp).then(psr).alias("incompletion_player"),
+        pl.when(is_incomp).then(psr_id).alias("incompletion_player_id"),
         pl.when(is_comp).then(recv).alias("reception_player"),
         pl.when(is_comp).then(recv_id).alias("reception_player_id"),
         pl.when(pl.col("int") == 1)

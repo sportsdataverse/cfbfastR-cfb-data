@@ -47,6 +47,16 @@ def build_summaries_season(
     Returns:
         Row counts per table key.
     """
+    if through_week is not None:
+        if publish:
+            raise ValueError(
+                "through-week snapshots are not publishable; the release tags "
+                "hold season-final builds (weekly long-format is a separate "
+                "dataset, program plan P8)"
+            )
+        # keep snapshots away from the canonical season artifacts + manifest
+        base = f"{base}/snapshots/through_wk{through_week:02d}"
+
     if pbp is None or schedule is None:
         from sportsdataverse.cfb import load_cfb_pbp, load_cfb_schedule
 

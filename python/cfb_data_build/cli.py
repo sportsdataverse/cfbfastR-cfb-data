@@ -36,7 +36,16 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: list[str] | None = None) -> int:
-    args = build_parser().parse_args(argv)
+    ap = build_parser()
+    args = ap.parse_args(argv)
+    if args.through_week is not None:
+        if args.dataset != "summaries":
+            ap.error("--through-week only applies to --dataset summaries")
+        if args.publish:
+            ap.error(
+                "--through-week snapshots cannot be published; canonical tags "
+                "hold season-final builds"
+            )
     if args.dataset == "summaries":
         from cfb_data_build.summaries_build import build_summaries_season
 

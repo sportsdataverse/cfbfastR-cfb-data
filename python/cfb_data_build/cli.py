@@ -10,9 +10,17 @@ from cfb_data_build.config import REGISTRY
 
 def build_parser() -> argparse.ArgumentParser:
     ap = argparse.ArgumentParser(prog="cfb_data_build")
-    ap.add_argument("--dataset", required=True, choices=sorted(REGISTRY))
+    ap.add_argument(
+        "--dataset", required=True, choices=sorted(REGISTRY) + ["summaries"]
+    )
     ap.add_argument("-s", "--start-year", type=int, required=True)
     ap.add_argument("-e", "--end-year", type=int, required=True)
+    ap.add_argument(
+        "--through-week",
+        type=int,
+        default=None,
+        help="summaries only: cumulative snapshot through week W (default: full season)",
+    )
     ap.add_argument("--cache-dir", default=".cache/cfb_final")
     ap.add_argument(
         "--schedule", default=None, help="schedule master path/URL (default: raw URL)"
@@ -28,7 +36,27 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: list[str] | None = None) -> int:
-    args = build_parser().parse_args(argv)
+    ap = build_parser()
+    args = ap.parse_args(argv)
+    if args.through_week is not None:
+        if args.dataset != "summaries":
+            ap.error("--through-week only applies to --dataset summaries")
+        if args.publish:
+            ap.error(
+                "--through-week snapshots cannot be published; canonical tags "
+                "hold season-final builds"
+            )
+    if args.dataset == "summaries":
+        from cfb_data_build.summaries_build import build_summaries_season
+
+        for season in range(args.start_year, args.end_year + 1):
+            build_summaries_season(
+                season,
+                through_week=args.through_week,
+                base=args.base,
+                publish=args.publish,
+            )
+        return 0
     build_dataset(
         args.dataset,
         args.start_year,

@@ -148,3 +148,18 @@ REGISTRY: dict[str, DatasetSpec] = {
         "rosters", "rosters", "espn_cfb_rosters", reshaper="rosters"
     ),
 }
+
+# The team-summaries family builds from the RELEASED espn_cfb_pbp (not
+# final.json), so neither ``block`` nor ``reshaper`` is set — these specs only
+# feed ``write_dataset`` / ``publish_dataset``. Mirrors the R script 15 tuples.
+SUMMARIES_REGISTRY: dict[str, DatasetSpec] = {
+    "percentiles": DatasetSpec(
+        "percentiles", "cfb_percentiles", "espn_cfb_percentiles"
+    ),
+    "team_summaries": DatasetSpec(
+        "team_summaries", "cfb_team_summaries", "espn_cfb_team_summaries"
+    ),
+    "passing": DatasetSpec("passing", "cfb_passing", "espn_cfb_passing"),
+    "rushing": DatasetSpec("rushing", "cfb_rushing", "espn_cfb_rushing"),
+    "receiving": DatasetSpec("receiving", "cfb_receiving", "espn_cfb_receiving"),
+}

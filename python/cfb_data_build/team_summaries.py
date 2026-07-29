@@ -448,7 +448,12 @@ def _prepare_for_write(df: pl.DataFrame, yr: int, schools: pl.DataFrame) -> pl.D
     df = _clean_rank_columns(df)
     # R computes fbs_class AFTER the select-rename, so reference the renamed cols.
     out = (
-        df.with_columns(season=pl.lit(float(yr)))
+        # season is a JOIN KEY across the ecosystem and must be an integer. This
+        # emitted Float64 (mirroring R's double numerics), publishing season as
+        # 2023.0 in team_summaries AND the passing/rushing/receiving player tables,
+        # which all route through here. Every other producer site (io.py,
+        # reshape.py, reshapers.py, summaries_input.py) already uses Int64.
+        df.with_columns(season=pl.lit(int(yr), dtype=pl.Int64))
         .join(schools, on="pos_team_id", how="left")
         .rename(
             {

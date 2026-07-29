@@ -4,7 +4,11 @@ version = "0.1.0"
 description = "CFB modeling subsystem (EP/WP/QBR, CPOE, fourth-down, RB-eval) + URL-fetch ingest + model-PBP build."
 requires-python = ">=3.11"
 dependencies = [
-    "sportsdataverse>=0.0.72",
+    # Track sdv-py main, not a PyPI release: this producer's summaries family
+    # depends on CFB pbp fixes (player-id join, box-score id fallback) that are
+    # merged but unreleased. uv.lock previously pinned an older main commit, so
+    # the venv silently built on pre-fix code.
+    "sportsdataverse @ git+https://github.com/sportsdataverse/sportsdataverse-py@main",
     "pandas>=2.0",
     "polars>=1.0",
     "pyarrow>=15.0",

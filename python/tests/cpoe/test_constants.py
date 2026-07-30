@@ -9,7 +9,7 @@ def test_constants_imports():
 def test_feature_cols_is_list():
     from cpoe.constants import FEATURE_COLS
     assert isinstance(FEATURE_COLS, list)
-    assert len(FEATURE_COLS) == 8
+    assert len(FEATURE_COLS) == 7
 
 
 def test_feature_cols_contains_required():
@@ -18,11 +18,10 @@ def test_feature_cols_contains_required():
         "down",
         "distance",
         "yards_to_goal",
-        "score_diff",
-        "seconds_remaining",
         "is_home",
-        "period",
-        "passing_down",
+        "air_yards",
+        "pass_is_middle",
+        "qb_hurry"
     }
     assert required == set(FEATURE_COLS)
 

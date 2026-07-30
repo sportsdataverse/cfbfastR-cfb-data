@@ -22,7 +22,22 @@ def trained_booster_and_df():
     from cpoe.train_cp import train_cp_model
     rng = np.random.default_rng(3)
     n = 60
-    df = pd.DataFrame({col: rng.integers(0, 10, n) for col in FEATURE_COLS})
+    df = pd.DataFrame(
+        {
+            # features (minus air yards)
+            "down": rng.integers(1, 5, n),
+            "distance": rng.integers(1, 20, n),
+            "yards_to_goal": rng.integers(1, 100, n),
+            "is_home": rng.integers(0, 2, n),
+            "pass_is_middle": rng.integers(0, 2, n),
+            "qb_hurry": rng.integers(0, 2, n),
+
+            # target
+            "completion": rng.integers(0, 2, n),
+        }
+    )
+    # do this after so we know the maximum air yards
+    df["air_yards"] = df["yards_to_goal"].apply(lambda x: rng.integers(-5, x))
     df[TARGET_COL] = rng.integers(0, 2, n)
     booster = train_cp_model(df[FEATURE_COLS], df[TARGET_COL])
     return booster, df

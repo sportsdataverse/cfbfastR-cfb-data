@@ -9,6 +9,7 @@ DESCRIPTOR_COLS = [
     "homeTeamName", "awayTeamName", "type.text", "text", "start.down", "start.distance",
     "start.yardsToEndzone", "pos_score_diff_start", "start.TimeSecsRem", "start.is_home",
     "passing_down", "pass", "rush", "completion", "scoring_play", "statYardage", "passer_player_name",
+    "qb_hurry", "air_yards", "pass_direction"
 ]
 
 PREDICTION_COLS = [

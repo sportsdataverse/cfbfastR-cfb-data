@@ -12,9 +12,9 @@ def test_score_cpoe_appends_completion_prob_and_cpoe():
     plays = pl.DataFrame({"game_id": [1, 1], "id": [100, 101], "completion": [True, None],
                           "type.text": ["Pass Completion", "Rush"], "start.down": [1, 2],
                           "start.distance": [10, 8], "start.yardsToEndzone": [75, 60],
-                          "pos_score_diff_start": [0, 0], "start.TimeSecsRem": [1800, 1700],
-                          "start.is_home": [True, True], "period": [1, 1], "passing_down": [False, False]},
-                         infer_schema_length=None)
+                          "start.is_home": [True, True], "qb_hurry": [False, True], 
+                          "air_yards": [25, 2], "pass_direction": ["middle", "left"]
+                            }, infer_schema_length=None)
     out = score_cpoe(carry, plays, cp_model_path=None, _predict=lambda X: [0.6])  # 1 pass row -> cp 0.6
     pass_row = out.filter(pl.col("id") == 100).row(0, named=True)
     assert abs(pass_row["completion_prob"] - 0.6) < 1e-9
@@ -46,8 +46,7 @@ def test_score_cpoe_real_model_path(tmp_path):
         "game_id": [99], "id": [200], "completion": [True],
         "type.text": ["Pass Completion"],
         "start.down": [1], "start.distance": [10], "start.yardsToEndzone": [75],
-        "pos_score_diff_start": [0], "start.TimeSecsRem": [1800],
-        "start.is_home": [True], "period": [1], "passing_down": [False],
+        "start.is_home": [True], "qb_hurry": [True], "air_yards": [25], "pass_direction": ["middle"]
     }, infer_schema_length=None)
 
     # Call score_cpoe with _predict=None — exercises the real booster load + pandas feats[FEATURE_COLS] path.

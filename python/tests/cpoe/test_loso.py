@@ -15,7 +15,7 @@ def multi_season_df() -> pd.DataFrame:
     n = 20
     parts = []
     for season in [2025]:
-        for week in range(1, 15):
+        for week in range(1, 16):
             data = {
                 # filters
                 "season": season,
@@ -63,8 +63,8 @@ def test_loso_has_summary_key(multi_season_df):
 def test_loso_folds_count(multi_season_df):
     from cpoe.loso import run_loso_cv
     result = run_loso_cv(multi_season_df, season_col="week")
-    # 14 weeks → 14 folds
-    assert len(result["folds"]) == 14
+    # 15 weeks → 15 folds
+    assert len(result["folds"]) == 15
 
 
 def test_loso_fold_has_metrics(multi_season_df):

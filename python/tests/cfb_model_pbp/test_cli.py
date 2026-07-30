@@ -70,6 +70,9 @@ def test_contract_columns(tmp_path):
             "homeTeamName": "TeamA",
             "awayTeamName": "TeamB",
             "passer_player_name": "QB1",
+            "pass_direction": "middle",
+            "qb_hurry": True,
+            "air_yards": 5
         },
         {
             "id": 1002,
@@ -108,6 +111,9 @@ def test_contract_columns(tmp_path):
             "homeTeamName": "TeamA",
             "awayTeamName": "TeamB",
             "passer_player_name": None,
+            "pass_direction": "left",
+            "qb_hurry": False,
+            "air_yards": 1
         },
     ]
 

@@ -17,7 +17,7 @@ def _make_plays(n: int, game_id: str, rng: np.random.Generator) -> list[dict]:
         {
             "game_id": game_id,
             "playType": rng.choice(pass_types),
-            "week": int(rng.integers(1, 15)),
+            "week": int(rng.integers(1, 16)),
 
             "start.down": int(rng.integers(1, 5)),
             "start.distance": int(rng.integers(1, 20)),
@@ -75,7 +75,7 @@ def test_cli_smoke_with_loso(synthetic_raw_dir, tmp_path):
     assert cv_path.exists()
     cv = json.loads(cv_path.read_text())
     assert "folds" in cv
-    assert len(cv["folds"]) == 14
+    assert len(cv["folds"]) == 15
     assert (tmp_path / "out_loso" / "cfb_cp_model.ubj").exists()
 
 

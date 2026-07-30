@@ -58,6 +58,44 @@ def build_dataset_frame(
     raise ValueError(f"{spec.dataset}: spec has neither block nor reshaper")
 
 
+def _union_release_ids(
+    spec: DatasetSpec, season: int, ids: list[int], cache: Path
+) -> list[int]:
+    """Add game ids the CURRENT release has but the schedule master does not list.
+
+    The master is not a superset of what was published: sampled 2004-2024 it
+    misses 160 released games (2012: 54, 2008: 49, 2016: 33), while 2004's
+    release conversely has FEWER games than the master. Enumerating from the
+    master alone would silently DROP those games from the republished dataset,
+    so a consumer querying one today would find it gone tomorrow.
+
+    Only ids with a cached ``final.json`` can actually contribute rows; the rest
+    are reported so the shortfall is visible rather than silent.
+    """
+    try:
+        import sportsdataverse.cfb as cfb
+
+        released = cfb.load_cfb_pbp([season])
+    except Exception as exc:  # noqa: BLE001 - never let this abort a build
+        print(
+            f"{spec.dataset} {season}: release id-union skipped ({type(exc).__name__})"
+        )
+        return ids
+
+    import polars as _pl
+
+    rel = {x for x in released["game_id"].cast(_pl.Int64).to_list() if x is not None}
+    extra = sorted(rel - set(ids))
+    if not extra:
+        return ids
+    have = [g for g in extra if (cache / f"{g}.json").exists()]
+    print(
+        f"{spec.dataset} {season}: +{len(have)} release-only games recovered "
+        f"({len(extra) - len(have)} released ids have no cached final -- still absent)"
+    )
+    return list(ids) + have
+
+
 def build_season(
     spec: DatasetSpec,
     season: int,
@@ -68,6 +106,7 @@ def build_season(
     publish: bool = False,
     base: str | Path = "cfb",
     output: str = "default",
+    include_release_ids: bool = False,
 ) -> pl.DataFrame:
     """Build (and optionally publish) one dataset for one season.
 
@@ -86,6 +125,8 @@ def build_season(
     if fetch:
         fetch_final([season], cache_dir, schedule=schedule)
     ids = season_game_ids(schedule, [season])
+    if include_release_ids:
+        ids = _union_release_ids(spec, season, ids, Path(cache_dir))
     cache = Path(cache_dir)
     frames: list[pl.DataFrame | None] = []
     for gid in ids:
@@ -147,6 +188,7 @@ def build_dataset(
     publish: bool = False,
     base: str | Path = "cfb",
     output: str = "default",
+    include_release_ids: bool = False,
 ) -> None:
     """Build a dataset across an inclusive season range (the R script ``main`` loop).
 
@@ -167,6 +209,7 @@ def build_dataset(
             schedule=schedule,
             fetch=fetch,
             output=output,
+            include_release_ids=include_release_ids,
             publish=publish,
             base=base,
         )

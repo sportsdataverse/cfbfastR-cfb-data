@@ -33,6 +33,14 @@ def build_parser() -> argparse.ArgumentParser:
     )
     ap.add_argument("--base", default="cfb", help="output root directory")
     ap.add_argument(
+        "--include-release-ids",
+        action="store_true",
+        help=(
+            "also build games the CURRENT release has that the schedule master "
+            "omits, so a republish never drops a game consumers can query today"
+        ),
+    )
+    ap.add_argument(
         "--output",
         choices=("default", "lean", "full"),
         default="default",
@@ -76,5 +84,6 @@ def main(argv: list[str] | None = None) -> int:
         publish=args.publish,
         base=args.base,
         output=args.output,
+        include_release_ids=args.include_release_ids,
     )
     return 0

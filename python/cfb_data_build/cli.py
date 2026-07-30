@@ -32,6 +32,15 @@ def build_parser() -> argparse.ArgumentParser:
         "--publish", action="store_true", help="upload to the espn_cfb_* release"
     )
     ap.add_argument("--base", default="cfb", help="output root directory")
+    ap.add_argument(
+        "--output",
+        choices=("default", "lean", "full"),
+        default="default",
+        help=(
+            "pbp column tier. Publish espn_cfb_pbp with --output full: the "
+            "default tier drops sack_vec, which team_summaries consumes."
+        ),
+    )
     return ap
 
 
@@ -66,5 +75,6 @@ def main(argv: list[str] | None = None) -> int:
         fetch=not args.no_fetch,
         publish=args.publish,
         base=args.base,
+        output=args.output,
     )
     return 0

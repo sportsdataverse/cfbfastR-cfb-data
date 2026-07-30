@@ -36,10 +36,23 @@ def _resolve_block(game: dict[str, Any], path: tuple[str, ...]) -> Any:
     return node
 
 
-def build_dataset_frame(spec: DatasetSpec, game: dict[str, Any]) -> pl.DataFrame:
-    """Reshape one game's payload into the dataset's per-game frame (the ``reshape_fn``)."""
+def build_dataset_frame(
+    spec: DatasetSpec, game: dict[str, Any], *, output: str = "default"
+) -> pl.DataFrame:
+    """Reshape one game's payload into the dataset's per-game frame (the ``reshape_fn``).
+
+    ``output`` selects the pbp column tier (see
+    :func:`cfb_data_build.pbp.apply_pbp_output_schema`); every other reshaper
+    ignores it.
+
+    PUBLISH espn_cfb_pbp WITH ``output="full"``. The ``default`` tier drops
+    ``sack_vec`` (via ``PBP_DROP_REDUNDANT``), which ``team_summaries`` and
+    ``summaries_input`` both consume -- publishing a default-tier pbp would
+    break the summaries rebuild that reads it back.
+    """
     if spec.reshaper is not None:
-        return reshapers.RESHAPERS[spec.reshaper](game)
+        fn = reshapers.RESHAPERS[spec.reshaper]
+        return fn(game, output=output) if spec.reshaper == "pbp" else fn(game)
     if spec.block is not None:
         return flat_block_frame(_resolve_block(game, spec.block), game)
     raise ValueError(f"{spec.dataset}: spec has neither block nor reshaper")
@@ -54,6 +67,7 @@ def build_season(
     fetch: bool = True,
     publish: bool = False,
     base: str | Path = "cfb",
+    output: str = "default",
 ) -> pl.DataFrame:
     """Build (and optionally publish) one dataset for one season.
 
@@ -80,7 +94,7 @@ def build_season(
             continue
         try:
             game = json.loads(path.read_text(encoding="utf-8"))
-            frames.append(build_dataset_frame(spec, game))
+            frames.append(build_dataset_frame(spec, game, output=output))
         except Exception as exc:  # noqa: BLE001 — one bad game cannot abort the season
             print(f"{spec.dataset} {gid}: {exc}")
     df = bind_games(frames)
@@ -132,8 +146,12 @@ def build_dataset(
     fetch: bool = True,
     publish: bool = False,
     base: str | Path = "cfb",
+    output: str = "default",
 ) -> None:
-    """Build a dataset across an inclusive season range (the R script ``main`` loop)."""
+    """Build a dataset across an inclusive season range (the R script ``main`` loop).
+
+    ``output`` is the pbp column tier; publish espn_cfb_pbp with ``"full"``.
+    """
     # rosters is a season-level derive over the game_rosters output, not a
     # per-game build -- route it to its dedicated season builder.
     if dataset == "rosters":
@@ -148,6 +166,7 @@ def build_dataset(
             cache_dir=cache_dir,
             schedule=schedule,
             fetch=fetch,
+            output=output,
             publish=publish,
             base=base,
         )

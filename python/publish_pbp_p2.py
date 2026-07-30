@@ -110,7 +110,15 @@ def main() -> None:
         if args.publish and not args.dry_run:
             from cfb_data_build.publish import publish_dataset
 
-            publish_dataset(spec, season, base=args.base)
+            # A slow/flaky upload must not abandon the remaining seasons. The
+            # first run died on a 300s gh timeout uploading the 347 MB 2005 csv
+            # and left 20 seasons unpublished.
+            try:
+                publish_dataset(spec, season, base=args.base)
+            except Exception as exc:  # noqa: BLE001
+                print(f"  PUBLISH FAILED {season}: {type(exc).__name__}: {str(exc)[:160]}", flush=True)
+                failed.append((season, [f"publish: {type(exc).__name__}"]))
+                continue
             print(f"  PUBLISHED {season}", flush=True)
         passed.append(season)
 

@@ -1,11 +1,16 @@
 from __future__ import annotations
 
+import os
 import subprocess
 from pathlib import Path
 
 from cfb_model_reports.discovery import discover_models
 
-GH_TIMEOUT_SECONDS = 300
+# Upload timeout. 300s was too short once plain-csv artifacts entered the mix:
+# a pbp season csv is ~347 MB (vs ~34 MB parquet) and reliably blew the limit,
+# aborting a 22-season publish after one season. Sized for the largest artifact
+# we ship on a slow link; override with CFB_GH_TIMEOUT_SECONDS.
+GH_TIMEOUT_SECONDS = int(os.getenv("CFB_GH_TIMEOUT_SECONDS", "1800"))
 
 # Release-notes body used when auto-creating a missing release. Keyed by tag;
 # falls back to a generic note for any other tag.

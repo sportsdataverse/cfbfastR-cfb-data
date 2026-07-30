@@ -58,6 +58,12 @@ def build_dataset_frame(
     raise ValueError(f"{spec.dataset}: spec has neither block nor reshaper")
 
 
+# Released game-ids per season, cached for the PROCESS. The fan-out runs 10
+# adv_* datasets x 22 seasons; without this the release parquet (~34 MB) would
+# be re-downloaded 220 times (~7.5 GB) instead of 22.
+_RELEASE_IDS_CACHE: dict[int, set[int]] = {}
+
+
 def _union_release_ids(
     spec: DatasetSpec, season: int, ids: list[int], cache: Path
 ) -> list[int]:
@@ -72,20 +78,27 @@ def _union_release_ids(
     Only ids with a cached ``final.json`` can actually contribute rows; the rest
     are reported so the shortfall is visible rather than silent.
     """
-    try:
-        import sportsdataverse.cfb as cfb
+    cached = _RELEASE_IDS_CACHE.get(season)
+    if cached is None:
+        try:
+            import sportsdataverse.cfb as cfb
 
-        released = cfb.load_cfb_pbp([season])
-    except Exception as exc:  # noqa: BLE001 - never let this abort a build
-        print(
-            f"{spec.dataset} {season}: release id-union skipped ({type(exc).__name__})"
-        )
-        return ids
+            released = cfb.load_cfb_pbp([season])
+        except Exception as exc:  # noqa: BLE001 - never let this abort a build
+            print(
+                f"{spec.dataset} {season}: release id-union skipped ({type(exc).__name__})"
+            )
+            return ids
 
-    import polars as _pl
+        import polars as _pl
 
-    rel = {x for x in released["game_id"].cast(_pl.Int64).to_list() if x is not None}
-    extra = sorted(rel - set(ids))
+        cached = {
+            x for x in released["game_id"].cast(_pl.Int64).to_list() if x is not None
+        }
+        _RELEASE_IDS_CACHE[season] = cached
+    released_ids = cached
+
+    extra = sorted(released_ids - set(ids))
     if not extra:
         return ids
     have = [g for g in extra if (cache / f"{g}.json").exists()]

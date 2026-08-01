@@ -37,7 +37,11 @@ import polars as pl
 from cfb_data_build.config import DatasetSpec
 from cfb_data_build.io import write_dataset
 
-CORE = "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football"
+CORE = "https://sports.core.api.espn.com/v2/sports/football/leagues/college-football"
+# ESPN returns http:// refs inside its own payloads; only follow ones that point at
+# the expected host, and upgrade them to https so a response cannot redirect the
+# crawl somewhere else.
+_CORE_HOSTS = ("https://sports.core.api.espn.com/", "http://sports.core.api.espn.com/")
 _UA = {"User-Agent": "Mozilla/5.0 (compatible; sportsdataverse/cfb-data)"}
 _TEAM_RE = re.compile(r"/teams/(\d+)")
 
@@ -46,9 +50,10 @@ SPECS: dict[str, DatasetSpec] = {
     "power_index": DatasetSpec("power_index", "power_index", "espn_cfb_power_index"),
 }
 
-# Regular season then postseason. Weeks are probed until a request returns zero
-# rows rather than assumed, because the count varies by season (2024 regular runs
-# to week 16; 2007 is shorter) and a hardcoded ceiling would silently truncate.
+# Regular season then postseason. Every week slot up to _MAX_WEEK is probed and
+# the empty ones contribute no rows -- the published count varies by season, so a
+# ceiling above any real season is simpler and faster than a sequential early-stop
+# walk, and cannot truncate a long one.
 SEASON_TYPES = (2, 3)
 _MAX_WEEK = 20
 
@@ -67,7 +72,10 @@ def _week_rows(season: int, season_type: int, week: int) -> list[dict[str, Any]]
     )
     try:
         payload = _get(url)
-    except Exception:
+    except Exception as exc:  # noqa: BLE001
+        # Reported, never dropped silently: a week that fails to fetch would
+        # otherwise be indistinguishable from a week ESPN does not publish.
+        print(f"  fpi_weekly {season} type{season_type} wk{week}: {type(exc).__name__}", flush=True)
         return []
     rows: list[dict[str, Any]] = []
     for item in payload.get("items") or []:
@@ -99,11 +107,12 @@ def build_fpi_weekly(
 ) -> pl.DataFrame:
     """Weekly FPI snapshots for one season, long over (season_type, week).
 
-    Weeks are walked until one comes back empty, then the walk stops for that
-    season type -- ESPN publishes a different number of weeks per season, so a
-    fixed range would either truncate a long season or waste requests on a short
-    one. Requests are modest in number (about 17 per season), so concurrency is
-    kept low to stay friendly to the core API.
+    Every week slot up to ``_MAX_WEEK`` is probed concurrently and the empty ones
+    simply contribute no rows -- the published week count varies by season (2024
+    regular runs to 16, 2009 to 15), and probing a fixed ceiling is both simpler
+    and faster than a sequential walk that stops at the first empty week. The
+    request count is small (about 40 per season), so concurrency is kept low to
+    stay friendly to the core API.
     """
     rows: list[dict[str, Any]] = []
     for st in SEASON_TYPES:
@@ -174,14 +183,21 @@ def _game_rows(game_id: int) -> list[dict[str, Any]]:
     url = f"{CORE}/events/{game_id}/competitions/{game_id}/powerindex?limit=10"
     try:
         payload = _get(url, timeout=30)
-    except Exception:
+    except Exception as exc:  # noqa: BLE001
+        print(f"  power_index {game_id}: {type(exc).__name__}", flush=True)
         return []
     rows: list[dict[str, Any]] = []
     for item in payload.get("items") or []:
         ref = item.get("$ref") or ""
+        if not ref.startswith(_CORE_HOSTS):
+            print(f"  power_index {game_id}: skipped off-host ref {ref[:60]}", flush=True)
+            continue
+        ref = ref.replace("http://", "https://", 1)
         try:
             entry = _get(ref, timeout=30) if "stats" not in item else item
-        except Exception:
+        except Exception as exc:  # noqa: BLE001
+            # [2] report rather than drop silently
+            print(f"  power_index {game_id}: ref fetch failed ({type(exc).__name__})", flush=True)
             continue
         tref = ((entry or {}).get("team") or {}).get("$ref", "") or ref
         m = _TEAM_RE.search(tref)
@@ -236,6 +252,7 @@ def build_fpi(
     base: str = "cfb",
     publish: bool = False,
     dry_run: bool = False,
+    schedule: str | None = None,
 ) -> list[tuple[int, str]]:
     """Build (and optionally publish) an FPI dataset across a season range.
 
@@ -247,7 +264,10 @@ def build_fpi(
     failures: list[tuple[int, str]] = []
     for season in range(start_year, end_year + 1):
         try:
-            df = build(season, base=base)
+            # power_index enumerates game ids from the schedule master, so the
+            # --schedule override has to reach it; fpi_weekly does not take one.
+            kw = {"schedule": schedule} if dataset == "power_index" else {}
+            df = build(season, base=base, **kw)
             if df.height == 0:
                 print(f"  {spec.dataset} {season}: 0 rows, skipped", flush=True)
                 continue

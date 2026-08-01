@@ -21,7 +21,79 @@ from cfb_data_build.config import REGISTRY, DatasetSpec
 from cfb_data_build.io import write_dataset
 from cfb_data_build.reshape import bind_games, flat_block_frame
 from cfb_data_ingest.fetch import fetch_final
-from cfb_data_ingest.schedule import season_game_ids
+from cfb_data_ingest.schedule import SCHEDULE_URL, season_game_ids
+
+# ESPN's advBoxScore blocks put a team ID in `pos_team` / `def_pos_team` -- a
+# name-shaped column. We surface the ID as `<col>_id` and fill `<col>` with the
+# readable display name, so the column finally means what it is named.
+_TEAM_ID_COLS = ("pos_team", "def_pos_team")
+
+
+# Team-name map per (schedule source, season), cached for the PROCESS. A
+# multi-season run (`-s 2004 -e 2025`, what the daily cron uses) would otherwise
+# rescan the schedule parquet once per dataset-season -- 220 scans instead of 22.
+_TEAM_NAME_CACHE: dict[tuple[str, int], pl.DataFrame] = {}
+
+
+def _team_names(schedule_path_or_url: str | Path | None, season: int) -> pl.DataFrame:
+    """``(team_id, team_name)`` for one season, unioned over the home and away sides.
+
+    The schedule master stores ``home_id`` / ``away_id`` as **String** while the
+    advBoxScore blocks emit ``pos_team`` as **Int64**, so both sides are cast to
+    Int64 before they are ever used as a join key (a raw join would silently
+    match nothing).
+    """
+    src = (
+        str(schedule_path_or_url) if schedule_path_or_url is not None else SCHEDULE_URL
+    )
+    cached = _TEAM_NAME_CACHE.get((src, season))
+    if cached is not None:
+        return cached
+    lf = pl.scan_parquet(src).filter(pl.col("season") == season)
+    sides = [
+        lf.select(
+            pl.col(f"{side}_id").cast(pl.Int64, strict=False).alias("team_id"),
+            pl.col(f"{side}_display_name").cast(pl.Utf8).alias("team_name"),
+        )
+        for side in ("home", "away")
+    ]
+    names = pl.concat(sides).drop_nulls("team_id").unique(subset=["team_id"]).collect()
+    _TEAM_NAME_CACHE[(src, season)] = names
+    return names
+
+
+def _resolve_team_names(
+    df: pl.DataFrame, season: int, schedule: str | Path | None
+) -> pl.DataFrame:
+    """Split ``pos_team`` / ``def_pos_team`` into ``<col>_id`` + readable ``<col>``.
+
+    No-op when the frame carries neither column or the season has no schedule
+    rows, so a dataset without a possession team is untouched. The id column is
+    kept adjacent to the name in the original position rather than appended, so
+    the column order stays readable.
+    """
+    present = [c for c in _TEAM_ID_COLS if c in df.columns]
+    if not present or df.height == 0:
+        return df
+    names = _team_names(schedule, season)
+    if names.height == 0:
+        print(f"  team names: no schedule rows for {season}, leaving {present} as ids")
+        return df
+    order: list[str] = []
+    for col in df.columns:
+        order.extend([f"{col}_id", col] if col in present else [col])
+    for col in present:
+        df = df.with_columns(
+            pl.col(col).cast(pl.Int64, strict=False).alias(f"{col}_id")
+        ).drop(col)
+        df = df.join(
+            names.rename({"team_id": f"{col}_id", "team_name": col}),
+            on=f"{col}_id",
+            how="left",
+        )
+        hit = df[col].drop_nulls().len() / df.height
+        print(f"  {col}: {hit:.1%} of rows resolved to a team name")
+    return df.select(order)
 
 
 def _resolve_block(game: dict[str, Any], path: tuple[str, ...]) -> Any:
@@ -152,6 +224,7 @@ def build_season(
         except Exception as exc:  # noqa: BLE001 — one bad game cannot abort the season
             print(f"{spec.dataset} {gid}: {exc}")
     df = bind_games(frames)
+    df = _resolve_team_names(df, season, schedule)
     print(f"{spec.dataset} {season}: {df.height} rows from {len(ids)} games")
     write_dataset(df, spec.dataset, season, spec.stem, base=base)
     if publish and df.height > 0:

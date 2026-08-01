@@ -34,10 +34,16 @@ SCHEDULE = Path(
 )
 
 SPECS: dict[str, DatasetSpec] = {
-    "gamelog": DatasetSpec("adv_team_gamelog", "adv_team_gamelog", "espn_cfb_adv_team_gamelog"),
-    "ratings_weekly": DatasetSpec("cfb_ratings_weekly", "cfb_ratings_weekly", "cfb_ratings_weekly"),
+    "gamelog": DatasetSpec(
+        "adv_team_gamelog", "adv_team_gamelog", "espn_cfb_adv_team_gamelog"
+    ),
+    "ratings_weekly": DatasetSpec(
+        "cfb_ratings_weekly", "cfb_ratings_weekly", "cfb_ratings_weekly"
+    ),
     "team_summaries_weekly": DatasetSpec(
-        "cfb_team_summaries_weekly", "cfb_team_summaries_weekly", "cfb_team_summaries_weekly"
+        "cfb_team_summaries_weekly",
+        "cfb_team_summaries_weekly",
+        "cfb_team_summaries_weekly",
     ),
 }
 
@@ -49,7 +55,9 @@ def week_cutoffs(season: int, schedule_path: Path = SCHEDULE) -> list[tuple[int,
     convention -- the schedule master agrees), so including it would collide the
     week labels.
     """
-    s = pl.read_parquet(schedule_path).filter((pl.col("season") == season) & (pl.col("season_type") == 2))
+    s = pl.read_parquet(schedule_path).filter(
+        (pl.col("season") == season) & (pl.col("season_type") == 2)
+    )
     if s.height == 0 or "start_date" not in s.columns:
         return []
     g = (
@@ -59,19 +67,25 @@ def week_cutoffs(season: int, schedule_path: Path = SCHEDULE) -> list[tuple[int,
         .agg(pl.col("start_date").max().alias("cutoff"))
         .sort("week")
     )
-    return [(int(w), str(c)[:10]) for w, c in zip(g["week"].to_list(), g["cutoff"].to_list())]
+    return [
+        (int(w), str(c)[:10])
+        for w, c in zip(g["week"].to_list(), g["cutoff"].to_list())
+    ]
 
 
-def build_gamelog(season: int, *, base: str = "cfb", schedule_path: Path = SCHEDULE) -> pl.DataFrame:
+def build_gamelog(
+    season: int, *, base: str = "cfb", schedule_path: Path = SCHEDULE
+) -> pl.DataFrame:
     """adv_team + game context, one row per team-GAME.
 
     Joined by ID, never by name: a name-namespace mismatch already cost this
     project once (NameAlt 80% vs homeTeamName 100%). ``game_id`` is Int64 in
     adv_team and Int32 in the schedule master, so both sides are cast.
 
-    ``adv_team.pos_team`` holds a team ID under a name-shaped column (a
-    pre-existing leak -- the published 2014 asset shows '2545','164' too), so it
-    is surfaced here as ``team_id`` and the readable name is joined in.
+    ``adv_team`` now ships ``pos_team_id`` (the ESPN team id) alongside a
+    ``pos_team`` that holds the readable name. Older assets predate that split
+    and still carry the id in ``pos_team``, so the id column is resolved by
+    preference and both spellings are accepted.
     """
     adv_path = Path(base) / "adv_team" / "parquet" / f"adv_team_{season}.parquet"
     if not adv_path.exists():
@@ -94,12 +108,15 @@ def build_gamelog(season: int, *, base: str = "cfb", schedule_path: Path = SCHED
         "home_display_name",
         "away_display_name",
     ]
-    ctx = sched.select([c for c in ctx_cols if c in sched.columns]).unique(subset=["game_id"])
+    ctx = sched.select([c for c in ctx_cols if c in sched.columns]).unique(
+        subset=["game_id"]
+    )
 
+    id_col = "pos_team_id" if "pos_team_id" in adv.columns else "pos_team"
     adv = adv.with_columns(
         pl.col("game_id").cast(pl.Int64),
-        pl.col("pos_team").cast(pl.Int64).alias("team_id"),
-    ).drop("pos_team")
+        pl.col(id_col).cast(pl.Int64, strict=False).alias("team_id"),
+    ).drop([c for c in ("pos_team", "pos_team_id") if c in adv.columns])
     ctx = ctx.with_columns(
         pl.col("game_id").cast(pl.Int64),
         pl.col("home_id").cast(pl.Int64),
@@ -112,9 +129,15 @@ def build_gamelog(season: int, *, base: str = "cfb", schedule_path: Path = SCHED
     is_home = pl.col("team_id") == pl.col("home_id")
     out = out.with_columns(
         is_home=is_home,
-        opponent_id=pl.when(is_home).then(pl.col("away_id")).otherwise(pl.col("home_id")),
-        team=pl.when(is_home).then(pl.col("home_display_name")).otherwise(pl.col("away_display_name")),
-        opponent=pl.when(is_home).then(pl.col("away_display_name")).otherwise(pl.col("home_display_name")),
+        opponent_id=pl.when(is_home)
+        .then(pl.col("away_id"))
+        .otherwise(pl.col("home_id")),
+        team=pl.when(is_home)
+        .then(pl.col("home_display_name"))
+        .otherwise(pl.col("away_display_name")),
+        opponent=pl.when(is_home)
+        .then(pl.col("away_display_name"))
+        .otherwise(pl.col("home_display_name")),
         points_for=pl.when(is_home)
         .then(pl.col("home_score"))
         .otherwise(pl.col("away_score"))
@@ -152,7 +175,14 @@ def build_gamelog(season: int, *, base: str = "cfb", schedule_path: Path = SCHED
         )
         if c in out.columns
     ]
-    drop = {"home_id", "away_id", "home_score", "away_score", "home_display_name", "away_display_name"}
+    drop = {
+        "home_id",
+        "away_id",
+        "home_score",
+        "away_score",
+        "home_display_name",
+        "away_display_name",
+    }
     rest = [c for c in out.columns if c not in lead and c not in drop]
     return out.select(lead + rest)
 
@@ -198,7 +228,11 @@ def build_team_summaries_weekly(season: int, *, base: str = "cfb") -> pl.DataFra
             / f"{spec.stem}_{season}.parquet"
         )
         if snap.exists():
-            frames.append(pl.read_parquet(snap).with_columns(through_week=pl.lit(week, dtype=pl.Int32)))
+            frames.append(
+                pl.read_parquet(snap).with_columns(
+                    through_week=pl.lit(week, dtype=pl.Int32)
+                )
+            )
     return pl.concat(frames, how="diagonal_relaxed") if frames else pl.DataFrame()
 
 
@@ -232,8 +266,15 @@ def build_derived(
             if df.height == 0:
                 print(f"  {spec.dataset} {season}: 0 rows, skipped", flush=True)
                 continue
-            extra = f", {df['through_week'].n_unique()} weekly snapshots" if "through_week" in df.columns else ""
-            print(f"  {spec.dataset} {season}: {df.height} rows, {df.width} cols{extra}", flush=True)
+            extra = (
+                f", {df['through_week'].n_unique()} weekly snapshots"
+                if "through_week" in df.columns
+                else ""
+            )
+            print(
+                f"  {spec.dataset} {season}: {df.height} rows, {df.width} cols{extra}",
+                flush=True,
+            )
             if dry_run:
                 continue
             write_dataset(df, spec.dataset, season, spec.stem, base=base)
@@ -242,6 +283,8 @@ def build_derived(
 
                 publish_dataset(spec, season, base=base)
         except Exception as exc:  # noqa: BLE001
-            print(f"  FAILED {season}: {type(exc).__name__}: {str(exc)[:150]}", flush=True)
+            print(
+                f"  FAILED {season}: {type(exc).__name__}: {str(exc)[:150]}", flush=True
+            )
             failures.append((season, type(exc).__name__))
     return failures

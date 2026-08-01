@@ -7,11 +7,23 @@ import argparse
 from cfb_data_build.build import build_dataset
 from cfb_data_build.config import REGISTRY
 
+# Datasets DERIVED from already-built artifacts rather than from final.json.
+# They were standalone scripts (build_gamelog.py / build_weekly.py) until P6
+# folded them in, so `--dataset` is now the single surface for every CFB
+# dataset. Adding one is an entry here plus its builder.
+#
+#   gamelog                  adv_team + schedule context, one row per team-GAME
+#   ratings_weekly           cfb_ratings at each week's end, long format
+#   team_summaries_weekly    summaries at each week's end, long format
+DERIVED = ("gamelog", "ratings_weekly", "team_summaries_weekly")
+
 
 def build_parser() -> argparse.ArgumentParser:
     ap = argparse.ArgumentParser(prog="cfb_data_build")
     ap.add_argument(
-        "--dataset", required=True, choices=sorted(REGISTRY) + ["summaries"]
+        "--dataset",
+        required=True,
+        choices=sorted(REGISTRY) + ["summaries", *DERIVED],
     )
     ap.add_argument("-s", "--start-year", type=int, required=True)
     ap.add_argument("-e", "--end-year", type=int, required=True)
@@ -33,6 +45,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
     ap.add_argument("--base", default="cfb", help="output root directory")
     ap.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="derived datasets: build + report, never write or publish",
+    )
+    ap.add_argument(
         "--include-release-ids",
         action="store_true",
         help=(
@@ -52,6 +69,24 @@ def build_parser() -> argparse.ArgumentParser:
     return ap
 
 
+def _run_derived(args) -> int:
+    """Dispatch a DERIVED dataset (gamelog / *_weekly) through the shared driver."""
+    from cfb_data_build.derived import build_derived
+
+    failures = build_derived(
+        args.dataset,
+        args.start_year,
+        args.end_year,
+        base=args.base,
+        publish=args.publish,
+        dry_run=args.dry_run,
+    )
+    print(f"\n=== {args.dataset}: {len(failures)} failures ===")
+    for season, kind in failures:
+        print(f"  {season}: {kind}")
+    return 1 if failures else 0
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = build_parser()
     args = ap.parse_args(argv)
@@ -60,8 +95,7 @@ def main(argv: list[str] | None = None) -> int:
             ap.error("--through-week only applies to --dataset summaries")
         if args.publish:
             ap.error(
-                "--through-week snapshots cannot be published; canonical tags "
-                "hold season-final builds"
+                "--through-week snapshots cannot be published; canonical tags hold season-final builds"
             )
     if args.dataset == "summaries":
         from cfb_data_build.summaries_build import build_summaries_season
@@ -74,6 +108,9 @@ def main(argv: list[str] | None = None) -> int:
                 publish=args.publish,
             )
         return 0
+
+    if args.dataset in DERIVED:
+        return _run_derived(args)
     build_dataset(
         args.dataset,
         args.start_year,

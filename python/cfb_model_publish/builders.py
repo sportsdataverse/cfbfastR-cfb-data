@@ -17,6 +17,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from sportsdataverse._rds import write_rds
+
 # One row per team per season, so a season that produces nothing is a real
 # failure (an empty/absent pbp asset), not a quiet zero-row parquet. sdv-py's
 # `cfb_ratings` returns a correctly-typed empty frame rather than raising when
@@ -60,10 +62,15 @@ def build_ratings(seasons: list[int], out_dir, *, compute=None) -> list[dict]:
             raise ValueError(
                 f"cfb_ratings: season {season} produced 0 rows -- refusing to publish an empty tag"
             )
+        # Every release ships parquet + csv + rds (program plan P7). The upload
+        # glob is cfb_ratings_*.* so all three ship without a publisher change;
+        # this tag previously carried 22 parquet and ZERO csv/rds.
         path = out_dir / f"cfb_ratings_{season}.parquet"
         df.write_parquet(path)
+        df.write_csv(out_dir / f"cfb_ratings_{season}.csv")
+        write_rds(df, out_dir / f"cfb_ratings_{season}.rds")
         results.append({"season": season, "rows": df.height, "path": str(path)})
-        print(f"ratings: season={season} rows={df.height} -> {path}")
+        print(f"ratings: season={season} rows={df.height} -> {path} (+csv +rds)")
     return results
 
 

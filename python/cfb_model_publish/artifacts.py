@@ -28,6 +28,14 @@ _RELEASE_BODY = {
         "dense ranks, and a net z-score. Built by sdv-py `cfb_ratings()` over the "
         "released `espn_cfb_pbp` play-by-play."
     ),
+    "espn_cfb_adv_team_gamelog": (
+        "College Football advanced team box score, ONE ROW PER TEAM-GAME, "
+        "2004-2025. The adv_team metrics plus the game context they lack: "
+        "opponent id/name, home/away, neutral site, points for/against, "
+        "margin, win, and kickoff date -- the columns needed for "
+        "opponent-adjustment, strength-of-schedule, home/away splits and "
+        "rolling in-season trends. Built from the rebuilt espn_cfb_pbp."
+    ),
     "cfb_recruiting_proj": (
         "College Football preseason team projections, one row per team per "
         "target season: predicted wins and scoring margin from an as-of ridge "

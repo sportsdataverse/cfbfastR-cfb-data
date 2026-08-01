@@ -17,13 +17,19 @@ from cfb_data_build.config import REGISTRY
 #   team_summaries_weekly    summaries at each week's end, long format
 DERIVED = ("gamelog", "ratings_weekly", "team_summaries_weekly")
 
+# ESPN Football Power Index. Separate from DERIVED because these are fetched from
+# the core-v2 API rather than derived from an already-built artifact.
+#   fpi_weekly    team x season_type x week, point-in-time snapshots
+#   power_index   game x team, the matchup predictions the old asset only linked
+FPI = ("fpi_weekly", "power_index")
+
 
 def build_parser() -> argparse.ArgumentParser:
     ap = argparse.ArgumentParser(prog="cfb_data_build")
     ap.add_argument(
         "--dataset",
         required=True,
-        choices=sorted(REGISTRY) + ["summaries", *DERIVED],
+        choices=sorted(REGISTRY) + ["summaries", *DERIVED, *FPI],
     )
     ap.add_argument("-s", "--start-year", type=int, required=True)
     ap.add_argument("-e", "--end-year", type=int, required=True)
@@ -108,6 +114,22 @@ def main(argv: list[str] | None = None) -> int:
                 publish=args.publish,
             )
         return 0
+
+    if args.dataset in FPI:
+        from cfb_data_build.fpi import build_fpi
+
+        failures = build_fpi(
+            args.dataset,
+            args.start_year,
+            args.end_year,
+            base=args.base,
+            publish=args.publish,
+            dry_run=args.dry_run,
+        )
+        print(f"\n=== {args.dataset}: {len(failures)} failures ===")
+        for season, kind in failures:
+            print(f"  {season}: {kind}")
+        return 1 if failures else 0
 
     if args.dataset in DERIVED:
         return _run_derived(args)

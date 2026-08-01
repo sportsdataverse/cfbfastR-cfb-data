@@ -36,6 +36,21 @@ _RELEASE_BODY = {
         "opponent-adjustment, strength-of-schedule, home/away splits and "
         "rolling in-season trends. Built from the rebuilt espn_cfb_pbp."
     ),
+    "cfb_ratings_weekly": (
+        "College Football opponent-adjusted team ratings as of the END OF EACH "
+        "REGULAR-SEASON WEEK, 2004-2025. LONG FORMAT: one asset per season "
+        "carrying a `through_week` column with every week's cumulative "
+        "snapshot stacked -- filter `through_week == W` for that week's view. "
+        "The ridge is refit on everything up to week W, so this is NOT "
+        "derivable by summing per-game rows."
+    ),
+    "cfb_team_summaries_weekly": (
+        "College Football team season summaries as of the END OF EACH "
+        "REGULAR-SEASON WEEK, 2004-2025. LONG FORMAT: one asset per season "
+        "with a `through_week` column stacking every week's cumulative "
+        "state. Built by re-running the season aggregation with plays "
+        "filtered to `week <= W`."
+    ),
     "cfb_recruiting_proj": (
         "College Football preseason team projections, one row per team per "
         "target season: predicted wins and scoring margin from an as-of ridge "

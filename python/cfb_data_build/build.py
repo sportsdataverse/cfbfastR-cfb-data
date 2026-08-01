@@ -29,6 +29,12 @@ from cfb_data_ingest.schedule import SCHEDULE_URL, season_game_ids
 _TEAM_ID_COLS = ("pos_team", "def_pos_team")
 
 
+# Team-name map per (schedule source, season), cached for the PROCESS. A
+# multi-season run (`-s 2004 -e 2025`, what the daily cron uses) would otherwise
+# rescan the schedule parquet once per dataset-season -- 220 scans instead of 22.
+_TEAM_NAME_CACHE: dict[tuple[str, int], pl.DataFrame] = {}
+
+
 def _team_names(schedule_path_or_url: str | Path | None, season: int) -> pl.DataFrame:
     """``(team_id, team_name)`` for one season, unioned over the home and away sides.
 
@@ -37,7 +43,12 @@ def _team_names(schedule_path_or_url: str | Path | None, season: int) -> pl.Data
     Int64 before they are ever used as a join key (a raw join would silently
     match nothing).
     """
-    src = str(schedule_path_or_url) if schedule_path_or_url is not None else SCHEDULE_URL
+    src = (
+        str(schedule_path_or_url) if schedule_path_or_url is not None else SCHEDULE_URL
+    )
+    cached = _TEAM_NAME_CACHE.get((src, season))
+    if cached is not None:
+        return cached
     lf = pl.scan_parquet(src).filter(pl.col("season") == season)
     sides = [
         lf.select(
@@ -46,10 +57,14 @@ def _team_names(schedule_path_or_url: str | Path | None, season: int) -> pl.Data
         )
         for side in ("home", "away")
     ]
-    return pl.concat(sides).drop_nulls("team_id").unique(subset=["team_id"]).collect()
+    names = pl.concat(sides).drop_nulls("team_id").unique(subset=["team_id"]).collect()
+    _TEAM_NAME_CACHE[(src, season)] = names
+    return names
 
 
-def _resolve_team_names(df: pl.DataFrame, season: int, schedule: str | Path | None) -> pl.DataFrame:
+def _resolve_team_names(
+    df: pl.DataFrame, season: int, schedule: str | Path | None
+) -> pl.DataFrame:
     """Split ``pos_team`` / ``def_pos_team`` into ``<col>_id`` + readable ``<col>``.
 
     No-op when the frame carries neither column or the season has no schedule
@@ -68,8 +83,14 @@ def _resolve_team_names(df: pl.DataFrame, season: int, schedule: str | Path | No
     for col in df.columns:
         order.extend([f"{col}_id", col] if col in present else [col])
     for col in present:
-        df = df.with_columns(pl.col(col).cast(pl.Int64, strict=False).alias(f"{col}_id")).drop(col)
-        df = df.join(names.rename({"team_id": f"{col}_id", "team_name": col}), on=f"{col}_id", how="left")
+        df = df.with_columns(
+            pl.col(col).cast(pl.Int64, strict=False).alias(f"{col}_id")
+        ).drop(col)
+        df = df.join(
+            names.rename({"team_id": f"{col}_id", "team_name": col}),
+            on=f"{col}_id",
+            how="left",
+        )
         hit = df[col].drop_nulls().len() / df.height
         print(f"  {col}: {hit:.1%} of rows resolved to a team name")
     return df.select(order)
@@ -87,7 +108,9 @@ def _resolve_block(game: dict[str, Any], path: tuple[str, ...]) -> Any:
     return node
 
 
-def build_dataset_frame(spec: DatasetSpec, game: dict[str, Any], *, output: str = "default") -> pl.DataFrame:
+def build_dataset_frame(
+    spec: DatasetSpec, game: dict[str, Any], *, output: str = "default"
+) -> pl.DataFrame:
     """Reshape one game's payload into the dataset's per-game frame (the ``reshape_fn``).
 
     ``output`` selects the pbp column tier (see
@@ -113,7 +136,9 @@ def build_dataset_frame(spec: DatasetSpec, game: dict[str, Any], *, output: str 
 _RELEASE_IDS_CACHE: dict[int, set[int]] = {}
 
 
-def _union_release_ids(spec: DatasetSpec, season: int, ids: list[int], cache: Path) -> list[int]:
+def _union_release_ids(
+    spec: DatasetSpec, season: int, ids: list[int], cache: Path
+) -> list[int]:
     """Add game ids the CURRENT release has but the schedule master does not list.
 
     The master is not a superset of what was published: sampled 2004-2024 it
@@ -132,12 +157,16 @@ def _union_release_ids(spec: DatasetSpec, season: int, ids: list[int], cache: Pa
 
             released = cfb.load_cfb_pbp([season])
         except Exception as exc:  # noqa: BLE001 - never let this abort a build
-            print(f"{spec.dataset} {season}: release id-union skipped ({type(exc).__name__})")
+            print(
+                f"{spec.dataset} {season}: release id-union skipped ({type(exc).__name__})"
+            )
             return ids
 
         import polars as _pl
 
-        cached = {x for x in released["game_id"].cast(_pl.Int64).to_list() if x is not None}
+        cached = {
+            x for x in released["game_id"].cast(_pl.Int64).to_list() if x is not None
+        }
         _RELEASE_IDS_CACHE[season] = cached
     released_ids = cached
 
@@ -205,7 +234,9 @@ def build_season(
     return df
 
 
-def build_rosters_season(season: int, *, base: str | Path = "cfb", publish: bool = False) -> pl.DataFrame:
+def build_rosters_season(
+    season: int, *, base: str | Path = "cfb", publish: bool = False
+) -> pl.DataFrame:
     """Season roster = dedup of the already-built game_rosters parquet (R espn_cfb_08).
 
     rosters is DERIVED from the whole-season game_rosters output (not per game),
@@ -215,11 +246,15 @@ def build_rosters_season(season: int, *, base: str | Path = "cfb", publish: bool
     spec = REGISTRY["rosters"]
     gr_path = Path(base) / "game_rosters" / "parquet" / f"game_rosters_{season}.parquet"
     if not gr_path.exists():
-        print(f"rosters {season}: no game_rosters parquet at {gr_path} (build game_rosters first)")
+        print(
+            f"rosters {season}: no game_rosters parquet at {gr_path} (build game_rosters first)"
+        )
         return pl.DataFrame()
     gr = pl.read_parquet(gr_path)
     df = reshapers.derive_rosters(gr)
-    print(f"rosters {season}: {df.height} athlete-team rows (from {gr.height} game-roster rows)")
+    print(
+        f"rosters {season}: {df.height} athlete-team rows (from {gr.height} game-roster rows)"
+    )
     write_dataset(df, spec.dataset, season, spec.stem, base=base)
     if publish and df.height > 0:
         from cfb_data_build.publish import publish_dataset

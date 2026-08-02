@@ -338,8 +338,26 @@ def prepare_percentiles(df: pl.DataFrame) -> pl.DataFrame:
     per_game = df.group_by(["game_id", "pos_team"]).agg(
         GEI=pl.col("GEI").drop_nulls().first(),
         EPAplay=pl.col("EPA").mean(),
-        pass_success=(pl.col("epa_success") * pl.col("pass")).mean(),
-        rush_success=(pl.col("epa_success") * pl.col("rush")).mean(),
+        # RATES, not shares. The R oracle computes these as
+        # `mean(epa_success * pass)` over EVERY play -- but `epa_success * pass`
+        # is 1 only on a successful pass and 0 on every other play, including
+        # every rush, so that mean is
+        #     (# successful passes) / (# ALL plays)
+        # i.e. the share of all plays that were successful passes, not the pass
+        # success rate. The tell in the published data: the pass and rush values
+        # SUM to the overall `success` (2024 medians 0.2153 + 0.2190 = 0.4343 vs
+        # success 0.4426) instead of each sitting near it. A real pass success
+        # rate is ~0.44, not ~0.22.
+        #
+        # This deliberately DIVERGES from the R oracle -- the oracle is wrong.
+        # Note the same file already splits pass/rush correctly by filtering for
+        # the summary tables (`team_off.filter(pl.col("pass") == 1)`) and divides
+        # `EPAdropback` by `dropbacks`, so the multiply form was an inconsistency
+        # inside this one function rather than a deliberate definition.
+        # A game-team with no pass (or rush) attempts yields null, which the
+        # quantile step skips -- correct for a rate, where 0 would be a lie.
+        pass_success=pl.col("epa_success").filter(pl.col("pass") == 1).mean(),
+        rush_success=pl.col("epa_success").filter(pl.col("rush") == 1).mean(),
         early_down_success=pl.col("early_down_success").mean(),
         early_down_EPA=pl.col("early_down_EPA").mean(),
         late_down_success=pl.col("late_down_success").mean(),
@@ -351,8 +369,12 @@ def prepare_percentiles(df: pl.DataFrame) -> pl.DataFrame:
         sum_pos_EPA_rush=pl.col("pos_EPA_rush").sum(),
         sum_yds_receiving=pl.col("yds_receiving").sum(),
         sum_yds_sacked=pl.col("yds_sacked").sum(),
-        pass_explosive=(pl.col("explosive") * pl.col("pass")).mean(),
-        rush_explosive=(pl.col("explosive") * pl.col("rush")).mean(),
+        # Same defect, same fix as pass_success/rush_success above: these were
+        # `mean(explosive * pass)` over all plays, so they summed to `explosive`
+        # (2024 medians 0.0400 + 0.0286 = 0.0686 vs explosive 0.0725) instead of
+        # each being an explosive RATE within pass / rush plays.
+        pass_explosive=pl.col("explosive").filter(pl.col("pass") == 1).mean(),
+        rush_explosive=pl.col("explosive").filter(pl.col("rush") == 1).mean(),
         explosive=pl.col("explosive").mean(),
         third_down_success=pl.col("third_down_success").mean(),
         red_zone_success=pl.col("red_zone_success").mean(),
@@ -412,6 +434,42 @@ def prepare_percentiles(df: pl.DataFrame) -> pl.DataFrame:
         # R quantile type 7 (default) == numpy 'linear'
         rows[c] = [float(np.nanquantile(vals, p, method="linear")) for p in pctiles]
     return pl.DataFrame(rows)
+
+
+def warn_implausible_epa_games(plays: pl.DataFrame, yr: int) -> pl.DataFrame:
+    """Report games whose mean EPA/play is impossible, before they poison the tables.
+
+    2016 week 2 published with ``end.yardsToEndzone`` pinned to 99 on essentially
+    every play (12,423 of them across 72 of that week's 75 games). ``EP_end`` was
+    therefore evaluated as if the offense were on its own 1-yard line after every
+    snap, so mean EPA ran about -2.6/play where a healthy game sits near 0. It
+    reached the published percentiles as a first-percentile early-down EPA of
+    -2.97 -- roughly six times every neighbouring season -- and went unnoticed
+    because the median and the upper tail were untouched.
+
+    A healthy season's per-game mean EPA sits inside +/-0.5 in all 22 published
+    seasons (2004-2025 scan: |season mean| <= 0.063). Anything outside that is a
+    parse or feed defect, not a team playing badly, so it is surfaced loudly
+    rather than averaged into a quantile.
+
+    Returns the offending games (empty frame when clean) so a caller can fail the
+    build; this function only warns, because a legitimately weird game should not
+    silently block a rebuild.
+    """
+    if plays.height == 0 or "EPA" not in plays.columns:
+        return pl.DataFrame()
+    per_game = (
+        plays.filter(pl.col("EPA").is_not_null()).group_by("game_id").agg(mean_epa=pl.col("EPA").mean(), plays=pl.len())
+    )
+    bad = per_game.filter(pl.col("mean_epa").abs() > 0.5).sort("mean_epa")
+    if bad.height:
+        print(
+            f"  !! {yr}: {bad.height} of {per_game.height} games have an implausible "
+            f"mean EPA/play (|mean| > 0.5) -- suspect corrupt end-state yardlines; "
+            f"worst {bad['mean_epa'][0]:+.2f} in game {bad['game_id'][0]}",
+            flush=True,
+        )
+    return bad
 
 
 def _build_schools(plays: pl.DataFrame) -> pl.DataFrame:
@@ -489,6 +547,7 @@ def _prepare_for_write(df: pl.DataFrame, yr: int, schools: pl.DataFrame) -> pl.D
 def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.DataFrame]:
     """Build the 5 season tables from a cleaned cfbfastR pbp frame (R build lines 554-958)."""
     plays = add_derived_metrics(plays_input)
+    warn_implausible_epa_games(plays, yr)
     team_off = plays.filter(
         pl.col("EPA").is_not_null() & pl.col("success").is_not_null() & pl.col("epa_success").is_not_null()
     )

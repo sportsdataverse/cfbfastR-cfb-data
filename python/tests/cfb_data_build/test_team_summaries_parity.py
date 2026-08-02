@@ -37,6 +37,25 @@ CORR_COLS = {
     "net_adj_epa_rank",
 }
 
+# Columns we DELIBERATELY diverge from the R oracle on, excluded from parity.
+#
+# R computes these as `mean(epa_success * pass)` over every play. That product is
+# 1 only on a successful pass and 0 on every other play (including every rush),
+# so the mean is (# successful passes) / (# ALL plays) -- the share of all plays
+# that were successful passes, not the pass success rate. The published data
+# shows it plainly: the pass and rush values SUM to the overall metric
+# (2024 medians 0.2153 + 0.2190 = 0.4343 vs success 0.4426) rather than each
+# sitting near it.
+#
+# Not put on a correlation bar instead: across the 99 quantile rows both the old
+# and new columns increase monotonically, so they would correlate ~1.0 and the
+# check would pass while measuring nothing. Excluded outright, with
+# test_percentile_pass_rush_are_rates_not_shares below asserting the new
+# semantics directly.
+DIVERGENT_FROM_R = {
+    "percentiles": {"pass_success", "rush_success", "pass_explosive", "rush_explosive"},
+}
+
 # dataset -> (sort keys, correlation columns)
 CASES = [
     ("percentiles", ["pctile"], set()),
@@ -72,12 +91,50 @@ def test_team_summaries_parity(
 ) -> None:
     yr, out = built
     oracle = pl.read_parquet(FIX / f"oracle_ts_{ds}_{yr}.parquet")
+    got = out[ds]
+    drop = DIVERGENT_FROM_R.get(ds, set())
+    if drop:
+        got = got.drop([c for c in drop if c in got.columns])
+        oracle = oracle.drop([c for c in drop if c in oracle.columns])
     assert_frame_parity(
-        out[ds],
+        got,
         oracle,
         name=ds,
         match_order=False,
         sort_keys=keys,
         corr_cols=corr,
         corr_threshold=0.9,
+    )
+
+
+def test_percentile_pass_rush_are_rates_not_shares(
+    built: tuple[int, dict[str, pl.DataFrame]],
+) -> None:
+    """The four columns excluded from R parity must be RATES, not shares.
+
+    The failure signature this guards is specific and was visible in every
+    published season: because R divides successful passes by ALL plays, the pass
+    and rush values SUM to the overall metric instead of each sitting near it.
+    A real pass success rate is close to the overall success rate (~0.44), not
+    half of it.
+    """
+    _yr, out = built
+    p = out["percentiles"]
+    mid = p.filter((pl.col("pctile") - 0.5).abs() < 1e-9)
+    assert mid.height == 1, "expected a median row"
+    row = mid.row(0, named=True)
+    for whole, part in (
+        ("success", "pass_success"),
+        ("success", "rush_success"),
+        ("explosive", "pass_explosive"),
+        ("explosive", "rush_explosive"),
+    ):
+        assert row[part] > 0.6 * row[whole], (
+            f"{part}={row[part]:.4f} is far below {whole}={row[whole]:.4f} at the median -- "
+            "this is the share-of-all-plays bug, not a rate"
+        )
+    # and the decisive one: the two halves must NOT sum to the whole
+    assert row["pass_success"] + row["rush_success"] > 1.4 * row["success"], (
+        "pass_success + rush_success still sums to overall success, so the "
+        "denominator is still all plays rather than pass / rush plays"
     )

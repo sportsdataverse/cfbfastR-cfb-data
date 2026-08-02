@@ -36,7 +36,10 @@ count, loess fit, y=x reference, weighted-calibration-error caption).
 ## Rule-era variables and spread backfill (2026 update)
 
 Two interventions were evaluated under honest leave-one-season-out (LOSO) CV
-(`model_training/era_experiment.py`; full table in `artifacts/era_report.md`).
+(the one-off `era_experiment.py` script — since archived to the gitignored `dev/`
+tree, recoverable from git history at `f0dbece1a^`; full table in
+`artifacts/era_report.md`). The promoted keepers retrain through the durable
+`python -m model_training` path — see `era_model_refresh.md`.
 
 **One-hot rule-era dummies (`era0..era3`)** — cuts 2006 / 2013 / 2020, i.e.
 **2004–2006 / 2007–2013 / 2014–2020 / 2021+** (`ERA_BOUNDS`). Era was **adopted only

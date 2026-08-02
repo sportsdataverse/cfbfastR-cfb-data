@@ -71,4 +71,9 @@ models, so promotion was a clean drop-in `.ubj` replacement (no code changes):
   (era) models.
 - `wp_spread`'s near-zero era delta is a *good* result: it reflects the
   consensus-odds upgrade absorbing the era signal, not a loss of model quality.
-- Reproduce: `python -m era_experiment --pbp artifacts/pbp_full_spreadfilled.parquet --only fg,qbr,wp_spread,fourth_down --espn-qbr <espn_qbr.parquet>` → `artifacts/era_results_new.json`.
+- Reproduce: the era A/B script (`era_experiment.py`) is archived — it moved to the
+  gitignored `dev/` tree in `f0dbece1a` and is recoverable from git history at
+  `f0dbece1a^` (path `python/era_experiment.py`). Retrain the promoted keepers through
+  the durable pipeline instead: `python -m model_training ingest --odds <cfb_line_odds.parquet>`
+  (applies the consensus spread backfill), then `train-qbr` / `train-fg` /
+  `train-wp --variant spread`, with `loso` for the out-of-fold metrics.

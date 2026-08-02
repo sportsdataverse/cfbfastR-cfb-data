@@ -17,3 +17,6 @@ __pycache__/
 python/.venv/
 python/.cache/
 python/artifacts/
+
+# Local-only experiments / debug inspectors (untracked working notes)
+dev/

@@ -23,14 +23,14 @@ on:
         description: 'Publish artifacts + model-PBP to sportsdataverse-data releases'
         required: false
         type: boolean
-        default: true
+        default: false
       run_t4:
         description: 'Also build the Track-4 pregame-WP model (needs CFBD_API_KEY secret)'
         required: false
         type: boolean
         default: false
-  schedule:
-    - cron: '0 6 5 2 *'   # early February — annual post-season retrain on the full history
+  # schedule:
+  #   - cron: '0 6 5 2 *'   # early February — annual post-season retrain on the full history
 
 permissions:
   contents: write
@@ -77,33 +77,33 @@ jobs:
       - name: Ingest PBP training frame
         run: uv run python -m model_training ingest --final-dir "$FINAL_DIR" --out artifacts/pbp_full.parquet
 
-      - name: Train EP / WP / QBR
-        run: |
-          uv run python -m model_training train-ep --pbp artifacts/pbp_full.parquet --out artifacts/ep.ubj
-          uv run python -m model_training train-wp --pbp artifacts/pbp_full.parquet --variant spread --out artifacts/wp_spread.ubj
-          # QBR needs the ESPN-QBR reference; scrape it into the raw checkout first.
-          uv run python "$GITHUB_WORKSPACE/_raw/python/scrape_cfb_qbr.py" -s 2004 -e "$(date +%Y)" --out artifacts/espn_qbr.parquet || true
-          if [ -f artifacts/espn_qbr.parquet ]; then \
-            uv run python -m model_training train-qbr --pbp artifacts/pbp_full.parquet --espn-qbr artifacts/espn_qbr.parquet --out artifacts/qbr.ubj; fi
+      # - name: Train EP / WP / QBR
+      #   run: |
+      #     uv run python -m model_training train-ep --pbp artifacts/pbp_full.parquet --out artifacts/ep.ubj
+      #     uv run python -m model_training train-wp --pbp artifacts/pbp_full.parquet --variant spread --out artifacts/wp_spread.ubj
+      #     # QBR needs the ESPN-QBR reference; scrape it into the raw checkout first.
+      #     uv run python "$GITHUB_WORKSPACE/_raw/python/scrape_cfb_qbr.py" -s 2004 -e "$(date +%Y)" --out artifacts/espn_qbr.parquet || true
+      #     if [ -f artifacts/espn_qbr.parquet ]; then \
+      #       uv run python -m model_training train-qbr --pbp artifacts/pbp_full.parquet --espn-qbr artifacts/espn_qbr.parquet --out artifacts/qbr.ubj; fi
 
-      - name: Train fourth-down
-        run: uv run python -m model_training.fourth_down.cli train-fd --final-dir "$FINAL_DIR" --out artifacts/fd_model.ubj --validate
+      # - name: Train fourth-down
+      #   run: uv run python -m model_training.fourth_down.cli train-fd --final-dir "$FINAL_DIR" --out artifacts/fd_model.ubj --validate
 
       - name: Train CPOE (+ LOSO) and promote cp model
         run: |
-          uv run python -m cpoe --final-dir "$FINAL_DIR" --out-dir artifacts/cpoe --seasons $(seq 2004 "$(date +%Y)") --loso
+          uv run python -m cpoe --final-dir "$FINAL_DIR" --out-dir artifacts/cpoe --seasons $(seq 2025 "$(date +%Y)") --loso
           cp artifacts/cpoe/cfb_cp_model.ubj artifacts/cfb_cp_model.ubj
           cp artifacts/cpoe/cfb_cp_model.json artifacts/cfb_cp_model.json
           rm -f artifacts/cpoe/cfb_cp_model.ubj artifacts/cpoe/cfb_cp_model.json
 
       # ---- out-of-fold predictions feed the report calibration metrics ----
       # cfb_model_reports reads these loso_*_oof.parquet files out of --artifacts.
-      - name: LOSO out-of-fold predictions (EP / WP / QBR)
-        run: |
-          uv run python -m model_training loso --pbp artifacts/pbp_full.parquet --model ep --oof-out artifacts/loso_ep_oof.parquet
-          uv run python -m model_training loso --pbp artifacts/pbp_full.parquet --model wp --oof-out artifacts/loso_wp_oof.parquet
-          if [ -f artifacts/espn_qbr.parquet ]; then \
-            uv run python -m model_training loso --pbp artifacts/pbp_full.parquet --model qbr --espn-qbr artifacts/espn_qbr.parquet --oof-out artifacts/loso_qbr_oof.parquet; fi
+      # - name: LOSO out-of-fold predictions (EP / WP / QBR)
+      #   run: |
+      #     uv run python -m model_training loso --pbp artifacts/pbp_full.parquet --model ep --oof-out artifacts/loso_ep_oof.parquet
+      #     uv run python -m model_training loso --pbp artifacts/pbp_full.parquet --model wp --oof-out artifacts/loso_wp_oof.parquet
+      #     if [ -f artifacts/espn_qbr.parquet ]; then \
+      #       uv run python -m model_training loso --pbp artifacts/pbp_full.parquet --model qbr --espn-qbr artifacts/espn_qbr.parquet --oof-out artifacts/loso_qbr_oof.parquet; fi
 
       # ---- scored model play-by-play ----
       - name: Build scored model-PBP
@@ -111,33 +111,38 @@ jobs:
 
       # ---- Track 4 (optional; CFBD-sourced, needs the secret) ----
       # build-boxes writes a DIRECTORY of per-game box parquets; train reads that directory.
-      - name: Track-4 pregame-WP (optional)
-        if: ${{ inputs.run_t4 }}
-        env:
-          CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
-        run: |
-          uv run python -m pregame_wp build-boxes --seasons 2012:2020 --out artifacts/pregame_wp/boxes/
-          uv run python -m pregame_wp train --boxes artifacts/pregame_wp/boxes/ --out artifacts/pregame_wp/
+      # - name: Track-4 pregame-WP (optional)
+      #   if: ${{ inputs.run_t4 }}
+      #   env:
+      #     CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
+      #   run: |
+      #     uv run python -m pregame_wp build-boxes --seasons 2012:2020 --out artifacts/pregame_wp/boxes/
+      #     uv run python -m pregame_wp train --boxes artifacts/pregame_wp/boxes/ --out artifacts/pregame_wp/
 
       # ---- publish (PAT scoped to this step only) ----
-      - name: Publish model artifacts + model-PBP
-        if: ${{ inputs.publish != false }}
-        env:
-          GH_TOKEN: ${{ secrets.SDV_GH_TOKEN }}
-          GITHUB_PAT: ${{ secrets.SDV_GH_TOKEN }}
-        run: |
-          uv run python -m cfb_model_publish artifacts --artifacts artifacts --tag espn_cfb_model_artifacts --repo "$PUBLISH_REPO"
-          gh release upload espn_cfb_model_pbp artifacts/model_pbp/cfb_model_pbp_full.parquet --repo "$PUBLISH_REPO" --clobber
+      # - name: Publish model artifacts + model-PBP
+      #   if: ${{ inputs.publish != false }}
+      #   env:
+      #     GH_TOKEN: ${{ secrets.SDV_GH_TOKEN }}
+      #     GITHUB_PAT: ${{ secrets.SDV_GH_TOKEN }}
+      #   run: |
+      #     uv run python -m cfb_model_publish artifacts --artifacts artifacts --tag espn_cfb_model_artifacts --repo "$PUBLISH_REPO"
+      #     gh release upload espn_cfb_model_pbp artifacts/model_pbp/cfb_model_pbp_full.parquet --repo "$PUBLISH_REPO" --clobber
 
       # ---- reports (committed back to this repo) ----
       - name: Regenerate model reports
         run: uv run python -m cfb_model_reports --artifacts artifacts --out ../docs/models
+      - name: Upload model reports to GHA
+        uses: actions/upload-artifact@v7
+        with:
+          archive: false
+          path: ../docs/models/cpoe.md
 
-      - name: Commit reports
-        working-directory: .
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add docs/models
-          git commit -m "ci(models): regenerate CFB model reports" || echo "no report changes"
-          git push || echo "nothing to push"
+      # - name: Commit reports
+      #   working-directory: .
+      #   run: |
+      #     git config --local user.email "action@github.com"
+      #     git config --local user.name "GitHub Action"
+      #     git add docs/models
+      #     git commit -m "ci(models): regenerate CFB model reports" || echo "no report changes"
+      #     git push || echo "nothing to push"

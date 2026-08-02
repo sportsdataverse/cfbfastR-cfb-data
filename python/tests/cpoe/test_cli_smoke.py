@@ -12,22 +12,29 @@ from cpoe.constants import FEATURE_COLS, TARGET_COL
 
 def _make_plays(n: int, game_id: str, rng: np.random.Generator) -> list[dict]:
     pass_types = ["Pass Reception", "Pass Incompletion", "Passing Touchdown"]
-    return [
+    pass_directions = ["left", "middle", "right"]
+    base = [
         {
             "game_id": game_id,
             "playType": rng.choice(pass_types),
+            "week": int(rng.integers(1, 16)),
+
             "start.down": int(rng.integers(1, 5)),
             "start.distance": int(rng.integers(1, 20)),
             "start.yardsToEndzone": int(rng.integers(1, 99)),
-            "pos_score_diff_start": int(rng.integers(-21, 22)),
-            "start.TimeSecsRem": int(rng.integers(0, 3600)),
             "start.is_home": bool(rng.integers(0, 2)),
-            "period": int(rng.integers(1, 5)),
-            "passing_down": int(rng.integers(0, 2)),
+            "pass_direction": rng.choice(pass_directions),
+            "qb_hurry": int(rng.integers(0, 2)),
+
             "completion": int(rng.integers(0, 2)),
         }
         for _ in range(n)
     ]
+
+    for b in base:
+        b["air_yards"] = int(rng.integers(0, b["start.yardsToEndzone"]))
+
+    return base
 
 
 @pytest.fixture()
@@ -68,7 +75,7 @@ def test_cli_smoke_with_loso(synthetic_raw_dir, tmp_path):
     assert cv_path.exists()
     cv = json.loads(cv_path.read_text())
     assert "folds" in cv
-    assert len(cv["folds"]) == 3
+    assert len(cv["folds"]) == 15
     assert (tmp_path / "out_loso" / "cfb_cp_model.ubj").exists()
 
 

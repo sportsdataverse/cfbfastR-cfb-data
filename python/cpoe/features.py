@@ -19,11 +19,10 @@ _COL_MAP: dict[str, str] = {
     "start.down": "down",
     "start.distance": "distance",
     "start.yardsToEndzone": "yards_to_goal",
-    "pos_score_diff_start": "score_diff",
-    "start.TimeSecsRem": "seconds_remaining",
     "start.is_home": "is_home",
-    "period": "period",
-    "passing_down": "passing_down",
+    "air_yards": "air_yards",
+    "pass_direction": "pass_direction",
+    "qb_hurry": "qb_hurry",
 }
 
 
@@ -84,6 +83,15 @@ def extract_pass_features(df: pd.DataFrame) -> pd.DataFrame:
         plays = plays.drop(columns=cols_to_drop)
     plays = plays.rename(columns=_COL_MAP)
 
+    # --- build pass_is_middle column (1 = pass_direction == "middle") ---
+    if "pass_is_middle" not in plays.columns:
+        plays["pass_is_middle"] = (
+            (plays["pass_direction"].notna())
+            & (plays["pass_direction"].isin(["middle"]))
+        )
+
+    plays["pass_is_middle"] = plays["pass_is_middle"].astype(int)
+
     # --- build target column (1 = completion) ---
     if "completion" not in plays.columns:
         plays["completion"] = (
@@ -95,12 +103,12 @@ def extract_pass_features(df: pd.DataFrame) -> pd.DataFrame:
         plays["completion"] = plays["completion"].astype(int)
 
     # --- coerce boolean columns to int ---
-    for col in ("is_home", "passing_down"):
+    for col in ("is_home", "qb_hurry", "pass_is_middle"):
         if col in plays.columns:
             plays[col] = plays[col].astype(int)
 
     # Preserve join keys + ``season`` if present so callers can rejoin scored
     # output back to the carry frame without a separate index round-trip.
-    extra_passthrough = [c for c in ("game_id", "id", "season") if c in plays.columns]
+    extra_passthrough = [c for c in ("game_id", "id", "season", "week") if c in plays.columns]
     keep = [c for c in FEATURE_COLS + [TARGET_COL] if c in plays.columns] + extra_passthrough
     return plays[keep].reset_index(drop=True)

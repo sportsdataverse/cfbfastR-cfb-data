@@ -14,11 +14,10 @@ def raw_pass_plays() -> list[dict]:
             "start.down": 1,
             "start.distance": 10,
             "start.yardsToEndzone": 65,
-            "pos_score_diff_start": 7,
-            "start.TimeSecsRem": 1800,
             "start.is_home": True,
-            "period": 2,
-            "passing_down": 0,
+            "pass_direction": "middle",
+            "qb_hurry": False,
+            "air_yards": 10,
             "completion": 1,
         },
         {
@@ -26,11 +25,10 @@ def raw_pass_plays() -> list[dict]:
             "start.down": 3,
             "start.distance": 8,
             "start.yardsToEndzone": 30,
-            "pos_score_diff_start": -3,
-            "start.TimeSecsRem": 400,
             "start.is_home": False,
-            "period": 4,
-            "passing_down": 1,
+            "pass_direction": "left",
+            "qb_hurry": True,
+            "air_yards": 15,
             "completion": 0,
         },
         {
@@ -38,11 +36,10 @@ def raw_pass_plays() -> list[dict]:
             "start.down": 1,
             "start.distance": 10,
             "start.yardsToEndzone": 50,
-            "pos_score_diff_start": 0,
-            "start.TimeSecsRem": 3600,
             "start.is_home": True,
-            "period": 1,
-            "passing_down": 0,
+            "pass_direction": "middle",
+            "qb_hurry": True,
+            "air_yards": 50,
             "completion": 0,
         },
     ]
@@ -90,12 +87,8 @@ def test_yards_to_goal_col_values(pass_df):
     assert list(pass_df["yards_to_goal"]) == [65, 30]
 
 
-def test_score_diff_col_values(pass_df):
-    assert list(pass_df["score_diff"]) == [7, -3]
-
-
-def test_seconds_remaining_col_values(pass_df):
-    assert list(pass_df["seconds_remaining"]) == [1800, 400]
+def test_air_yards_col_values(pass_df):
+    assert list(pass_df["air_yards"]) == [10, 15]
 
 
 def test_is_home_col_numeric(pass_df):
@@ -104,12 +97,12 @@ def test_is_home_col_numeric(pass_df):
     assert vals == [1, 0]
 
 
-def test_period_col_values(pass_df):
-    assert list(pass_df["period"]) == [2, 4]
+def test_pass_is_middle_col_numeric(pass_df):
+    assert list(pass_df["pass_is_middle"]) == [1, 0]
 
 
-def test_passing_down_col_numeric(pass_df):
-    vals = list(pass_df["passing_down"])
+def test_qb_hurry_col_numeric(pass_df):
+    vals = list(pass_df["qb_hurry"])
     assert all(v in (0, 1) for v in vals)
     assert vals == [0, 1]
 

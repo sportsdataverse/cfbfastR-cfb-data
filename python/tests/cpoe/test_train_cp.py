@@ -16,16 +16,20 @@ def tiny_df() -> pd.DataFrame:
     rng = np.random.default_rng(42)
     n = 40
     data = {
+        # features (minus air yards)
         "down": rng.integers(1, 5, n),
         "distance": rng.integers(1, 20, n),
         "yards_to_goal": rng.integers(1, 100, n),
-        "score_diff": rng.integers(-28, 29, n),
-        "seconds_remaining": rng.integers(0, 3600, n),
         "is_home": rng.integers(0, 2, n),
-        "period": rng.integers(1, 5, n),
-        "passing_down": rng.integers(0, 2, n),
+        "pass_is_middle": rng.integers(0, 2, n),
+        "qb_hurry": rng.integers(0, 2, n),
+
+        # target
         "completion": rng.integers(0, 2, n),
     }
+    # do this after so we know the maximum air yards
+    data["air_yards"] = [rng.integers(-5, k, 1)[0] for k in data["yards_to_goal"]]
+    
     return pd.DataFrame(data)
 
 

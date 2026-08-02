@@ -47,13 +47,13 @@ def build_parser() -> argparse.ArgumentParser:
         type=int,
         default=[],
         metavar="YEAR",
-        help="Seasons to include (e.g. 2021 2022 2023).",
+        help="Seasons to include (e.g. 2025).",
     )
     p.add_argument(
         "--loso",
         action="store_true",
         default=False,
-        help="Run leave-one-season-out cross-validation.",
+        help="Run leave-one-set-out cross-validation (set == week).",
     )
     p.add_argument(
         "--nrounds",
@@ -105,7 +105,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.loso:
         from .loso import run_loso_cv
         print("Running LOSO cross-validation ...")
-        cv_result = run_loso_cv(all_df, nrounds=nrounds)
+        cv_result = run_loso_cv(all_df, season_col="week", nrounds=nrounds)
         cv_path = out_dir / "loso_cv.json"
         cv_path.write_text(json.dumps(cv_result, indent=2), encoding="utf-8")
         print(f"  mean log-loss: {cv_result['summary']['mean_log_loss']:.4f}")

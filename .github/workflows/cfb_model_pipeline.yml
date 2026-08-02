@@ -29,6 +29,11 @@ on:
         required: false
         type: boolean
         default: false
+      train_extras:
+        description: 'Also retrain the extras: FG / xpass / two-point / naive-WP (committed trainers with no cadence otherwise)'
+        required: false
+        type: boolean
+        default: false
   schedule:
     - cron: '0 6 5 2 *'   # early February — annual post-season retrain on the full history
 
@@ -90,6 +95,19 @@ jobs:
 
       - name: Train fourth-down
         run: uv run python -m model_training.fourth_down.cli train-fd --final-dir "$FINAL_DIR" --out artifacts/fd_model.ubj --validate
+
+      # The extras trainers are committed but had NO trigger of any kind, so their
+      # artifacts could only ever be refreshed by hand (2026-08-02 pipeline audit:
+      # "a model without a retrain trigger is a decaying asset"). Opt-in rather than
+      # default-on: they are not part of the artifacts this pipeline publishes today,
+      # so a silent addition would change what the annual cron ships.
+      - name: Train extras (FG / xpass / two-point / naive WP)
+        if: ${{ inputs.train_extras }}
+        run: |
+          uv run python -m model_training train-fg --pbp artifacts/pbp_full.parquet --out artifacts/fg.ubj
+          uv run python -m model_training train-xpass --pbp artifacts/pbp_full.parquet --out artifacts/xpass.ubj
+          uv run python -m model_training train-two-pt --pbp artifacts/pbp_full.parquet --out artifacts/two_pt.ubj
+          uv run python -m model_training train-wp --pbp artifacts/pbp_full.parquet --variant naive --out artifacts/wp_naive.ubj
 
       - name: Train CPOE (+ LOSO) and promote cp model
         run: |

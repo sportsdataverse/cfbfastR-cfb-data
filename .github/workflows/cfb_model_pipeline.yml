@@ -82,6 +82,8 @@ jobs:
           uv run python -m model_training train-ep --pbp artifacts/pbp_full.parquet --out artifacts/ep.ubj
           uv run python -m model_training train-wp --pbp artifacts/pbp_full.parquet --variant spread --out artifacts/wp_spread.ubj
           # QBR needs the ESPN-QBR reference; scrape it into the raw checkout first.
+          # Cross-repo dependency: scrape_cfb_qbr.py lives in cfbfastR-cfb-raw
+          # (checked out sparse at _raw above) — renaming/moving it there breaks this step.
           uv run python "$GITHUB_WORKSPACE/_raw/python/scrape_cfb_qbr.py" -s 2004 -e "$(date +%Y)" --out artifacts/espn_qbr.parquet || true
           if [ -f artifacts/espn_qbr.parquet ]; then \
             uv run python -m model_training train-qbr --pbp artifacts/pbp_full.parquet --espn-qbr artifacts/espn_qbr.parquet --out artifacts/qbr.ubj; fi

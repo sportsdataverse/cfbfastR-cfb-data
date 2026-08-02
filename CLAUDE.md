@@ -36,6 +36,10 @@ The native model suite moved here from `-raw` (2026-06-17). Run from `python/`:
 | `pregame_wp` | `python -m pregame_wp` | `pregame-wp` (scipy/sklearn) |
 | `cpoe` | `python -m cpoe` | — |
 
+Cross-repo dependency: `.github/workflows/cfb_model_pipeline.yml` runs
+`cfbfastR-cfb-raw`'s `python/scrape_cfb_qbr.py` (sparse checkout at `_raw`) for the
+ESPN-QBR reference — renaming/moving that script in `-raw` breaks the QBR train step.
+
 Supporting packages: `cfb_data_ingest`, `cfb_model_pbp`, `cfb_model_publish`,
 `cfb_model_reports`. Figures: `uv sync --group figures` (plotnine). GAM tests (`rb_eval`):
 `uv sync --group gam`; they skip cleanly otherwise. Integration checklist:

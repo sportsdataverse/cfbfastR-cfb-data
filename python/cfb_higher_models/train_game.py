@@ -66,6 +66,12 @@ def _xy(
 #: one for CONTEXT.
 CONTEXT_FEATURES = ("week", "min_games", "neutral_site")
 
+#: Schedule-spot columns from features.add_rest, present only when the frame
+#: was built with enrich=True. Off-substrate: rest and byes appear nowhere in
+#: the play-level data, so unlike a 201st efficiency metric they are not
+#: another measurement of the same latent team quality.
+REST_FEATURES = ("rest_diff", "bye_home", "bye_away")
+
 
 def add_context(frame: pl.DataFrame) -> pl.DataFrame:
     """Add the shared-context columns a pure diff encoding destroys."""
@@ -194,6 +200,34 @@ def ablate(frame: pl.DataFrame, diffs: list[str], *, min_train: int = 3) -> dict
                 row[label] = float("nan")
         out[fam] = row
         print(f"{fam:>12} {len(cols):>7} {row['only']:>8.2f} {row['without']:>9.2f}")
+    return out
+
+
+def compare_feature_sets(
+    frame: pl.DataFrame, sets: dict[str, list[str]], *, min_train: int = 3, head=None
+) -> dict:
+    """A/B one head across named feature sets on ONE frame.
+
+    The frame is fixed so the only thing varying is the feature list -- the
+    comparison a "does X help?" question actually asks. Building a fresh frame
+    per arm (as sweep_blend_k must, since k changes the data) would confound
+    the feature change with any nondeterminism in the build.
+    """
+    head = head or head_gbm
+    out = {}
+    print(f"{'set':>22} {'MAE':>8} {'Brier':>8} {'corr':>7} {'cal_err':>8}")
+    for name, feats in sets.items():
+        rep, _ = walk_forward(
+            frame,
+            lambda tr, te, _f=feats: head(tr, te, feats=_f),
+            name=name,
+            min_train=min_train,
+        )
+        out[name] = {"margin": rep.margin, "wp": rep.wp, "n_feat": len(feats)}
+        print(
+            f"{name:>22} {rep.margin['mae']:>8.3f} {rep.wp['brier']:>8.4f} "
+            f"{rep.margin['corr']:>7.3f} {rep.wp['max_cal_err']:>8.3f}"
+        )
     return out
 
 

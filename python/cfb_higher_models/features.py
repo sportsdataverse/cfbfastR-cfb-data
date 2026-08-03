@@ -71,9 +71,7 @@ def add_prior_season(weekly: pl.DataFrame, cols=CARRY_COLS) -> pl.DataFrame:
     return weekly.join(final, on=["team_id", "season"], how="left")
 
 
-def blend_prior(
-    weekly: pl.DataFrame, cols=CARRY_COLS, *, k: float = 4.0
-) -> pl.DataFrame:
+def blend_prior(weekly: pl.DataFrame, cols=CARRY_COLS, *, k: float = 4.0) -> pl.DataFrame:
     """Shrinkage blend of this season's as-of rating toward last season's final.
 
     ``blend = (n/(n+k)) * current + (k/(n+k)) * prior`` where ``n`` is games
@@ -85,18 +83,13 @@ def blend_prior(
     have = [c for c in cols if c in weekly.columns and f"prior_{c}" in weekly.columns]
     if not have:
         return weekly
-    n = (
-        pl.col("valid_games")
-        if "valid_games" in weekly.columns
-        else pl.col("through_week")
-    )
+    n = pl.col("valid_games") if "valid_games" in weekly.columns else pl.col("through_week")
     w = n.cast(pl.Float64) / (n.cast(pl.Float64) + k)
     return weekly.with_columns(
         [
-            (
-                w * pl.col(c).fill_null(0.0)
-                + (1 - w) * pl.col(f"prior_{c}").fill_null(pl.col(c)).fill_null(0.0)
-            ).alias(f"blend_{c}")
+            (w * pl.col(c).fill_null(0.0) + (1 - w) * pl.col(f"prior_{c}").fill_null(pl.col(c)).fill_null(0.0)).alias(
+                f"blend_{c}"
+            )
             for c in have
         ]
     )
@@ -127,14 +120,20 @@ def add_rest(games: pl.DataFrame) -> pl.DataFrame:
         None,
     )
     if date_col is None:
-        return games
-    g = games.with_columns(
-        pl.col(date_col)
-        .cast(pl.Utf8)
-        .str.slice(0, 10)
-        .str.to_date(strict=False)
-        .alias("_d")
-    )
+        # This used to `return games` unchanged -- a silent no-op, the exact
+        # failure this codebase keeps shipping. It cost a real experiment:
+        # build_game_frame's fixed column select dropped the date, add_rest
+        # returned the frame untouched, and the A/B reported base and
+        # "base + rest" byte-identical at 13.026. The honest reading is "rest
+        # was never tested"; the tempting one is "rest doesn't help". Raise, so
+        # a caller cannot mistake absence of a feature for evidence about it.
+        raise ValueError(
+            "add_rest: no date column (looked for start_date / date_time / "
+            f"game_date); got {list(games.columns)[:12]}. Returning the frame "
+            "unchanged would score identically to the baseline and read as a "
+            "negative result."
+        )
+    g = games.with_columns(pl.col(date_col).cast(pl.Utf8).str.slice(0, 10).str.to_date(strict=False).alias("_d"))
     # Long form (one row per team-game) so "previous game" is a single sort.
     long = pl.concat(
         [
@@ -143,9 +142,7 @@ def add_rest(games: pl.DataFrame) -> pl.DataFrame:
         ]
     )
     long = long.sort(["tid", "season", "_d"]).with_columns(
-        (pl.col("_d") - pl.col("_d").shift(1).over(["tid", "season"]))
-        .dt.total_days()
-        .alias("rest")
+        (pl.col("_d") - pl.col("_d").shift(1).over(["tid", "season"])).dt.total_days().alias("rest")
     )
     out = g
     for side in ("home", "away"):

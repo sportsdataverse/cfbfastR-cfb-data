@@ -205,6 +205,20 @@ def build_game_frame(
         pl.col("through_week").cast(pl.Int64),
         *[pl.col(c).cast(pl.Float64) for c in feats],
     )
+    # Rest is derived BEFORE the select, on the full games frame -- the select
+    # below drops the kickoff date, and add_rest needs it. Getting this order
+    # wrong produced a silent no-op that scored identically to the baseline.
+    # It also must run before the min_week filter, or a week-2 game's "previous
+    # game" would be missing and every early rest value would be null.
+    extra_game_cols: list[str] = []
+    if enrich:
+        from .features import add_rest
+
+        games = add_rest(games)
+        extra_game_cols = [
+            c for c in ("rest_home", "rest_away", "rest_diff", "bye_home", "bye_away") if c in games.columns
+        ]
+
     g = games.select(
         pl.col("game_id").cast(pl.Int64),
         pl.col("season").cast(pl.Int64),
@@ -214,12 +228,16 @@ def build_game_frame(
         pl.col("neutral_site").cast(pl.Boolean),
         pl.col("home_points").cast(pl.Float64),
         pl.col("away_points").cast(pl.Float64),
+        *[pl.col(c).cast(pl.Float64) for c in extra_game_cols],
     ).filter(pl.col("week") >= min_week)
+    if enrich and not extra_game_cols:
+        raise ValueError(
+            "enrich=True but add_rest produced no rest columns -- the feature "
+            "would be silently absent from every downstream experiment."
+        )
 
     if g.schema["home_id"] != w.schema["team_id"]:
-        raise ValueError(
-            f"join key dtype mismatch: home_id={g.schema['home_id']} team_id={w.schema['team_id']}"
-        )
+        raise ValueError(f"join key dtype mismatch: home_id={g.schema['home_id']} team_id={w.schema['team_id']}")
 
     # THE BOUNDARY: week W sees only through_week == W - 1.
     g = g.with_columns((pl.col("week") - 1).alias("_asof"))
@@ -248,13 +266,9 @@ def build_game_frame(
         (pl.col("home_points") > pl.col("away_points")).alias("home_won"),
         # `rated` is kept even when we drop on it, so a caller that opts out
         # can still segment instead of silently mixing rated/unrated rows.
-        pl.all_horizontal(
-            [
-                pl.col(f"{c}_{s}").is_not_null()
-                for c in RATING_COLS
-                for s in ("home", "away")
-            ]
-        ).alias("rated"),
+        pl.all_horizontal([pl.col(f"{c}_{s}").is_not_null() for c in RATING_COLS for s in ("home", "away")]).alias(
+            "rated"
+        ),
     ).drop("_asof")
 
     if require_rating:
@@ -274,9 +288,7 @@ def paired_features(frame: pl.DataFrame) -> list[str]:
     return [c for c in frame.columns if c.endswith(("_home", "_away"))]
 
 
-def diff_features(
-    frame: pl.DataFrame, feats: list[str]
-) -> tuple[pl.DataFrame, list[str]]:
+def diff_features(frame: pl.DataFrame, feats: list[str]) -> tuple[pl.DataFrame, list[str]]:
     """Collapse each home/away pair to a single ``{feat}_diff`` column.
 
     Halves the feature count and bakes in the symmetry a margin model would
@@ -285,7 +297,5 @@ def diff_features(
     """
     bases = sorted({c[:-5] for c in feats if c.endswith("_home")})
     both = [b for b in bases if f"{b}_away" in frame.columns]
-    diffs = [
-        (pl.col(f"{b}_home") - pl.col(f"{b}_away")).alias(f"{b}_diff") for b in both
-    ]
+    diffs = [(pl.col(f"{b}_home") - pl.col(f"{b}_away")).alias(f"{b}_diff") for b in both]
     return frame.with_columns(diffs), [f"{b}_diff" for b in both]

@@ -29,6 +29,8 @@ import numpy as np
 import polars as pl
 from sportsdataverse.cfb import cfb_adjusted_epa
 
+from .checks import assert_adjustment_is_real
+
 # Explosive-play EPA thresholds (R build lines 604-608).
 _EXPLOSIVE_PASS_EPA = 2.4
 _EXPLOSIVE_RUSH_EPA = 1.8
@@ -960,6 +962,13 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
     team_data = _prepare_for_write(team_data, yr, schools).join(
         cfb_adjusted_epa(plays).drop("pos_team"), on="team_id", how="left"
     )
+    # Assert the adjustment ACTUALLY ADJUSTED. On 2026-08-01 this shipped with
+    # adj_off_epa at corr 0.9928 against its own raw EPAplay_off -- the ridge
+    # penalty was on the glmnet scale (325) which, under sklearn's
+    # alpha = lambda * n, shrinks every team effect to zero. Nothing errored;
+    # the columns were present and plausible; it sat live for two days. Check
+    # the output, not the config.
+    assert_adjustment_is_real(team_data, label=f"team_summaries {yr}")
     qb_out = _prepare_for_write(qb_data, yr, schools).rename(
         {"passer_player_id": "player_id"}
     )

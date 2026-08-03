@@ -105,3 +105,58 @@ def blend_prior(
 def enrich_weekly(weekly: pl.DataFrame, *, k: float = 4.0) -> pl.DataFrame:
     """The full Phase-2 team-week enrichment, in dependency order."""
     return blend_prior(add_prior_season(weekly), k=k)
+
+
+# --------------------------------------------------------------------------
+# game-level: schedule spot
+# --------------------------------------------------------------------------
+def add_rest(games: pl.DataFrame) -> pl.DataFrame:
+    """Days of rest for each team, and the differential.
+
+    Genuinely OFF-substrate: rest, byes and short weeks are nowhere in the
+    play-level data, so unlike another efficiency metric this is not a
+    re-measurement of team quality. It is also strictly as-of -- it depends
+    only on when previous games were played, never on their outcome.
+
+    Adds ``rest_home`` / ``rest_away`` / ``rest_diff``, plus ``bye_home`` /
+    ``bye_away`` (>= 13 days, i.e. an actual open date rather than a normal
+    Saturday-to-Saturday turnaround).
+    """
+    date_col = next(
+        (c for c in ("start_date", "date_time", "game_date") if c in games.columns),
+        None,
+    )
+    if date_col is None:
+        return games
+    g = games.with_columns(
+        pl.col(date_col)
+        .cast(pl.Utf8)
+        .str.slice(0, 10)
+        .str.to_date(strict=False)
+        .alias("_d")
+    )
+    # Long form (one row per team-game) so "previous game" is a single sort.
+    long = pl.concat(
+        [
+            g.select("game_id", "season", pl.col("home_id").alias("tid"), "_d"),
+            g.select("game_id", "season", pl.col("away_id").alias("tid"), "_d"),
+        ]
+    )
+    long = long.sort(["tid", "season", "_d"]).with_columns(
+        (pl.col("_d") - pl.col("_d").shift(1).over(["tid", "season"]))
+        .dt.total_days()
+        .alias("rest")
+    )
+    out = g
+    for side in ("home", "away"):
+        s = long.select(
+            "game_id",
+            pl.col("tid").alias(f"{side}_id"),
+            pl.col("rest").alias(f"rest_{side}"),
+        )
+        out = out.join(s, on=["game_id", f"{side}_id"], how="left")
+    return out.with_columns(
+        (pl.col("rest_home") - pl.col("rest_away")).alias("rest_diff"),
+        (pl.col("rest_home") >= 13).cast(pl.Float64).alias("bye_home"),
+        (pl.col("rest_away") >= 13).cast(pl.Float64).alias("bye_away"),
+    ).drop("_d")

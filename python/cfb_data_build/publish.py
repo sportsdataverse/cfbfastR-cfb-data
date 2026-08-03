@@ -36,6 +36,45 @@ def _dataset_files(spec: DatasetSpec, season: int, base: str | Path) -> list[Pat
     return [f for f in candidates if f.exists()]
 
 
+#: Per-tag release notes. The weekly datasets carry a LEAKAGE WARNING because
+#: `through_week == W` is INCLUSIVE of week W -- verified empirically at 97.0%
+#: against 58.7% for the exclusive reading. A consumer who filters
+#: `through_week == W` to project week W is handed that week's results,
+#: including the game being projected. The obvious usage is the wrong one, so
+#: the note has to say so.
+_WEEKLY_ASOF_WARNING = """
+**As-of semantics -- read before using this for projections.**
+
+`through_week == W` is **inclusive of week W**: the snapshot contains games
+PLAYED in week W. To project week W, use the `through_week == W - 1` row.
+Filtering `through_week == W` and predicting week W leaks that week's results.
+
+Verified empirically (2024, delta between consecutive snapshots vs games
+actually played): 97.0% consistent with the inclusive reading, 58.7% with the
+exclusive one.
+"""
+
+RELEASE_NOTES: dict[str, str] = {
+    "cfb_team_summaries_weekly": (
+        "College Football team summaries as of the END OF EACH REGULAR-SEASON "
+        "WEEK. LONG FORMAT: one asset per season carrying a `through_week` "
+        "column with every week's cumulative snapshot stacked.\n" + _WEEKLY_ASOF_WARNING
+    ),
+    "cfb_ratings_weekly": (
+        "College Football opponent-adjusted team ratings as of the END OF EACH "
+        "REGULAR-SEASON WEEK. LONG FORMAT: one asset per season carrying a "
+        "`through_week` column with every week's cumulative snapshot stacked. "
+        "The ridge is refit on everything up to week W, so this is NOT "
+        "derivable by summing per-game rows.\n" + _WEEKLY_ASOF_WARNING
+    ),
+}
+
+
+def release_notes(tag: str) -> str:
+    """Release body for a tag, falling back to the generic one-liner."""
+    return RELEASE_NOTES.get(tag, f"{tag} (CFB dataset, Python-built).")
+
+
 def publish_dataset(
     spec: DatasetSpec,
     season: int,
@@ -66,7 +105,7 @@ def publish_dataset(
                     "--title",
                     spec.tag,
                     "--notes",
-                    f"{spec.tag} (CFB dataset, Python-built).",
+                    release_notes(spec.tag),
                 ]
             )
         count = 0

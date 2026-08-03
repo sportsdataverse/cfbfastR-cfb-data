@@ -1,10 +1,12 @@
 """CLI: ingest | train-ep | train-wp | train-qbr | validate | figures."""
+
 from __future__ import annotations
 
 import argparse
 import sys
 from pathlib import Path
 
+from . import constants as C
 from .ingest import add_winner, build_training_frame, write_training_frame  # noqa: F401
 
 
@@ -16,9 +18,19 @@ def build_parser() -> argparse.ArgumentParser:
     i.add_argument("--final-dir", default=".cache/cfb_final")
     i.add_argument("--out", default="pbp_full.parquet")
     i.add_argument("--seasons", nargs="*", type=int)
-    i.add_argument("--odds", default=None,
-                   help="cfb_line_odds parquet; applies the consensus spread backfill to the frame")
-    for name in ("train-ep", "train-wp", "train-qbr", "train-fg", "train-xpass", "train-two-pt"):
+    i.add_argument(
+        "--odds",
+        default=None,
+        help="cfb_line_odds parquet; applies the consensus spread backfill to the frame",
+    )
+    for name in (
+        "train-ep",
+        "train-wp",
+        "train-qbr",
+        "train-fg",
+        "train-xpass",
+        "train-two-pt",
+    ):
         s = sub.add_parser(name)
         s.add_argument("--pbp", default="pbp_full.parquet")
         s.add_argument("--out", required=True)
@@ -26,20 +38,53 @@ def build_parser() -> argparse.ArgumentParser:
             s.add_argument("--variant", choices=["spread", "naive"], default="spread")
         if name == "train-qbr":
             s.add_argument("--espn-qbr", required=True)
-    v = sub.add_parser("validate", help="prediction-parity of a retrained model vs a shipped reference")
+    v = sub.add_parser(
+        "validate", help="prediction-parity of a retrained model vs a shipped reference"
+    )
     v.add_argument("--model", required=True, help="path to the retrained .ubj")
     v.add_argument("--ref", required=True, help="path to the shipped reference .ubj")
-    v.add_argument("--type", required=True, choices=["ep", "wp", "wp_naive", "qbr"],
-                   help="feature family used to build the comparison matrix")
+    v.add_argument(
+        "--type",
+        required=True,
+        choices=["ep", "wp", "wp_naive", "qbr"],
+        help="feature family used to build the comparison matrix",
+    )
     v.add_argument("--pbp", default="pbp_full.parquet", help="feature source frame")
-    v.add_argument("--tol", type=float, default=1e-3, help="max abs prediction diff to pass")
-    v.add_argument("--sample", type=int, default=0, help="optional row cap for a quick check (0 = all)")
-    lo = sub.add_parser("loso", help="leave-one-season-out CV (pooled + per-season metrics)")
+    v.add_argument(
+        "--tol", type=float, default=1e-3, help="max abs prediction diff to pass"
+    )
+    v.add_argument(
+        "--sample",
+        type=int,
+        default=0,
+        help="optional row cap for a quick check (0 = all)",
+    )
+    lo = sub.add_parser(
+        "loso", help="leave-one-season-out CV (pooled + per-season metrics)"
+    )
     lo.add_argument("--pbp", default="pbp_full.parquet")
-    lo.add_argument("--model", required=True,
-                    choices=["ep", "wp", "qbr", "fg", "xpass", "two_pt"])
-    lo.add_argument("--espn-qbr", help="ESPN QBR reference parquet (required for --model qbr)")
-    lo.add_argument("--oof-out", help="optional path to write the out-of-fold predictions parquet")
+    lo.add_argument(
+        "--model", required=True, choices=["ep", "wp", "qbr", "fg", "xpass", "two_pt"]
+    )
+    lo.add_argument(
+        "--espn-qbr", help="ESPN QBR reference parquet (required for --model qbr)"
+    )
+    lo.add_argument(
+        "--oof-out", help="optional path to write the out-of-fold predictions parquet"
+    )
+    h = sub.add_parser(
+        "hpo", help="hyperparameter search (TPE) gated on the shipped metric"
+    )
+    h.add_argument("--pbp", default="pbp_full.parquet")
+    h.add_argument(
+        "--model",
+        required=True,
+        choices=["ep", "wp_spread", "wp_naive", "fg", "xpass", "two_pt"],
+    )
+    h.add_argument("--trials", type=int, default=60)
+    h.add_argument("--folds", type=int, default=4)
+    h.add_argument("--seed", type=int, default=17)
+    h.add_argument("--out-dir", default="artifacts/hpo")
     f = sub.add_parser("figures")
     f.add_argument("--table", required=True)
     f.add_argument("--out", required=True)
@@ -49,10 +94,18 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv=None) -> int:
     args = build_parser().parse_args(argv)
     if args.cmd == "ingest":
-        n = write_training_frame(args.final_dir, args.out, args.seasons, odds_path=args.odds)
+        n = write_training_frame(
+            args.final_dir, args.out, args.seasons, odds_path=args.odds
+        )
         print(f"wrote {n} rows -> {args.out}")
-    elif args.cmd in ("train-ep", "train-wp", "train-qbr", "train-fg", "train-xpass",
-                      "train-two-pt"):
+    elif args.cmd in (
+        "train-ep",
+        "train-wp",
+        "train-qbr",
+        "train-fg",
+        "train-xpass",
+        "train-two-pt",
+    ):
         import polars as pl
 
         df = add_winner(pl.read_parquet(args.pbp))
@@ -83,6 +136,7 @@ def main(argv=None) -> int:
         Path(args.out).parent.mkdir(parents=True, exist_ok=True)
         model.save_model(args.out)
         from .model_card import write_xgb_model_card
+
         # Resolve per-cmd metadata without eagerly evaluating args.variant
         # (only train-wp defines --variant).
         if args.cmd == "train-ep":
@@ -100,28 +154,75 @@ def main(argv=None) -> int:
         # train-qbr aggregates to per-QB-game rows and inner-joins ESPN QBR,
         # so df.height (raw PBP rows) is misleading for that branch.
         _n_rows = None if args.cmd == "train-qbr" else df.height
-        write_xgb_model_card(args.out, model_type=_mtype, label=_label, model=model,
-                             n_rows=_n_rows)
+        # Hyperparameters and training seasons were being dropped, leaving cards
+        # with `hyperparameters: None` / `training_seasons: None` -- i.e. no way to
+        # answer "what was this trained on" without reading the code. Record the
+        # recipe, the season span, and the corpus the frame came from.
+        _params = {
+            "ep": C.EP_PARAMS, "fg": C.FG_PARAMS, "xpass": C.XPASS_PARAMS,
+            "two_pt": C.TWO_PT_PARAMS, "qbr": C.QBR_PARAMS,
+            "wp_spread": C.WP_SPREAD_PARAMS, "wp_naive": C.WP_NAIVE_PARAMS,
+        }.get(_mtype)
+        _rounds = {
+            "ep": C.EP_NROUNDS, "fg": C.FG_NROUNDS, "xpass": C.XPASS_NROUNDS,
+            "two_pt": C.TWO_PT_NROUNDS, "qbr": C.QBR_NROUNDS,
+            "wp_spread": C.WP_SPREAD_NROUNDS, "wp_naive": C.WP_NAIVE_NROUNDS,
+        }.get(_mtype)
+        _seasons = (
+            sorted(int(s) for s in df["season"].unique().to_list())
+            if "season" in df.columns else None
+        )
+        write_xgb_model_card(
+            args.out, model_type=_mtype, label=_label, model=model, n_rows=_n_rows,
+            hyperparams=dict(_params or {}),
+            seasons=_seasons,
+            extra={"num_boost_round": _rounds, "training_frame": str(args.pbp)},
+        )
         print(f"saved -> {args.out} (+ model_card.json)")
+    elif args.cmd == "hpo":
+        import polars as pl
+
+        from .hpo import search
+
+        # add_winner is what supplies the WP label; the loso path applies it too,
+        # so search and confirm see identical frames.
+        df = add_winner(pl.read_parquet(args.pbp))
+        search(
+            df,
+            args.model,
+            n_trials=args.trials,
+            k_folds=args.folds,
+            seed=args.seed,
+            out_dir=Path(args.out_dir),
+        )
     elif args.cmd == "loso":
         import polars as pl
 
         from .validate import loso_cv
 
         if args.model == "qbr" and not args.espn_qbr:
-            print("loso --model qbr requires --espn-qbr <reference.parquet>", file=sys.stderr)
+            print(
+                "loso --model qbr requires --espn-qbr <reference.parquet>",
+                file=sys.stderr,
+            )
             return 2
         df = add_winner(pl.read_parquet(args.pbp))
         espn = None
         if args.espn_qbr:
-            espn = pl.read_parquet(args.espn_qbr).select(
-                pl.col("game_id").cast(pl.Int64),
-                pl.col("passer_player_name"),
-                pl.col("raw_qbr").cast(pl.Float64, strict=False),
-            ).drop_nulls()
+            espn = (
+                pl.read_parquet(args.espn_qbr)
+                .select(
+                    pl.col("game_id").cast(pl.Int64),
+                    pl.col("passer_player_name"),
+                    pl.col("raw_qbr").cast(pl.Float64, strict=False),
+                )
+                .drop_nulls()
+            )
         res = loso_cv(df, args.model, espn_qbr=espn)
-        pooled = " ".join(f"{k}={v:.4f}" if isinstance(v, float) else f"{k}={v}"
-                          for k, v in res["pooled"].items())
+        pooled = " ".join(
+            f"{k}={v:.4f}" if isinstance(v, float) else f"{k}={v}"
+            for k, v in res["pooled"].items()
+        )
         print(f"LOSO {args.model} POOLED: {pooled}")
         if args.oof_out and res["oof"].height:
             Path(args.oof_out).parent.mkdir(parents=True, exist_ok=True)

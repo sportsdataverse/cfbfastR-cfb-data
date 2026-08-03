@@ -29,7 +29,11 @@ dependencies = [
 sportsdataverse = { git = "https://github.com/sportsdataverse/sportsdataverse-py", branch = "main" }
 
 [dependency-groups]
-dev = ["pytest>=8.0", "joblib>=1.3"]
+dev = [
+    "pytest>=8.0",
+    "joblib>=1.3",
+    "optuna>=4.9.0",
+]
 figures = ["plotnine>=0.13", "statsmodels>=0.14", "pillow>=10.0"]
 gam = ["pygam>=0.9"]
 pregame-wp = ["scipy>=1.10", "scikit-learn>=1.3"]

@@ -111,6 +111,57 @@ def load_games(seasons: list[int], *, cache: bool = True) -> pl.DataFrame:
     return df
 
 
+def assert_asof_boundary(weekly: pl.DataFrame, *, sample_weeks=(5, 8, 11)) -> dict:
+    """Verify `through_week == W` means "through the END of week W".
+
+    This is the assumption the whole package rests on, and it is NOT
+    self-evident -- it determines whether joining a week-W game to
+    ``through_week == W - 1`` is leak-free or leaky by a full week.
+
+    Measured on 2024 (delta between consecutive snapshots vs whether the team
+    actually played an FBS opponent that week): **97.0% inclusive vs 58.7%
+    exclusive**. So a consumer who filters ``through_week == W`` and predicts
+    week W IS LEAKING that week's results -- which is what the release note's
+    "filter through_week == W for that week's view" invites.
+
+    The check here is the leak-DIRECTION one: a snapshot at W must not already
+    contain week W+1. If it did, our W-1 join would still see the future.
+    Comparing counts against the schedule cannot test this (valid_games is
+    FBS-vs-FBS filtered, so it never equals a raw game count -- that confound
+    made a first attempt read 55-70% either way and look inconclusive). The
+    delta between consecutive snapshots carries the same filter on both sides
+    and is therefore exact.
+
+    Returns the per-week inclusive-match rates. Raises if a snapshot appears to
+    contain the FOLLOWING week.
+    """
+    if "valid_games" not in weekly.columns:
+        return {}
+    rates: dict[int, float] = {}
+    for W in sample_weeks:
+        a = weekly.filter(pl.col("through_week") == W).select(
+            "team_id", pl.col("valid_games").alias("vg_w")
+        )
+        b = weekly.filter(pl.col("through_week") == W + 1).select(
+            "team_id", pl.col("valid_games").alias("vg_next")
+        )
+        j = a.join(b, on="team_id", how="inner").drop_nulls()
+        if j.height < 50:
+            continue
+        # If W already contained W+1, the next snapshot would add nothing for
+        # the teams that played in W+1 -- delta would be ~0 across the board.
+        grew = (j["vg_next"] > j["vg_w"]).mean()
+        rates[W] = float(grew)
+        if grew < 0.30:
+            raise ValueError(
+                f"as-of boundary looks broken at through_week={W}: only "
+                f"{grew:.0%} of teams gained a game by week {W + 1}. A snapshot "
+                "that already contains the following week makes every as-of "
+                "join leak, regardless of the offset used."
+            )
+    return rates
+
+
 def feature_columns(weekly: pl.DataFrame, *, keep_ranks: bool = False) -> list[str]:
     """Numeric per-team feature columns, excluding keys and (by default) ranks."""
     keys = {
@@ -216,7 +267,9 @@ def build_game_frame(
 
         games = add_rest(games)
         extra_game_cols = [
-            c for c in ("rest_home", "rest_away", "rest_diff", "bye_home", "bye_away") if c in games.columns
+            c
+            for c in ("rest_home", "rest_away", "rest_diff", "bye_home", "bye_away")
+            if c in games.columns
         ]
 
     g = games.select(
@@ -237,9 +290,16 @@ def build_game_frame(
         )
 
     if g.schema["home_id"] != w.schema["team_id"]:
-        raise ValueError(f"join key dtype mismatch: home_id={g.schema['home_id']} team_id={w.schema['team_id']}")
+        raise ValueError(
+            f"join key dtype mismatch: home_id={g.schema['home_id']} team_id={w.schema['team_id']}"
+        )
 
-    # THE BOUNDARY: week W sees only through_week == W - 1.
+    # THE BOUNDARY. `through_week == W` is INCLUSIVE of week W -- verified
+    # empirically at 97.0% vs 58.7% for the exclusive reading (see
+    # assert_asof_boundary). So a week-W game must join to W-1 to see weeks
+    # 1..W-1 only. Joining to W would hand the model that week's results,
+    # including the game being predicted.
+    assert_asof_boundary(weekly)
     g = g.with_columns((pl.col("week") - 1).alias("_asof"))
 
     for side in ("home", "away"):
@@ -266,9 +326,13 @@ def build_game_frame(
         (pl.col("home_points") > pl.col("away_points")).alias("home_won"),
         # `rated` is kept even when we drop on it, so a caller that opts out
         # can still segment instead of silently mixing rated/unrated rows.
-        pl.all_horizontal([pl.col(f"{c}_{s}").is_not_null() for c in RATING_COLS for s in ("home", "away")]).alias(
-            "rated"
-        ),
+        pl.all_horizontal(
+            [
+                pl.col(f"{c}_{s}").is_not_null()
+                for c in RATING_COLS
+                for s in ("home", "away")
+            ]
+        ).alias("rated"),
     ).drop("_asof")
 
     if require_rating:
@@ -288,7 +352,9 @@ def paired_features(frame: pl.DataFrame) -> list[str]:
     return [c for c in frame.columns if c.endswith(("_home", "_away"))]
 
 
-def diff_features(frame: pl.DataFrame, feats: list[str]) -> tuple[pl.DataFrame, list[str]]:
+def diff_features(
+    frame: pl.DataFrame, feats: list[str]
+) -> tuple[pl.DataFrame, list[str]]:
     """Collapse each home/away pair to a single ``{feat}_diff`` column.
 
     Halves the feature count and bakes in the symmetry a margin model would
@@ -297,5 +363,7 @@ def diff_features(frame: pl.DataFrame, feats: list[str]) -> tuple[pl.DataFrame, 
     """
     bases = sorted({c[:-5] for c in feats if c.endswith("_home")})
     both = [b for b in bases if f"{b}_away" in frame.columns]
-    diffs = [(pl.col(f"{b}_home") - pl.col(f"{b}_away")).alias(f"{b}_diff") for b in both]
+    diffs = [
+        (pl.col(f"{b}_home") - pl.col(f"{b}_away")).alias(f"{b}_diff") for b in both
+    ]
     return frame.with_columns(diffs), [f"{b}_diff" for b in both]

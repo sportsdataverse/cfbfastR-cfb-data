@@ -193,14 +193,16 @@ def build_ratings_weekly(season: int, *, base: str = "cfb") -> pl.DataFrame:
     from sportsdataverse.cfb import cfb_ratings
 
     frames = []
+    built: list[int] = []
     for week, cutoff in week_cutoffs(season):
-        try:
-            d = cfb_ratings(season, as_of_date=dt.date.fromisoformat(cutoff))
-        except Exception as exc:  # noqa: BLE001 - one week must not kill the season
-            print(f"    week {week}: {type(exc).__name__}: {str(exc)[:90]}", flush=True)
-            continue
-        if d.height:
+        d = _retry(
+            lambda c=cutoff: cfb_ratings(season, as_of_date=dt.date.fromisoformat(c)),
+            what=f"ratings_weekly {season} week {week}",
+        )
+        if d is not None and d.height:
             frames.append(d.with_columns(through_week=pl.lit(week, dtype=pl.Int32)))
+            built.append(week)
+    _report_gaps(season, built, [w for w, _ in week_cutoffs(season)], "ratings_weekly")
     return pl.concat(frames, how="diagonal_relaxed") if frames else pl.DataFrame()
 
 
@@ -209,11 +211,20 @@ def build_team_summaries_weekly(season: int, *, base: str = "cfb") -> pl.DataFra
 
     spec = SUMMARIES_REGISTRY["team_summaries"]
     frames = []
+    built: list[int] = []
     for week, _cutoff in week_cutoffs(season):
-        try:
-            build_summaries_season(season, through_week=week, base=base, publish=False)
-        except Exception as exc:  # noqa: BLE001
-            print(f"    week {week}: {type(exc).__name__}: {str(exc)[:90]}", flush=True)
+        if (
+            _retry(
+                lambda w=week: (
+                    build_summaries_season(
+                        season, through_week=w, base=base, publish=False
+                    )
+                    or True
+                ),
+                what=f"team_summaries_weekly {season} week {week}",
+            )
+            is None
+        ):
             continue
         # Path comes from the registry. Hardcoding it silently produced an EMPTY
         # frame -- the stem is "cfb_team_summaries", not "team_summaries", so the
@@ -233,7 +244,55 @@ def build_team_summaries_weekly(season: int, *, base: str = "cfb") -> pl.DataFra
                     through_week=pl.lit(week, dtype=pl.Int32)
                 )
             )
+            built.append(week)
+    _report_gaps(
+        season, built, [w for w, _ in week_cutoffs(season)], "team_summaries_weekly"
+    )
     return pl.concat(frames, how="diagonal_relaxed") if frames else pl.DataFrame()
+
+
+#: Weekly builds fetch per week, so a transient network blip costs a whole
+#: snapshot. Observed live on the 2026-08-03 republish: three WinError 10060
+#: timeouts (2009 wk5, 2019 wk11, 2020 wk1) each silently dropped that week
+#: while the season still reported success. A missing through_week is not a
+#: cosmetic gap -- an as-of consumer joining week W+1 to through_week W finds
+#: no row and drops those games entirely.
+_RETRY_ATTEMPTS = 3
+_RETRY_BACKOFF_S = 5.0
+
+
+def _retry(fn, *, what: str, attempts: int = _RETRY_ATTEMPTS):
+    """Run ``fn``, retrying transient failures. Returns None if all fail."""
+    import time
+
+    for i in range(1, attempts + 1):
+        try:
+            return fn()
+        except Exception as exc:  # noqa: BLE001 - one week must not kill the season
+            last = f"{type(exc).__name__}: {str(exc)[:90]}"
+            if i < attempts:
+                print(
+                    f"    {what}: {last} (attempt {i}/{attempts}, retrying)", flush=True
+                )
+                time.sleep(_RETRY_BACKOFF_S * i)
+            else:
+                print(f"    {what}: {last} -- GAVE UP after {attempts}", flush=True)
+    return None
+
+
+def _report_gaps(
+    season: int, built: list[int], expected: list[int], dataset: str
+) -> None:
+    """Say loudly which weeks are missing. Silence here reads as completeness."""
+    missing = sorted(set(expected) - set(built))
+    if missing:
+        print(
+            f"  !! {dataset} {season}: MISSING through_week {missing} "
+            f"({len(built)}/{len(expected)} built). Consumers joining week W+1 "
+            f"to through_week W will silently drop those games -- re-run this "
+            f"season before relying on it.",
+            flush=True,
+        )
 
 
 BUILDERS = {

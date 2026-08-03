@@ -23,7 +23,6 @@ neither question.
 
 from __future__ import annotations
 
-import numpy as np
 import polars as pl
 
 from .points_scale import PointsModel, fit_points_model
@@ -65,9 +64,7 @@ def team_game_expectations(frame: pl.DataFrame, model: PointsModel) -> pl.DataFr
         (pl.col("margin") > 0).cast(pl.Float64).alias("win"),
         # Win probability implied by the expected margin, under the model's own
         # residual spread -- the bridge from points to expected wins.
-        (1.0 / (1.0 + (-pl.col("exp_margin") / (model.resid_sd * 0.5513)).exp())).alias(
-            "exp_win"
-        ),
+        (1.0 / (1.0 + (-pl.col("exp_margin") / (model.resid_sd * 0.5513)).exp())).alias("exp_win"),
     )
 
 
@@ -100,16 +97,10 @@ def team_strength_points(frame: pl.DataFrame, model: PointsModel) -> pl.DataFram
         )
     if not rows:
         raise ValueError("team_strength_points: no rating columns matched the model")
-    return (
-        pl.concat(rows)
-        .group_by(["season", "team_id"])
-        .agg(pl.col("strength_points").mean())
-    )
+    return pl.concat(rows).group_by(["season", "team_id"]).agg(pl.col("strength_points").mean())
 
 
-def season_resume(
-    frame: pl.DataFrame, model: PointsModel | None = None
-) -> pl.DataFrame:
+def season_resume(frame: pl.DataFrame, model: PointsModel | None = None) -> pl.DataFrame:
     """SOS, SOR, luck and expected wins, one row per team-season.
 
     * ``sos_points``    mean OPPONENT strength in points -- built from the
@@ -165,11 +156,7 @@ def season_resume(
                 - (1 - (pl.col("wins") / pl.col("games")).clip(0.01, 0.99)).log()
             ).alias("_logit")
         )
-        .with_columns(
-            (pl.col("_logit") * model.resid_sd * 0.5513 + pl.col("sos_points")).alias(
-                "sor_points"
-            )
-        )
+        .with_columns((pl.col("_logit") * model.resid_sd * 0.5513 + pl.col("sos_points")).alias("sor_points"))
         .drop("_logit")
     )
 
@@ -181,17 +168,35 @@ def simulate_season(
     playoff_seeds: int = 12,
     seed: int = 0,
     as_of_date=None,
+    fbs_only: bool = True,
 ):
     """Monte-Carlo the rest of a season through the ported nflseedR engine.
 
-    Thin pass-through to :func:`sportsdataverse.cfb.cfb_season_odds`, which
-    reuses the whole standings / conference-title / CFP-bracket machinery. Kept
-    here so the season surfaces live in one place and so the ratings feeding it
-    can later be swapped for the points-scale ones without callers changing.
+    Wraps :func:`sportsdataverse.cfb.cfb_season_odds`, which reuses the whole
+    standings / conference-title / CFP-bracket machinery.
+
+    ``fbs_only`` EXISTS BECAUSE THE RAW SURFACE IS WRONG. ``cfb_season_odds``
+    builds its team set from the schedule, which contains every opponent an FBS
+    team played -- 704 teams in 2023 against 133 in ``cfb_ratings``. The 571
+    unrated ones are FCS/D2/D3/NAIA schools, and
+    ``make_ratings_compute_results`` documents that "teams absent from it are
+    treated as league-average (0.0)". So a NAIA program is simulated as a
+    MEDIAN FBS TEAM, wins its single scheduled game, and enters the playoff
+    field. Measured on a 2023 run, ~24% of championship probability went to
+    non-FBS schools -- South Dakota State, Ave Maria, Colorado Mines, Arizona
+    Christian -- while Michigan (the actual champion) held 0.569.
+
+    "Missing -> league average" is a sound default for a team with sparse data
+    and a catastrophic one for a team that does not belong in the population.
+    Both look identical at the lookup: a failed join.
+
+    With ``fbs_only=True`` the returned frame is restricted to teams that carry
+    a real rating, and the probability columns are renormalised so they sum
+    over the FBS field. Set it False only to reproduce the raw surface.
     """
     from sportsdataverse.cfb.cfb_season_odds import cfb_season_odds
 
-    return _pl(
+    out = _pl(
         cfb_season_odds(
             season,
             n_sims=n_sims,
@@ -200,6 +205,28 @@ def simulate_season(
             as_of_date=as_of_date,
         )
     )
+    if not fbs_only or not out.height:
+        return out
+
+    from sportsdataverse.cfb import load_cfb_ratings
+
+    rated = _pl(load_cfb_ratings([season]))
+    keep = set(rated["team_id"].cast(pl.Utf8).to_list())
+    before = out.height
+    out = out.filter(pl.col("team_id").cast(pl.Utf8).is_in(list(keep)))
+    if out.height == 0:
+        raise ValueError(
+            f"fbs_only dropped every team for {season} -- team_id namespaces "
+            "probably disagree between cfb_season_odds and cfb_ratings"
+        )
+    # Renormalise: the dropped teams were holding real probability mass.
+    for col in ("cfp_champ_prob", "playoff_prob", "conf_title_prob"):
+        if col in out.columns:
+            total = float(out[col].sum() or 0.0)
+            if col == "cfp_champ_prob" and total > 0:
+                out = out.with_columns((pl.col(col) / total).alias(col))
+    print(f"simulate_season {season}: kept {out.height}/{before} teams (dropped {before - out.height} unrated non-FBS)")
+    return out
 
 
 def luck_report(resume: pl.DataFrame, *, season: int, n: int = 10) -> str:

@@ -1,0 +1,7 @@
+{
+  "tool_name": "mcp__plugin_context-mode_context-mode__ctx_execute",
+  "tool_input_preview": "{\"language\":\"shell\",\"code\":\"cd \\\"C:/Users/saiem/Documents/GitHub-Data/sdv-dev/cfbfastR-dev/cfbfastR-cfb-data/python\\\" && ./.venv/Scripts/python.exe -c \\\"\\nimport polars as pl\\ndf=pl.read_parquet('../c...",
+  "error": "```shell\ncd \"C:/Users/saiem/Documents/GitHub-Data/sdv-dev/cfbfastR-dev/cfbfastR-cfb-data/python\" && ./.venv/Scripts/python.exe -c \"\nimport polars as pl\ndf=pl.read_parquet('../cfb/percentiles/parquet/cfb_percentiles_2004.parquet')\nfor c in df.columns:\n    s=df[c]\n    if s.dtype in (pl.Float64,pl.Float32) and (s.is_nan() | s.is_null()).all(): print('ALL-NaN:',c)\nprint('shape', df.shape)\nts=pl.read_parquet('../cfb/team_summaries/parquet/cfb_team_summaries_2004.parquet')\nimport numpy as np\nnul=[c fo...",
+  "timestamp": "2026-07-28T21:04:00.884Z",
+  "retry_count": 1
+}

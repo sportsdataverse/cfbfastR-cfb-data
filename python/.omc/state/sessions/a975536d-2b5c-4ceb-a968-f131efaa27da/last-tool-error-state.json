@@ -1,0 +1,7 @@
+{
+  "tool_name": "Bash",
+  "tool_input_preview": "{\"command\":\"cd /c/Users/saiem/Documents/GitHub-Data/sdv-dev/cfbfastR-dev/cfbfastR-cfb-data/python\\nS=/c/Users/saiem/AppData/Local/Temp/claude/C--Users-saiem-Documents-GitHub-Data-sdv-dev/a975536d-2b5c...",
+  "error": "Exit code 2\n  File \"C:\\Users\\saiem\\Documents\\GitHub-Data\\sdv-dev\\cfbfastR-dev\\cfbfastR-cfb-data\\python\\cfb_model_publish\\cli.py\", line 58, in main\r\n    results = build_ratings(_seasons(args.seasons), args.out)\r\n  File \"C:\\Users\\saiem\\Documents\\GitHub-Data\\sdv-dev\\cfbfastR-dev\\cfbfastR-cfb-data\\python\\cfb_model_publish\\builders.py\", line 46, in build_ratings\r\n    from sportsdataverse.cfb import cfb_ratings as compute\r\nImportError: cannot import name 'cfb_ratings' from 'sportsdataverse.cfb' (C:\\Us...",
+  "timestamp": "2026-07-16T17:40:01.386Z",
+  "retry_count": 1
+}

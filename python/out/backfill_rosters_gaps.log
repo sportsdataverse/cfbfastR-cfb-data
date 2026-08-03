@@ -1,0 +1,9 @@
+== 2026-07-12T02:06:59-04:00 game_rosters season=2023
+game_rosters 2023: 215604 rows from 911 games
+== 2026-07-12T02:07:36-04:00 rosters season=2023
+rosters 2023: 26068 athlete-team rows (from 215604 game-roster rows)
+== 2026-07-12T02:07:39-04:00 game_rosters season=2025
+game_rosters 2025: 213493 rows from 958 games
+== 2026-07-12T02:08:14-04:00 rosters season=2025
+rosters 2025: 26287 athlete-team rows (from 213493 game-roster rows)
+JOB_DONE=0

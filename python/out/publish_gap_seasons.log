@@ -1,0 +1,9 @@
+pbp 2011 {'sportsdataverse/sportsdataverse-data': 2}
+pbp 2020 {'sportsdataverse/sportsdataverse-data': 2}
+pbp 2023 {'sportsdataverse/sportsdataverse-data': 2}
+pbp 2025 {'sportsdataverse/sportsdataverse-data': 2}
+game_rosters 2023 {'sportsdataverse/sportsdataverse-data': 2}
+game_rosters 2025 {'sportsdataverse/sportsdataverse-data': 2}
+rosters 2023 {'sportsdataverse/sportsdataverse-data': 2}
+rosters 2025 {'sportsdataverse/sportsdataverse-data': 2}
+JOB_DONE=0

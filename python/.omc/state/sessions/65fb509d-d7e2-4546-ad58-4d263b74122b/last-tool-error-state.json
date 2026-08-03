@@ -1,0 +1,7 @@
+{
+  "tool_name": "Bash",
+  "tool_input_preview": "{\"command\":\"cd \\\"c:/Users/saiem/Documents/GitHub-Data/sdv-dev/cfbfastR-dev/cfbfastR-cfb-data/python\\\" && gh release download espn_cfb_power_index --repo sportsdataverse/sportsdataverse-data --pattern ...",
+  "error": "Exit code 1\nTraceback (most recent call last):\r\n  File \"<string>\", line 3, in <module>\r\n    o = pl.read_parquet('/tmp/pi_oracle/power_index_2024.parquet')\r\n  File \"C:\\Users\\saiem\\Documents\\GitHub-Data\\sdv-dev\\sdv-py\\.venv\\Lib\\site-packages\\polars\\_utils\\deprecation.py\", line 128, in wrapper\r\n    return function(*args, **kwargs)\r\n  File \"C:\\Users\\saiem\\Documents\\GitHub-Data\\sdv-dev\\sdv-py\\.venv\\Lib\\site-packages\\polars\\_utils\\deprecation.py\", line 128, in wrapper\r\n    return function(*args, **kwa...",
+  "timestamp": "2026-07-12T08:49:31.153Z",
+  "retry_count": 1
+}

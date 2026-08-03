@@ -59,7 +59,9 @@ class PregameFit:
 
     def predict(self, frame: pl.DataFrame, *, use_curve: bool = True) -> np.ndarray:
         diff = frame[_DIFF[0]].to_numpy() - frame[_DIFF[1]].to_numpy()
-        hfa = np.where(frame["neutral_site"].to_numpy(), 0.0, self.hfa_points)
+        hfa = np.where(
+            frame["neutral_site"].to_numpy().astype(bool), 0.0, self.hfa_points
+        )
         if not use_curve:
             return self.net_points_scale * diff + hfa
         # Fewer games -> noisier rating -> flatter slope.
@@ -91,7 +93,9 @@ def fit(frame: pl.DataFrame) -> PregameFit:
     """Fit every constant on ``frame`` (caller guarantees it is training-only)."""
     diff = frame[_DIFF[0]].to_numpy() - frame[_DIFF[1]].to_numpy()
     margin = frame["margin"].to_numpy()
-    neutral = frame["neutral_site"].to_numpy()
+    # Callers may have cast neutral_site to float for a matrix build; `~` on a
+    # float array raises. Normalise rather than assume the caller's dtype.
+    neutral = frame["neutral_site"].to_numpy().astype(bool)
 
     # Slope and HFA jointly: margin ~ slope*diff + hfa*(not neutral).
     X = np.column_stack([diff, (~neutral).astype(float)])

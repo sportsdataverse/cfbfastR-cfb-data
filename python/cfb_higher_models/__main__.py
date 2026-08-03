@@ -14,6 +14,14 @@ def main(argv=None) -> int:
         s.add_argument("--seasons", nargs="*", type=int)
         if name != "backtest":
             s.add_argument("--out-dir", default="artifacts/higher_models")
+        if name == "train-game":
+            s.add_argument(
+                "--enrich",
+                action="store_true",
+                help="add prior-season carryover + shrinkage blend features",
+            )
+            s.add_argument("--blend-k", type=float, default=4.0)
+            s.add_argument("--ablate", action="store_true")
     args = ap.parse_args(argv)
 
     if args.cmd == "backtest":
@@ -26,7 +34,13 @@ def main(argv=None) -> int:
         return run(args.seasons, args.out_dir)
     from .train_game import main as run
 
-    return run(args.seasons, args.out_dir)
+    return run(
+        args.seasons,
+        args.out_dir,
+        enrich=args.enrich,
+        blend_k=args.blend_k,
+        do_ablate=args.ablate,
+    )
 
 
 if __name__ == "__main__":

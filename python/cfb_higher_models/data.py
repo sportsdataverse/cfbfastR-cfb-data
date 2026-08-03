@@ -147,6 +147,8 @@ def build_game_frame(
     min_week: int = 2,
     keep_ranks: bool = False,
     require_rating: bool = True,
+    enrich: bool = False,
+    blend_k: float = 4.0,
     cache: bool = True,
     verbose: bool = True,
 ) -> pl.DataFrame:
@@ -185,6 +187,13 @@ def build_game_frame(
         right_on=["team_id", "season", "through_week"],
         how="left",
     )
+    if enrich:
+        # Prior-season carryover + shrinkage blend. Applied at the TEAM-WEEK
+        # level, before the home/away join, so it inherits the as-of boundary
+        # instead of opening a second place leakage could enter.
+        from .features import enrich_weekly
+
+        weekly = enrich_weekly(weekly, k=blend_k)
     feats = feature_columns(weekly, keep_ranks=keep_ranks)
 
     # ID discipline: pin one dtype at the boundary and assert agreement rather

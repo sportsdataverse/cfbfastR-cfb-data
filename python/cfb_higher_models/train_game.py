@@ -43,6 +43,39 @@ FAMILIES: dict[str, tuple[str, ...]] = {
 }
 
 
+#: The recommended feature set: 60 columns, not 244.
+#:
+#: Measured walk-forward on the corrected spine, 2014-2025 (n=5,089):
+#:
+#:     all (244)                 MAE 13.027  Brier 0.1875  cal_err 0.052
+#:     minus efficiency (167)    MAE 12.962  Brier 0.1864  cal_err 0.045
+#:     core+prior+finishing (60) MAE 12.966  Brier 0.1870  cal_err 0.043
+#:     core: other+rating (35)   MAE 13.135  Brier 0.1889  cal_err 0.053
+#:     other only (18)           MAE 13.217  Brier 0.1910  cal_err 0.068
+#:
+#: 60 features match 167 to within 0.004 MAE and beat the full 244 on every
+#: metric. Dropping 77 efficiency columns IMPROVES the model -- they are
+#: re-measurements of a dimension already present, and their only marginal
+#: contribution is variance. Feature count was never the constraint.
+LEAN_FAMILIES = ("other", "rating", "finishing")
+
+
+def lean_features(diffs: list[str]) -> list[str]:
+    """The 60-ish column set: cfb_ratings block + ratings + finishing + carryover.
+
+    ``other`` is the rt_* cfb_ratings block (special teams, FEI, adj_net) --
+    the only family whose removal measurably hurts, confirmed three separate
+    ways (family ablation, leave-one-block-out, and this prune).
+    """
+    keep, seen = [], set()
+    for c in diffs:
+        if family_of(c) in LEAN_FAMILIES or c.startswith(("prior_", "blend_")):
+            if c not in seen:
+                seen.add(c)
+                keep.append(c)
+    return keep
+
+
 def family_of(col: str) -> str:
     for fam, frags in FAMILIES.items():
         if any(f in col for f in frags):

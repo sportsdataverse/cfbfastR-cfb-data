@@ -83,9 +83,7 @@ def family_of(col: str) -> str:
     return "other"
 
 
-def _xy(
-    df: pl.DataFrame, feats: list[str], target: str = "margin"
-) -> tuple[np.ndarray, np.ndarray]:
+def _xy(df: pl.DataFrame, feats: list[str], target: str = "margin") -> tuple[np.ndarray, np.ndarray]:
     X = df.select(feats).to_numpy().astype(np.float64)
     y = df[target].to_numpy()
     return np.nan_to_num(X, nan=0.0, posinf=0.0, neginf=0.0), y.astype(np.float64)
@@ -236,9 +234,60 @@ def ablate(frame: pl.DataFrame, diffs: list[str], *, min_train: int = 3) -> dict
     return out
 
 
-def compare_feature_sets(
-    frame: pl.DataFrame, sets: dict[str, list[str]], *, min_train: int = 3, head=None
-) -> dict:
+def assert_arms_differ(frame: pl.DataFrame, sets: dict[str, list[str]]) -> None:
+    """Fail if two arms of an A/B are not actually different, WITH DATA.
+
+    Three separate times this session an experiment "added" features that were
+    absent or empty and reported a clean, plausible, meaningless comparison:
+
+      1. add_rest returned the frame unchanged (no date column) -- arms were
+         byte-identical at 13.026.
+      2. diff_features had already paired rest_home/away into rest_diff, so
+         "base + rest" duplicated columns the baseline held.
+      3. cfb_roster_talent returned ZERO ROWS; the join produced three all-null
+         columns and the A/B moved 12.978 -> 12.999, which reads as a small
+         negative result about talent. Talent was never tested.
+
+    Each time the guard I had checked column PRESENCE. Presence is not data. A
+    column of nulls exists, has a name, and tells a model nothing.
+
+    Raises:
+        ValueError: if two arms share an identical column list, or if the
+            columns distinguishing them are entirely null or constant.
+    """
+    names = list(sets)
+    for i, a in enumerate(names):
+        for b in names[i + 1 :]:
+            if set(sets[a]) == set(sets[b]):
+                raise ValueError(
+                    f"arms '{a}' and '{b}' have identical feature sets -- the comparison cannot say anything"
+                )
+    baseline = min(sets.values(), key=len)
+    for name, cols in sets.items():
+        extra = [c for c in cols if c not in baseline]
+        if not extra:
+            continue
+        dead = []
+        for c in extra:
+            if c not in frame.columns:
+                dead.append(f"{c}(absent)")
+                continue
+            s = frame[c]
+            if s.null_count() == frame.height:
+                dead.append(f"{c}(all-null)")
+            elif s.drop_nulls().n_unique() <= 1:
+                dead.append(f"{c}(constant)")
+        if dead and len(dead) == len(extra):
+            raise ValueError(
+                f"arm '{name}' adds {len(extra)} column(s) over the baseline and "
+                f"EVERY ONE is empty: {dead[:6]}. The comparison would report a "
+                "difference of pure noise as a result about those features."
+            )
+        if dead:
+            print(f"  warning: {name} has {len(dead)}/{len(extra)} empty added columns: {dead[:4]}")
+
+
+def compare_feature_sets(frame: pl.DataFrame, sets: dict[str, list[str]], *, min_train: int = 3, head=None) -> dict:
     """A/B one head across named feature sets on ONE frame.
 
     The frame is fixed so the only thing varying is the feature list -- the
@@ -247,6 +296,7 @@ def compare_feature_sets(
     the feature change with any nondeterminism in the build.
     """
     head = head or head_gbm
+    assert_arms_differ(frame, sets)
     out = {}
     print(f"{'set':>22} {'MAE':>8} {'Brier':>8} {'corr':>7} {'cal_err':>8}")
     for name, feats in sets.items():
@@ -274,9 +324,7 @@ def sweep_blend_k(seasons: list[int], ks=(2.0, 4.0, 8.0, 12.0, 20.0)) -> dict:
     is still thin. That is the signature of a prior decaying too fast.
     """
     out = {}
-    print(
-        f"{'k':>6} {'MAE':>7} {'Brier':>8} {'wk2-4':>7} {'wk5-8':>7} {'wk9-12':>7} {'wk13+':>7}"
-    )
+    print(f"{'k':>6} {'MAE':>7} {'Brier':>8} {'wk2-4':>7} {'wk5-8':>7} {'wk9-12':>7} {'wk13+':>7}")
     for k in ks:
         frame = build_game_frame(seasons, enrich=True, blend_k=k, verbose=False)
         frame, diffs = diff_features(frame, paired_features(frame))
@@ -288,9 +336,7 @@ def sweep_blend_k(seasons: list[int], ks=(2.0, 4.0, 8.0, 12.0, 20.0)) -> dict:
             name=f"k={k}",
             min_train=3,
         )
-        d = oof.with_columns(
-            (pl.col("pred_margin") - pl.col("margin")).abs().alias("ae")
-        )
+        d = oof.with_columns((pl.col("pred_margin") - pl.col("margin")).abs().alias("ae"))
         buckets = []
         for lo, hi in ((2, 4), (5, 8), (9, 12), (13, 25)):
             s = d.filter(pl.col("week").is_between(lo, hi))
@@ -300,10 +346,7 @@ def sweep_blend_k(seasons: list[int], ks=(2.0, 4.0, 8.0, 12.0, 20.0)) -> dict:
             "brier": rep.wp["brier"],
             "by_week": buckets,
         }
-        print(
-            f"{k:>6.1f} {rep.margin['mae']:>7.3f} {rep.wp['brier']:>8.4f} "
-            + " ".join(f"{b:>7.2f}" for b in buckets)
-        )
+        print(f"{k:>6.1f} {rep.margin['mae']:>7.3f} {rep.wp['brier']:>8.4f} " + " ".join(f"{b:>7.2f}" for b in buckets))
     return out
 
 
@@ -391,9 +434,7 @@ def main(
             min_train=3,
         )
         print("gbm by week bucket (MAE):")
-        d = oof.with_columns(
-            (pl.col("pred_margin") - pl.col("margin")).abs().alias("ae")
-        )
+        d = oof.with_columns((pl.col("pred_margin") - pl.col("margin")).abs().alias("ae"))
         for lo, hi, lbl in (
             (2, 4, "2-4"),
             (5, 8, "5-8"),

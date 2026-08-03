@@ -43,6 +43,8 @@ markers = [
     "integration: whole-corpus or network test requiring fetched/cached JSON or a CFBD key (deselected by default)",
     "live: hits the live ESPN API (gated by CFB_LIVE_TESTS=1)",
 ]
-testpaths = ["tests"]
-pythonpath = ["."]
+testpaths = ["python/tests"]
+# Relative to this file, which now sits at the repo root (2026-08-03);
+# the Python sources stayed under python/.
+pythonpath = ["python"]
 addopts = '-m "not integration"'

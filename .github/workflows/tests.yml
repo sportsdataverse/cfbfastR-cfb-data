@@ -43,7 +43,7 @@ jobs:
         uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
-          cache-dependency-glob: python/uv.lock
+          cache-dependency-glob: uv.lock
 
       # --frozen: CI must fail on a stale lockfile rather than silently re-resolve.
       - name: Sync deps

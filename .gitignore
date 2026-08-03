@@ -20,3 +20,6 @@ python/artifacts/
 
 # Local-only experiments / debug inspectors (untracked working notes)
 dev/
+
+# uv-managed project virtualenv (now at the repo root).
+.venv/

@@ -28,8 +28,47 @@ def _pl(df) -> pl.DataFrame:
 
 
 def _implied(odds: np.ndarray) -> np.ndarray:
-    """American odds -> implied probability (still vigged)."""
-    return np.where(odds > 0, 100.0 / (odds + 100.0), -odds / (-odds + 100.0))
+    """American odds -> implied probability (still vigged).
+
+    Guards the degenerate rows the feed actually contains: odds of 0 (and the
+    impossible -100) divide by zero and produce inf, which then poisons the
+    de-vig normalisation for the whole game.
+    """
+    o = np.asarray(odds, dtype=float)
+    bad = (o == 0) | (o == -100) | ~np.isfinite(o)
+    p = np.where(o > 0, 100.0 / (np.abs(o) + 100.0), np.abs(o) / (np.abs(o) + 100.0))
+    return np.where(bad, np.nan, p)
+
+
+def abbr_crosswalk(bl: pl.DataFrame) -> pl.DataFrame:
+    """Derive abbr -> team_id FROM THE BETTING DATA ITSELF.
+
+    ``load_cfb_team_info().abbreviation`` matches only 147 of the 602 distinct
+    betting abbreviations (24%), and a game needs BOTH teams resolved, so the
+    external crosswalk stranded 92% of games -- and the 8% that survived were a
+    biased slice (constant-baseline home edge +7.30 vs +3.34 overall), which is
+    how it produced a "market" MAE of 12.85 at corr 0.498, worse-correlated
+    than our own model. A ceiling you cannot trust is worse than none.
+
+    No external table is needed. Every row carries ``home_team_id`` and
+    ``away_team_id``, so for a given abbr its OWN id appears in every row
+    mentioning it, while each opponent's id appears only in the games they
+    played. The mode over that tally is the team, by a wide margin.
+    """
+    long = pl.concat(
+        [
+            bl.select("abbr", pl.col("home_team_id").alias("tid")),
+            bl.select("abbr", pl.col("away_team_id").alias("tid")),
+        ]
+    ).drop_nulls()
+    return (
+        long.group_by(["abbr", "tid"])
+        .len()
+        .sort("len", descending=True)
+        .group_by("abbr")
+        .first()
+        .select("abbr", "tid")
+    )
 
 
 def market_frame(seasons: list[int]) -> pl.DataFrame:
@@ -38,30 +77,9 @@ def market_frame(seasons: list[int]) -> pl.DataFrame:
     Returns columns ``game_id``, ``mkt_margin`` (positive = home favoured),
     ``mkt_wp``. Games without a usable line are absent, not null-filled.
     """
-    from sportsdataverse.cfb import load_cfb_betting_lines, load_cfb_team_info
+    from sportsdataverse.cfb import load_cfb_betting_lines
 
-    bl = _pl(load_cfb_betting_lines(seasons))
-    info = _pl(load_cfb_team_info(seasons))
-
-    # abbr -> team_id. Abbreviations are not unique across all of history, so
-    # keep it season-scoped where the info frame allows.
-    abbr_col = next(
-        (c for c in ("abbreviation", "team_abbreviation", "abbr") if c in info.columns),
-        None,
-    )
-    id_col = next((c for c in ("team_id", "id") if c in info.columns), None)
-    if not abbr_col or not id_col:
-        raise ValueError(f"no abbr/id columns in team_info: {info.columns[:20]}")
-    xwalk = (
-        info.select(
-            pl.col(abbr_col).cast(pl.Utf8).alias("abbr"),
-            pl.col(id_col).cast(pl.Int64).alias("tid"),
-        )
-        .drop_nulls()
-        .unique(subset=["abbr"], keep="first")
-    )
-
-    base = bl.select(
+    bl = _pl(load_cfb_betting_lines(seasons)).select(
         pl.col("game_id").cast(pl.Int64),
         pl.col("market_type").cast(pl.Utf8),
         pl.col("abbr").cast(pl.Utf8),
@@ -69,7 +87,8 @@ def market_frame(seasons: list[int]) -> pl.DataFrame:
         pl.col("odds").cast(pl.Float64, strict=False),
         pl.col("home_team_id").cast(pl.Int64, strict=False),
         pl.col("away_team_id").cast(pl.Int64, strict=False),
-    ).join(xwalk, on="abbr", how="inner")
+    )
+    base = bl.join(abbr_crosswalk(bl), on="abbr", how="inner")
 
     is_home = pl.col("tid") == pl.col("home_team_id")
 

@@ -40,6 +40,30 @@ bash scripts/daily_cfb_R_processor.sh -s 2024 -e 2024    # all datasets, season 
 Rscript R/releases_init.R                                # one-time: create release tags
 ```
 
+### Recruiting datasets (backfill / manual)
+
+`scripts/10_build_recruiting.sh` builds `cfb_recruits`, `cfb_team_talent` and
+`cfb_returning_production`. The daily processor already builds the current
+season; this script is the **backfill** entry point, and it carries each
+dataset's measured floor so a below-floor request is clamped rather than
+silently producing a thinner number:
+
+| dataset | floor | why |
+|---|---|---|
+| `cfb_recruits` | 2002 | 247 composite ratings collapse before then (2001: 52% rated on page 1, 0% by page 4) |
+| `cfb_team_talent` | 2005 | 2002 + the 4-class window |
+| `cfb_returning_production` | 2005 | needs the season S-1 ESPN player box, which floors at 2004 |
+
+```sh
+bash scripts/10_build_recruiting.sh                                   # all three, floor..current
+bash scripts/10_build_recruiting.sh --publish                         # + upload to the release tags
+bash scripts/10_build_recruiting.sh --dataset team_talent --start 2020 --end 2024
+```
+
+`recruits` and `team_talent` read the raw 247 store from `cfbfastR-cfb-raw`
+(`CFB_RAW_ROOT`, default `../cfbfastR-cfb-raw`); `returning_production` reads
+the ESPN player box and needs no store.
+
 ## Automation
 
 Triggered by a `repository_dispatch` from `cfbfastR-cfb-raw` on every push (the commit

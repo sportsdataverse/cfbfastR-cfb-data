@@ -226,10 +226,17 @@ def build_recruiting(
                     df = pl.from_pandas(df)
                 assert_returning_is_real(df, label=f"{spec.dataset} {season}")
             else:
-                # Talent for season S draws on classes S-window+1..S; a missing
-                # class silently shrinks the composite, so require the full
-                # window rather than quietly publishing a thinner number.
-                years = list(range(season - TALENT_WINDOW + 1, season + 1))
+                # `recruits` is a per-season passthrough -- it needs ONLY its own
+                # class. Talent draws on classes S-window+1..S, where a missing
+                # class silently shrinks the composite, so only IT requires the
+                # full window. Requiring the window for both made cfb_recruits
+                # 2002-2004 fail on classes that predate the usable floor and
+                # were never going to exist.
+                years = (
+                    [season]
+                    if dataset == "recruits"
+                    else list(range(season - TALENT_WINDOW + 1, season + 1))
+                )
                 missing = [y for y in years if y not in have]
                 if missing:
                     raise FileNotFoundError(
@@ -247,12 +254,29 @@ def build_recruiting(
                     f"{spec.dataset} {season}: 0 rows -- refusing to publish an empty season"
                 )
 
-            out = Path(base) / spec.dataset
+            # MUST be the parquet/ subdir: publish._dataset_files looks for
+            # {base}/{dataset}/parquet/{stem}_{season}.parquet. Writing flat
+            # made the file list come back empty, so the tag was created and
+            # NOTHING was uploaded -- silently, with the build still reporting
+            # rows written and 0 failures.
+            out = Path(base) / spec.dataset / "parquet"
             out.mkdir(parents=True, exist_ok=True)
             df.write_parquet(out / f"{spec.stem}_{season}.parquet")
             print(f"  {spec.dataset} {season}: {df.height} rows", flush=True)
             if publish:
-                publish_dataset(spec, season, base=base, dry_run=dry_run)
+                res = publish_dataset(spec, season, base=base, dry_run=dry_run)
+                # A publish that uploaded nothing is a FAILURE, not a success.
+                # Without this the tag exists, the log says "N rows", and the
+                # release is empty -- which is how this shipped the first time.
+                if not dry_run and not any(
+                    (res.get("uploaded") or {}).values()
+                    if isinstance(res, dict)
+                    else []
+                ):
+                    raise ValueError(
+                        f"{spec.dataset} {season}: publish uploaded 0 files. Expected "
+                        f"{Path(base) / spec.dataset / 'parquet'}/{spec.stem}_{season}.parquet"
+                    )
         except Exception as exc:  # noqa: BLE001 - one bad season must not kill the sweep
             print(
                 f"  {spec.dataset} {season}: FAILED ({type(exc).__name__}: {exc})",

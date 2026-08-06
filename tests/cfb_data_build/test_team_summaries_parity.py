@@ -138,3 +138,47 @@ def test_percentile_pass_rush_are_rates_not_shares(
         "pass_success + rush_success still sums to overall success, so the "
         "denominator is still all plays rather than pass / rush plays"
     )
+
+
+def test_sack_and_int_only_passers_are_kept(
+    built: tuple[int, dict[str, pl.DataFrame]],
+) -> None:
+    """A passer whose whole season is sacks/picks must still appear (#33).
+
+    `qb_data` used to be seeded only from completion/incompletion-derived ids
+    with sacks and interceptions LEFT-joined on, so a passer with neither an
+    attempt nor a completion had no seed row and vanished -- 13 sack-only and
+    20 int-only keys in 2025. Same family as #30: the plays that went missing
+    were the negative-only ones.
+    """
+    _yr, out = built
+    p = out["passing"]
+    seeded = p.filter(pl.col("att") == 0)
+
+    # every seeded row must be there for a reason and be self-consistent
+    assert (seeded["sacked"] + seeded["pass_int"] > 0).all(), (
+        "a zero-attempt passer only belongs here if he took a sack or threw a pick"
+    )
+    assert (seeded["dropbacks"] > 0).all(), "seeded rows must have a real denominator"
+    assert seeded["games"].is_not_null().all(), "seeded rows need games for EPAgame"
+    # comppct is undefined without attempts -- null, never 0/0
+    assert seeded.filter(pl.col("pass_int") == 0)["comppct"].is_null().all()
+
+
+def test_no_division_artifacts_in_passing(
+    built: tuple[int, dict[str, pl.DataFrame]],
+) -> None:
+    """Seeding zero-attempt passers (#33) added new zero denominators.
+
+    `comppct` divides by attempts and `yardsplay` by plays, both of which are
+    now legitimately 0 for a seeded row. A NaN reaching the release would also
+    poison the derived `*_rank` columns.
+    """
+    _yr, out = built
+    p = out["passing"]
+    for col, dtype in p.schema.items():
+        if dtype not in (pl.Float64, pl.Float32):
+            continue
+        s = p[col]
+        bad = int((s.is_nan() | s.is_infinite()).sum())
+        assert bad == 0, f"{col} has {bad} inf/NaN values"

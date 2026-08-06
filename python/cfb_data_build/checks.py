@@ -214,6 +214,7 @@ def assert_passer_epa_includes_sacks(df, *, label: str = "") -> None:
         "TEPA",
         "sacked",
         "pass_int",
+        "att",
         "dropbacks",
         "sack_epa",
         "int_epa",
@@ -251,4 +252,35 @@ def assert_passer_epa_includes_sacks(df, *, label: str = "") -> None:
             raise ValueError(
                 f"passing{tag}: aggregate {col} is {total:.1f}, expected clearly "
                 f"negative. {col.split('_')[0]} EPA is not reaching the passer."
+            )
+
+    # (3) zero-attempt passers are seeded from the sack/INT keys (#33), which
+    # introduced `att == 0` and `plays == 0` as legitimate states. Every such row
+    # must be there for a reason, and no divisor may have produced inf/NaN --
+    # a NaN would propagate straight into the derived `*_rank` columns.
+    seeded = df.filter(pl.col("att") == 0)
+    if seeded.height:
+        stray = seeded.filter((pl.col("sacked") + pl.col("pass_int")) <= 0)
+        if stray.height:
+            raise ValueError(
+                f"passing{tag}: {stray.height} passer(s) have no attempts, no sacks "
+                "and no interceptions. A zero-attempt row only belongs in this "
+                "table when a sack or a pick put it there (see #33)."
+            )
+        if (seeded["dropbacks"] <= 0).any():
+            raise ValueError(
+                f"passing{tag}: a seeded zero-attempt passer has dropbacks <= 0, "
+                "so EPAplay divided by nothing."
+            )
+
+    for col, dtype in df.schema.items():
+        if dtype not in (pl.Float64, pl.Float32):
+            continue
+        s = df[col]
+        n_bad = int((s.is_nan() | s.is_infinite()).sum())
+        if n_bad:
+            raise ValueError(
+                f"passing{tag}: {col} has {n_bad} inf/NaN value(s). A zero "
+                "denominator reached the output -- `comppct` divides by attempts "
+                "and `yardsplay` by plays, both of which are 0 for a #33 row."
             )

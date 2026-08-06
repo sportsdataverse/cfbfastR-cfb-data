@@ -24,6 +24,7 @@ RAIOLA = {
     "TEPA": 32.07396871224046,
     "EPAplay": 0.12778473590534048,
     "dropbacks": 251.0,
+    "att": 219.0,
     "sacked": 27,
     "pass_int": 5,
     "sack_epa": -44.13125030696392,
@@ -74,6 +75,38 @@ def test_raises_when_sack_or_int_epa_is_not_negative() -> None:
             assert_passer_epa_includes_sacks(_passers(**{col: 0.0}))
 
 
+def test_accepts_a_seeded_zero_attempt_passer() -> None:
+    """A #33 row: no attempts, one sack, and that is the whole season."""
+    seeded = _passers(
+        passer_player_name="Squirrel White",
+        att=0.0,
+        TEPA=-1.0479698181152344,
+        dropbacks=1.0,
+        EPAplay=-1.0479698181152344,
+        sacked=1,
+        pass_int=0,
+        int_epa=-0.0,
+        comppct=None,
+    )
+    assert assert_passer_epa_includes_sacks(seeded) is None
+
+
+def test_raises_on_a_zero_attempt_passer_with_nothing_behind_it() -> None:
+    """`att == 0` with no sack and no pick means the seed logic misfired."""
+    bogus = _passers(
+        att=0.0, sacked=0, pass_int=0, TEPA=0.0, EPAplay=0.0, dropbacks=1.0
+    )
+    with pytest.raises(ValueError, match="#33"):
+        assert_passer_epa_includes_sacks(bogus)
+
+
+def test_raises_on_nan_from_a_zero_denominator() -> None:
+    """`comppct` = 0/0 for a seeded passer must never reach the release."""
+    nan_row = _passers(comppct=float("nan"))
+    with pytest.raises(ValueError, match="inf/NaN"):
+        assert_passer_epa_includes_sacks(nan_row)
+
+
 def test_raises_on_empty_and_on_missing_columns() -> None:
     with pytest.raises(ValueError, match="EMPTY"):
         assert_passer_epa_includes_sacks(_passers().clear())
@@ -86,6 +119,7 @@ def test_raises_on_empty_and_on_missing_columns() -> None:
         "dropbacks",
         "sacked",
         "pass_int",
+        "att",
         "sack_epa",
         "int_epa",
     ):

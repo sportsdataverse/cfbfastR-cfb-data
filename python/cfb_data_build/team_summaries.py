@@ -822,7 +822,11 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
         on=["pos_team_id", "passer_player_name"],
         how="anti",
     )
-    sack_counts = (
+    # Bound to names before the group_by so `_neg_meta` below can reuse the
+    # resolved rows -- a passer seeded only from these needs a name and a real
+    # game count, and taking them from the union is exact where a per-side
+    # maximum would undercount a QB sacked in one game and picked in another.
+    _sack_rows = (
         plays.filter((pl.col("pass") == 1) & (pl.col("sack_vec") == 1))
         .select(
             [
@@ -831,6 +835,7 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
                 "sack_taken_player_id",
                 "yds_sacked",
                 "EPA",
+                "game_id",
             ]
         )
         .join(id_map, on=["pos_team_id", "passer_player_name"], how="left")
@@ -840,7 +845,9 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
             )
         )
         .filter(pl.col("qb_id").is_not_null())
-        .group_by(["pos_team_id", "qb_id"])
+    )
+    sack_counts = (
+        _sack_rows.group_by(["pos_team_id", "qb_id"])
         .agg(
             sacked=pl.len(),
             sack_yds=pl.col("yds_sacked").sum(),
@@ -850,7 +857,7 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
         )
         .rename({"qb_id": "passer_player_id"})
     )
-    int_counts = (
+    _int_rows = (
         plays.filter((pl.col("pass") == 1) & (pl.col("int") == 1))
         .select(
             [
@@ -858,6 +865,7 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
                 "passer_player_name",
                 "interception_thrown_player_id",
                 "EPA",
+                "game_id",
             ]
         )
         .join(id_map, on=["pos_team_id", "passer_player_name"], how="left")
@@ -867,21 +875,60 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
             )
         )
         .filter(pl.col("qb_id").is_not_null())
-        .group_by(["pos_team_id", "qb_id"])
+    )
+    int_counts = (
+        _int_rows.group_by(["pos_team_id", "qb_id"])
         .agg(pass_int=pl.len(), int_epa=pl.col("EPA").sum())
         .rename({"qb_id": "passer_player_id"})
     )
-    # KNOWN GAP (cfbfastR-cfb-data#33): these are LEFT joins onto a `qb_data`
-    # seeded only from completion/incompletion-derived ids, so a passer whose
-    # entire season is sacks and/or interceptions never appears at all. Measured
-    # 2025: 13 sack-only and 20 int-only keys, though a chunk of the latter are
-    # negative TEAM placeholder ids rather than players. Deliberately not fixed
-    # here -- seeding from the union needs a call on whether a zero-attempt
-    # passer belongs on the leaderboard, and guards for the per-game columns
-    # that would divide by `games`/`att` of 0.
+    _key = ["pos_team_id", "qb_id"]
+    _neg_meta = (
+        pl.concat(
+            [
+                _sack_rows.select([*_key, "game_id", "passer_player_name"]),
+                _int_rows.select([*_key, "game_id", "passer_player_name"]),
+            ]
+        )
+        .group_by(_key)
+        .agg(
+            neg_games=pl.col("game_id").n_unique(),
+            neg_name=pl.col("passer_player_name").drop_nulls().first(),
+        )
+        .rename({"qb_id": "passer_player_id"})
+    )
+    # SEED FROM THE UNION, NOT FROM ATTEMPTS ALONE (cfbfastR-cfb-data#33).
+    #
+    # These were LEFT joins onto a `qb_data` built only from
+    # completion/incompletion-derived ids, so a passer whose entire season is
+    # sacks and/or interceptions had no seed row and vanished from the table --
+    # 13 sack-only and 20 int-only keys in 2025, 7 and 6 in 2019, 9 and 0 in
+    # 2007. Same family as #30: the negative-only outcomes were the ones lost.
+    #
+    # `full` + `coalesce` unions the keys. Negative ids are deliberately NOT
+    # filtered -- `TEAM` rows already ship in this table (6 in 2025, with real
+    # `att` and `TEPA`), so dropping them here would invent an inconsistency
+    # rather than remove one.
+    _team_games = (
+        _add_team_games(plays).group_by("pos_team_id").agg(pl.col("team_games").first())
+    )
     qb_data = (
-        qb_data.join(sack_counts, on=["pos_team_id", "passer_player_id"], how="left")
-        .join(int_counts, on=["pos_team_id", "passer_player_id"], how="left")
+        qb_data.join(
+            sack_counts,
+            on=["pos_team_id", "passer_player_id"],
+            how="full",
+            coalesce=True,
+        )
+        .join(
+            int_counts,
+            on=["pos_team_id", "passer_player_id"],
+            how="full",
+            coalesce=True,
+        )
+        .join(
+            _neg_meta,
+            on=["pos_team_id", "passer_player_id"],
+            how="left",
+        )
         .with_columns(
             sacked=pl.col("sacked").fill_null(0),
             sack_yds=pl.col("sack_yds").fill_null(0),
@@ -889,6 +936,27 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
             sack_epa=pl.col("sack_epa").fill_null(0.0),
             int_epa=pl.col("int_epa").fill_null(0.0),
         )
+        # Seed the attempt-side columns for rows the union just added. They have
+        # no attempts by construction, so every count is a true 0; `games` and
+        # the name come from the sack/INT plays themselves. `success` stays null
+        # -- it is a mean over attempts, and this passer has none.
+        .join(_team_games, on="pos_team_id", how="left", suffix="_tm")
+        .with_columns(
+            passer_player_name=pl.coalesce("passer_player_name", "neg_name"),
+            games=pl.coalesce("games", "neg_games"),
+            team_games=pl.coalesce("team_games", "team_games_tm"),
+            plays=pl.col("plays").fill_null(0),
+            TEPA=pl.col("TEPA").fill_null(0.0),
+            yards=pl.col("yards").fill_null(0.0),
+            comp=pl.col("comp").fill_null(0.0),
+            att=pl.col("att").fill_null(0.0),
+            passing_td=pl.col("passing_td").fill_null(0.0),
+            # per-game rates over zero attempts are a legitimate 0; `yardsplay`
+            # is left null because it divides by `plays`, which is also 0
+            playsgame=pl.col("playsgame").fill_null(0.0),
+            yardsgame=pl.col("yardsgame").fill_null(0.0),
+        )
+        .drop("neg_name", "neg_games", "team_games_tm")
         # RETURN SACK + INTERCEPTION EPA TO THE PASSER (cfbfastR-cfb-data#30).
         #
         # `qb_data` above aggregates only plays whose derived passer id survives
@@ -932,7 +1000,12 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
             # count of `att + sacked` omits every pick (Raiola 2025 shipped 246
             # for a QB with 251). Both denominators here add `pass_int` back.
             dropbacks=pl.col("att") + pl.col("sacked") + pl.col("pass_int"),
-            comppct=pl.col("comp") / (pl.col("att") + pl.col("pass_int")),
+            # null, not 0/0, for a #33 passer who never attempted a pass --
+            # completion percentage is undefined without a denominator, and a
+            # NaN here would poison comppct_rank.
+            comppct=pl.when((pl.col("att") + pl.col("pass_int")) > 0)
+            .then(pl.col("comp") / (pl.col("att") + pl.col("pass_int")))
+            .otherwise(None),
             sack_adj_yards=pl.col("yards") - pl.col("sack_yds").abs(),
         )
         .with_columns(

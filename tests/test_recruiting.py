@@ -156,7 +156,9 @@ def test_build_recruiting_writes_parquet_when_the_window_is_whole(
         "team_talent", 2016, 2016, raw_root=tmp_path, base=str(out)
     )
     assert failures == []
-    written = out / "cfb_team_talent" / "cfb_team_talent_2016.parquet"
+    # the parquet/ subdir is load-bearing: publish._dataset_files looks there,
+    # and writing flat is what made every release tag publish EMPTY
+    written = out / "cfb_team_talent" / "parquet" / "cfb_team_talent_2016.parquet"
     assert written.is_file()
     df = pl.read_parquet(written)
     assert df.height > 0 and "talent_composite" in df.columns
@@ -265,7 +267,10 @@ def test_returning_production_needs_no_raw_store(tmp_path, monkeypatch) -> None:
     )
     assert failures == [], failures
     assert (
-        out / "cfb_returning_production" / "cfb_returning_production_2012.parquet"
+        out
+        / "cfb_returning_production"
+        / "parquet"
+        / "cfb_returning_production_2012.parquet"
     ).is_file()
 
 

@@ -226,3 +226,82 @@ def test_build_recruits_emits_espn_ids_not_247_keys(tmp_path) -> None:
         assert (resolved["team_id"] != resolved["team_id_247"]).any(), (
             "team_id is identical to team_id_247 -- the ESPN re-key did not run"
         )
+
+
+def test_returning_production_needs_no_raw_store(tmp_path, monkeypatch) -> None:
+    """`returning_production` builds from the player box, not the 247 store.
+
+    It is grouped with the recruiting datasets because it is the same
+    roster-continuity family and publishes identically, but requiring a raw
+    store for it would make an empty store block a dataset that never reads one.
+    """
+    import cfb_data_build.recruiting as rec_mod
+
+    fake = pl.DataFrame(
+        {
+            "season": [2012] * 4,
+            "team_id": ["1", "2", "3", "4"],
+            "off_returning": [0.70, 0.55, 0.40, 0.30],
+            "def_returning": [0.60, 0.50, 0.45, 0.35],
+            "overall_returning": [0.70, 0.55, 0.40, 0.30],
+            "n_returning": [20, 18, 15, 12],
+        }
+    )
+    monkeypatch.setattr(
+        "sportsdataverse.cfb.cfb_returning_production",
+        lambda *a, **k: fake,
+        raising=False,
+    )
+    import sportsdataverse.cfb as sdv_cfb
+
+    monkeypatch.setattr(
+        sdv_cfb, "cfb_returning_production", lambda *a, **k: fake, raising=False
+    )
+
+    out = tmp_path / "out"
+    # tmp_path holds NO recruit store, which is the point
+    failures = rec_mod.build_recruiting(
+        "returning_production", 2012, 2012, raw_root=tmp_path, base=str(out)
+    )
+    assert failures == [], failures
+    assert (
+        out / "cfb_returning_production" / "cfb_returning_production_2012.parquet"
+    ).is_file()
+
+
+def test_returning_gate_rejects_a_collapsed_join() -> None:
+    """A returning table where every team matches must not publish.
+
+    Returning production is a ratio over two joins; when either key collapses
+    every team lands on the same value and the frame still looks well-formed.
+    """
+    from cfb_data_build.checks import assert_returning_is_real
+
+    real = pl.DataFrame(
+        {
+            "season": [2012] * 4,
+            "team_id": ["1", "2", "3", "4"],
+            "off_returning": [0.70, 0.55, 0.40, 0.30],
+            "overall_returning": [0.70, 0.55, 0.40, 0.30],
+        }
+    )
+    assert_returning_is_real(real, label="real")
+
+    with pytest.raises(ValueError, match="EMPTY"):
+        assert_returning_is_real(real.head(0), label="empty")
+    with pytest.raises(ValueError, match="a join key collapsed"):
+        assert_returning_is_real(
+            real.with_columns(pl.lit(0.5, dtype=pl.Float64).alias("off_returning")),
+            label="flat",
+        )
+    # A low mean must trip the RANGE check, not the sd check -- so this frame
+    # keeps real spread (sd 0.08) while sitting far below a plausible season.
+    # Scaling the real values instead collapsed sd as well and silently tested
+    # the wrong branch.
+    zeroish = real.with_columns(
+        pl.Series("off_returning", [0.0, 0.0, 0.0, 0.16]),
+        pl.Series("overall_returning", [0.0, 0.0, 0.0, 0.16]),
+    )
+    assert zeroish["off_returning"].std() > 0.05  # the sd gate must NOT be what fires
+    with pytest.raises(ValueError, match="outside"):
+        assert_returning_is_real(zeroish, label="zeroish")

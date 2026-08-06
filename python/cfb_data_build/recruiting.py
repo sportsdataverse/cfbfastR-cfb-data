@@ -164,7 +164,18 @@ def build_team_talent(
 RECRUITING_SPECS = {
     "recruits": DatasetSpec("cfb_recruits", "cfb_recruits", "cfb_recruits"),
     "team_talent": DatasetSpec("cfb_team_talent", "cfb_team_talent", "cfb_team_talent"),
+    # Not built from the recruit store at all -- returning production comes from
+    # the ESPN player box (season S-1) plus the season-S roster. It lives here
+    # because it is the same roster-continuity family and publishes the same way.
+    "returning_production": DatasetSpec(
+        "cfb_returning_production",
+        "cfb_returning_production",
+        "cfb_returning_production",
+    ),
 }
+
+#: Datasets that need the 247 raw store. `returning_production` does not.
+_NEEDS_RAW_STORE = ("recruits", "team_talent")
 
 #: Class years behind a talent composite. A season's talent is built from this
 #: many signing classes, so the raw store must reach back this far before the
@@ -191,7 +202,7 @@ def build_recruiting(
     Unlike the game-derived datasets this reads NO game data -- only the raw
     247 store -- so it can rebuild years after the fact with no network at all.
     """
-    from cfb_data_build.checks import assert_talent_is_real
+    from cfb_data_build.checks import assert_returning_is_real, assert_talent_is_real
     from cfb_data_build.publish import publish_dataset
 
     if dataset not in RECRUITING_SPECS:
@@ -199,7 +210,7 @@ def build_recruiting(
             f"unknown recruiting dataset {dataset!r}; expected one of {sorted(RECRUITING_SPECS)}"
         )
     spec = RECRUITING_SPECS[dataset]
-    have = set(available_years(raw_root))
+    have = set(available_years(raw_root)) if dataset in _NEEDS_RAW_STORE else set()
     failures: list[tuple[int, str]] = []
 
     for season in range(start_year, end_year + 1):
@@ -207,19 +218,30 @@ def build_recruiting(
             # Talent for season S draws on classes S-window+1..S; a missing
             # class silently shrinks the composite, so require the full window
             # rather than quietly publishing a thinner number.
-            years = list(range(season - TALENT_WINDOW + 1, season + 1))
-            missing = [y for y in years if y not in have]
-            if missing:
-                raise FileNotFoundError(
-                    f"{spec.dataset} {season}: raw store is missing complete classes {missing}. "
-                    "Scrape them first -- a partial window understates talent without erroring."
-                )
-            recruits = build_recruits(raw_root, years)
-            if dataset == "recruits":
-                df = recruits.filter(pl.col("season") == season)
+            if dataset == "returning_production":
+                from sportsdataverse.cfb import cfb_returning_production
+
+                df = cfb_returning_production(season)
+                if not isinstance(df, pl.DataFrame):
+                    df = pl.from_pandas(df)
+                assert_returning_is_real(df, label=f"{spec.dataset} {season}")
             else:
-                df = build_team_talent(recruits, [season])
-                assert_talent_is_real(df, label=f"{spec.dataset} {season}")
+                # Talent for season S draws on classes S-window+1..S; a missing
+                # class silently shrinks the composite, so require the full
+                # window rather than quietly publishing a thinner number.
+                years = list(range(season - TALENT_WINDOW + 1, season + 1))
+                missing = [y for y in years if y not in have]
+                if missing:
+                    raise FileNotFoundError(
+                        f"{spec.dataset} {season}: raw store is missing complete classes {missing}. "
+                        "Scrape them first -- a partial window understates talent without erroring."
+                    )
+                recruits = build_recruits(raw_root, years)
+                if dataset == "recruits":
+                    df = recruits.filter(pl.col("season") == season)
+                else:
+                    df = build_team_talent(recruits, [season])
+                    assert_talent_is_real(df, label=f"{spec.dataset} {season}")
             if df.height == 0:
                 raise ValueError(
                     f"{spec.dataset} {season}: 0 rows -- refusing to publish an empty season"

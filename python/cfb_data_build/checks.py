@@ -109,16 +109,62 @@ def assert_talent_is_real(df, *, label: str = "") -> None:
     """
     tag = f" [{label}]" if label else ""
     if df.height == 0:
-        raise ValueError(f"team talent{tag} is EMPTY -- a recruit class is never empty; this is a fetch failure")
+        raise ValueError(
+            f"team talent{tag} is EMPTY -- a recruit class is never empty; this is a fetch failure"
+        )
     for col in ("talent_composite", "blue_chip_ratio"):
         if col not in df.columns:
-            raise ValueError(f"team talent{tag} is missing {col!r}; got {sorted(df.columns)}")
+            raise ValueError(
+                f"team talent{tag} is missing {col!r}; got {sorted(df.columns)}"
+            )
         nulls = df[col].null_count()
         if nulls == df.height:
-            raise ValueError(f"team talent{tag}: {col!r} is entirely null ({nulls}/{df.height})")
+            raise ValueError(
+                f"team talent{tag}: {col!r} is entirely null ({nulls}/{df.height})"
+            )
     sd = df["blue_chip_ratio"].drop_nulls().std()
     if sd is None or float(sd) < MIN_BLUE_CHIP_SD:
         raise ValueError(
             f"team talent{tag}: blue_chip_ratio sd={sd} < {MIN_BLUE_CHIP_SD} -- "
             "every team looks alike, so the join or the feed collapsed"
+        )
+
+
+#: Returning production that does not vary across teams is not measuring
+#: roster continuity. Measured on real seasons: off_returning sd ~0.22-0.24.
+MIN_RETURNING_SD = 0.05
+
+
+def assert_returning_is_real(df, *, label: str = "") -> None:
+    """Raise if a returning-production table is empty or degenerate.
+
+    Same shape of failure as `assert_talent_is_real`, different input. Returning
+    production is a ratio built from two joins (season S-1 production, season S
+    roster); when either side fails to key, every team comes out at 0.0 or null
+    and the table still looks well-formed. The 57.7% name-match that preceded
+    the id-keyed join is exactly that failure part-way done.
+    """
+    tag = f" [{label}]" if label else ""
+    if df.height == 0:
+        raise ValueError(
+            f"returning production{tag} is EMPTY -- a season always has returning players"
+        )
+    for col in ("off_returning", "overall_returning"):
+        if col not in df.columns:
+            raise ValueError(
+                f"returning production{tag} is missing {col!r}; got {sorted(df.columns)}"
+            )
+        if df[col].null_count() == df.height:
+            raise ValueError(f"returning production{tag}: {col!r} is entirely null")
+    sd = df["off_returning"].drop_nulls().std()
+    if sd is None or float(sd) < MIN_RETURNING_SD:
+        raise ValueError(
+            f"returning production{tag}: off_returning sd={sd} < {MIN_RETURNING_SD} -- "
+            "every team returns the same share, so a join key collapsed"
+        )
+    mean = df["off_returning"].drop_nulls().mean()
+    if mean is not None and not (0.05 <= float(mean) <= 0.95):
+        raise ValueError(
+            f"returning production{tag}: off_returning mean={mean:.3f} is outside [0.05, 0.95]; "
+            "a real season lands near 0.40-0.60"
         )

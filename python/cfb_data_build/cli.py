@@ -25,8 +25,10 @@ DERIVED = ("gamelog", "ratings_weekly", "team_summaries_weekly")
 #   power_index   game x team, the matchup predictions the old asset only linked
 FPI = ("fpi_weekly", "power_index")
 
-#: Built from the raw 247 recruit store, not from game data (no network).
-RECRUITING = ("recruits", "team_talent")
+#: Roster-continuity datasets. `recruits`/`team_talent` come from the raw 247
+#: store; `returning_production` comes from the ESPN player box + rosters and
+#: needs no raw store at all.
+RECRUITING = ("recruits", "team_talent", "returning_production")
 
 
 def build_parser() -> argparse.ArgumentParser:

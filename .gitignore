@@ -23,3 +23,8 @@ dev/
 
 # uv-managed project virtualenv (now at the repo root).
 .venv/
+
+# Local agent/skill tooling -- never part of the repo
+.omc/
+agent/
+.agents/

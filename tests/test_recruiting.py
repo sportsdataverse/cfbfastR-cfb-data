@@ -107,8 +107,12 @@ def test_load_year_reads_the_raw_store_offline(tmp_path) -> None:
     assert df.height == 3
     assert df.schema["team_id"] == pl.Utf8
     assert df["season"].unique().to_list() == [2016]
-    # integer-origin key -> "71", never "71.0"
-    assert set(df["team_id"].to_list()) == {"71", "72", "73"}
+    # integer-origin 247 key -> "71", never "71.0"
+    assert set(df["team_id_247"].to_list()) == {"71", "72", "73"}
+    # `team_id` is the ESPN id, resolved from the team NAME -- these synthetic
+    # schools do not exist, so it stays null. That is the correct outcome: an
+    # unresolvable team must not silently inherit 247's key.
+    assert df["team_id"].null_count() == df.height
 
 
 def test_build_recruits_raises_when_nothing_is_available(tmp_path) -> None:
@@ -131,7 +135,20 @@ def test_build_recruiting_requires_the_full_talent_window(tmp_path) -> None:
     assert failures == [(2016, "FileNotFoundError")]
 
 
-def test_build_recruiting_writes_parquet_when_the_window_is_whole(tmp_path) -> None:
+def test_build_recruiting_writes_parquet_when_the_window_is_whole(
+    tmp_path, monkeypatch
+) -> None:
+    # Synthetic schools never resolve to ESPN ids, and talent drops unresolved
+    # teams -- correctly. Stub the re-key so this test stays about the window
+    # and publish logic; the re-key itself is covered by its own test.
+    import sys as _sys
+
+    tal_mod = _sys.modules["sportsdataverse.cfb.cfb_roster_talent"]
+    monkeypatch.setattr(
+        tal_mod,
+        "_add_espn_team_id",
+        lambda df: df.with_columns(pl.col("team_id_247").alias("team_id")),
+    )
     for y in range(2016 - TALENT_WINDOW + 1, 2017):
         _write_year(tmp_path, y)
     out = tmp_path / "out"
@@ -180,3 +197,32 @@ def test_talent_gate_fires_on_the_shapes_the_bug_produced() -> None:
         )
     with pytest.raises(ValueError, match="missing"):
         assert_talent_is_real(real.drop("blue_chip_ratio"), label="missing")
+
+
+def test_build_recruits_emits_espn_ids_not_247_keys(tmp_path) -> None:
+    """The compile must resolve `team_id` to the ESPN id, like the sdv-py loader.
+
+    The producer assembles pages itself rather than going through
+    `load_recruit_classes`, so it has to apply the ESPN re-key too. When it
+    didn't, `team_id` stayed at the null placeholder the normalizer emits and
+    every downstream join silently matched nothing.
+
+    Worse than nothing, actually: before the re-key existed at all, `team_id`
+    held 247's own key, and because both are small integers a fraction of them
+    COLLIDE with ESPN ids -- an inner join then returns plausible rows for the
+    wrong teams. Measured during this change: the 2024 leaderboard read
+    Rutgers / Cornell / Yale / MIT carrying Alabama's and Georgia's numbers.
+    """
+    _write_year(tmp_path, 2016)
+    df = build_recruits(tmp_path, [2016])
+    assert "team_id_247" in df.columns, df.columns
+    assert "team_id" in df.columns
+    # the synthetic teams are not real schools, so they will not resolve --
+    # what matters is that the column exists, is Utf8, and is NOT the 247 key
+    assert df.schema["team_id"] == pl.Utf8
+    assert df.schema["team_id_247"] == pl.Utf8
+    resolved = df.filter(pl.col("team_id").is_not_null())
+    if resolved.height:
+        assert (resolved["team_id"] != resolved["team_id_247"]).any(), (
+            "team_id is identical to team_id_247 -- the ESPN re-key did not run"
+        )

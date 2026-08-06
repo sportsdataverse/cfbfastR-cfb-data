@@ -114,7 +114,14 @@ def load_year(raw_root: str | Path, year: int) -> pl.DataFrame:
         frames.append(talent_mod._normalize_recruit_page(raw, year))
     if not frames:
         return pl.DataFrame(schema=talent_mod._RECRUIT_SCHEMA)
-    return pl.concat(frames)
+    # `_normalize_recruit_page` leaves `team_id` as a null placeholder -- the
+    # ESPN id is resolved once, over the whole frame, in sdv-py's
+    # `load_recruit_classes`. This producer assembles pages itself and so must
+    # do the same, or every downstream join sees nulls. (247's own key stays in
+    # `team_id_247`; the two are NOT interchangeable -- 247 key 71 is Michigan,
+    # ESPN id 130 -- and a fraction of them collide, so mixing them returns
+    # plausible rows for the wrong teams rather than failing.)
+    return talent_mod._add_espn_team_id(pl.concat(frames))
 
 
 def build_recruits(

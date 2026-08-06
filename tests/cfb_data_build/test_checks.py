@@ -77,5 +77,17 @@ def test_raises_when_sack_or_int_epa_is_not_negative() -> None:
 def test_raises_on_empty_and_on_missing_columns() -> None:
     with pytest.raises(ValueError, match="EMPTY"):
         assert_passer_epa_includes_sacks(_passers().clear())
-    with pytest.raises(ValueError, match="missing"):
-        assert_passer_epa_includes_sacks(_passers().drop("sack_epa"))
+    # every column the two invariants read is required -- `pass_int` included,
+    # because without it the int_epa check would fall back to the whole frame
+    # and pass on an unrelated negative aggregate
+    for col in (
+        "TEPA",
+        "EPAplay",
+        "dropbacks",
+        "sacked",
+        "pass_int",
+        "sack_epa",
+        "int_epa",
+    ):
+        with pytest.raises(ValueError, match="missing"):
+            assert_passer_epa_includes_sacks(_passers().drop(col))

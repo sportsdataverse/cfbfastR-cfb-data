@@ -209,7 +209,15 @@ def assert_passer_epa_includes_sacks(df, *, label: str = "") -> None:
     tag = f" [{label}]" if label else ""
     if df.height == 0:
         raise ValueError(f"passing{tag} is EMPTY")
-    need = {"EPAplay", "TEPA", "sacked", "dropbacks", "sack_epa", "int_epa"}
+    need = {
+        "EPAplay",
+        "TEPA",
+        "sacked",
+        "pass_int",
+        "dropbacks",
+        "sack_epa",
+        "int_epa",
+    }
     missing = need - set(df.columns)
     if missing:
         raise ValueError(f"passing{tag} missing {sorted(missing)}")
@@ -232,7 +240,10 @@ def assert_passer_epa_includes_sacks(df, *, label: str = "") -> None:
 
     # (2) sack and interception EPA must actually have reached the passer
     for col, flag in (("sack_epa", "sacked"), ("int_epa", "pass_int")):
-        rows = df.filter(pl.col(flag) > 0) if flag in df.columns else df
+        # `flag` is in `need`, so no absent-column fallback: falling back to the
+        # whole frame would let a frame with no interception count pass on an
+        # unrelated negative aggregate.
+        rows = df.filter(pl.col(flag) > 0)
         if not rows.height:
             continue
         total = float(rows[col].sum())

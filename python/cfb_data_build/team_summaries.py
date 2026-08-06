@@ -871,6 +871,14 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
         .agg(pass_int=pl.len(), int_epa=pl.col("EPA").sum())
         .rename({"qb_id": "passer_player_id"})
     )
+    # KNOWN GAP (cfbfastR-cfb-data#33): these are LEFT joins onto a `qb_data`
+    # seeded only from completion/incompletion-derived ids, so a passer whose
+    # entire season is sacks and/or interceptions never appears at all. Measured
+    # 2025: 13 sack-only and 20 int-only keys, though a chunk of the latter are
+    # negative TEAM placeholder ids rather than players. Deliberately not fixed
+    # here -- seeding from the union needs a call on whether a zero-attempt
+    # passer belongs on the leaderboard, and guards for the per-game columns
+    # that would divide by `games`/`att` of 0.
     qb_data = (
         qb_data.join(sack_counts, on=["pos_team_id", "passer_player_id"], how="left")
         .join(int_counts, on=["pos_team_id", "passer_player_id"], how="left")

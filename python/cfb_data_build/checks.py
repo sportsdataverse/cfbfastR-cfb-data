@@ -81,3 +81,44 @@ def assert_adjustment_is_real(
             f"(expected ~0.035) and that no caller overrides it."
         )
     return rep
+
+
+#: A team-talent table with no blue-chip variation is not measuring talent.
+#: Measured on the 2013-2026 raw store: blue_chip_ratio spans 0.000 (Air Force)
+#: to 0.563 (Georgia), sd ~0.13. A degenerate build (empty feed, all-null join)
+#: collapses this to 0.
+MIN_BLUE_CHIP_SD = 0.02
+
+
+def assert_talent_is_real(df, *, label: str = "") -> None:
+    """Raise if a team-talent table is empty or degenerate.
+
+    THE FAILURE THIS PREVENTS. `cfb_roster_talent` returned ZERO ROWS for every
+    season from the day it was written (2026-07-08) -- `_PAGE_SIZE` was 500,
+    which exceeds what the 247 RDB serves inside the 3s client timeout, so every
+    page raised curl(28) and the loop returned a well-formed empty frame. That
+    is indistinguishable from "247 has no recruits" to every caller.
+
+    It then flowed into `cfb_recruiting_projection`'s left join with talent on
+    the LEFT, so zero talent rows produced zero output rows, and the only thing
+    between an empty feed and a silently talent-free projection was
+    `build_recruiting`'s zero-row guard. Nothing measured the talent itself.
+
+    Assert on the OUTPUT: a real talent table has rows, non-null composites, and
+    blue-chip ratios that actually vary.
+    """
+    tag = f" [{label}]" if label else ""
+    if df.height == 0:
+        raise ValueError(f"team talent{tag} is EMPTY -- a recruit class is never empty; this is a fetch failure")
+    for col in ("talent_composite", "blue_chip_ratio"):
+        if col not in df.columns:
+            raise ValueError(f"team talent{tag} is missing {col!r}; got {sorted(df.columns)}")
+        nulls = df[col].null_count()
+        if nulls == df.height:
+            raise ValueError(f"team talent{tag}: {col!r} is entirely null ({nulls}/{df.height})")
+    sd = df["blue_chip_ratio"].drop_nulls().std()
+    if sd is None or float(sd) < MIN_BLUE_CHIP_SD:
+        raise ValueError(
+            f"team talent{tag}: blue_chip_ratio sd={sd} < {MIN_BLUE_CHIP_SD} -- "
+            "every team looks alike, so the join or the feed collapsed"
+        )

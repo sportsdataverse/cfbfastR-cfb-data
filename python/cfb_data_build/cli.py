@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import os
+
 import argparse
 
 from cfb_data_build.build import build_dataset
@@ -23,13 +25,16 @@ DERIVED = ("gamelog", "ratings_weekly", "team_summaries_weekly")
 #   power_index   game x team, the matchup predictions the old asset only linked
 FPI = ("fpi_weekly", "power_index")
 
+#: Built from the raw 247 recruit store, not from game data (no network).
+RECRUITING = ("recruits", "team_talent")
+
 
 def build_parser() -> argparse.ArgumentParser:
     ap = argparse.ArgumentParser(prog="cfb_data_build")
     ap.add_argument(
         "--dataset",
         required=True,
-        choices=sorted(REGISTRY) + ["summaries", *DERIVED, *FPI],
+        choices=sorted(REGISTRY) + ["summaries", *DERIVED, *FPI, *RECRUITING],
     )
     ap.add_argument("-s", "--start-year", type=int, required=True)
     ap.add_argument("-e", "--end-year", type=int, required=True)
@@ -50,6 +55,14 @@ def build_parser() -> argparse.ArgumentParser:
         "--publish", action="store_true", help="upload to the espn_cfb_* release"
     )
     ap.add_argument("--base", default="cfb", help="output root directory")
+    ap.add_argument(
+        "--raw-root",
+        default=os.environ.get("CFB_RAW_ROOT", "../cfbfastR-cfb-raw"),
+        help=(
+            "recruiting datasets: cfbfastR-cfb-raw checkout holding "
+            "cfb/recruits/json (env CFB_RAW_ROOT)"
+        ),
+    )
     ap.add_argument(
         "--dry-run",
         action="store_true",
@@ -122,6 +135,23 @@ def main(argv: list[str] | None = None) -> int:
             args.dataset,
             args.start_year,
             args.end_year,
+            base=args.base,
+            publish=args.publish,
+            dry_run=args.dry_run,
+        )
+        print(f"\n=== {args.dataset}: {len(failures)} failures ===")
+        for season, kind in failures:
+            print(f"  {season}: {kind}")
+        return 1 if failures else 0
+
+    if args.dataset in RECRUITING:
+        from cfb_data_build.recruiting import build_recruiting
+
+        failures = build_recruiting(
+            args.dataset,
+            args.start_year,
+            args.end_year,
+            raw_root=args.raw_root,
             base=args.base,
             publish=args.publish,
             dry_run=args.dry_run,

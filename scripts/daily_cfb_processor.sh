@@ -29,6 +29,13 @@ PY_DERIVED="rosters gamelog"
 # Weekly long-format snapshots read the summaries/ratings output, so they run
 # last of all.
 PY_WEEKLY="ratings_weekly team_summaries_weekly"
+# Roster continuity. `recruits`/`team_talent` read the 247 raw store in
+# cfbfastR-cfb-raw; `returning_production` reads the ESPN player box and needs
+# no store. `recruiting_proj` consumes talent + returning, so it runs after
+# both. run_py does `cd python`, so the raw root must be absolute or resolve
+# from there -- CFB_RAW_ROOT is exported below for exactly that reason.
+PY_RECRUITING="recruits team_talent returning_production"
+export CFB_RAW_ROOT="${CFB_RAW_ROOT:-$(cd "$(dirname "$0")/../../cfbfastR-cfb-raw" 2>/dev/null && pwd)}"
 
 mkdir -p logs
 ANY_FAILED=0
@@ -60,6 +67,16 @@ for i in $(seq "${START_YEAR}" "${END_YEAR}"); do
     run_py summaries --publish
 
     for ds in $PY_WEEKLY; do run_py "$ds" --no-fetch --publish; done
+
+    # Recruiting last: it depends on nothing above, and a 247 outage must not
+    # cost the game datasets. Per-dataset failures are already non-fatal here.
+    if [[ -n "$CFB_RAW_ROOT" && -d "$CFB_RAW_ROOT" ]]; then
+      for ds in $PY_RECRUITING; do run_py "$ds" --publish; done
+    else
+      echo "::warning::CFB_RAW_ROOT unset or missing ($CFB_RAW_ROOT); skipping recruiting datasets"
+      # returning_production reads no raw store, so it can still run
+      run_py returning_production --publish
+    fi
 
     echo "RSCRIPT_RC=$SEASON_RC" > "/tmp/_rc_${i}"
     git pull >/dev/null

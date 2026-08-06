@@ -3,10 +3,13 @@
 
 Unlike the other datasets this is a **season-level aggregation off a full
 cfbfastR-schema season pbp** (``cfbfastR::load_cfb_pbp`` in R; the analogous
-``sportsdataverse.cfb.load_cfb_pbp`` in Python -- currently stale for recent
-seasons, which is why this dataset's CI step stays on R for now). It produces 5
-released tables: ``percentiles``, ``team_summaries``, ``passing``, ``rushing``,
-``receiving``.
+``sportsdataverse.cfb.load_cfb_pbp`` in Python). It produces 5 released tables:
+``percentiles``, ``team_summaries``, ``passing``, ``rushing``, ``receiving``.
+
+This module IS the live producer. R's ``espn_cfb_15`` was retired once the P2
+pbp rebuild made the Python season-pbp source current -- ``scripts/
+daily_cfb_processor.sh`` runs ``run_py summaries --publish``. Several workflow
+comments still credit the R script; they are stale.
 
 Opponent-adjusted EPA is delegated to the shared
 :func:`sportsdataverse.cfb.cfb_adjusted_epa` primitive (single owner since sdv-py
@@ -29,7 +32,7 @@ import numpy as np
 import polars as pl
 from sportsdataverse.cfb import cfb_adjusted_epa
 
-from .checks import assert_adjustment_is_real
+from .checks import assert_adjustment_is_real, assert_passer_epa_includes_sacks
 
 # Explosive-play EPA thresholds (R build lines 604-608).
 _EXPLOSIVE_PASS_EPA = 2.4
@@ -170,8 +173,8 @@ def add_derived_metrics(plays: pl.DataFrame) -> pl.DataFrame:
         .then(pl.lit(0.0))
         .otherwise(None),
         nonExplosiveEpa=pl.when(
-            pl.col("EPA").is_not_null() & (pl.col("explosive") == False)
-        )  # noqa: E712
+            pl.col("EPA").is_not_null() & (pl.col("explosive") == False)  # noqa: E712
+        )
         .then(pl.col("EPA"))
         .otherwise(None),
     )
@@ -822,7 +825,13 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
     sack_counts = (
         plays.filter((pl.col("pass") == 1) & (pl.col("sack_vec") == 1))
         .select(
-            ["pos_team_id", "passer_player_name", "sack_taken_player_id", "yds_sacked"]
+            [
+                "pos_team_id",
+                "passer_player_name",
+                "sack_taken_player_id",
+                "yds_sacked",
+                "EPA",
+            ]
         )
         .join(id_map, on=["pos_team_id", "passer_player_name"], how="left")
         .with_columns(
@@ -832,12 +841,25 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
         )
         .filter(pl.col("qb_id").is_not_null())
         .group_by(["pos_team_id", "qb_id"])
-        .agg(sacked=pl.len(), sack_yds=pl.col("yds_sacked").sum())
+        .agg(
+            sacked=pl.len(),
+            sack_yds=pl.col("yds_sacked").sum(),
+            # EPA of the sacks, so it can be returned to the passer's total.
+            # Without this the QB's TEPA omits its largest negative component.
+            sack_epa=pl.col("EPA").sum(),
+        )
         .rename({"qb_id": "passer_player_id"})
     )
     int_counts = (
         plays.filter((pl.col("pass") == 1) & (pl.col("int") == 1))
-        .select(["pos_team_id", "passer_player_name", "interception_thrown_player_id"])
+        .select(
+            [
+                "pos_team_id",
+                "passer_player_name",
+                "interception_thrown_player_id",
+                "EPA",
+            ]
+        )
         .join(id_map, on=["pos_team_id", "passer_player_name"], how="left")
         .with_columns(
             qb_id=pl.coalesce(
@@ -846,7 +868,7 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
         )
         .filter(pl.col("qb_id").is_not_null())
         .group_by(["pos_team_id", "qb_id"])
-        .agg(pass_int=pl.len())
+        .agg(pass_int=pl.len(), int_epa=pl.col("EPA").sum())
         .rename({"qb_id": "passer_player_id"})
     )
     qb_data = (
@@ -856,6 +878,26 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
             sacked=pl.col("sacked").fill_null(0),
             sack_yds=pl.col("sack_yds").fill_null(0),
             pass_int=pl.col("pass_int").fill_null(0),
+            sack_epa=pl.col("sack_epa").fill_null(0.0),
+            int_epa=pl.col("int_epa").fill_null(0.0),
+        )
+        # RETURN SACK + INTERCEPTION EPA TO THE PASSER (cfbfastR-cfb-data#30).
+        #
+        # `qb_data` above aggregates only plays whose derived passer id survives
+        # (completion_player_id ?? incompletion_player_id), which is neither on a
+        # sack nor on a pick -- so TEPA carried the passer's completions and
+        # incompletions and none of his worst outcomes. The counts were already
+        # revived here; the EPA was not.
+        #
+        # Measured on 2025: sacks -6,277.9 EPA over 3,703 plays and interceptions
+        # -5,628.7 over 1,421 were discarded league-wide, and the resulting
+        # `EPAplay` ran ~2.8x a play-by-play reconstruction (Dylan Raiola: 0.4801
+        # published vs 0.173 over his actual dropbacks).
+        #
+        # `EPAplay` is now per DROPBACK, matching the numerator. Dividing a
+        # dropback-complete TEPA by attempts would swap one mismatch for another.
+        .with_columns(
+            TEPA=pl.col("TEPA") + pl.col("sack_epa") + pl.col("int_epa"),
         )
         .with_columns(
             detmer=(pl.col("yards") / (400 * pl.col("games")))
@@ -877,10 +919,21 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
                     ).abs()
                 )
             ),
-            dropbacks=pl.col("att") + pl.col("sacked"),
+            # `att` counts the `pass_attempt` flag over the frame `summarize_passer`
+            # received, which excludes sacks AND interceptions -- so a dropback
+            # count of `att + sacked` omits every pick (Raiola 2025 shipped 246
+            # for a QB with 251). Both denominators here add `pass_int` back.
+            dropbacks=pl.col("att") + pl.col("sacked") + pl.col("pass_int"),
+            comppct=pl.col("comp") / (pl.col("att") + pl.col("pass_int")),
             sack_adj_yards=pl.col("yards") - pl.col("sack_yds").abs(),
         )
-        .with_columns(yardsdropback=pl.col("sack_adj_yards") / pl.col("dropbacks"))
+        .with_columns(
+            yardsdropback=pl.col("sack_adj_yards") / pl.col("dropbacks"),
+            # re-derived from the corrected TEPA; `summarize_passer` computed
+            # these from the attempts-only sum before sacks/INTs were folded in
+            EPAplay=pl.col("TEPA") / pl.col("dropbacks"),
+            EPAgame=pl.col("TEPA") / pl.col("games"),
+        )
     )
     qb_data = _attach_leader_ranks(
         qb_data,
@@ -969,6 +1022,9 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
     # the columns were present and plausible; it sat live for two days. Check
     # the output, not the config.
     assert_adjustment_is_real(team_data, label=f"team_summaries {yr}")
+    # A passer's TEPA must carry his sacks and interceptions -- see #30, where
+    # it did not and every column still looked individually plausible.
+    assert_passer_epa_includes_sacks(qb_data, label=f"passing {yr}")
     qb_out = _prepare_for_write(qb_data, yr, schools).rename(
         {"passer_player_id": "player_id"}
     )

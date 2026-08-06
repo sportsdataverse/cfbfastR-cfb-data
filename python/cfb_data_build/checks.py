@@ -168,3 +168,76 @@ def assert_returning_is_real(df, *, label: str = "") -> None:
             f"returning production{tag}: off_returning mean={mean:.3f} is outside [0.05, 0.95]; "
             "a real season lands near 0.40-0.60"
         )
+
+
+def assert_passer_epa_includes_sacks(df, *, label: str = "") -> None:
+    """Raise if `cfb_passing` looks like it dropped its negative plays again.
+
+    THE FAILURE THIS PREVENTS (cfbfastR-cfb-data#30). `summarize_passer`
+    aggregates plays whose derived passer id survives
+    (`completion_player_id ?? incompletion_player_id`) -- which is neither a
+    sack nor an interception. The counts were revived separately via a
+    name->id map; the EPA was not. So every QB's TEPA carried his completions
+    and incompletions and none of his worst outcomes, and `EPAplay` ran ~2.8x a
+    play-by-play reconstruction. Dylan Raiola 2025 published 0.4801 EPA/play,
+    9th nationally, against 0.128 once his 27 sacks and 5 picks were counted.
+
+    Nothing caught it because every column was individually plausible: `sacked`
+    was right, `dropbacks` was right, and TEPA was simply a sum over the wrong
+    row set. The check therefore has to compare columns TO EACH OTHER.
+
+    NO LEVEL THRESHOLD IS POSSIBLE HERE -- this was measured, not assumed. The
+    first version of this gate rejected any qualified passer above 0.45
+    EPA/dropback, on the belief that the post-fix leader sat near 0.35.
+    Rebuilding 2004-2025 says otherwise: the real post-fix maximum is Jameis
+    Winston's 2013 at **0.7666** over 321 dropbacks, which is HIGHER than the
+    0.7641 that the broken 2025 build produced. A legitimate Heisman season and
+    the bug occupy the same range, so any cutoff either blocks Winston or never
+    fires. The two invariants below are exact instead:
+
+    1. `TEPA` must equal `EPAplay * dropbacks`. Before the fix `EPAplay` was
+       the mean EPA over ATTEMPTS (`TEPA / plays`) while `dropbacks` was
+       `att + sacked`, so the identity broke for every passer who took a sack.
+       It holds for all 10,463 post-fix rows across 22 seasons. This is what
+       catches the numerator and denominator spanning different play sets --
+       the actual defect in #30.
+    2. `sack_epa` and `int_epa` must both be present and clearly negative in
+       aggregate. That is what dies if the `(pos_team_id, passer_player_name)`
+       join breaks or the EPA column stops being carried into it, which is how
+       the values would silently stop reaching the passer.
+    """
+    tag = f" [{label}]" if label else ""
+    if df.height == 0:
+        raise ValueError(f"passing{tag} is EMPTY")
+    need = {"EPAplay", "TEPA", "sacked", "dropbacks", "sack_epa", "int_epa"}
+    missing = need - set(df.columns)
+    if missing:
+        raise ValueError(f"passing{tag} missing {sorted(missing)}")
+
+    # (1) numerator and denominator must span the same play set
+    off = df.with_columns(
+        _resid=(pl.col("TEPA") - pl.col("EPAplay") * pl.col("dropbacks")).abs()
+        - 1e-6 * (1 + pl.col("TEPA").abs())
+    ).filter(pl.col("_resid") > 0)
+    if off.height:
+        worst = off.sort("_resid", descending=True).head(1).to_dicts()[0]
+        name = worst.get("passer_player_name", "?")
+        raise ValueError(
+            f"passing{tag}: TEPA != EPAplay * dropbacks for {off.height} passer(s); "
+            f"worst is {name} with TEPA={worst['TEPA']:.3f} vs "
+            f"EPAplay*dropbacks={worst['EPAplay'] * worst['dropbacks']:.3f}. "
+            "EPA/play is being computed over a different set of plays than TEPA "
+            "sums -- the shape of cfbfastR-cfb-data#30."
+        )
+
+    # (2) sack and interception EPA must actually have reached the passer
+    for col, flag in (("sack_epa", "sacked"), ("int_epa", "pass_int")):
+        rows = df.filter(pl.col(flag) > 0) if flag in df.columns else df
+        if not rows.height:
+            continue
+        total = float(rows[col].sum())
+        if total >= 0:
+            raise ValueError(
+                f"passing{tag}: aggregate {col} is {total:.1f}, expected clearly "
+                f"negative. {col.split('_')[0]} EPA is not reaching the passer."
+            )

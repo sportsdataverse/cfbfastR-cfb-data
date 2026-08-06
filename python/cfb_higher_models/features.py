@@ -71,7 +71,9 @@ def add_prior_season(weekly: pl.DataFrame, cols=CARRY_COLS) -> pl.DataFrame:
     return weekly.join(final, on=["team_id", "season"], how="left")
 
 
-def blend_prior(weekly: pl.DataFrame, cols=CARRY_COLS, *, k: float = 4.0) -> pl.DataFrame:
+def blend_prior(
+    weekly: pl.DataFrame, cols=CARRY_COLS, *, k: float = 4.0
+) -> pl.DataFrame:
     """Shrinkage blend of this season's as-of rating toward last season's final.
 
     ``blend = (n/(n+k)) * current + (k/(n+k)) * prior`` where ``n`` is games
@@ -83,21 +85,90 @@ def blend_prior(weekly: pl.DataFrame, cols=CARRY_COLS, *, k: float = 4.0) -> pl.
     have = [c for c in cols if c in weekly.columns and f"prior_{c}" in weekly.columns]
     if not have:
         return weekly
-    n = pl.col("valid_games") if "valid_games" in weekly.columns else pl.col("through_week")
+    n = (
+        pl.col("valid_games")
+        if "valid_games" in weekly.columns
+        else pl.col("through_week")
+    )
     w = n.cast(pl.Float64) / (n.cast(pl.Float64) + k)
     return weekly.with_columns(
         [
-            (w * pl.col(c).fill_null(0.0) + (1 - w) * pl.col(f"prior_{c}").fill_null(pl.col(c)).fill_null(0.0)).alias(
-                f"blend_{c}"
-            )
+            (
+                w * pl.col(c).fill_null(0.0)
+                + (1 - w) * pl.col(f"prior_{c}").fill_null(pl.col(c)).fill_null(0.0)
+            ).alias(f"blend_{c}")
             for c in have
         ]
     )
 
 
+#: Preseason roster context. Both are SEASON-level and known before week 1:
+#: talent accumulates classes signed before the season, and returning
+#: production is last season's play attributed to this season's roster. Joining
+#: them at the team-week level therefore adds no leakage surface -- the value
+#: is constant across the season's weeks.
+ROSTER_COLS = (
+    "talent_composite",
+    "blue_chip_ratio",
+    "off_returning",
+    "overall_returning",
+)
+
+
+def add_roster_context(weekly: pl.DataFrame) -> pl.DataFrame:
+    """Attach per-team-season talent + returning production from the releases.
+
+    MEASURED WORTH (walk-forward margin, 2016-2024, GBM head, n=4174):
+
+        base           MAE 13.1715
+        +talent        MAE 13.0555   +0.116  p_game .020  p_season .235  4/5
+        +retprod       MAE 13.1639   +0.008  p_game .877  p_season .907  2/5
+        +both          MAE 12.9843   +0.187  p_game .002  p_season .043  5/5  REAL
+
+    Returning production ALONE is worth nothing but adds value WITH talent:
+    talent is how much raw material a roster has, returning production how much
+    of it is actually on the field.
+
+    This is the first thing to move the model since the prior-season carryover,
+    and it is the class that was predicted to: the family ablation showed the
+    play-derived substrate is ~one dimension, so gains must come from OUTSIDE
+    current-season play.
+
+    Reads the published `cfb_team_talent` / `cfb_returning_production`. A
+    season the releases do not cover yields nulls, which the tree heads handle.
+    """
+    from sportsdataverse.cfb import load_cfb_returning_production, load_cfb_team_talent
+
+    seasons = sorted(weekly["season"].unique().to_list())
+    key = pl.col("team_id").cast(pl.Int64).cast(pl.Utf8)
+
+    def _load(fn, cols):
+        df = fn(seasons)
+        if not isinstance(df, pl.DataFrame):
+            df = pl.from_pandas(df)
+        if df.height == 0:
+            return None
+        return df.select(
+            pl.col("season").cast(pl.Int64),
+            key,
+            *[pl.col(c).cast(pl.Float64) for c in cols],
+        )
+
+    tal = _load(load_cfb_team_talent, ["talent_composite", "blue_chip_ratio"])
+    rp = _load(load_cfb_returning_production, ["off_returning", "overall_returning"])
+    out = weekly.with_columns(key.alias("_rk"))
+    for extra in (tal, rp):
+        if extra is None:
+            continue
+        out = out.join(
+            extra, left_on=["season", "_rk"], right_on=["season", "team_id"], how="left"
+        )
+    return out.drop("_rk")
+
+
 def enrich_weekly(weekly: pl.DataFrame, *, k: float = 4.0) -> pl.DataFrame:
     """The full Phase-2 team-week enrichment, in dependency order."""
-    return blend_prior(add_prior_season(weekly), k=k)
+    return add_roster_context(blend_prior(add_prior_season(weekly), k=k))
 
 
 # --------------------------------------------------------------------------
@@ -133,7 +204,13 @@ def add_rest(games: pl.DataFrame) -> pl.DataFrame:
             "unchanged would score identically to the baseline and read as a "
             "negative result."
         )
-    g = games.with_columns(pl.col(date_col).cast(pl.Utf8).str.slice(0, 10).str.to_date(strict=False).alias("_d"))
+    g = games.with_columns(
+        pl.col(date_col)
+        .cast(pl.Utf8)
+        .str.slice(0, 10)
+        .str.to_date(strict=False)
+        .alias("_d")
+    )
     # Long form (one row per team-game) so "previous game" is a single sort.
     long = pl.concat(
         [
@@ -142,7 +219,9 @@ def add_rest(games: pl.DataFrame) -> pl.DataFrame:
         ]
     )
     long = long.sort(["tid", "season", "_d"]).with_columns(
-        (pl.col("_d") - pl.col("_d").shift(1).over(["tid", "season"])).dt.total_days().alias("rest")
+        (pl.col("_d") - pl.col("_d").shift(1).over(["tid", "season"]))
+        .dt.total_days()
+        .alias("rest")
     )
     out = g
     for side in ("home", "away"):

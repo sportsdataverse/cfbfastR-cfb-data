@@ -77,7 +77,21 @@ jobs:
       - name: Default years if empty
         if: ${{ env.START_YEAR == '' }}
         run: |
-          YR=$(Rscript -e 'cat(cfbfastR::most_recent_cfb_season())')
+          # `cfbfastR::most_recent_cfb_season()` is NOT exported -- it is an
+          # internal helper in R/utils.R -- so the `::` call errored and took
+          # every unparameterised run down ("not an exported object from
+          # 'namespace:cfbfastR'"). `:::` would work but reaches into another
+          # package's internals for a date calculation.
+          #
+          # Same rule, computed here: the CFB season rolls over on Aug 15.
+          # 10# forces base 10 -- bash reads a zero-padded "08" as octal.
+          Y=$(date -u +%Y); M=$((10#$(date -u +%m))); D=$((10#$(date -u +%d)))
+          if [ "$M" -gt 8 ] || { [ "$M" -eq 8 ] && [ "$D" -ge 15 ]; }; then
+            YR=$Y
+          else
+            YR=$((Y - 1))
+          fi
+          echo "resolved season: $YR (from ${Y}-${M}-${D} UTC)"
           echo "START_YEAR=$YR" >> $GITHUB_ENV
           echo "END_YEAR=$YR"   >> $GITHUB_ENV
 

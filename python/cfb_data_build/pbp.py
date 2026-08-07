@@ -361,12 +361,17 @@ PBP_OUTPUT_ORDER: list[str] = [
 ]
 
 # .pbp_drop_player_aliases (pbp_output_schema.R:154-160) -- always dropped.
+# `*_return_player` are the raw regex intermediates and `rush_player_name`
+# duplicates `rusher_player_name`, so all three are genuine aliases. The two
+# `*_return_player_name` columns were dropped here historically but are NOT
+# aliases: the released pbp ships `punt_return_player_id` /
+# `kickoff_return_player_id`, so withholding the name twin made returners the
+# only credited role identifiable by id alone. Retained as of this change so
+# every role ships id *and* name. Mirrors cfbfastR `pbp_output_schema.R`.
 PBP_DROP_PLAYER_ALIASES: list[str] = [
     "punt_return_player",
     "kickoff_return_player",
     "rush_player_name",
-    "punt_return_player_name",
-    "kickoff_return_player_name",
 ]
 
 # .pbp_drop_lag_lead (pbp_output_schema.R:171-212) -- dropped in default + lean.

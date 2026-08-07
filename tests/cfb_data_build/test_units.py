@@ -12,6 +12,7 @@ from cfb_data_build.build import build_dataset_frame
 from cfb_data_build.config import REGISTRY
 from cfb_data_build.pbp import (
     PBP_DROP_LAG_LEAD,
+    PBP_DROP_PLAYER_ALIASES,
     apply_pbp_output_schema,
     build_pbp_frame,
 )
@@ -99,7 +100,9 @@ def test_build_dataset_frame_dispatches_pbp_and_generic() -> None:
     assert pp.shape == (158, 56)
     # pbp dispatch == direct conform
     assert pbp.columns == build_pbp_frame(g).columns
-    assert pbp.shape == (169, 371)
+    # 373 = 371 + the two returner name columns retained so every credited
+    # role ships id *and* name (test_return_player_names_survive_the_alias_drop).
+    assert pbp.shape == (169, 373)
 
 
 # ``team_box_extra`` / ``power_index`` carry stamped game_id/season/week scalars
@@ -145,3 +148,27 @@ def test_reshape_power_index_no_fpi_game_is_empty_not_crash() -> None:
         "power_index": {"items": [{"stat": "fpi", "value": 1.5}], **_stamped()},
     }
     assert reshape_power_index(g).height == 1
+
+
+def test_return_player_names_survive_the_alias_drop() -> None:
+    """Returners must not be the one credited role that ships id-without-name.
+
+    The released pbp carries ``punt_return_player_id`` /
+    ``kickoff_return_player_id``; dropping the name twin made a returner the only
+    role identifiable by id alone. Only true aliases (the raw regex intermediates
+    and the ``rusher_player_name`` duplicate) stay dropped. Mirrors cfbfastR
+    ``pbp_output_schema.R`` -- both languages must agree or the parity gate trips.
+    """
+    assert "punt_return_player_name" not in PBP_DROP_PLAYER_ALIASES
+    assert "kickoff_return_player_name" not in PBP_DROP_PLAYER_ALIASES
+    # genuine aliases stay dropped
+    assert "rush_player_name" in PBP_DROP_PLAYER_ALIASES
+    assert "punt_return_player" in PBP_DROP_PLAYER_ALIASES
+    assert "kickoff_return_player" in PBP_DROP_PLAYER_ALIASES
+
+    g = _game()
+    raw = flat_block_frame(g["plays"], g)
+    default = apply_pbp_output_schema(raw, "default")
+    for col in ("punt_return_player_name", "kickoff_return_player_name"):
+        assert col in raw.columns, f"{col} missing upstream -- fixture drifted"
+        assert col in default.columns, f"{col} was dropped from the published tier"

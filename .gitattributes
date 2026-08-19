@@ -1,0 +1,4 @@
+# Shell scripts must keep LF endings: a CRLF copy of scripts/daily_cfb_processor.sh
+# (committed 2026-08-06 in 21e76bc) broke `set -uo pipefail` and failed the daily
+# CFB data build for two weeks straight before anyone noticed.
+*.sh text eol=lf

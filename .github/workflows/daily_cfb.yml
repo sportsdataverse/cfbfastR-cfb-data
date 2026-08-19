@@ -72,7 +72,7 @@ jobs:
       # Python builders (cfb_data_build) own the per-game reshape datasets;
       # R above is retained only for team_summaries (espn_cfb_15) + run_summary.
       - name: Set up uv + Python
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v8.1.0
         with:
           python-version: '3.12'
 

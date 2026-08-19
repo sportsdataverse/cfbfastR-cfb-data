@@ -86,7 +86,7 @@ jobs:
           persist-credentials: false   # don't leave external-repo creds on the runner
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v8.1.0
         with:
           enable-cache: true
           cache-dependency-glob: uv.lock

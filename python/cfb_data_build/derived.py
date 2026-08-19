@@ -22,6 +22,7 @@ weekly assets there would be redundant bulk.
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 import polars as pl
@@ -29,9 +30,30 @@ import polars as pl
 from cfb_data_build.config import SUMMARIES_REGISTRY, DatasetSpec
 from cfb_data_build.io import write_dataset
 
-SCHEDULE = Path(
-    r"C:\Users\saiem\Documents\GitHub-Data\sdv-dev\cfbfastR-dev\cfbfastR-cfb-raw\cfb\cfb_schedule_master.parquet"
-)
+
+def _schedule_master() -> Path:
+    """Locate cfbfastR-cfb-raw's schedule master.
+
+    This was a hardcoded absolute path to one developer's Windows checkout, so
+    `ratings_weekly` and `team_summaries_weekly` raised FileNotFoundError on
+    every other machine -- including CI, where they had never once built.
+
+    scripts/daily_cfb_processor.sh already exports CFB_RAW_ROOT (it has to:
+    run_py does `cd python`, so a relative path would not resolve). Prefer it,
+    and fall back to the sibling checkout beside this repo.
+    """
+    root = os.environ.get("CFB_RAW_ROOT")
+    if root:
+        return Path(root) / "cfb" / "cfb_schedule_master.parquet"
+    return (
+        Path(__file__).resolve().parents[3]
+        / "cfbfastR-cfb-raw"
+        / "cfb"
+        / "cfb_schedule_master.parquet"
+    )
+
+
+SCHEDULE = _schedule_master()
 
 SPECS: dict[str, DatasetSpec] = {
     "gamelog": DatasetSpec(

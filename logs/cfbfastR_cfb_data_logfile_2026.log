@@ -1,119 +1,75 @@
-warning: `VIRTUAL_ENV=/root/.venvs/default` does not match the project environment path `/mnt/sdv_repos/cfbfastR-cfb-data/.venv` and will be ignored; use `--active` to target the active environment instead
+From https://github.com/sportsdataverse/cfbfastR-cfb-data
+ * [new branch]      AE/update-air-yards-model -> origin/AE/update-air-yards-model
+ * [new branch]      feat/adv-missing-datasets -> origin/feat/adv-missing-datasets
+ * [new branch]      feat/cfb-era-vars-spread-backfill -> origin/feat/cfb-era-vars-spread-backfill
+ * [new branch]      feat/cfb-model-suite-completion -> origin/feat/cfb-model-suite-completion
+ * [new branch]      feat/cfb-ratings-builder -> origin/feat/cfb-ratings-builder
+ * [new branch]      feat/cfb-ratings-cron -> origin/feat/cfb-ratings-cron
+ * [new tag]         espn_cfb_adv_defensive -> espn_cfb_adv_defensive
+ * [new tag]         espn_cfb_adv_drives   -> espn_cfb_adv_drives
+ * [new tag]         espn_cfb_adv_passing  -> espn_cfb_adv_passing
+ * [new tag]         espn_cfb_adv_receiving -> espn_cfb_adv_receiving
+ * [new tag]         espn_cfb_adv_rushing  -> espn_cfb_adv_rushing
+ * [new tag]         espn_cfb_adv_situational -> espn_cfb_adv_situational
+ * [new tag]         espn_cfb_adv_team     -> espn_cfb_adv_team
+ * [new tag]         espn_cfb_adv_turnover -> espn_cfb_adv_turnover
+ * [new tag]         espn_cfb_betting      -> espn_cfb_betting
+ * [new tag]         espn_cfb_drives       -> espn_cfb_drives
+ * [new tag]         espn_cfb_injuries     -> espn_cfb_injuries
+ * [new tag]         espn_cfb_linescores   -> espn_cfb_linescores
+ * [new tag]         espn_cfb_pbp          -> espn_cfb_pbp
+ * [new tag]         espn_cfb_play_participants -> espn_cfb_play_participants
+ * [new tag]         espn_cfb_player_box   -> espn_cfb_player_box
+ * [new tag]         espn_cfb_power_index  -> espn_cfb_power_index
+ * [new tag]         espn_cfb_rosters      -> espn_cfb_rosters
+ * [new tag]         espn_cfb_schedules    -> espn_cfb_schedules
+ * [new tag]         espn_cfb_team_box     -> espn_cfb_team_box
 pbp 2026: 0 rows from 946 games
-warning: `VIRTUAL_ENV=/root/.venvs/default` does not match the project environment path `/mnt/sdv_repos/cfbfastR-cfb-data/.venv` and will be ignored; use `--active` to target the active environment instead
 play_participants 2026: 0 rows from 946 games
-warning: `VIRTUAL_ENV=/root/.venvs/default` does not match the project environment path `/mnt/sdv_repos/cfbfastR-cfb-data/.venv` and will be ignored; use `--active` to target the active environment instead
 team_box 2026: 1892 rows from 946 games
-warning: `VIRTUAL_ENV=/root/.venvs/default` does not match the project environment path `/mnt/sdv_repos/cfbfastR-cfb-data/.venv` and will be ignored; use `--active` to target the active environment instead
 player_box 2026: 0 rows from 946 games
-warning: `VIRTUAL_ENV=/root/.venvs/default` does not match the project environment path `/mnt/sdv_repos/cfbfastR-cfb-data/.venv` and will be ignored; use `--active` to target the active environment instead
 drives 2026: 0 rows from 946 games
-warning: `VIRTUAL_ENV=/root/.venvs/default` does not match the project environment path `/mnt/sdv_repos/cfbfastR-cfb-data/.venv` and will be ignored; use `--active` to target the active environment instead
 game_rosters 2026: 0 rows from 946 games
-warning: `VIRTUAL_ENV=/root/.venvs/default` does not match the project environment path `/mnt/sdv_repos/cfbfastR-cfb-data/.venv` and will be ignored; use `--active` to target the active environment instead
 betting 2026: 946 rows from 946 games
-warning: `VIRTUAL_ENV=/root/.venvs/default` does not match the project environment path `/mnt/sdv_repos/cfbfastR-cfb-data/.venv` and will be ignored; use `--active` to target the active environment instead
 schedules 2026: 946 rows from 946 games
-warning: `VIRTUAL_ENV=/root/.venvs/default` does not match the project environment path `/mnt/sdv_repos/cfbfastR-cfb-data/.venv` and will be ignored; use `--active` to target the active environment instead
 linescores 2026: 0 rows from 946 games
-warning: `VIRTUAL_ENV=/root/.venvs/default` does not match the project environment path `/mnt/sdv_repos/cfbfastR-cfb-data/.venv` and will be ignored; use `--active` to target the active environment instead
   power_index 2026: 1776 rows, 7 cols
 
 === power_index: 0 failures ===
-warning: `VIRTUAL_ENV=/root/.venvs/default` does not match the project environment path `/mnt/sdv_repos/cfbfastR-cfb-data/.venv` and will be ignored; use `--active` to target the active environment instead
 injuries 2026: 0 rows from 946 games
-warning: `VIRTUAL_ENV=/root/.venvs/default` does not match the project environment path `/mnt/sdv_repos/cfbfastR-cfb-data/.venv` and will be ignored; use `--active` to target the active environment instead
 adv_team 2026: 0 rows from 946 games
-warning: `VIRTUAL_ENV=/root/.venvs/default` does not match the project environment path `/mnt/sdv_repos/cfbfastR-cfb-data/.venv` and will be ignored; use `--active` to target the active environment instead
 adv_passing 2026: 0 rows from 946 games
-warning: `VIRTUAL_ENV=/root/.venvs/default` does not match the project environment path `/mnt/sdv_repos/cfbfastR-cfb-data/.venv` and will be ignored; use `--active` to target the active environment instead
 adv_rushing 2026: 0 rows from 946 games
-warning: `VIRTUAL_ENV=/root/.venvs/default` does not match the project environment path `/mnt/sdv_repos/cfbfastR-cfb-data/.venv` and will be ignored; use `--active` to target the active environment instead
 adv_receiving 2026: 0 rows from 946 games
-warning: `VIRTUAL_ENV=/root/.venvs/default` does not match the project environment path `/mnt/sdv_repos/cfbfastR-cfb-data/.venv` and will be ignored; use `--active` to target the active environment instead
 adv_defensive 2026: 0 rows from 946 games
-warning: `VIRTUAL_ENV=/root/.venvs/default` does not match the project environment path `/mnt/sdv_repos/cfbfastR-cfb-data/.venv` and will be ignored; use `--active` to target the active environment instead
 adv_turnover 2026: 0 rows from 946 games
-warning: `VIRTUAL_ENV=/root/.venvs/default` does not match the project environment path `/mnt/sdv_repos/cfbfastR-cfb-data/.venv` and will be ignored; use `--active` to target the active environment instead
 adv_drives 2026: 0 rows from 946 games
-warning: `VIRTUAL_ENV=/root/.venvs/default` does not match the project environment path `/mnt/sdv_repos/cfbfastR-cfb-data/.venv` and will be ignored; use `--active` to target the active environment instead
 adv_situational 2026: 0 rows from 946 games
-warning: `VIRTUAL_ENV=/root/.venvs/default` does not match the project environment path `/mnt/sdv_repos/cfbfastR-cfb-data/.venv` and will be ignored; use `--active` to target the active environment instead
 adv_defensive_players 2026: 0 rows from 946 games
-warning: `VIRTUAL_ENV=/root/.venvs/default` does not match the project environment path `/mnt/sdv_repos/cfbfastR-cfb-data/.venv` and will be ignored; use `--active` to target the active environment instead
 adv_specialists 2026: 0 rows from 946 games
-warning: `VIRTUAL_ENV=/root/.venvs/default` does not match the project environment path `/mnt/sdv_repos/cfbfastR-cfb-data/.venv` and will be ignored; use `--active` to target the active environment instead
 rosters 2026: no game_rosters parquet at ../cfb/game_rosters/parquet/game_rosters_2026.parquet (build game_rosters first)
-warning: `VIRTUAL_ENV=/root/.venvs/default` does not match the project environment path `/mnt/sdv_repos/cfbfastR-cfb-data/.venv` and will be ignored; use `--active` to target the active environment instead
   adv_team_gamelog 2026: 0 rows, skipped
 
 === gamelog: 0 failures ===
-warning: `VIRTUAL_ENV=/root/.venvs/default` does not match the project environment path `/mnt/sdv_repos/cfbfastR-cfb-data/.venv` and will be ignored; use `--active` to target the active environment instead
-/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/sportsdataverse/cfb/cfb_loaders.py:571: UserWarning: load_cfb_pbp: no data for season(s) [2026] (skipped)
+/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/.venv/lib/python3.12/site-packages/sportsdataverse/cfb/cfb_loaders.py:571: UserWarning: load_cfb_pbp: no data for season(s) [2026] (skipped)
   cli_warn("load_cfb_pbp: no data for season(s) {missing} (skipped)".format(missing=missing))
-/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/sportsdataverse/cfb/cfb_loaders.py:925: UserWarning: load_cfb_schedule: no data for season(s) [2026] (skipped)
+/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/.venv/lib/python3.12/site-packages/sportsdataverse/cfb/cfb_loaders.py:925: UserWarning: load_cfb_schedule: no data for season(s) [2026] (skipped)
   cli_warn("load_cfb_schedule: no data for season(s) {missing} (skipped)".format(missing=missing))
 [summaries 2026] 0 plays, skipped (season has not started)
-warning: `VIRTUAL_ENV=/root/.venvs/default` does not match the project environment path `/mnt/sdv_repos/cfbfastR-cfb-data/.venv` and will be ignored; use `--active` to target the active environment instead
-/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/sportsdataverse/cfb/cfb_loaders.py:571: UserWarning: load_cfb_pbp: no data for season(s) [2026] (skipped)
-  cli_warn("load_cfb_pbp: no data for season(s) {missing} (skipped)".format(missing=missing))
-/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/sportsdataverse/cfb/cfb_loaders.py:925: UserWarning: load_cfb_schedule: no data for season(s) [2026] (skipped)
-  cli_warn("load_cfb_schedule: no data for season(s) {missing} (skipped)".format(missing=missing))
-  !! ratings_weekly 2026: MISSING through_week [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] (0/15 built). Consumers joining week W+1 to through_week W will silently drop those games -- re-run this season before relying on it.
-  cfb_ratings_weekly 2026: 0 rows, skipped
+  FAILED 2026: FileNotFoundError: No such file or directory (os error 2): /home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-raw/cfb/cfb_schedule_master.parquet
 
-=== ratings_weekly: 0 failures ===
-warning: `VIRTUAL_ENV=/root/.venvs/default` does not match the project environment path `/mnt/sdv_repos/cfbfastR-cfb-data/.venv` and will be ignored; use `--active` to target the active environment instead
-/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/sportsdataverse/cfb/cfb_loaders.py:571: UserWarning: load_cfb_pbp: no data for season(s) [2026] (skipped)
-  cli_warn("load_cfb_pbp: no data for season(s) {missing} (skipped)".format(missing=missing))
-/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/sportsdataverse/cfb/cfb_loaders.py:925: UserWarning: load_cfb_schedule: no data for season(s) [2026] (skipped)
-  cli_warn("load_cfb_schedule: no data for season(s) {missing} (skipped)".format(missing=missing))
-[summaries 2026] 0 plays, skipped (season has not started)
-[summaries 2026] 0 plays, skipped (season has not started)
-[summaries 2026] 0 plays, skipped (season has not started)
-[summaries 2026] 0 plays, skipped (season has not started)
-[summaries 2026] 0 plays, skipped (season has not started)
-[summaries 2026] 0 plays, skipped (season has not started)
-[summaries 2026] 0 plays, skipped (season has not started)
-[summaries 2026] 0 plays, skipped (season has not started)
-[summaries 2026] 0 plays, skipped (season has not started)
-[summaries 2026] 0 plays, skipped (season has not started)
-[summaries 2026] 0 plays, skipped (season has not started)
-[summaries 2026] 0 plays, skipped (season has not started)
-[summaries 2026] 0 plays, skipped (season has not started)
-[summaries 2026] 0 plays, skipped (season has not started)
-[summaries 2026] 0 plays, skipped (season has not started)
-  !! team_summaries_weekly 2026: MISSING through_week [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] (0/15 built). Consumers joining week W+1 to through_week W will silently drop those games -- re-run this season before relying on it.
-  cfb_team_summaries_weekly 2026: 0 rows, skipped
+=== ratings_weekly: 1 failures ===
+  2026: FileNotFoundError
+::warning ::cfb_data_build ratings_weekly for season 2026 exited with code 1
+  FAILED 2026: FileNotFoundError: No such file or directory (os error 2): /home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-raw/cfb/cfb_schedule_master.parquet
 
-=== team_summaries_weekly: 0 failures ===
-warning: `VIRTUAL_ENV=/root/.venvs/default` does not match the project environment path `/mnt/sdv_repos/cfbfastR-cfb-data/.venv` and will be ignored; use `--active` to target the active environment instead
-/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/sportsdataverse/cfb/cfb_loaders.py:997: UserWarning: load_cfb_team_info: no data for season(s) [2026] (skipped)
-  cli_warn("load_cfb_team_info: no data for season(s) {missing} (skipped)".format(missing=missing))
-  cfb_recruits 2026: 4453 rows
-
-=== recruits: 0 failures ===
-warning: `VIRTUAL_ENV=/root/.venvs/default` does not match the project environment path `/mnt/sdv_repos/cfbfastR-cfb-data/.venv` and will be ignored; use `--active` to target the active environment instead
-/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/sportsdataverse/cfb/cfb_loaders.py:997: UserWarning: load_cfb_team_info: no data for season(s) [2026] (skipped)
-  cli_warn("load_cfb_team_info: no data for season(s) {missing} (skipped)".format(missing=missing))
-  cfb_team_talent 2026: 317 rows
-
-=== team_talent: 0 failures ===
-warning: `VIRTUAL_ENV=/root/.venvs/default` does not match the project environment path `/mnt/sdv_repos/cfbfastR-cfb-data/.venv` and will be ignored; use `--active` to target the active environment instead
-/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/sportsdataverse/cfb/cfb_loaders.py:851: UserWarning: load_cfb_rosters: no data for season(s) [2026] (skipped)
+=== team_summaries_weekly: 1 failures ===
+  2026: FileNotFoundError
+::warning ::cfb_data_build team_summaries_weekly for season 2026 exited with code 1
+::warning::CFB_RAW_ROOT unset or missing (); skipping recruiting datasets
+/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/.venv/lib/python3.12/site-packages/sportsdataverse/cfb/cfb_loaders.py:851: UserWarning: load_cfb_rosters: no data for season(s) [2026] (skipped)
   cli_warn("load_cfb_rosters: no data for season(s) {missing} (skipped)".format(missing=missing))
   cfb_returning_production 2026: 0 rows, skipped (season has no roster data yet)
 
 === returning_production: 0 failures ===
-On branch main
-Your branch is up to date with 'origin/main'.
-
-Changes not staged for commit:
-  (use "git add <file>..." to update what will be committed)
-  (use "git restore <file>..." to discard changes in working directory)
-	modified:   python/cfb_data_build/recruiting.py
-	modified:   python/cfb_data_build/summaries_build.py
-
-no changes added to commit (use "git add" and/or "git commit -a")
-No changes to commit
-Everything up-to-date
+nothing to commit for: CFB Data Updated (Start: 2026 End: 2026)

@@ -224,6 +224,23 @@ def build_recruiting(
                 df = cfb_returning_production(season)
                 if not isinstance(df, pl.DataFrame):
                     df = pl.from_pandas(df)
+                # Returning production joins season S-1 production to the season
+                # S roster. Before a season's first kickoff the roster side does
+                # not exist yet, so the frame is legitimately empty -- that is a
+                # season not started, not a build that went wrong, and it should
+                # read like build_derived's skip rather than failing the sweep.
+                #
+                # Only the height==0 case is downgraded. assert_returning_is_real
+                # still runs on every non-empty frame, so the failure it actually
+                # exists to catch -- a broken join yielding a well-formed table of
+                # zeros and nulls -- keeps raising exactly as before.
+                if df.height == 0:
+                    print(
+                        f"  {spec.dataset} {season}: 0 rows, skipped "
+                        "(season has no roster data yet)",
+                        flush=True,
+                    )
+                    continue
                 assert_returning_is_real(df, label=f"{spec.dataset} {season}")
             else:
                 # `recruits` is a per-season passthrough -- it needs ONLY its own

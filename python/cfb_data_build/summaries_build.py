@@ -65,6 +65,17 @@ def build_summaries_season(
         if schedule is None:
             schedule = load_cfb_schedule(seasons=[season])
 
+    # A season with no plays yet (published schedule, no kickoff) used to reach
+    # build_team_summaries with an empty frame and die on
+    # ColumnNotFoundError: game_id -- three times over, since the weekly caller
+    # retries. Report it the way build_derived reports an empty derived season.
+    if pbp is None or pbp.height == 0:
+        print(
+            f"[summaries {season}] 0 plays, skipped (season has not started)",
+            flush=True,
+        )
+        return {key: 0 for key in SUMMARIES_REGISTRY}
+
     plays = prepare_plays_input(pbp, schedule, season)
     if through_week is not None:
         plays = plays.filter(pl.col("week") <= through_week)

@@ -53,38 +53,7 @@ warning: `VIRTUAL_ENV=/root/.venvs/default` does not match the project environme
   cli_warn("load_cfb_pbp: no data for season(s) {missing} (skipped)".format(missing=missing))
 /mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/sportsdataverse/cfb/cfb_loaders.py:925: UserWarning: load_cfb_schedule: no data for season(s) [2026] (skipped)
   cli_warn("load_cfb_schedule: no data for season(s) {missing} (skipped)".format(missing=missing))
-Traceback (most recent call last):
-  File "<frozen runpy>", line 198, in _run_module_as_main
-  File "<frozen runpy>", line 88, in _run_code
-  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
-    raise SystemExit(main())
-                     ~~~~^^
-  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 125, in main
-    build_summaries_season(
-    ~~~~~~~~~~~~~~~~~~~~~~^
-        season,
-        ^^^^^^^
-    ...<2 lines>...
-        publish=args.publish,
-        ^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/summaries_build.py", line 68, in build_summaries_season
-    plays = prepare_plays_input(pbp, schedule, season)
-  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/summaries_input.py", line 54, in prepare_plays_input
-    df = pbp.with_columns(pl.col("game_id").cast(pl.Utf8))
-  File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/dataframe/frame.py", line 10582, in with_columns
-    .collect(optimizations=QueryOptFlags._eager())
-     ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/_utils/deprecation.py", line 97, in wrapper
-    return function(*args, **kwargs)
-  File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/opt_flags.py", line 343, in wrapper
-    return function(*args, **kwargs)
-  File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/frame.py", line 2630, in collect
-    return wrap_df(ldf.collect(engine, callback))
-                   ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
-polars.exceptions.ColumnNotFoundError: unable to find column "game_id"; valid columns: []
-::warning ::cfb_data_build summaries for season 2026 exited with code 1
+[summaries 2026] 0 plays, skipped (season has not started)
 warning: `VIRTUAL_ENV=/root/.venvs/default` does not match the project environment path `/mnt/sdv_repos/cfbfastR-cfb-data/.venv` and will be ignored; use `--active` to target the active environment instead
 /mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/sportsdataverse/cfb/cfb_loaders.py:571: UserWarning: load_cfb_pbp: no data for season(s) [2026] (skipped)
   cli_warn("load_cfb_pbp: no data for season(s) {missing} (skipped)".format(missing=missing))
@@ -99,51 +68,21 @@ warning: `VIRTUAL_ENV=/root/.venvs/default` does not match the project environme
   cli_warn("load_cfb_pbp: no data for season(s) {missing} (skipped)".format(missing=missing))
 /mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/sportsdataverse/cfb/cfb_loaders.py:925: UserWarning: load_cfb_schedule: no data for season(s) [2026] (skipped)
   cli_warn("load_cfb_schedule: no data for season(s) {missing} (skipped)".format(missing=missing))
-    team_summaries_weekly 2026 week 1: ColumnNotFoundError: unable to find column "game_id"; valid columns: [] (attempt 1/3, retrying)
-    team_summaries_weekly 2026 week 1: ColumnNotFoundError: unable to find column "game_id"; valid columns: [] (attempt 2/3, retrying)
-    team_summaries_weekly 2026 week 1: ColumnNotFoundError: unable to find column "game_id"; valid columns: [] -- GAVE UP after 3
-    team_summaries_weekly 2026 week 2: ColumnNotFoundError: unable to find column "game_id"; valid columns: [] (attempt 1/3, retrying)
-    team_summaries_weekly 2026 week 2: ColumnNotFoundError: unable to find column "game_id"; valid columns: [] (attempt 2/3, retrying)
-    team_summaries_weekly 2026 week 2: ColumnNotFoundError: unable to find column "game_id"; valid columns: [] -- GAVE UP after 3
-    team_summaries_weekly 2026 week 3: ColumnNotFoundError: unable to find column "game_id"; valid columns: [] (attempt 1/3, retrying)
-    team_summaries_weekly 2026 week 3: ColumnNotFoundError: unable to find column "game_id"; valid columns: [] (attempt 2/3, retrying)
-    team_summaries_weekly 2026 week 3: ColumnNotFoundError: unable to find column "game_id"; valid columns: [] -- GAVE UP after 3
-    team_summaries_weekly 2026 week 4: ColumnNotFoundError: unable to find column "game_id"; valid columns: [] (attempt 1/3, retrying)
-    team_summaries_weekly 2026 week 4: ColumnNotFoundError: unable to find column "game_id"; valid columns: [] (attempt 2/3, retrying)
-    team_summaries_weekly 2026 week 4: ColumnNotFoundError: unable to find column "game_id"; valid columns: [] -- GAVE UP after 3
-    team_summaries_weekly 2026 week 5: ColumnNotFoundError: unable to find column "game_id"; valid columns: [] (attempt 1/3, retrying)
-    team_summaries_weekly 2026 week 5: ColumnNotFoundError: unable to find column "game_id"; valid columns: [] (attempt 2/3, retrying)
-    team_summaries_weekly 2026 week 5: ColumnNotFoundError: unable to find column "game_id"; valid columns: [] -- GAVE UP after 3
-    team_summaries_weekly 2026 week 6: ColumnNotFoundError: unable to find column "game_id"; valid columns: [] (attempt 1/3, retrying)
-    team_summaries_weekly 2026 week 6: ColumnNotFoundError: unable to find column "game_id"; valid columns: [] (attempt 2/3, retrying)
-    team_summaries_weekly 2026 week 6: ColumnNotFoundError: unable to find column "game_id"; valid columns: [] -- GAVE UP after 3
-    team_summaries_weekly 2026 week 7: ColumnNotFoundError: unable to find column "game_id"; valid columns: [] (attempt 1/3, retrying)
-    team_summaries_weekly 2026 week 7: ColumnNotFoundError: unable to find column "game_id"; valid columns: [] (attempt 2/3, retrying)
-    team_summaries_weekly 2026 week 7: ColumnNotFoundError: unable to find column "game_id"; valid columns: [] -- GAVE UP after 3
-    team_summaries_weekly 2026 week 8: ColumnNotFoundError: unable to find column "game_id"; valid columns: [] (attempt 1/3, retrying)
-    team_summaries_weekly 2026 week 8: ColumnNotFoundError: unable to find column "game_id"; valid columns: [] (attempt 2/3, retrying)
-    team_summaries_weekly 2026 week 8: ColumnNotFoundError: unable to find column "game_id"; valid columns: [] -- GAVE UP after 3
-    team_summaries_weekly 2026 week 9: ColumnNotFoundError: unable to find column "game_id"; valid columns: [] (attempt 1/3, retrying)
-    team_summaries_weekly 2026 week 9: ColumnNotFoundError: unable to find column "game_id"; valid columns: [] (attempt 2/3, retrying)
-    team_summaries_weekly 2026 week 9: ColumnNotFoundError: unable to find column "game_id"; valid columns: [] -- GAVE UP after 3
-    team_summaries_weekly 2026 week 10: ColumnNotFoundError: unable to find column "game_id"; valid columns: [] (attempt 1/3, retrying)
-    team_summaries_weekly 2026 week 10: ColumnNotFoundError: unable to find column "game_id"; valid columns: [] (attempt 2/3, retrying)
-    team_summaries_weekly 2026 week 10: ColumnNotFoundError: unable to find column "game_id"; valid columns: [] -- GAVE UP after 3
-    team_summaries_weekly 2026 week 11: ColumnNotFoundError: unable to find column "game_id"; valid columns: [] (attempt 1/3, retrying)
-    team_summaries_weekly 2026 week 11: ColumnNotFoundError: unable to find column "game_id"; valid columns: [] (attempt 2/3, retrying)
-    team_summaries_weekly 2026 week 11: ColumnNotFoundError: unable to find column "game_id"; valid columns: [] -- GAVE UP after 3
-    team_summaries_weekly 2026 week 12: ColumnNotFoundError: unable to find column "game_id"; valid columns: [] (attempt 1/3, retrying)
-    team_summaries_weekly 2026 week 12: ColumnNotFoundError: unable to find column "game_id"; valid columns: [] (attempt 2/3, retrying)
-    team_summaries_weekly 2026 week 12: ColumnNotFoundError: unable to find column "game_id"; valid columns: [] -- GAVE UP after 3
-    team_summaries_weekly 2026 week 13: ColumnNotFoundError: unable to find column "game_id"; valid columns: [] (attempt 1/3, retrying)
-    team_summaries_weekly 2026 week 13: ColumnNotFoundError: unable to find column "game_id"; valid columns: [] (attempt 2/3, retrying)
-    team_summaries_weekly 2026 week 13: ColumnNotFoundError: unable to find column "game_id"; valid columns: [] -- GAVE UP after 3
-    team_summaries_weekly 2026 week 14: ColumnNotFoundError: unable to find column "game_id"; valid columns: [] (attempt 1/3, retrying)
-    team_summaries_weekly 2026 week 14: ColumnNotFoundError: unable to find column "game_id"; valid columns: [] (attempt 2/3, retrying)
-    team_summaries_weekly 2026 week 14: ColumnNotFoundError: unable to find column "game_id"; valid columns: [] -- GAVE UP after 3
-    team_summaries_weekly 2026 week 15: ColumnNotFoundError: unable to find column "game_id"; valid columns: [] (attempt 1/3, retrying)
-    team_summaries_weekly 2026 week 15: ColumnNotFoundError: unable to find column "game_id"; valid columns: [] (attempt 2/3, retrying)
-    team_summaries_weekly 2026 week 15: ColumnNotFoundError: unable to find column "game_id"; valid columns: [] -- GAVE UP after 3
+[summaries 2026] 0 plays, skipped (season has not started)
+[summaries 2026] 0 plays, skipped (season has not started)
+[summaries 2026] 0 plays, skipped (season has not started)
+[summaries 2026] 0 plays, skipped (season has not started)
+[summaries 2026] 0 plays, skipped (season has not started)
+[summaries 2026] 0 plays, skipped (season has not started)
+[summaries 2026] 0 plays, skipped (season has not started)
+[summaries 2026] 0 plays, skipped (season has not started)
+[summaries 2026] 0 plays, skipped (season has not started)
+[summaries 2026] 0 plays, skipped (season has not started)
+[summaries 2026] 0 plays, skipped (season has not started)
+[summaries 2026] 0 plays, skipped (season has not started)
+[summaries 2026] 0 plays, skipped (season has not started)
+[summaries 2026] 0 plays, skipped (season has not started)
+[summaries 2026] 0 plays, skipped (season has not started)
   !! team_summaries_weekly 2026: MISSING through_week [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] (0/15 built). Consumers joining week W+1 to through_week W will silently drop those games -- re-run this season before relying on it.
   cfb_team_summaries_weekly 2026: 0 rows, skipped
 
@@ -163,14 +102,18 @@ warning: `VIRTUAL_ENV=/root/.venvs/default` does not match the project environme
 warning: `VIRTUAL_ENV=/root/.venvs/default` does not match the project environment path `/mnt/sdv_repos/cfbfastR-cfb-data/.venv` and will be ignored; use `--active` to target the active environment instead
 /mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/sportsdataverse/cfb/cfb_loaders.py:851: UserWarning: load_cfb_rosters: no data for season(s) [2026] (skipped)
   cli_warn("load_cfb_rosters: no data for season(s) {missing} (skipped)".format(missing=missing))
-  cfb_returning_production 2026: FAILED (ValueError: returning production [cfb_returning_production 2026] is EMPTY -- a season always has returning players)
+  cfb_returning_production 2026: 0 rows, skipped (season has no roster data yet)
 
-=== returning_production: 1 failures ===
-  2026: ValueError
-::warning ::cfb_data_build returning_production for season 2026 exited with code 1
+=== returning_production: 0 failures ===
 On branch main
 Your branch is up to date with 'origin/main'.
 
-nothing to commit, working tree clean
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   python/cfb_data_build/recruiting.py
+	modified:   python/cfb_data_build/summaries_build.py
+
+no changes added to commit (use "git add" and/or "git commit -a")
 No changes to commit
 Everything up-to-date

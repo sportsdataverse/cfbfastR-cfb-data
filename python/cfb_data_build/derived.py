@@ -70,6 +70,23 @@ SPECS: dict[str, DatasetSpec] = {
 }
 
 
+def schedule_master_available(schedule_path: Path = SCHEDULE) -> bool:
+    """Whether cfbfastR-cfb-raw's schedule master is reachable.
+
+    `ratings_weekly` and `team_summaries_weekly` are the only datasets in this
+    builder that read the raw store, and CI does not check that repo out -- so
+    they raised FileNotFoundError on every scheduled run and turned an
+    otherwise-clean preseason build RED. With CFB week 1 days away, a job that
+    is permanently red cannot signal a real failure.
+
+    A missing raw store is an ABSENT INPUT, not a defect: the recruiting
+    datasets already treat it that way (`daily_cfb_processor.sh` skips them
+    with a warning when CFB_RAW_ROOT is unset). This is the same contract for
+    the weekly pair.
+    """
+    return schedule_path.is_file()
+
+
 def week_cutoffs(season: int, schedule_path: Path = SCHEDULE) -> list[tuple[int, str]]:
     """(week, last-kickoff-date) for the season's REGULAR-season weeks, ascending.
 
@@ -210,6 +227,13 @@ def build_gamelog(
 
 
 def build_ratings_weekly(season: int, *, base: str = "cfb") -> pl.DataFrame:
+    if not schedule_master_available():
+        print(
+            f"  ratings_weekly {season}: skipped -- no cfbfastR-cfb-raw schedule "
+            f"master at {SCHEDULE} (set CFB_RAW_ROOT)",
+            flush=True,
+        )
+        return pl.DataFrame()
     import datetime as dt
 
     from sportsdataverse.cfb import cfb_ratings
@@ -229,6 +253,13 @@ def build_ratings_weekly(season: int, *, base: str = "cfb") -> pl.DataFrame:
 
 
 def build_team_summaries_weekly(season: int, *, base: str = "cfb") -> pl.DataFrame:
+    if not schedule_master_available():
+        print(
+            f"  team_summaries_weekly {season}: skipped -- no cfbfastR-cfb-raw schedule "
+            f"master at {SCHEDULE} (set CFB_RAW_ROOT)",
+            flush=True,
+        )
+        return pl.DataFrame()
     from cfb_data_build.summaries_build import build_summaries_season
 
     spec = SUMMARIES_REGISTRY["team_summaries"]

@@ -5,6 +5,7 @@ From https://github.com/sportsdataverse/cfbfastR-cfb-data
  * [new branch]      feat/cfb-model-suite-completion -> origin/feat/cfb-model-suite-completion
  * [new branch]      feat/cfb-ratings-builder -> origin/feat/cfb-ratings-builder
  * [new branch]      feat/cfb-ratings-cron -> origin/feat/cfb-ratings-cron
+ * [new branch]      fix/cfb-weekly-raw-store -> origin/fix/cfb-weekly-raw-store
  * [new tag]         espn_cfb_adv_defensive -> espn_cfb_adv_defensive
  * [new tag]         espn_cfb_adv_drives   -> espn_cfb_adv_drives
  * [new tag]         espn_cfb_adv_passing  -> espn_cfb_adv_passing
@@ -56,17 +57,47 @@ rosters 2026: no game_rosters parquet at ../cfb/game_rosters/parquet/game_roster
 /home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/.venv/lib/python3.12/site-packages/sportsdataverse/cfb/cfb_loaders.py:925: UserWarning: load_cfb_schedule: no data for season(s) [2026] (skipped)
   cli_warn("load_cfb_schedule: no data for season(s) {missing} (skipped)".format(missing=missing))
 [summaries 2026] 0 plays, skipped (season has not started)
-  FAILED 2026: FileNotFoundError: No such file or directory (os error 2): /home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-raw/cfb/cfb_schedule_master.parquet
+/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/.venv/lib/python3.12/site-packages/sportsdataverse/cfb/cfb_loaders.py:571: UserWarning: load_cfb_pbp: no data for season(s) [2026] (skipped)
+  cli_warn("load_cfb_pbp: no data for season(s) {missing} (skipped)".format(missing=missing))
+/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/.venv/lib/python3.12/site-packages/sportsdataverse/cfb/cfb_loaders.py:925: UserWarning: load_cfb_schedule: no data for season(s) [2026] (skipped)
+  cli_warn("load_cfb_schedule: no data for season(s) {missing} (skipped)".format(missing=missing))
+  !! ratings_weekly 2026: MISSING through_week [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] (0/15 built). Consumers joining week W+1 to through_week W will silently drop those games -- re-run this season before relying on it.
+  cfb_ratings_weekly 2026: 0 rows, skipped
 
-=== ratings_weekly: 1 failures ===
-  2026: FileNotFoundError
-::warning ::cfb_data_build ratings_weekly for season 2026 exited with code 1
-  FAILED 2026: FileNotFoundError: No such file or directory (os error 2): /home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-raw/cfb/cfb_schedule_master.parquet
+=== ratings_weekly: 0 failures ===
+/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/.venv/lib/python3.12/site-packages/sportsdataverse/cfb/cfb_loaders.py:571: UserWarning: load_cfb_pbp: no data for season(s) [2026] (skipped)
+  cli_warn("load_cfb_pbp: no data for season(s) {missing} (skipped)".format(missing=missing))
+/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/.venv/lib/python3.12/site-packages/sportsdataverse/cfb/cfb_loaders.py:925: UserWarning: load_cfb_schedule: no data for season(s) [2026] (skipped)
+  cli_warn("load_cfb_schedule: no data for season(s) {missing} (skipped)".format(missing=missing))
+[summaries 2026] 0 plays, skipped (season has not started)
+[summaries 2026] 0 plays, skipped (season has not started)
+[summaries 2026] 0 plays, skipped (season has not started)
+[summaries 2026] 0 plays, skipped (season has not started)
+[summaries 2026] 0 plays, skipped (season has not started)
+[summaries 2026] 0 plays, skipped (season has not started)
+[summaries 2026] 0 plays, skipped (season has not started)
+[summaries 2026] 0 plays, skipped (season has not started)
+[summaries 2026] 0 plays, skipped (season has not started)
+[summaries 2026] 0 plays, skipped (season has not started)
+[summaries 2026] 0 plays, skipped (season has not started)
+[summaries 2026] 0 plays, skipped (season has not started)
+[summaries 2026] 0 plays, skipped (season has not started)
+[summaries 2026] 0 plays, skipped (season has not started)
+[summaries 2026] 0 plays, skipped (season has not started)
+  !! team_summaries_weekly 2026: MISSING through_week [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] (0/15 built). Consumers joining week W+1 to through_week W will silently drop those games -- re-run this season before relying on it.
+  cfb_team_summaries_weekly 2026: 0 rows, skipped
 
-=== team_summaries_weekly: 1 failures ===
+=== team_summaries_weekly: 0 failures ===
+  cfb_recruits 2026: FAILED (FileNotFoundError: cfb_recruits 2026: raw store is missing complete classes [2026]. Scrape them first -- a partial window understates talent without erroring.)
+
+=== recruits: 1 failures ===
   2026: FileNotFoundError
-::warning ::cfb_data_build team_summaries_weekly for season 2026 exited with code 1
-::warning::CFB_RAW_ROOT unset or missing (); skipping recruiting datasets
+::warning ::cfb_data_build recruits for season 2026 exited with code 1
+  cfb_team_talent 2026: FAILED (FileNotFoundError: cfb_team_talent 2026: raw store is missing complete classes [2023, 2024, 2025, 2026]. Scrape them first -- a partial window understates talent without erroring.)
+
+=== team_talent: 1 failures ===
+  2026: FileNotFoundError
+::warning ::cfb_data_build team_talent for season 2026 exited with code 1
 /home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/.venv/lib/python3.12/site-packages/sportsdataverse/cfb/cfb_loaders.py:851: UserWarning: load_cfb_rosters: no data for season(s) [2026] (skipped)
   cli_warn("load_cfb_rosters: no data for season(s) {missing} (skipped)".format(missing=missing))
   cfb_returning_production 2026: 0 rows, skipped (season has no roster data yet)

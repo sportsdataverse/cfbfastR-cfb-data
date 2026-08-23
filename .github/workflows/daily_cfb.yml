@@ -71,6 +71,28 @@ jobs:
 
       # Python builders (cfb_data_build) own the per-game reshape datasets;
       # R above is retained only for team_summaries (espn_cfb_15) + run_summary.
+      # ratings_weekly + team_summaries_weekly read cfbfastR-cfb-raw's schedule
+      # master and nothing else in this builder does. Fetch just that ONE file:
+      # the repo is 17.8 GB, and even `--filter=blob:none --depth 1` did not
+      # finish inside 10 minutes when measured. The direct download takes ~2s.
+      #
+      # Without it those two datasets had never built in CI -- they raised
+      # FileNotFoundError on every scheduled run and reddened an otherwise-clean
+      # preseason job. They now skip cleanly when the file is absent (see
+      # derived.py `schedule_master_available`), so a failure here degrades to
+      # "two datasets skipped", never a hard failure.
+      - name: Fetch cfbfastR-cfb-raw schedule master
+        run: |
+          mkdir -p ../cfbfastR-cfb-raw/cfb
+          curl -sSLf --retry 3 --retry-delay 5             -o ../cfbfastR-cfb-raw/cfb/cfb_schedule_master.parquet             https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet             || echo "::warning::schedule master fetch failed; weekly datasets will skip"
+          if [ -s ../cfbfastR-cfb-raw/cfb/cfb_schedule_master.parquet ]; then
+            echo "CFB_RAW_ROOT=$(cd ../cfbfastR-cfb-raw && pwd)" >> "$GITHUB_ENV"
+            ls -lh ../cfbfastR-cfb-raw/cfb/cfb_schedule_master.parquet
+          else
+            rm -f ../cfbfastR-cfb-raw/cfb/cfb_schedule_master.parquet
+            echo "::warning::no schedule master; ratings_weekly + team_summaries_weekly will skip"
+          fi
+
       - name: Set up uv + Python
         uses: astral-sh/setup-uv@v8.1.0
         with:

@@ -53,6 +53,10 @@ def _schedule_master() -> Path:
     )
 
 
+#: Import-time snapshot, kept for callers that referenced it. Everything in
+#: this module resolves via `_schedule_master()` at CALL time instead -- a
+#: default argument would freeze the path at import, so any caller that sets
+#: CFB_RAW_ROOT afterwards would silently keep using the old location.
 SCHEDULE = _schedule_master()
 
 SPECS: dict[str, DatasetSpec] = {
@@ -70,13 +74,42 @@ SPECS: dict[str, DatasetSpec] = {
 }
 
 
-def week_cutoffs(season: int, schedule_path: Path = SCHEDULE) -> list[tuple[int, str]]:
+def schedule_master_available(schedule_path: "Path | None" = None) -> bool:
+    """Whether cfbfastR-cfb-raw's schedule master is reachable.
+
+    `ratings_weekly` and `team_summaries_weekly` are the only datasets in this
+    builder that read the raw store, and CI does not check that repo out -- so
+    they raised FileNotFoundError on every scheduled run and turned an
+    otherwise-clean preseason build RED. With CFB week 1 days away, a job that
+    is permanently red cannot signal a real failure.
+
+    A missing raw store is an ABSENT INPUT, not a defect: the recruiting
+    datasets already treat it that way (`daily_cfb_processor.sh` skips them
+    with a warning when CFB_RAW_ROOT is unset). This is the same contract for
+    the weekly pair.
+    """
+    path = schedule_path if schedule_path is not None else _schedule_master()
+    if not path.is_file() or path.stat().st_size == 0:
+        return False
+    try:
+        # A truncated or half-written download is a file, and `is_file()` alone
+        # would wave it through into `pl.read_parquet` -- which raises, which is
+        # exactly the hard failure this guard exists to prevent. Read the
+        # footer only; this is cheap and does not load the data.
+        pl.read_parquet_schema(path)
+    except Exception:
+        return False
+    return True
+
+
+def week_cutoffs(season: int, schedule_path: "Path | None" = None) -> list[tuple[int, str]]:
     """(week, last-kickoff-date) for the season's REGULAR-season weeks, ascending.
 
     Regular season only: the postseason restarts week numbering at 1 (ESPN's own
     convention -- the schedule master agrees), so including it would collide the
     week labels.
     """
+    schedule_path = schedule_path if schedule_path is not None else _schedule_master()
     s = pl.read_parquet(schedule_path).filter(
         (pl.col("season") == season) & (pl.col("season_type") == 2)
     )
@@ -96,7 +129,7 @@ def week_cutoffs(season: int, schedule_path: Path = SCHEDULE) -> list[tuple[int,
 
 
 def build_gamelog(
-    season: int, *, base: str = "cfb", schedule_path: Path = SCHEDULE
+    season: int, *, base: str = "cfb", schedule_path: "Path | None" = None
 ) -> pl.DataFrame:
     """adv_team + game context, one row per team-GAME.
 
@@ -112,10 +145,22 @@ def build_gamelog(
     adv_path = Path(base) / "adv_team" / "parquet" / f"adv_team_{season}.parquet"
     if not adv_path.exists():
         return pl.DataFrame()
+    if not schedule_master_available(schedule_path):
+        # Same absent-input contract as the weekly builders. This one is NOT
+        # reachable in preseason -- gamelog returns early when no adv_team
+        # artifact exists yet -- so it only bites once week 1 produces one,
+        # which is exactly when a red job is most expensive.
+        print(
+            f"  adv_team_gamelog {season}: skipped -- no cfbfastR-cfb-raw "
+            f"schedule master at {_schedule_master()} (set CFB_RAW_ROOT)",
+            flush=True,
+        )
+        return pl.DataFrame()
     adv = pl.read_parquet(adv_path)
     if adv.height == 0:
         return pl.DataFrame()
 
+    schedule_path = schedule_path if schedule_path is not None else _schedule_master()
     sched = pl.read_parquet(schedule_path).filter(pl.col("season") == season)
     ctx_cols = [
         "game_id",
@@ -210,6 +255,13 @@ def build_gamelog(
 
 
 def build_ratings_weekly(season: int, *, base: str = "cfb") -> pl.DataFrame:
+    if not schedule_master_available():
+        print(
+            f"  ratings_weekly {season}: skipped -- no cfbfastR-cfb-raw schedule "
+            f"master at {_schedule_master()} (set CFB_RAW_ROOT)",
+            flush=True,
+        )
+        return pl.DataFrame()
     import datetime as dt
 
     from sportsdataverse.cfb import cfb_ratings
@@ -229,6 +281,13 @@ def build_ratings_weekly(season: int, *, base: str = "cfb") -> pl.DataFrame:
 
 
 def build_team_summaries_weekly(season: int, *, base: str = "cfb") -> pl.DataFrame:
+    if not schedule_master_available():
+        print(
+            f"  team_summaries_weekly {season}: skipped -- no cfbfastR-cfb-raw schedule "
+            f"master at {_schedule_master()} (set CFB_RAW_ROOT)",
+            flush=True,
+        )
+        return pl.DataFrame()
     from cfb_data_build.summaries_build import build_summaries_season
 
     spec = SUMMARIES_REGISTRY["team_summaries"]

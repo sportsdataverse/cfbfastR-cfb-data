@@ -110,10 +110,18 @@ for i in $(seq "${START_YEAR}" "${END_YEAR}"); do
 
     # Recruiting last: it depends on nothing above, and a 247 outage must not
     # cost the game datasets. Per-dataset failures are already non-fatal here.
-    if [[ -n "$CFB_RAW_ROOT" && -d "$CFB_RAW_ROOT" ]]; then
+    # Guard on the input this family ACTUALLY reads (cfb/recruits/json), not on
+    # the raw root merely existing. CI now materialises ../cfbfastR-cfb-raw with
+    # ONLY cfb_schedule_master.parquet in it (for ratings_weekly /
+    # team_summaries_weekly), so `-d "$CFB_RAW_ROOT"` became true while the
+    # recruits store was still absent -- and recruits/team_talent went from
+    # cleanly skipped to hard failures:
+    #   cfb_recruits 2026: FAILED (raw store is missing complete classes [2026])
+    # One env var, two unrelated inputs; each guard has to check its own.
+    if [[ -n "$CFB_RAW_ROOT" && -d "$CFB_RAW_ROOT/cfb/recruits/json" ]]; then
       for ds in $PY_RECRUITING; do run_py "$ds" --publish; done
     else
-      echo "::warning::CFB_RAW_ROOT unset or missing ($CFB_RAW_ROOT); skipping recruiting datasets"
+      echo "::warning::no 247 recruits store at ${CFB_RAW_ROOT:-<unset>}/cfb/recruits/json; skipping recruiting datasets"
       # returning_production reads no raw store, so it can still run
       run_py returning_production --publish
     fi

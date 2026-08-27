@@ -64,6 +64,15 @@ def _rank(col: str, *, descending: bool) -> pl.Expr:
     return pl.when(c.is_null()).then(null_trail).otherwise(base)
 
 
+def _pct(col: str) -> pl.Expr:
+    """Calculates a percentile based off the passed rank values.
+    
+    The ranks are assumed to always be generated with descending = True"""
+    c = pl.col(col)
+    N = c.count()
+    return 100 * (N - c ) / (N + 1)
+
+
 def add_derived_metrics(plays: pl.DataFrame) -> pl.DataFrame:
     """Port of the build's possession/EPA/explosive derived-column mutate (lines 554-643)."""
     home = pl.col("pos_team") == pl.col("home")
@@ -1033,7 +1042,11 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
             "yardsdropback",
             "detmer",
             "detmergame",
+            "passing_td", 
+            "pass_int",
+            "sacked"
         ],
+        asc_cols=["pass_int, sacked"]
     )
 
     rb_data = summarize_rusher(
@@ -1131,11 +1144,16 @@ def _add_team_games(df: pl.DataFrame) -> pl.DataFrame:
 
 
 def _attach_leader_ranks(
-    data: pl.DataFrame, *, keys: list[str], min_expr: pl.Expr, rank_cols: list[str]
+    data: pl.DataFrame, *, keys: list[str], min_expr: pl.Expr, rank_cols: list[str],
+    asc_cols: list[str] | None = None
 ) -> pl.DataFrame:
     """Compute leaderboard ranks among qualifiers, left-joined back (R rank blocks)."""
     qual = data.filter(min_expr)
+    asc_cols = set(asc_cols or [])
     ranks = qual.select(
-        *keys, *[_rank(c, descending=True).alias(f"{c}_rank") for c in rank_cols]
+        *keys, *[_rank(c, descending=(c in asc_cols)).alias(f"{c}_rank") for c in rank_cols]
     )
-    return data.join(ranks, on=keys, how="left")
+    pcts = ranks.with_columns(
+        *[_pct(c).alias(f"{c}_pct") for c in rank_cols]
+    )
+    return data.join(pcts, on=keys, how="left")

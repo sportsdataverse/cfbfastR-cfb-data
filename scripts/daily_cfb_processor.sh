@@ -24,8 +24,14 @@ END_YEAR=${END_YEAR:-$START_YEAR}
 PY_FIRST="pbp"
 PY_REST="play_participants team_box player_box drives game_rosters betting schedules linescores power_index injuries adv_team adv_passing adv_rushing adv_receiving adv_defensive adv_turnover adv_drives adv_situational adv_defensive_players adv_specialists"
 # Derived datasets -- each reads an artifact an earlier step produced, so order
-# matters: rosters <- game_rosters, gamelog <- adv_team.
-PY_DERIVED="rosters gamelog"
+# matters: gamelog <- adv_team.
+PY_DERIVED="gamelog"
+# ESPN-native season rosters. Compiled straight from the raw per-game roster
+# blocks over HTTP (not from an earlier step), with a REAL resolved position.
+# Supersedes the legacy `rosters` dataset and R/espn_cfb_08_rosters_creation.R,
+# both of which published href-only positions under a second naming stem on the
+# same tag; neither runs from a driver any more.
+PY_ROSTERS="cfb_rosters"
 # Weekly long-format snapshots read the summaries/ratings output, so they run
 # last of all.
 PY_WEEKLY="ratings_weekly team_summaries_weekly"
@@ -99,6 +105,7 @@ for i in $(seq "${START_YEAR}" "${END_YEAR}"); do
     run_py "$PY_FIRST" --publish
     for ds in $PY_REST; do run_py "$ds" --no-fetch --publish; done
     for ds in $PY_DERIVED; do run_py "$ds" --no-fetch --publish; done
+    for ds in $PY_ROSTERS; do run_py "$ds" --publish; done
 
     # The 5-table summaries family. This ran on R (espn_cfb_15) because the
     # Python season-pbp source was stale for the current season; the P2 pbp

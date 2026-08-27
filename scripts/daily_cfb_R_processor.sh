@@ -19,7 +19,6 @@ SCRIPTS=(
   R/espn_cfb_05_play_participants_creation.R
   R/espn_cfb_06_drives_creation.R
   R/espn_cfb_07_game_rosters_creation.R
-  R/espn_cfb_08_rosters_creation.R
   R/espn_cfb_09_betting_creation.R
   R/espn_cfb_10_schedules_creation.R
   R/espn_cfb_11_linescores_creation.R

@@ -30,13 +30,22 @@ FPI = ("fpi_weekly", "power_index")
 #: needs no raw store at all.
 RECRUITING = ("recruits", "team_talent", "returning_production")
 
+#: Per-season ESPN team + conference reference, compiled from the season bundles
+#: cfbfastR-cfb-raw commits at cfb/teams/json/{season}.json (read over HTTP).
+TEAMS = ("teams",)
+
+#: ESPN-native season rosters, compiled from the per-game roster blocks
+#: cfbfastR-cfb-raw commits at cfb/game_rosters/json/{game_id}.json (read over
+#: HTTP), with position resolved against the league position reference.
+ROSTERS = ("cfb_rosters",)
+
 
 def build_parser() -> argparse.ArgumentParser:
     ap = argparse.ArgumentParser(prog="cfb_data_build")
     ap.add_argument(
         "--dataset",
         required=True,
-        choices=sorted(REGISTRY) + ["summaries", *DERIVED, *FPI, *RECRUITING],
+        choices=sorted(REGISTRY) + ["summaries", *DERIVED, *FPI, *RECRUITING, *TEAMS, *ROSTERS],
     )
     ap.add_argument("-s", "--start-year", type=int, required=True)
     ap.add_argument("-e", "--end-year", type=int, required=True)
@@ -47,23 +56,14 @@ def build_parser() -> argparse.ArgumentParser:
         help="summaries only: cumulative snapshot through week W (default: full season)",
     )
     ap.add_argument("--cache-dir", default=".cache/cfb_final")
-    ap.add_argument(
-        "--schedule", default=None, help="schedule master path/URL (default: raw URL)"
-    )
-    ap.add_argument(
-        "--no-fetch", action="store_true", help="use cached final.json only"
-    )
-    ap.add_argument(
-        "--publish", action="store_true", help="upload to the espn_cfb_* release"
-    )
+    ap.add_argument("--schedule", default=None, help="schedule master path/URL (default: raw URL)")
+    ap.add_argument("--no-fetch", action="store_true", help="use cached final.json only")
+    ap.add_argument("--publish", action="store_true", help="upload to the espn_cfb_* release")
     ap.add_argument("--base", default="cfb", help="output root directory")
     ap.add_argument(
         "--raw-root",
         default=os.environ.get("CFB_RAW_ROOT", "../cfbfastR-cfb-raw"),
-        help=(
-            "recruiting datasets: cfbfastR-cfb-raw checkout holding "
-            "cfb/recruits/json (env CFB_RAW_ROOT)"
-        ),
+        help=("recruiting datasets: cfbfastR-cfb-raw checkout holding cfb/recruits/json (env CFB_RAW_ROOT)"),
     )
     ap.add_argument(
         "--dry-run",
@@ -115,9 +115,7 @@ def main(argv: list[str] | None = None) -> int:
         if args.dataset != "summaries":
             ap.error("--through-week only applies to --dataset summaries")
         if args.publish:
-            ap.error(
-                "--through-week snapshots cannot be published; canonical tags hold season-final builds"
-            )
+            ap.error("--through-week snapshots cannot be published; canonical tags hold season-final builds")
     if args.dataset == "summaries":
         from cfb_data_build.summaries_build import build_summaries_season
 
@@ -159,6 +157,41 @@ def main(argv: list[str] | None = None) -> int:
             dry_run=args.dry_run,
         )
         print(f"\n=== {args.dataset}: {len(failures)} failures ===")
+        for season, kind in failures:
+            print(f"  {season}: {kind}")
+        return 1 if failures else 0
+
+    if args.dataset in TEAMS:
+        from cfb_data_build.teams import build as build_teams_range
+
+        failures = build_teams_range(
+            args.start_year,
+            args.end_year,
+            base=args.base,
+            publish=args.publish,
+            dry_run=args.dry_run,
+        )
+        print(f"\n=== {args.dataset}: {len(failures)} failures ===")
+        for season, kind in failures:
+            print(f"  {season}: {kind}")
+        return 1 if failures else 0
+
+    if args.dataset in ROSTERS:
+        from cfb_data_build.rosters_espn import build as build_rosters_range
+
+        # NOT args.cache_dir: that dir holds final.json keyed by game id, and the
+        # roster payloads are keyed by game id too -- sharing it would let a later
+        # `--no-fetch` build read a roster doc as a final doc. Own cache, own dir.
+        failures = build_rosters_range(
+            args.start_year,
+            args.end_year,
+            schedule=args.schedule,
+            base=args.base,
+            publish=args.publish,
+            write=not args.dry_run,
+        )
+        print()
+        print(f"=== {args.dataset}: {len(failures)} failures ===")
         for season, kind in failures:
             print(f"  {season}: {kind}")
         return 1 if failures else 0

@@ -1,6 +1,5 @@
 From https://github.com/sportsdataverse/cfbfastR-cfb-data
  * [new branch]      AE/update-air-yards-model -> origin/AE/update-air-yards-model
- * [new branch]      chore/qbr-path-readerside -> origin/chore/qbr-path-readerside
  * [new branch]      feat/adv-missing-datasets -> origin/feat/adv-missing-datasets
  * [new branch]      feat/cfb-era-vars-spread-backfill -> origin/feat/cfb-era-vars-spread-backfill
  * [new branch]      feat/cfb-model-suite-completion -> origin/feat/cfb-model-suite-completion
@@ -10,8 +9,8 @@ From https://github.com/sportsdataverse/cfbfastR-cfb-data
  * [new branch]      fix/bowl-season-cron  -> origin/fix/bowl-season-cron
  * [new branch]      fix/cfb-recruiting-guard -> origin/fix/cfb-recruiting-guard
  * [new branch]      fix/cfb-weekly-raw-store -> origin/fix/cfb-weekly-raw-store
- * [new branch]      fix/issue-14-triage   -> origin/fix/issue-14-triage
  * [new branch]      fix/preseason-missing-sources -> origin/fix/preseason-missing-sources
+ * [new branch]      fix/preseason-zero-rosters -> origin/fix/preseason-zero-rosters
  * [new tag]         espn_cfb_adv_defensive -> espn_cfb_adv_defensive
  * [new tag]         espn_cfb_adv_drives   -> espn_cfb_adv_drives
  * [new tag]         espn_cfb_adv_passing  -> espn_cfb_adv_passing
@@ -61,11 +60,9 @@ adv_specialists 2026: 0 rows from 946 games
 
 === cfb_schedules: 0 failures ===
 cfb_rosters 2026: 0 rows from 946/946 games | position 0.0% | division 0.0% | cfbd_recruit_ids 0.0% of 0 cfbd athletes
-cfb_rosters 2026: FAILED RuntimeError('cfb_rosters 2026: compiled zero roster rows')
+  cfb_rosters 2026: 0 rows, skipped (season has not started)
 
-=== cfb_rosters: 1 failures ===
-  2026: RuntimeError('cfb_rosters 2026: compiled zero roster rows')
-::warning ::cfb_data_build cfb_rosters for season 2026 exited with code 1
+=== cfb_rosters: 0 failures ===
 /home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/.venv/lib/python3.12/site-packages/sportsdataverse/cfb/cfb_loaders.py:571: UserWarning: load_cfb_pbp: no data for season(s) [2026] (skipped)
   cli_warn("load_cfb_pbp: no data for season(s) {missing} (skipped)".format(missing=missing))
 [summaries 2026] 0 plays, skipped (season has not started)

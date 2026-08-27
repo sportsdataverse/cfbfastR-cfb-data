@@ -54,7 +54,15 @@ def _stages() -> dict[str, str]:
             continue
         m = PACKAGE_RE.search(path.read_text(encoding="utf-8"))
         assert m, f"{path.name} declares no PACKAGE"
-        out[m.group("pkg")] = path.name
+        pkg = m.group("pkg")
+        # A dict would keep the LAST shim declaring a package and silently drop the
+        # first, so two stages pointing at one package would read as one stage and
+        # every check below would pass on a pipeline that is actually mis-wired.
+        assert pkg not in out, (
+            f"{path.name} and {out[pkg]} both declare PACKAGE {pkg!r}; "
+            "a package must have exactly one numbered stage."
+        )
+        out[pkg] = path.name
     return out
 
 

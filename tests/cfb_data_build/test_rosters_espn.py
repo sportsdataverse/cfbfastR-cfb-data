@@ -322,3 +322,87 @@ def test_cfbd_join_is_left_and_never_changes_the_espn_row_set(positions, divisio
     pre = [c for c in R.OUTPUT_COLS if c not in R.CFBD_COLS.values()]
     assert len(pre) == 78
     assert df.select(pre).equals(espn_only.select(pre))
+
+
+# --------------------------------------------------------------------------
+# Pre-season degradation: a source that has not published yet
+#
+# These exercise the DOWNLOADERS, not an injected `fetcher=`. The existing
+# `fetcher=lambda _u: None` tests inject past the failure point, which is why a
+# pre-season 404 took the whole `cfb_rosters` build down unnoticed: `download`
+# RAISES on a 404 rather than returning a non-200 response, so the "return None"
+# branch those tests cover was unreachable in production.
+# --------------------------------------------------------------------------
+
+
+def _raising_download(exc):
+    """Stand in for ``dl_utils.download``, recording that it was actually called."""
+    calls = {"n": 0}
+
+    def fake(url, *a, **k):
+        calls["n"] += 1
+        raise exc
+
+    return fake, calls
+
+
+def test_download_bytes_degrades_when_the_asset_is_missing(monkeypatch):
+    """A season CFBD has not published yet must yield ``None``, not an exception.
+
+    ``cfb_rosters`` LEFT-joins the CFBD columns onto the ESPN rosters, so an absent
+    CFBD asset means null enrichment -- never a failed dataset.
+    """
+    import sportsdataverse.dl_utils as dl
+    from sportsdataverse import errors
+
+    missing = getattr(errors, "NoDataError", None) or errors.NoESPNDataError
+    fake, calls = _raising_download(missing("404 for cfb_rosters_2026.parquet"))
+    monkeypatch.setattr(dl, "download", fake)
+
+    assert R._download_bytes("https://example.invalid/cfb_rosters_2026.parquet") is None
+    assert calls["n"] == 1, "download was never called -- the test mocked past the code under test"
+
+
+def test_download_degrades_when_the_asset_is_missing(monkeypatch):
+    """Same rule for the text downloader (positions reference, per-season teams)."""
+    import sportsdataverse.dl_utils as dl
+    from sportsdataverse import errors
+
+    missing = getattr(errors, "NoDataError", None) or errors.NoESPNDataError
+    fake, calls = _raising_download(missing("404"))
+    monkeypatch.setattr(dl, "download", fake)
+
+    assert R._download("https://example.invalid/positions.json") is None
+    assert calls["n"] == 1
+
+
+def test_a_failed_fetch_still_propagates(monkeypatch):
+    """Only a definitive 404 degrades.
+
+    A 403, a rate limit, or an exhausted retry budget means the answer is UNKNOWN.
+    Swallowing those would publish a season with silently-null enrichment and no
+    error -- the failure mode this whole guard exists to prevent.
+    """
+    import sportsdataverse.dl_utils as dl
+
+    fake, calls = _raising_download(RuntimeError("HTTP 403 rate limited"))
+    monkeypatch.setattr(dl, "download", fake)
+
+    with pytest.raises(RuntimeError, match="403"):
+        R._download_bytes("https://example.invalid/cfb_rosters_2025.parquet")
+    assert calls["n"] == 1
+
+
+def test_missing_cfbd_season_builds_empty_typed_frame(monkeypatch):
+    """End to end: the raise becomes an empty frame carrying the pinned schema."""
+    import sportsdataverse.dl_utils as dl
+    from sportsdataverse import errors
+
+    missing = getattr(errors, "NoDataError", None) or errors.NoESPNDataError
+    fake, _ = _raising_download(missing("404"))
+    monkeypatch.setattr(dl, "download", fake)
+
+    out = R.load_cfbd_rosters(2026)
+    assert out.height == 0
+    assert out.schema["athlete_id"] == pl.Int64
+    assert set(R.CFBD_COLS.values()).issubset(set(out.columns))

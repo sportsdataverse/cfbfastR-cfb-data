@@ -1163,6 +1163,6 @@ def _attach_leader_ranks(
         *keys, *[_rank(c, descending=(c in asc_cols)).alias(f"{c}_rank") for c in rank_cols]
     )
     pcts = ranks.with_columns(
-        *[_pct(c).alias(f"{c}_pct") for c in rank_cols]
+        *[_pct(f"{c}_rank").alias(f"{c}_pct") for c in rank_cols]
     )
     return data.join(pcts, on=keys, how="left")

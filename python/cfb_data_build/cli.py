@@ -30,13 +30,17 @@ FPI = ("fpi_weekly", "power_index")
 #: needs no raw store at all.
 RECRUITING = ("recruits", "team_talent", "returning_production")
 
+#: Per-season ESPN team + conference reference, compiled from the season bundles
+#: cfbfastR-cfb-raw commits at cfb/teams/json/{season}.json (read over HTTP).
+TEAMS = ("teams",)
+
 
 def build_parser() -> argparse.ArgumentParser:
     ap = argparse.ArgumentParser(prog="cfb_data_build")
     ap.add_argument(
         "--dataset",
         required=True,
-        choices=sorted(REGISTRY) + ["summaries", *DERIVED, *FPI, *RECRUITING],
+        choices=sorted(REGISTRY) + ["summaries", *DERIVED, *FPI, *RECRUITING, *TEAMS],
     )
     ap.add_argument("-s", "--start-year", type=int, required=True)
     ap.add_argument("-e", "--end-year", type=int, required=True)
@@ -159,6 +163,22 @@ def main(argv: list[str] | None = None) -> int:
             dry_run=args.dry_run,
         )
         print(f"\n=== {args.dataset}: {len(failures)} failures ===")
+        for season, kind in failures:
+            print(f"  {season}: {kind}")
+        return 1 if failures else 0
+
+    if args.dataset in TEAMS:
+        from cfb_data_build.teams import build as build_teams_range
+
+        failures = build_teams_range(
+            args.start_year,
+            args.end_year,
+            base=args.base,
+            publish=args.publish,
+            dry_run=args.dry_run,
+        )
+        print()
+        print(f"=== {args.dataset}: {len(failures)} failures ===")
         for season, kind in failures:
             print(f"  {season}: {kind}")
         return 1 if failures else 0

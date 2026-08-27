@@ -7,7 +7,7 @@ import pathlib
 import numpy as np
 import pytest
 
-from cpoe.constants import FEATURE_COLS, TARGET_COL
+from cfb_model_build.cpoe.constants import FEATURE_COLS, TARGET_COL
 
 
 def _make_plays(n: int, game_id: str, rng: np.random.Generator) -> list[dict]:
@@ -44,7 +44,7 @@ def synthetic_raw_dir(tmp_path: pathlib.Path) -> pathlib.Path:
 
 
 def test_cli_smoke_no_loso(synthetic_raw_dir, tmp_path):
-    from cpoe.cli import main
+    from cfb_model_build.cpoe.cli import main
     rc = main([
         "--final-dir", str(synthetic_raw_dir),
         "--out-dir", str(tmp_path / "out"),
@@ -56,7 +56,7 @@ def test_cli_smoke_no_loso(synthetic_raw_dir, tmp_path):
 
 
 def test_cli_smoke_with_loso(synthetic_raw_dir, tmp_path):
-    from cpoe.cli import main
+    from cfb_model_build.cpoe.cli import main
     rc = main([
         "--final-dir", str(synthetic_raw_dir),
         "--out-dir", str(tmp_path / "out_loso"),
@@ -73,7 +73,7 @@ def test_cli_smoke_with_loso(synthetic_raw_dir, tmp_path):
 
 
 def test_cli_no_seasons_returns_nonzero(synthetic_raw_dir, tmp_path):
-    from cpoe.cli import main
+    from cfb_model_build.cpoe.cli import main
     rc = main([
         "--final-dir", str(synthetic_raw_dir),
         "--out-dir", str(tmp_path / "out_fail"),
@@ -82,7 +82,7 @@ def test_cli_no_seasons_returns_nonzero(synthetic_raw_dir, tmp_path):
 
 
 def test_cli_missing_raw_dir_returns_nonzero(tmp_path):
-    from cpoe.cli import main
+    from cfb_model_build.cpoe.cli import main
     rc = main([
         "--final-dir", str(tmp_path / "nonexistent"),
         "--out-dir", str(tmp_path / "out_fail"),

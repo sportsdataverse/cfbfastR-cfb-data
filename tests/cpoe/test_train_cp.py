@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from cpoe.constants import FEATURE_COLS, TARGET_COL
+from cfb_model_build.cpoe.constants import FEATURE_COLS, TARGET_COL
 
 
 @pytest.fixture()
@@ -30,12 +30,12 @@ def tiny_df() -> pd.DataFrame:
 
 
 def test_train_cp_imports():
-    from cpoe.train_cp import train_cp_model  # noqa: F401
+    from cfb_model_build.cpoe.train_cp import train_cp_model  # noqa: F401
 
 
 def test_train_returns_booster(tiny_df):
     import xgboost as xgb
-    from cpoe.train_cp import train_cp_model
+    from cfb_model_build.cpoe.train_cp import train_cp_model
     X = tiny_df[FEATURE_COLS]
     y = tiny_df[TARGET_COL]
     booster = train_cp_model(X, y)
@@ -44,7 +44,7 @@ def test_train_returns_booster(tiny_df):
 
 def test_predict_returns_probabilities(tiny_df):
     import xgboost as xgb
-    from cpoe.train_cp import train_cp_model
+    from cfb_model_build.cpoe.train_cp import train_cp_model
     X = tiny_df[FEATURE_COLS]
     y = tiny_df[TARGET_COL]
     booster = train_cp_model(X, y)
@@ -57,7 +57,7 @@ def test_predict_returns_probabilities(tiny_df):
 
 def test_save_and_load_round_trip(tiny_df, tmp_path: pathlib.Path):
     import xgboost as xgb
-    from cpoe.train_cp import load_cp_model, save_cp_model, train_cp_model
+    from cfb_model_build.cpoe.train_cp import load_cp_model, save_cp_model, train_cp_model
     X = tiny_df[FEATURE_COLS]
     y = tiny_df[TARGET_COL]
     booster = train_cp_model(X, y)
@@ -72,14 +72,14 @@ def test_save_and_load_round_trip(tiny_df, tmp_path: pathlib.Path):
 
 
 def test_load_missing_raises(tmp_path: pathlib.Path):
-    from cpoe.train_cp import load_cp_model
+    from cfb_model_build.cpoe.train_cp import load_cp_model
     with pytest.raises(FileNotFoundError):
         load_cp_model(tmp_path / "nonexistent.ubj")
 
 
 def test_train_cp_model_accepts_numpy(tiny_df):
     """train_cp_model must accept bare numpy arrays in addition to DataFrames."""
-    from cpoe.train_cp import train_cp_model
+    from cfb_model_build.cpoe.train_cp import train_cp_model
     import xgboost as xgb
     X = tiny_df[FEATURE_COLS].to_numpy()
     y = tiny_df[TARGET_COL].to_numpy()

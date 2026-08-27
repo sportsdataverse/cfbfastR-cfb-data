@@ -1,6 +1,6 @@
 """Model stage 34 (train) -- higher-order / opponent-adjusted models.
 
-Thin shim over ``python -m cfb_higher_models``: the directory listing IS the model pipeline,
+Thin shim over ``python -m cfb_model_build.cfb_higher_models``: the directory listing IS the model pipeline,
 mirroring the numbered dataset stages beside it.
 
 Stage order is ingest -> features -> train -> evaluate/gate -> package ->
@@ -32,7 +32,7 @@ from __future__ import annotations
 import runpy
 import sys
 
-PACKAGE = "cfb_higher_models"
+PACKAGE = "cfb_model_build.cfb_higher_models"
 
 if __name__ == "__main__":
     sys.argv[0] = f"python -m {PACKAGE}"

@@ -1,6 +1,6 @@
 """Model stage 60 (publish) -- upload artifacts to their release tags.
 
-Thin shim over ``python -m cfb_model_publish``: the directory listing IS the model pipeline,
+Thin shim over ``python -m cfb_model_build.cfb_model_publish``: the directory listing IS the model pipeline,
 mirroring the numbered dataset stages beside it.
 
 Stage order is ingest -> features -> train -> evaluate/gate -> package ->
@@ -32,7 +32,7 @@ from __future__ import annotations
 import runpy
 import sys
 
-PACKAGE = "cfb_model_publish"
+PACKAGE = "cfb_model_build.cfb_model_publish"
 
 if __name__ == "__main__":
     sys.argv[0] = f"python -m {PACKAGE}"

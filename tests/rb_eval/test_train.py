@@ -7,7 +7,7 @@ import pytest
 
 pytest.importorskip("pygam")  # GAM training requires the optional `gam` dep group
 
-from rb_eval.train import loso_cv, load_model, save_model, train_xrepa
+from cfb_model_build.rb_eval.train import loso_cv, load_model, save_model, train_xrepa
 
 
 def _synth_model_data(n: int = 80) -> pl.DataFrame:

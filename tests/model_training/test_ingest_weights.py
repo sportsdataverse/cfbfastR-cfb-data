@@ -1,5 +1,5 @@
 import polars as pl
-from model_training.ingest import add_weights
+from cfb_model_build.model_training.ingest import add_weights
 
 
 def test_weights_formula_matches_nflscrapr():

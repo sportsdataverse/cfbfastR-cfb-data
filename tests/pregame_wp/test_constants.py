@@ -1,4 +1,4 @@
-from pregame_wp import constants as C
+from cfb_model_build.pregame_wp import constants as C
 
 
 def test_factor_weights_sum_to_one():

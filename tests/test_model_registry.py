@@ -6,7 +6,7 @@ checks close that loop from both directions.
 
 Scope is deliberately the PACKAGE, not the exact command string. The registry's
 `fitting script` cells are prose (`model_training/train_ep.py (train-ep)`,
-`python -m cpoe --loso`, `cfb_model_publish ratings`), and asserting on prose
+`python -m cfb_model_build.cpoe --loso`, `cfb_model_publish ratings`), and asserting on prose
 would fail on a reworded cell while missing a genuinely stranded model.
 """
 
@@ -25,12 +25,12 @@ CLAUDE = REPO / "CLAUDE.md"
 #:
 #: The bar is "does it PUBLISH a model artifact", not "is it in the pipeline".
 NON_PUBLISHING_STAGES: dict[str, str] = {
-    "cfb_model_reports": (
+    "cfb_model_build.cfb_model_reports": (
         "Report stage: emits model cards and evaluation reports ABOUT artifacts "
         "other stages publish. It ships no model of its own, so a registry row "
         "would have nothing to put in artifact/gates/cadence."
     ),
-    "cfb_higher_models": (
+    "cfb_model_build.cfb_higher_models": (
         "Research package. Its outputs are experiment records -- pregame_fit.json, "
         "gbm_tuning.json, game_heads.json, experiments.json -- not published "
         "artifacts; nothing downstream consumes them. It earns a registry row the "
@@ -43,7 +43,7 @@ NON_PUBLISHING_STAGES: dict[str, str] = {
 
 #: Numbered model stage shims declare the package they forward to.
 STAGE_RE = re.compile(r"^cfb_model_(?P<num>\d{2})_(?P<name>.+)_creation\.py$")
-PACKAGE_RE = re.compile(r'^PACKAGE = "(?P<pkg>[a-z_]+)"$', re.M)
+PACKAGE_RE = re.compile(r'^PACKAGE = "(?P<pkg>[a-z_.]+)"$', re.M)
 
 
 def _stages() -> dict[str, str]:
@@ -71,8 +71,22 @@ def _registry_rows() -> list[str]:
     ][1:]  # drop the header row
 
 
+MODEL_PKG = "cfb_model_build"
+
+
 def _packages_on_disk() -> set[str]:
-    return {p.name for p in PY_DIR.iterdir() if p.is_dir() and (p / "__init__.py").exists()}
+    """Model packages, as the shims name them: ``cfb_model_build.<family>``.
+
+    They live under one package now (mirroring ``cfb_data_build`` on the dataset
+    side), so a stage's PACKAGE is dotted and the bare family name alone is no
+    longer importable.
+    """
+    root = PY_DIR / MODEL_PKG
+    return {
+        f"{MODEL_PKG}.{p.name}"
+        for p in root.iterdir()
+        if p.is_dir() and (p / "__init__.py").exists()
+    }
 
 
 def test_parsers_find_something():
@@ -92,7 +106,10 @@ def test_every_registry_model_is_reachable_from_a_stage():
     stages, on_disk = _stages(), _packages_on_disk()
     rows, stranded = _registry_rows(), []
     for row in rows:
-        cited = {p for p in on_disk if re.search(rf"\b{re.escape(p)}\b", row)}
+        # Registry cells cite the FAMILY name as an operator types it
+        # (`model_training/train_ep.py`, `python -m cpoe --loso`), not the
+        # dotted import path, so match on the last segment.
+        cited = {p for p in on_disk if re.search(rf"\b{re.escape(p.split(".")[-1])}\b", row)}
         if not cited:
             continue  # row cites no in-repo package (e.g. an sdv-py entry point)
         if not (cited & set(stages)):
@@ -111,7 +128,7 @@ def test_no_model_stage_absent_from_the_registry():
         f"{f} ({pkg})"
         for pkg, f in _stages().items()
         if pkg not in NON_PUBLISHING_STAGES
-        and not re.search(rf"\b{re.escape(pkg)}\b", rows)
+        and not re.search(rf"\b{re.escape(pkg.split(chr(46))[-1])}\b", rows)
     )
     assert not orphans, (
         f"model stages no registry row mentions: {orphans}\n"

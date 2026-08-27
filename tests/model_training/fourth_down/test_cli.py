@@ -1,4 +1,4 @@
-from model_training.fourth_down.cli import build_parser
+from cfb_model_build.model_training.fourth_down.cli import build_parser
 
 
 def test_train_fd_subcommand_present():

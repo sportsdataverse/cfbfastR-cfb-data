@@ -3,7 +3,7 @@ import numpy as np
 import polars as pl
 import pytest
 
-from cfb_model_reports.metrics import (
+from cfb_model_build.cfb_model_reports.metrics import (
     binary_loso_metrics,
     compute_classification_metrics,
     ep_loso_metrics,

@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import xgboost as xgb
 
-from model_training.validate import prediction_parity
+from cfb_model_build.model_training.validate import prediction_parity
 
 FIX = pathlib.Path(__file__).parent.parent / "fixtures" / "model_training"
 
@@ -21,7 +21,7 @@ def test_parity_against_self_is_zero():
 def test_wp_naive_reference_predicts_on_sanity_fixture():
     import json
 
-    from model_training import constants as C
+    from cfb_model_build.model_training import constants as C
 
     ref = xgb.Booster()
     ref.load_model(str(FIX / "xgb_wp_naive_model.ubj"))

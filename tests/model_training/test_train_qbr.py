@@ -2,8 +2,8 @@ import json
 import numpy as np
 import pandas as pd
 
-from model_training import constants as C
-from model_training.train_qbr import train_qbr_from_matrix
+from cfb_model_build.model_training import constants as C
+from cfb_model_build.model_training.train_qbr import train_qbr_from_matrix
 
 
 def test_qbr_model_matches_qbr_features_regression():

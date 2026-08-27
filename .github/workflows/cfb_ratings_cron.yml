@@ -116,7 +116,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.SDV_GH_TOKEN }}
         run: |
-          uv run --no-sync python -m cfb_model_publish ratings \
+          uv run --no-sync python -m cfb_model_build.cfb_model_publish ratings \
             --seasons "$SEASONS" \
             --out out/cfb_ratings \
             --tag cfb_ratings \

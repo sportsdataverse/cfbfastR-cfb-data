@@ -12,8 +12,8 @@ import json
 import polars as pl
 import pytest
 
-from cfb_model_publish.artifacts import upload_artifacts
-from cfb_model_publish.builders import (
+from cfb_model_build.cfb_model_publish.artifacts import upload_artifacts
+from cfb_model_build.cfb_model_publish.builders import (
     MIN_SEASON,
     MIN_SEASON_RECRUITING,
     build_ratings,
@@ -21,7 +21,7 @@ from cfb_model_publish.builders import (
     write_ratings_card,
     write_recruiting_card,
 )
-from cfb_model_publish.cli import _seasons, main
+from cfb_model_build.cfb_model_publish.cli import _seasons, main
 
 
 def _fake_ratings(season: int) -> pl.DataFrame:
@@ -108,7 +108,7 @@ def test_seasons_parses_range_and_single():
 
 
 def test_cli_build_only_writes_files_and_skips_upload(tmp_path, monkeypatch):
-    import cfb_model_publish.cli as cli
+    import cfb_model_build.cfb_model_publish.cli as cli
 
     monkeypatch.setattr(
         cli,
@@ -182,7 +182,7 @@ def test_recruiting_card_carries_seasons_and_gate_anchors(tmp_path):
 
 
 def test_cli_recruiting_build_only_writes_files_and_skips_upload(tmp_path, monkeypatch):
-    import cfb_model_publish.cli as cli
+    import cfb_model_build.cfb_model_publish.cli as cli
 
     monkeypatch.setattr(
         cli,

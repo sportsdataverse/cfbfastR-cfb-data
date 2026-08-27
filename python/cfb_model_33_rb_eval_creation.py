@@ -1,6 +1,6 @@
 """Model stage 33 (train) -- running-back evaluation (xREPA).
 
-Thin shim over ``python -m rb_eval``: the directory listing IS the model pipeline,
+Thin shim over ``python -m cfb_model_build.rb_eval``: the directory listing IS the model pipeline,
 mirroring the numbered dataset stages beside it.
 
 Stage order is ingest -> features -> train -> evaluate/gate -> package ->
@@ -32,7 +32,7 @@ from __future__ import annotations
 import runpy
 import sys
 
-PACKAGE = "rb_eval"
+PACKAGE = "cfb_model_build.rb_eval"
 
 if __name__ == "__main__":
     sys.argv[0] = f"python -m {PACKAGE}"

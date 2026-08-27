@@ -2,7 +2,7 @@ import json
 
 import polars as pl
 
-from cfb_model_reports.cli import build_parser, main
+from cfb_model_build.cfb_model_reports.cli import build_parser, main
 
 
 def test_parser_defaults():

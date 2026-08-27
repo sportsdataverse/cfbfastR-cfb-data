@@ -1,6 +1,6 @@
 import polars as pl
-from pregame_wp.box_score import calculate_box_score_from_frames
-from pregame_wp.ep_curve import load_ep_curve, load_punt_sr
+from cfb_model_build.pregame_wp.box_score import calculate_box_score_from_frames
+from cfb_model_build.pregame_wp.ep_curve import load_ep_curve, load_punt_sr
 
 OFF_TYPES = ["Rush", "Pass Reception", "Pass Incompletion", "Rushing Touchdown"]
 ST_TYPES = ["Kickoff", "Punt"]

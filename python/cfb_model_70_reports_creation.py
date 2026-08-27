@@ -1,6 +1,6 @@
 """Model stage 70 (report) -- model cards + evaluation reports.
 
-Thin shim over ``python -m cfb_model_reports``: the directory listing IS the model pipeline,
+Thin shim over ``python -m cfb_model_build.cfb_model_reports``: the directory listing IS the model pipeline,
 mirroring the numbered dataset stages beside it.
 
 Stage order is ingest -> features -> train -> evaluate/gate -> package ->
@@ -32,7 +32,7 @@ from __future__ import annotations
 import runpy
 import sys
 
-PACKAGE = "cfb_model_reports"
+PACKAGE = "cfb_model_build.cfb_model_reports"
 
 if __name__ == "__main__":
     sys.argv[0] = f"python -m {PACKAGE}"

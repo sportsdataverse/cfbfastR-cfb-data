@@ -1,4 +1,4 @@
-from rb_eval.cli import build_parser
+from cfb_model_build.rb_eval.cli import build_parser
 
 
 def test_features_final_dir_defaults_to_cache():

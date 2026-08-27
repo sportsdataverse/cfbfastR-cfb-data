@@ -74,6 +74,6 @@ models, so promotion was a clean drop-in `.ubj` replacement (no code changes):
 - Reproduce: the era A/B script (`era_experiment.py`) is archived — it moved to the
   gitignored `dev/` tree in `f0dbece1a` and is recoverable from git history at
   `f0dbece1a^` (path `python/era_experiment.py`). Retrain the promoted keepers through
-  the durable pipeline instead: `python -m model_training ingest --odds <cfb_line_odds.parquet>`
+  the durable pipeline instead: `python -m cfb_model_build.model_training ingest --odds <cfb_line_odds.parquet>`
   (applies the consensus spread backfill), then `train-qbr` / `train-fg` /
   `train-wp --variant spread`, with `loso` for the out-of-fold metrics.

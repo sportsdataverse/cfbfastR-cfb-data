@@ -4,7 +4,7 @@ import numpy as np
 import polars as pl
 import pytest
 
-from rb_eval.validate import calibration_table, weighted_cal_error, weighted_r2
+from cfb_model_build.rb_eval.validate import calibration_table, weighted_cal_error, weighted_r2
 
 
 def _cv_frame(n: int = 40) -> pl.DataFrame:
@@ -54,7 +54,7 @@ def test_weighted_r2_is_finite():
 
 def test_xrepa_calibration_figure_emits_png_and_csv(tmp_path):
     pytest.importorskip("plotnine")  # figure rendering needs the optional `figures` group
-    from rb_eval.figures import write_xrepa_calibration
+    from cfb_model_build.rb_eval.figures import write_xrepa_calibration
     cv = _cv_frame(100)
     table = calibration_table(cv)
     png, csv = write_xrepa_calibration(table, tmp_path / "xrepa", cal_error=0.01, r2=0.82)

@@ -4,7 +4,7 @@ pytest.importorskip("plotnine")
 
 import polars as pl
 
-from model_training.figures import write_calibration
+from cfb_model_build.model_training.figures import write_calibration
 
 
 def test_write_calibration_emits_png_and_table(tmp_path):

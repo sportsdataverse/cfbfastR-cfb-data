@@ -1,4 +1,4 @@
-from model_training.cli import build_parser
+from cfb_model_build.model_training.cli import build_parser
 
 
 def test_ingest_final_dir_defaults_to_cache():

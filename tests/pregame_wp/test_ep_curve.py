@@ -1,4 +1,4 @@
-from pregame_wp.ep_curve import load_ep_curve, load_punt_sr, ep_at, eqppp
+from cfb_model_build.pregame_wp.ep_curve import load_ep_curve, load_punt_sr, ep_at, eqppp
 
 
 def test_ep_curve_has_101_entries():

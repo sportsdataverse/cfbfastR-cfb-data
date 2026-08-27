@@ -5,8 +5,8 @@ import pandas as pd
 import pytest
 import xgboost as xgb
 
-from model_training.fourth_down import constants as C
-from model_training.fourth_down.validate import assert_structure, calibration_fd
+from cfb_model_build.model_training.fourth_down import constants as C
+from cfb_model_build.model_training.fourth_down.validate import assert_structure, calibration_fd
 
 FIX = pathlib.Path(__file__).parent.parent.parent / "fixtures" / "model_training"
 REF_MODEL = FIX / "fd_model.ubj"
@@ -41,7 +41,7 @@ def test_calibration_fd_shape():
         }
     )
     y_yards = rng.integers(-10, 66, 200)
-    from model_training.fourth_down.train import train_fourth_down
+    from cfb_model_build.model_training.fourth_down.train import train_fourth_down
 
     y_label = (y_yards + 10).astype(int)
     m = train_fourth_down(X, y_label, nrounds=3)

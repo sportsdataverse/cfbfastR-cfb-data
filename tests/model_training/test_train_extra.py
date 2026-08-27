@@ -9,11 +9,11 @@ import json
 import numpy as np
 import polars as pl
 
-from model_training import constants as C
-from model_training.features import fg_matrix, two_pt_matrix, xpass_matrix
-from model_training.train_fg import train_fg
-from model_training.train_two_pt import train_two_pt
-from model_training.train_xpass import train_xpass
+from cfb_model_build.model_training import constants as C
+from cfb_model_build.model_training.features import fg_matrix, two_pt_matrix, xpass_matrix
+from cfb_model_build.model_training.train_fg import train_fg
+from cfb_model_build.model_training.train_two_pt import train_two_pt
+from cfb_model_build.model_training.train_xpass import train_xpass
 
 
 def _synth_fg_frame(n=400):

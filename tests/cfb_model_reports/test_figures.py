@@ -3,12 +3,12 @@
 These cover the *recipe* (binning + weighted calibration error) and the defensive
 builder contracts (missing parquet -> []), without requiring plotnine to render a
 PNG. The faceted figure rendering itself is exercised by the live regeneration in
-``python -m cfb_model_reports``.
+``python -m cfb_model_build.cfb_model_reports``.
 """
 import numpy as np
 import polars as pl
 
-from cfb_model_reports import figures as figmod
+from cfb_model_build.cfb_model_reports import figures as figmod
 
 
 def test_binned_calibration_recipe_matches_cfbscrapR():

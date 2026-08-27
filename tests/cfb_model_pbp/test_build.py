@@ -1,5 +1,5 @@
 import polars as pl
-from cfb_model_pbp.build import build_carry_frame
+from cfb_model_build.cfb_model_pbp.build import build_carry_frame
 
 
 def test_build_carry_renames_and_keeps_keys(tmp_path):

@@ -1,5 +1,5 @@
 import polars as pl
-from pregame_wp.team_stats import (
+from cfb_model_build.pregame_wp.team_stats import (
     generate_team_play_stats,
     generate_team_drive_stats,
     generate_team_turnover_stats,
@@ -142,7 +142,7 @@ def test_actual_to_is_ints_plus_fumbles():
 # ---------------------------------------------------------------------------
 
 def _make_st_plays():
-    from pregame_wp.ep_curve import load_ep_curve
+    from cfb_model_build.pregame_wp.ep_curve import load_ep_curve
     ep = load_ep_curve()
     return pl.DataFrame([
         {"play_type": "Kickoff", "offense": "A", "defense": "B",

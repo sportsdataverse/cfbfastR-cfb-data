@@ -1,5 +1,5 @@
 import polars as pl
-from cpoe.features import extract_pass_features
+from cfb_model_build.cpoe.features import extract_pass_features
 
 
 def test_extract_pass_features_reads_final_json_play_types():

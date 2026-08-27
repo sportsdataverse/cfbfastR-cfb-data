@@ -13,7 +13,7 @@ from __future__ import annotations
 import numpy as np
 import polars as pl
 
-from model_training import spread_backfill as sb
+from cfb_model_build.model_training import spread_backfill as sb
 
 
 def _odds_frame() -> pl.DataFrame:

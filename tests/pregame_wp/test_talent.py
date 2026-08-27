@@ -1,6 +1,6 @@
 import numpy as np
 import polars as pl
-from pregame_wp.talent import calculate_roster_talent, calculate_returning_production
+from cfb_model_build.pregame_wp.talent import calculate_roster_talent, calculate_returning_production
 
 
 def _make_recruiting(n=80, seed=0):

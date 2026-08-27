@@ -3,15 +3,15 @@ from __future__ import annotations
 
 
 def test_package_imports():
-    import cpoe  # noqa: F401
+    import cfb_model_build.cpoe  # noqa: F401
 
 
 def test_version_present():
-    import cpoe
+    import cfb_model_build.cpoe as cpoe
     assert hasattr(cpoe, "__version__")
 
 
 def test_version_is_string():
-    import cpoe
+    import cfb_model_build.cpoe as cpoe
     assert isinstance(cpoe.__version__, str)
     assert cpoe.__version__

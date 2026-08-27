@@ -1,5 +1,5 @@
 import numpy as np
-from pregame_wp.predict import five_fr_to_wp
+from cfb_model_build.pregame_wp.predict import five_fr_to_wp
 
 
 def test_wp_is_50_when_mov_equals_mu():

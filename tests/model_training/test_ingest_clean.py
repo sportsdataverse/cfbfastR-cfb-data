@@ -1,5 +1,5 @@
 import polars as pl
-from model_training.ingest import clean_plays
+from cfb_model_build.model_training.ingest import clean_plays
 
 
 def test_drops_ot_zero_specialteams_and_fixes_kickoff_down():

@@ -1,5 +1,5 @@
 import json
-from cfb_model_publish.artifacts import plan_uploads, upload_artifacts
+from cfb_model_build.cfb_model_publish.artifacts import plan_uploads, upload_artifacts
 
 
 def _seed(tmp_path):

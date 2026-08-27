@@ -25,7 +25,7 @@ A `pygam` **LinearGAM(s(0) + s(1))** — two smooth splines — mapping `epa_per
 
 **Algorithm.** A `pygam` **`LinearGAM(s(0) + s(1))`** — two penalized smoothing splines — deliberately simple and interpretable rather than a high-variance tree ensemble. Fit on **897 rushers across 2015-2025**.
 
-**Evaluation.** Leave-one-season-out: bin the predicted EPA, compare to mean realized unadjusted EPA per bin, and report a weighted R² and weighted calibration error (the `rb_eval.validate` recipe, a port of the R `show_calibration_chart`). Metrics + the calibration figure are emitted only when `xrepa_loso.parquet` is present (regenerate with `python -m rb_eval train`).
+**Evaluation.** Leave-one-season-out: bin the predicted EPA, compare to mean realized unadjusted EPA per bin, and report a weighted R² and weighted calibration error (the `rb_eval.validate` recipe, a port of the R `show_calibration_chart`). Metrics + the calibration figure are emitted only when `xrepa_loso.parquet` is present (regenerate with `python -m cfb_model_build.rb_eval train`).
 
 
 ## Metrics
@@ -44,7 +44,7 @@ A `pygam` **LinearGAM(s(0) + s(1))** — two smooth splines — mapping `epa_per
 
 ## Discussion
 
-Validation is leave-one-season-out: bin the predicted EPA, compare to mean realized unadjusted EPA per bin, and report a weighted R² and weighted calibration error (the `rb_eval.validate` recipe, a port of the R `show_calibration_chart`). The calibration figure plots binned predicted EPA/play against realized EPA. Metrics are emitted only when the `xrepa_loso.parquet` is present (regenerate with `python -m rb_eval train`).
+Validation is leave-one-season-out: bin the predicted EPA, compare to mean realized unadjusted EPA per bin, and report a weighted R² and weighted calibration error (the `rb_eval.validate` recipe, a port of the R `show_calibration_chart`). The calibration figure plots binned predicted EPA/play against realized EPA. Metrics are emitted only when the `xrepa_loso.parquet` is present (regenerate with `python -m cfb_model_build.rb_eval train`).
 
 
 ## Feature importance

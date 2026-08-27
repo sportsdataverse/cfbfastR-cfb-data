@@ -4,8 +4,8 @@ import pathlib
 import numpy as np
 import pytest
 
-from model_training.features import wp_matrix
-from model_training.ingest import add_winner, build_training_frame
+from cfb_model_build.model_training.features import wp_matrix
+from cfb_model_build.model_training.ingest import add_winner, build_training_frame
 
 FINAL_DIR = pathlib.Path(
     os.environ.get(

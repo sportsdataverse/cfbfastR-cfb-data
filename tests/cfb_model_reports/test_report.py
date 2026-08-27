@@ -1,4 +1,4 @@
-from cfb_model_reports.report import ModelReport, render_model_report, render_index, _fmt_cell
+from cfb_model_build.cfb_model_reports.report import ModelReport, render_model_report, render_index, _fmt_cell
 
 
 def test_render_model_report_has_metrics_figures_provenance():

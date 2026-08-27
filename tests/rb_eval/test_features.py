@@ -4,7 +4,7 @@ import pathlib
 import polars as pl
 import pytest
 
-from rb_eval.features import add_fo_success
+from cfb_model_build.rb_eval.features import add_fo_success
 
 FIXTURE = pathlib.Path(__file__).parent.parent / "fixtures" / "rb_eval" / "synth_plays.json"
 
@@ -62,7 +62,7 @@ def test_fo_success_down4_included():
 
 def test_filter_rush_plays_excludes_non_rush_and_team():
     df = pl.DataFrame(json.loads(FIXTURE.read_text()))
-    from rb_eval.features import filter_rush_plays
+    from cfb_model_build.rb_eval.features import filter_rush_plays
 
     out = filter_rush_plays(df)
     assert "TEAM" not in (out["rusher_player_name"].to_list())
@@ -74,7 +74,7 @@ def test_filter_rush_plays_excludes_non_rush_and_team():
 
 def test_filter_adds_fo_success_and_is_rush_opp():
     df = pl.DataFrame(json.loads(FIXTURE.read_text()))
-    from rb_eval.features import filter_rush_plays
+    from cfb_model_build.rb_eval.features import filter_rush_plays
 
     out = filter_rush_plays(df)
     assert "fo_success" in out.columns

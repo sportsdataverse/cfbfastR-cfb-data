@@ -1,5 +1,5 @@
 """Tests for cfb_model_reports.narratives — the authored prose blocks."""
-from cfb_model_reports.narratives import NARRATIVES, ModelNarrative
+from cfb_model_build.cfb_model_reports.narratives import NARRATIVES, ModelNarrative
 
 
 def test_all_expected_models_have_narratives():

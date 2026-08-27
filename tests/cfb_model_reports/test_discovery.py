@@ -1,5 +1,5 @@
 import json
-from cfb_model_reports.discovery import discover_models
+from cfb_model_build.cfb_model_reports.discovery import discover_models
 
 
 def test_discover_reads_model_type_and_locates_sibling(tmp_path):

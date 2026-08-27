@@ -15,7 +15,7 @@ from __future__ import annotations
 import polars as pl
 import pytest
 
-from cfb_higher_models.features import ROSTER_COLS, add_roster_context
+from cfb_model_build.cfb_higher_models.features import ROSTER_COLS, add_roster_context
 
 
 def _weekly() -> pl.DataFrame:

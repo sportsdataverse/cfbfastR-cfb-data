@@ -1,7 +1,7 @@
 import numpy as np
 import polars as pl
 import pytest
-from pregame_wp.training import filter_outliers, train_pgwp_model
+from cfb_model_build.pregame_wp.training import filter_outliers, train_pgwp_model
 
 
 def _make_training_df(n=500, seed=1):

@@ -50,12 +50,12 @@ def raw_pass_plays() -> list[dict]:
 
 @pytest.fixture()
 def pass_df(raw_pass_plays) -> pd.DataFrame:
-    from cpoe.features import extract_pass_features
+    from cfb_model_build.cpoe.features import extract_pass_features
     return extract_pass_features(pd.DataFrame(raw_pass_plays))
 
 
 def test_extract_pass_features_imports():
-    from cpoe.features import extract_pass_features  # noqa: F401
+    from cfb_model_build.cpoe.features import extract_pass_features  # noqa: F401
 
 
 def test_extract_returns_dataframe(pass_df):
@@ -68,13 +68,13 @@ def test_extract_filters_non_pass(pass_df):
 
 
 def test_extract_has_all_feature_cols(pass_df):
-    from cpoe.constants import FEATURE_COLS
+    from cfb_model_build.cpoe.constants import FEATURE_COLS
     for col in FEATURE_COLS:
         assert col in pass_df.columns, f"Missing column: {col}"
 
 
 def test_extract_has_target_col(pass_df):
-    from cpoe.constants import TARGET_COL
+    from cfb_model_build.cpoe.constants import TARGET_COL
     assert TARGET_COL in pass_df.columns
 
 
@@ -122,7 +122,7 @@ def test_completion_col_numeric(pass_df):
 
 def test_empty_input_returns_empty_df():
     import pandas as pd
-    from cpoe.features import extract_pass_features
+    from cfb_model_build.cpoe.features import extract_pass_features
     result = extract_pass_features(pd.DataFrame())
     assert isinstance(result, pd.DataFrame)
     assert len(result) == 0
@@ -130,7 +130,7 @@ def test_empty_input_returns_empty_df():
 
 def test_no_pass_plays_returns_empty_df(raw_pass_plays):
     import pandas as pd
-    from cpoe.features import extract_pass_features
+    from cfb_model_build.cpoe.features import extract_pass_features
     rush_only = [p for p in raw_pass_plays if p["playType"] == "Rush"]
     result = extract_pass_features(pd.DataFrame(rush_only))
     assert len(result) == 0

@@ -1,5 +1,5 @@
 import polars as pl
-from model_training.next_score import label_next_score_half
+from cfb_model_build.model_training.next_score import label_next_score_half
 
 
 def _plays(rows):

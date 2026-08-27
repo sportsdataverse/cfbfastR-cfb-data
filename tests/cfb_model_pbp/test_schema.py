@@ -1,4 +1,4 @@
-from cfb_model_pbp.schema import MODEL_PBP_COLUMNS, JOIN_KEYS, CARRY_RENAME
+from cfb_model_build.cfb_model_pbp.schema import MODEL_PBP_COLUMNS, JOIN_KEYS, CARRY_RENAME
 
 
 def test_schema_contract():

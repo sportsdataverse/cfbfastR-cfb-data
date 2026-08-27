@@ -34,11 +34,11 @@ _LIVE_SEASON_TYPE = "postseason"
 # ---------------------------------------------------------------------------
 
 def test_module_imports_without_error():
-    from pregame_wp import data_ingest  # noqa: F401
+    from cfb_model_build.pregame_wp import data_ingest  # noqa: F401
 
 
 def test_public_api_present():
-    from pregame_wp import data_ingest
+    from cfb_model_build.pregame_wp import data_ingest
     for name in ("fetch_games", "fetch_plays", "fetch_drives", "load_game_frames"):
         assert hasattr(data_ingest, name), f"Missing: {name}"
 
@@ -105,7 +105,7 @@ _DRIVES_FIXTURE = [
 
 
 def test_normalize_plays_returns_dataframe():
-    from pregame_wp.data_ingest import normalize_plays
+    from cfb_model_build.pregame_wp.data_ingest import normalize_plays
     df = normalize_plays(_PLAYS_FIXTURE)
     assert isinstance(df, pl.DataFrame)
     assert len(df) == 2
@@ -114,7 +114,7 @@ def test_normalize_plays_returns_dataframe():
 
 
 def test_normalize_plays_dtypes():
-    from pregame_wp.data_ingest import normalize_plays
+    from cfb_model_build.pregame_wp.data_ingest import normalize_plays
     df = normalize_plays(_PLAYS_FIXTURE)
     for col in ("down", "distance", "yards_gained", "yard_line"):
         assert df.schema[col].is_numeric(), f"{col} should be numeric"
@@ -122,7 +122,7 @@ def test_normalize_plays_dtypes():
 
 def test_normalize_plays_camelcase_keys():
     """normalize_plays() must handle CFBD camelCase field names."""
-    from pregame_wp.data_ingest import normalize_plays
+    from cfb_model_build.pregame_wp.data_ingest import normalize_plays
     df = normalize_plays(_PLAYS_CAMEL_FIXTURE)
     assert "play_type" in df.columns
     assert "yards_gained" in df.columns
@@ -133,7 +133,7 @@ def test_normalize_plays_camelcase_keys():
 
 
 def test_normalize_drives_returns_dataframe():
-    from pregame_wp.data_ingest import normalize_drives
+    from cfb_model_build.pregame_wp.data_ingest import normalize_drives
     df = normalize_drives(_DRIVES_FIXTURE)
     assert isinstance(df, pl.DataFrame)
     assert len(df) == 2
@@ -142,14 +142,14 @@ def test_normalize_drives_returns_dataframe():
 
 
 def test_normalize_plays_empty_input():
-    from pregame_wp.data_ingest import normalize_plays
+    from cfb_model_build.pregame_wp.data_ingest import normalize_plays
     df = normalize_plays([])
     assert isinstance(df, pl.DataFrame)
     assert len(df) == 0
 
 
 def test_normalize_drives_empty_input():
-    from pregame_wp.data_ingest import normalize_drives
+    from cfb_model_build.pregame_wp.data_ingest import normalize_drives
     df = normalize_drives([])
     assert isinstance(df, pl.DataFrame)
     assert len(df) == 0
@@ -157,7 +157,7 @@ def test_normalize_drives_empty_input():
 
 def test_load_game_frames_from_disk(tmp_path: pathlib.Path):
     """load_game_frames() reads from pre-cached JSON files on disk."""
-    from pregame_wp.data_ingest import load_game_frames
+    from cfb_model_build.pregame_wp.data_ingest import load_game_frames
 
     game_id = "401415063"
     game_dir = tmp_path / str(game_id)
@@ -173,7 +173,7 @@ def test_load_game_frames_from_disk(tmp_path: pathlib.Path):
 
 
 def test_load_game_frames_missing_raises(tmp_path: pathlib.Path):
-    from pregame_wp.data_ingest import load_game_frames
+    from cfb_model_build.pregame_wp.data_ingest import load_game_frames
     with pytest.raises(FileNotFoundError):
         load_game_frames("999999999", raw_dir=tmp_path)
 
@@ -184,7 +184,7 @@ def test_load_game_frames_missing_raises(tmp_path: pathlib.Path):
 
 @skip_no_key
 def test_fetch_games_returns_list():
-    from pregame_wp.data_ingest import fetch_games
+    from cfb_model_build.pregame_wp.data_ingest import fetch_games
     games = fetch_games(season=2019, season_type="regular")
     assert isinstance(games, list)
     assert len(games) > 0
@@ -198,7 +198,7 @@ def test_fetch_games_returns_list():
 @skip_no_key
 def test_fetch_plays_for_known_game():
     """Fetch all postseason week-1 plays and spot-check structure."""
-    from pregame_wp.data_ingest import fetch_plays
+    from cfb_model_build.pregame_wp.data_ingest import fetch_plays
     plays = fetch_plays(year=_LIVE_YEAR, week=_LIVE_WEEK, season_type=_LIVE_SEASON_TYPE)
     assert isinstance(plays, list)
     assert len(plays) > 50
@@ -206,7 +206,7 @@ def test_fetch_plays_for_known_game():
 
 @skip_no_key
 def test_fetch_drives_for_known_game():
-    from pregame_wp.data_ingest import fetch_drives
+    from cfb_model_build.pregame_wp.data_ingest import fetch_drives
     drives = fetch_drives(
         year=_LIVE_YEAR,
         season_type=_LIVE_SEASON_TYPE,
@@ -219,7 +219,7 @@ def test_fetch_drives_for_known_game():
 
 @skip_no_key
 def test_fetch_plays_normalized_columns():
-    from pregame_wp.data_ingest import (
+    from cfb_model_build.pregame_wp.data_ingest import (
         fetch_plays,
         filter_plays_to_game,
         normalize_plays,
@@ -234,7 +234,7 @@ def test_fetch_plays_normalized_columns():
 @skip_no_key
 def test_fetch_and_cache_game(tmp_path: pathlib.Path):
     """fetch_and_cache() writes plays.json + drives.json, then load_game_frames reads them back."""
-    from pregame_wp.data_ingest import fetch_and_cache, load_game_frames
+    from cfb_model_build.pregame_wp.data_ingest import fetch_and_cache, load_game_frames
     fetch_and_cache(
         game_id=_LIVE_GAME_ID,
         year=_LIVE_YEAR,
@@ -255,9 +255,9 @@ def test_fetch_and_cache_game(tmp_path: pathlib.Path):
 @skip_no_key
 def test_e2e_box_score_from_live_game(tmp_path: pathlib.Path):
     """Full pipeline: fetch → normalize → box_score for one known game."""
-    from pregame_wp.box_score import calculate_box_score_from_frames
-    from pregame_wp.data_ingest import fetch_and_cache, load_game_frames
-    from pregame_wp.ep_curve import load_ep_curve, load_punt_sr
+    from cfb_model_build.pregame_wp.box_score import calculate_box_score_from_frames
+    from cfb_model_build.pregame_wp.data_ingest import fetch_and_cache, load_game_frames
+    from cfb_model_build.pregame_wp.ep_curve import load_ep_curve, load_punt_sr
 
     fetch_and_cache(
         game_id=_LIVE_GAME_ID,

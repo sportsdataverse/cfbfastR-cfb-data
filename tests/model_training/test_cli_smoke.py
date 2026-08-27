@@ -1,7 +1,7 @@
 import os
 import pathlib
 import pytest
-from model_training.cli import main
+from cfb_model_build.model_training.cli import main
 
 FINAL = pathlib.Path(
     os.environ.get(

@@ -16,11 +16,17 @@ static dimension table and 2013 Maryland is correctly Big-10-less.
 
 Two ESPN facts the compile depends on:
 
-* **Division comes from group membership, not from the team payload.** Group 80
-  is FBS and group 81 is FCS; a team's own payload carries no division field.
-* **A team's ``groups`` ``$ref`` points at season type 3** while the 80/81
+* **Division comes from group membership, not from the team payload.** A team's
+  own payload carries no division field; the group whose team list contains it is
+  the only signal. The tree is
+  ``99 -> {90 -> {80 FBS, 81 FCS}, 35 -> {57 D-II, 58 D-III}, 36 All Star}``,
+  plus group 186 (NAIA), a PARENTLESS sibling of 99 that no tree walk reaches.
+* **A team's ``groups`` ``$ref`` points at season type 3** while the group
   children live under type 2. Only the group *id* is comparable across the two,
   so the conference join is on the id parsed out of the ref.
+
+Filtering to FBS is ``pl.col("is_fbs")`` -- a non-null Boolean, so a team ESPN
+files in no group at all reads False rather than poisoning the mask with a null.
 """
 
 from __future__ import annotations
@@ -42,9 +48,27 @@ _ID_RE = re.compile(r"/groups/(\d+)")
 SPEC = DatasetSpec("cfb_teams", "cfb_teams", "espn_cfb_teams")
 SPECS: dict[str, DatasetSpec] = {"teams": SPEC}
 
-#: group id -> division label. Membership in one of these two team lists is the
-#: only authoritative division signal ESPN gives.
-DIVISIONS = {"80": "fbs", "81": "fcs"}
+#: group id -> division label, MOST SPECIFIC FIRST: a team listed under both a
+#: leaf and its parent takes the leaf. ``d2_d3`` and ``d1`` are the honest labels
+#: for the parent-only case, which is not an edge case -- ESPN files 107 of 2023's
+#: 800 teams directly under group 35, and in 2001 groups 57/58 were empty outright
+#: so all 195 non-D-I teams landed there.
+DIVISIONS = {
+    "80": "fbs",
+    "81": "fcs",
+    "57": "d2",
+    "58": "d3",
+    "36": "all_star",
+    "186": "naia",
+    "35": "d2_d3",
+    "90": "d1",
+}
+
+#: The classification tree itself. A team's ``groups`` ref can point straight at
+#: one of these (every group-35 team, and D-II teams like Colorado Mesa whose ref
+#: is group 57), and none of them is a conference -- so the walk-up both STOPS
+#: here and refuses to report the node it stopped on as a conference.
+STRUCTURAL_GROUPS = {99, 90, 80, 81, 35, 57, 58, 36, 186}
 
 #: Declared so an empty season still ships the documented column set rather than
 #: a zero-column frame (and so every season's parquet has one schema).
@@ -66,6 +90,7 @@ SCHEMA: dict[str, pl.DataType] = {
     "is_all_star": pl.Boolean,
     "is_exhibition": pl.Boolean,
     "division": pl.Utf8,
+    "is_fbs": pl.Boolean,
     "team_group_id": pl.Int64,
     "team_group_name": pl.Utf8,
     "conference_id": pl.Int64,
@@ -134,12 +159,16 @@ def _conference_logo(conf: dict) -> str | None:
 
 
 def _division_map(bundle: dict) -> dict[str, str]:
-    """team id -> 'fbs'/'fcs'. FBS wins if ESPN lists a team under both."""
+    """team id -> division label; the most specific containing group wins.
+
+    ``DIVISIONS`` is ordered leaf-first, so ``setdefault`` resolves a team listed
+    under both a leaf and its parent (432 of them in 2023) to the leaf.
+    """
     out: dict[str, str] = {}
+    groups = bundle.get("divisions") or {}
     for gid, label in DIVISIONS.items():
-        for tid in (bundle.get("divisions") or {}).get(gid) or []:
-            if label == "fbs" or str(tid) not in out:
-                out[str(tid)] = label
+        for tid in groups.get(gid) or []:
+            out.setdefault(str(tid), label)
     return out
 
 
@@ -153,7 +182,9 @@ def _group_id(ref: str | None) -> int | None:
     return int(m.group(1)) if m else None
 
 
-def _resolve_conference(gid: int | None, conferences: dict, *, max_hops: int = 5) -> dict:
+def _resolve_conference(
+    gid: int | None, conferences: dict, *, max_hops: int = 5
+) -> dict:
     """Walk a team's group up to the CONFERENCE-level group.
 
     ESPN assigns a team to its DIVISION WITHIN a conference whenever one exists
@@ -161,7 +192,12 @@ def _resolve_conference(gid: int | None, conferences: dict, *, max_hops: int = 5
     false``), not group 8, ``"Southeastern Conference"``. Taking the immediate
     group as the conference silently publishes "SEC - West" as a conference name
     for 14 of 16 SEC teams, and splits every divisioned conference in two. The
-    conference is the ancestor whose own parent is a DIVISION group (80/81).
+    conference is the ancestor whose own parent is a STRUCTURAL group.
+
+    Returns ``{}`` when the walk lands ON a structural group: the D-II/D-III teams
+    ESPN files straight under group 35 (and D-II teams whose ref is group 57) have
+    no conference at all, and publishing "Division II/III" as their conference
+    name would be a fabrication.
     """
     seen: set[int] = set()
     cur = gid
@@ -175,13 +211,17 @@ def _resolve_conference(gid: int | None, conferences: dict, *, max_hops: int = 5
             break
         group = nxt
         parent = _group_id((group.get("parent") or {}).get("$ref"))
-        if parent is None or parent in (80, 81):
+        if parent is None or parent in STRUCTURAL_GROUPS:
             break
         cur = parent
+    if _int(group.get("id")) in STRUCTURAL_GROUPS:
+        return {}
     return group
 
 
-def _team_row(season: int, tid: str, team: dict, division: str | None, conferences: dict) -> dict:
+def _team_row(
+    season: int, tid: str, team: dict, division: str | None, conferences: dict
+) -> dict:
     group_id = _group_id(((team or {}).get("groups") or {}).get("$ref"))
     group = conferences.get(str(group_id)) or {}
     conf = _resolve_conference(group_id, conferences)
@@ -198,7 +238,16 @@ def _team_row(season: int, tid: str, team: dict, division: str | None, conferenc
     # (Northeastern, Hofstra -- both dropped football in 2009) correctly in.
     # Guarded on the payload existing: a team whose payload failed to fetch also
     # has no conference and no logo, and must not be mislabelled an exhibition.
-    exhibition = bool(team) and not conf and logo is None
+    #
+    # SCOPED TO DIVISION I. Outside FBS/FCS, "no conference and no logo" describes
+    # several hundred perfectly real D-II/D-III/NAIA programs per season, so
+    # applying the rule there would relabel most of the newly-captured universe as
+    # exhibitions. ESPN only files all-star squads inside 80/81 (plus the dedicated
+    # group 36, empty on every season captured), so restricting it there keeps the
+    # flag's meaning AND leaves every pre-expansion FBS/FCS row unchanged.
+    exhibition = division == "all_star" or (
+        division in ("fbs", "fcs") and bool(team) and not conf and logo is None
+    )
     return {
         "season": season,
         "team_id": _int(team.get("id") or tid),
@@ -217,6 +266,12 @@ def _team_row(season: int, tid: str, team: dict, division: str | None, conferenc
         "is_all_star": team.get("isAllStar"),
         "is_exhibition": exhibition,
         "division": division,
+        # Built in Python, not as a polars expression: `pl.col("division") == "fbs"`
+        # is NULL wherever `division` is null, and a null in a filter mask drops the
+        # row silently instead of answering the question. `is_fbs` is always a real
+        # Boolean, so `filter(pl.col("is_fbs"))` and `filter(~pl.col("is_fbs"))`
+        # partition the season exactly.
+        "is_fbs": division == "fbs",
         "team_group_id": group_id,
         "team_group_name": group.get("name"),
         "conference_id": _int(conf.get("id")),
@@ -245,11 +300,19 @@ def compile_teams(bundle: dict) -> pl.DataFrame:
     conferences = bundle.get("conferences") or {}
     divisions = _division_map(bundle)
     teams = bundle.get("teams") or {}
-    # Driven by the DIVISION LISTS, not by the captured team payloads: a team
-    # whose payload failed to fetch must still show up (as a null-filled row)
-    # rather than vanish from the season it played in.
-    ids = sorted(set(divisions) | set(teams), key=lambda t: _int(t) or 0)
-    rows = [_team_row(season, tid, teams.get(tid) or {}, divisions.get(tid), conferences) for tid in ids]
+    # Driven by EVERY captured group list, not by the captured team payloads: a
+    # team whose payload failed to fetch must still show up (as a null-filled row)
+    # rather than vanish from the season it played in. Group 99 (the root, and the
+    # whole season universe) carries no division label, so its ids are unioned in
+    # from the raw lists rather than through `divisions`.
+    listed = {
+        str(t) for lst in (bundle.get("divisions") or {}).values() for t in lst or []
+    }
+    ids = sorted(listed | set(divisions) | set(teams), key=lambda t: _int(t) or 0)
+    rows = [
+        _team_row(season, tid, teams.get(tid) or {}, divisions.get(tid), conferences)
+        for tid in ids
+    ]
     if not rows:
         return pl.DataFrame(schema=SCHEMA)
     df = pl.from_dicts(rows, schema=SCHEMA)
@@ -282,9 +345,14 @@ def build(
                 print(f"  {SPEC.dataset} {season}: 0 rows, skipped", flush=True)
                 failures.append((season, "empty"))
                 continue
-            counts = df.group_by("division").len().sort("division").rows() if "division" in df.columns else []
+            counts = (
+                df.group_by("division").len().sort("division").rows()
+                if "division" in df.columns
+                else []
+            )
             print(
                 f"  {SPEC.dataset} {season}: {df.height} rows, {df.width} cols, "
+                f"is_fbs={int(df['is_fbs'].sum())}, "
                 + ", ".join(f"{k or 'none'}={v}" for k, v in counts),
                 flush=True,
             )
@@ -296,6 +364,8 @@ def build(
 
                 publish_dataset(SPEC, season, base=base)
         except Exception as exc:  # noqa: BLE001 - one season must not kill the sweep
-            print(f"  FAILED {season}: {type(exc).__name__}: {str(exc)[:150]}", flush=True)
+            print(
+                f"  FAILED {season}: {type(exc).__name__}: {str(exc)[:150]}", flush=True
+            )
             failures.append((season, type(exc).__name__))
     return failures

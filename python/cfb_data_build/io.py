@@ -17,6 +17,8 @@ git-ignored (they bloat the tree and the release is the distribution channel).
 
 from __future__ import annotations
 
+import gzip
+import shutil
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -91,3 +93,24 @@ def write_dataset(
         "csv": csv_path,
         "manifest": manifest_path,
     }
+
+
+def gzip_csv(paths: dict | None) -> None:
+    """Replace a written ``.csv`` with ``.csv.gz`` in place.
+
+    Every sibling ESPN tag (``espn_cfb_game_rosters`` and friends) publishes
+    ``.csv.gz``; :func:`write_dataset` still emits plain csv because most
+    datasets are small. A dataset whose season csv is large drops the plain file
+    rather than shipping it alongside -- one csv artifact, one naming pattern.
+    """
+    if not paths:
+        return
+    csv_path = paths.get("csv")
+    if csv_path is None or not Path(csv_path).exists():
+        return
+    csv_path = Path(csv_path)
+    gz_path = csv_path.with_suffix(csv_path.suffix + ".gz")
+    with open(csv_path, "rb") as src, gzip.GzipFile(gz_path, "wb", mtime=0) as dst:
+        shutil.copyfileobj(src, dst)
+    csv_path.unlink()
+    paths["csv"] = gz_path

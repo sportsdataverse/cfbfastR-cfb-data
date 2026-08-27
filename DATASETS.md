@@ -25,10 +25,11 @@ Expected `col_name | col_type | col_description` for each per-game-compiled **se
 | [rosters](#rosters) | one row per rostered athlete per season (deduped) | ~63 | `espn_cfb_rosters` |
 | [betting](#betting) | one row per game | 9 | `espn_cfb_betting` |
 | [schedules](#schedules) | one row per game | 34 | `espn_cfb_schedules` |
+| [cfb_schedules](#cfb_schedules) ‡ | one row per game (all divisions) | 41 | `cfb_schedules` |
 | [linescores](#linescores) | one row per (team, period) | 5 | `espn_cfb_linescores` |
-| [power_index](#power-index) | one row per team (or per game) | 22 | `espn_cfb_power_index` |
+| [power_index](#power_index) | one row per team (or per game) | 22 | `espn_cfb_power_index` |
 | [injuries](#injuries) | one row per injury entry | 12 | `espn_cfb_injuries` |
-| [teams](#teams) ‡ | one row per (season, team) | 36 | `espn_cfb_teams` |
+| [teams](#teams) ‡ | one row per (season, team) | 54 | `espn_cfb_teams` |
 | [team_summaries](#team_summaries) † | one row per team per season | 383 | `espn_cfb_team_summaries` |
 | [passing](#passing) † | one row per (team, passer) per season | 43 | `espn_cfb_passing` |
 | [rushing](#rushing) † | one row per (team, rusher) per season | 28 | `espn_cfb_rushing` |
@@ -46,7 +47,10 @@ Expected `col_name | col_type | col_description` for each per-game-compiled **se
 > ‡ **Season reference dataset.** `teams` is not reshaped from per-game `final`
 > JSON either: it is compiled by `python/cfb_data_build/teams.py` from the
 > per-season ESPN team + conference bundles that `cfbfastR-cfb-raw` commits at
-> `cfb/teams/json/{season}.json`, read over HTTP.
+> `cfb/teams/json/{season}.json`, read over HTTP. `cfb_schedules` is likewise not
+> reshaped from `final` JSON: it is compiled by
+> `python/cfb_data_build/schedules_unified.py` from the CFBD `/games` endpoint
+> UNIONed with this repo's own ESPN-native `schedules` artifact.
 
 ---
 
@@ -1131,6 +1135,107 @@ _Release tag: `espn_cfb_schedules`_
 
 ---
 
+### cfb_schedules
+
+One row per game, **all divisions**, keyed on `game_id`. This is the schedule
+the loaders read (`sportsdataverse.cfb.load_cfb_schedule`), and it is the
+UNIFICATION of the two schedule datasets that used to sit side by side.
+
+**Every column here is ESPN data.** The build reads two feeds -- this repo's
+ESPN-native `schedules` artifact and the CollegeFootballData `/games` endpoint
+-- but CollegeFootballData is a *redistributor* of ESPN, not an independent
+source: `game_id` is an ESPN id on both paths, which is why they join on it at
+all. The two feeds are read for COVERAGE, not provenance, and no column below
+is attributed to CollegeFootballData because none originates there. The only
+values in the `/games` payload that are genuinely NOT ESPN are the modeling
+outputs, and those are excluded (see Columns).
+
+* **Rows** = the redistributed superset (every division, every season type,
+  including 2020's `spring_*` COVID season) UNIONed with the games only the
+  ESPN-native artifact carries. Those extra rows are real schedule facts: in
+  2020 they are 121 COVID postponements/cancellations the redistributed feed
+  drops because they were never played (56 `STATUS_POSTPONED`, 65
+  `STATUS_CANCELED`) plus one offseason all-star game. `status` in
+  (`STATUS_POSTPONED`, `STATUS_CANCELED`) plus `season_type == "offseason"`
+  identifies exactly those 122 rows.
+* **Columns** = the union of both feeds MINUS seven modeling columns
+  (`home_pregame_elo`, `away_pregame_elo`, `home_postgame_elo`,
+  `away_postgame_elo`, `home_post_win_prob`, `away_post_win_prob`,
+  `excitement_index`). Those are model output, not ESPN schedule facts.
+* **Where the two feeds overlap semantically, one column ships, not two
+  near-duplicates**: `home_points` <- `home_score`, `away_points` <-
+  `away_score`, `completed` <- `status == "STATUS_FINAL"`, `start_date` <-
+  `game_date`, `conference_game` <- `conference_competition`. `game_date`
+  therefore does not ship as its own column (it is `start_date` at coarser
+  string precision -- identical instants on all 911 shared 2023 rows), while
+  `conference_competition` DOES, because the two flags measurably disagree.
+* **Season type ships twice because ESPN publishes it twice**: `season_type_id`
+  is ESPN's integer (1 preseason, 2 regular, 3 postseason, 4 offseason, 5
+  spring regular, 6 spring postseason -- verbatim from ESPN's
+  `/seasons/{year}/types`) and `season_type` its snake_cased label. The pair is
+  a strict 1:1 mapping across all 26 seasons.
+* **FBS filtering** uses `fbs_game` / `fbs_participant`, never a comparison
+  against `home_division` / `away_division`: those are NA for teams outside the
+  `fbs`/`fcs`/`ii`/`iii` classification (2023: 21 NA home, 61 NA away) and an NA
+  must read FALSE, not NULL.
+
+`espn_cfb_schedules` is **retained**, unchanged, as the ESPN-native schedule
+(FBS-scoped, straight off `final.json`) -- it is one of this dataset's two
+inputs, and its columns are documented under [schedules](#schedules).
+Consumers wanting the full picture should read `cfb_schedules`.
+
+Built by `python -m cfb_data_build --dataset cfb_schedules` (needs
+`CFBD_API_KEY`); runs daily right after `schedules` in
+`scripts/daily_cfb_processor.sh`.
+
+| col_name | col_type | col_description |
+| --- | --- | --- |
+| game_id | integer | ESPN game id. Primary key, one row per game; joins every other CFB table. Pinned to a 64-bit integer on every path. |
+| season | integer | Season year the game belongs to. January bowl/playoff games carry the prior calendar year. |
+| week | integer | Week number within the season as ESPN numbers it, restarting at 1 for the postseason. |
+| season_type | character | ESPN's season-type label, snake_cased: `regular`, `postseason`, `offseason`, and 2020's COVID-only `spring_regular` / `spring_postseason`. |
+| season_type_id | integer | ESPN's season-type integer, from `/seasons/{year}/types`: 1 preseason, 2 regular, 3 postseason, 4 offseason, 5 spring regular, 6 spring postseason. Strict 1:1 partner of `season_type`. |
+| start_date | character | Scheduled kickoff instant from ESPN, ISO-8601 UTC (not local time). |
+| start_time_tbd | logical | Whether ESPN has announced the date but not yet the kickoff time. |
+| completed | logical | Whether the game has been played to a final. FALSE covers both future games and cancellations -- read `status` to tell them apart. |
+| neutral_site | logical | Whether the game was played at a neutral site. |
+| conference_game | logical | Whether the game counted as a conference matchup. Taken from the CFBD feed's `conferenceGame` flag, falling back to ESPN's `conference_competition` where that is absent -- it is not recomputed from that season's conference membership, so it can disagree with comparing home_conference to away_conference. |
+| conference_competition | logical | ESPN's own flag on the competition record. Kept alongside `conference_game` because the two measurably disagree (12 of 911 shared 2023 rows). NA for games the ESPN-native feed does not carry. |
+| attendance | integer | Announced attendance. NA is unknown, not zero. |
+| venue_id | integer | ESPN's stadium identifier. Stable across seasons and renames -- the join key for venue metadata in `cfb_team_info`. |
+| venue | character | Stadium name as ESPN spells it that season. Sponsor renames drift the string; join on `venue_id`. |
+| status | character | ESPN game status enum (`STATUS_FINAL`, `STATUS_SCHEDULED`, `STATUS_POSTPONED`, `STATUS_CANCELED`, ...). The signal distinguishing a scheduled-then-cancelled game from an unplayed future one. NA for games the ESPN-native feed does not carry. |
+| home_id | integer | ESPN team id of the home team -- the join key to every team-level CFB table. |
+| home_team | character | Home team's school name as ESPN spells it. Display text; join on `home_id`. |
+| home_abbreviation | character | Home team's short ESPN abbreviation. Not unique league-wide -- display only. NA for games the ESPN-native feed does not carry. |
+| home_division | character | Home team division: `fbs` / `fcs` / `ii` / `iii`, or NA for a team outside that classification. **An NA is a genuinely non-FBS team, not missing data** -- filter with `fbs_game` / `fbs_participant` rather than comparing this column, which yields NULL on NA in polars. |
+| home_conference | character | Home team's conference that season; follows realignment. |
+| home_points | integer | Final points scored by the home team; NA until played. |
+| home_winner | logical | Whether the home team won. ESPN's flag where present, otherwise derived from a completed game's points; NA when not completed or unscored. |
+| away_id | integer | ESPN team id of the away team. |
+| away_team | character | Away team's school name as ESPN spells it. Display text; join on `away_id`. |
+| away_abbreviation | character | Away team's short ESPN abbreviation -- see `home_abbreviation`. |
+| away_division | character | Away team division -- see `home_division`. |
+| away_conference | character | Away team's conference that season; follows realignment. |
+| away_points | integer | Final points scored by the away team; NA until played. |
+| away_winner | logical | Whether the away team won -- see `home_winner`. |
+| fbs_game | logical | TRUE when BOTH teams are FBS. Derived with `.eq_missing("fbs")` so an NA division reads FALSE, never NA. (2015: 765, 2023: 792.) |
+| fbs_participant | logical | TRUE when AT LEAST ONE team is FBS. Same NA-reads-FALSE rule. (2015: 870, 2023: 910.) |
+| highlights | character | Link to ESPN's highlight package, where one was published. |
+| notes | character | Free-text note ESPN attaches to the game -- usually the bowl or event name. Unstructured; use `playoff_bowl_name` for bowl identity. |
+| playoff_competition | character | Playoff competition the game belongs to (e.g. `cfp`); NA for non-playoff games. |
+| playoff_format | character | Playoff format in effect (e.g. `four_team`, `twelve_team_2025`). |
+| playoff_round | character | Playoff round slug (e.g. `first_round`, `semifinal`). |
+| playoff_round_name | character | Playoff round display name (e.g. "Semifinal"). Snake_cased here; cfbfastR's flatten emitted `playoff_roundName`. |
+| playoff_bracket_slot | character | Playoff bracket slot (e.g. `SF1`, `FR4`) -- reconstructs the bracket tree. |
+| playoff_home_seed | integer | Home team's playoff seed. |
+| playoff_away_seed | integer | Away team's playoff seed. |
+| playoff_bowl_name | character | Bowl hosting the playoff game (e.g. "Rose Bowl"). |
+
+_Release tag: `cfb_schedules`_
+
+---
+
 ### linescores
 
 One row per (team, period) — per-quarter scoring for each team, reshaped from `g["team_box_extra"][team_id]["linescores"]` long across all games in a season.
@@ -1209,7 +1314,9 @@ _Release tag: `espn_cfb_injuries`_
 
 One row per (season, team) — ESPN's team identity, conference membership, and branding **as of that season**, so a team's conference/colors/logos are point-in-time (2013 Maryland is correctly not in the Big Ten). Built by `python/cfb_data_build/teams.py`, which reads the raw season bundle over HTTP; it does not use `final` JSON.
 
-Division comes from ESPN group membership: group 80 = FBS, group 81 = FCS. Those groups also contain bowl **all-star / exhibition squads** ("SOUTH All-Stars", "Kai Hulakai", "Team Gaither", "TBA" — 12 of 2023's 145 group-80 entries); ESPN's own `isAllStar` flag catches only a third of them, so `is_exhibition` is derived (no conference group and no logo) and is the column to filter on for a real-program count.
+Division comes from ESPN group membership, and the whole NCAA Football tree is captured, not just Division I: `99 NCAA Football → {90 Division I → {80 FBS, 81 FCS}, 35 Division II/III → {57 D-II, 58 D-III}, 36 All Star}`. Group 99's team list is the season universe (800 teams in 2023, 435 in 2001) and is byte-equal to `espn_cfb_season_teams`. **Filter with `is_fbs`, not `division == "fbs"`** — `is_fbs` is a non-null Boolean, so a team ESPN files in no group reads `FALSE` instead of poisoning the mask with `NA`/null.
+
+ESPN files bowl **all-star / exhibition squads** inside groups 80/81 ("SOUTH All-Stars", "Kai Hulakai", "Team Gaither", "TBA" — 12 of 2023's 145 group-80 entries); ESPN's own `isAllStar` flag catches only a third of them, so `is_exhibition` is derived (no conference group and no logo). The rule is **scoped to FBS/FCS**: outside Division I, "no conference and no logo" describes hundreds of real D-II/D-III/NAIA programs per season, so `is_exhibition` is always `FALSE` there.
 
 `conference_*` is the **conference**, not the division within it: a team's own `groups` `$ref` resolves to e.g. group 7 `"SEC - West"`, whose parent is group 8 `"Southeastern Conference"`. The immediate group is kept as `team_group_*`.
 
@@ -1231,10 +1338,11 @@ Division comes from ESPN group membership: group 80 = FBS, group 81 = FCS. Those
 | is_active | logical | ESPN `isActive`. |
 | is_all_star | logical | ESPN `isAllStar`, verbatim — unreliable; prefer `is_exhibition`. |
 | is_exhibition | logical | Derived: the row is a bowl all-star / exhibition squad rather than a program (no conference group and no logo). |
-| division | character | "fbs" (group 80) or "fcs" (group 81); the only authoritative division signal ESPN gives. |
+| division | character | Most-specific NCAA group containing the team: `"fbs"` (80), `"fcs"` (81), `"d2"` (57), `"d3"` (58), `"all_star"` (36), `"d2_d3"` (filed straight under 35 — 107 of 2023's 800 teams, and all 195 non-D-I teams in 2001 when 57/58 were empty), `"d1"` (90 only). Null only when ESPN lists the team in no group. |
+| is_fbs | logical | `division == "fbs"`, **never null** — the safe FBS filter. |
 | team_group_id | integer | The group ESPN assigns the team to — a division within a conference when one exists (e.g. 7 = "SEC - West"). |
 | team_group_name | character | Name of that immediate group. |
-| conference_id | integer | Conference group id, walked up from `team_group_id` (e.g. 8). |
+| conference_id | integer | Conference group id, walked up from `team_group_id` (e.g. 8). Null when the team has no conference — expected for D-II/D-III/NAIA teams whose `groups` ref points straight at a structural node (35 or 57); the structural node is never reported as a conference. |
 | conference_name | character | Conference name (e.g. "Southeastern Conference"). |
 | conference_short_name | character | Conference short name (e.g. "SEC"). |
 | conference_abbreviation | character | Conference abbreviation — ESPN lowercases this at conference level (e.g. "sec"). |

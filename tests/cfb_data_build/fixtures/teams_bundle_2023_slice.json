@@ -8,6 +8,22 @@
   ],
   "81": [
    "13"
+  ],
+  "57": [
+   "11"
+  ],
+  "58": [
+   "3"
+  ],
+  "35": [
+   "95"
+  ],
+  "99": [
+   "2",
+   "3",
+   "11",
+   "13",
+   "95"
   ]
  },
  "group_children": {},
@@ -294,6 +310,291 @@
       "group"
      ],
      "href": "https://www.espn.com/college-football/conferences/statistics/_/id/8/southeastern-conference",
+     "text": "Stats",
+     "shortText": "Stats",
+     "isExternal": false,
+     "isPremium": false
+    }
+   ]
+  },
+  "57": {
+   "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2023/types/2/groups/57?lang=en&region=us",
+   "uid": "s:20~l:23~g:57",
+   "id": "57",
+   "name": "NCAA Division II",
+   "abbreviation": "d2",
+   "shortName": "NCAA Division II",
+   "midsizeName": "NCAA Division II",
+   "season": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2023?lang=en&region=us"
+   },
+   "children": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2023/types/2/groups/57/children?lang=en&region=us"
+   },
+   "parent": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2023/types/2/groups/35?lang=en&region=us"
+   },
+   "standings": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2023/types/2/groups/57/standings?lang=en&region=us"
+   },
+   "isConference": false,
+   "slug": "ncaa-division-ii",
+   "teams": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2023/types/2/groups/57/teams?lang=en&region=us"
+   },
+   "links": [
+    {
+     "language": "en-US",
+     "rel": [
+      "standings",
+      "desktop",
+      "group"
+     ],
+     "href": "https://www.espn.com/college-football/standings/_/group/57",
+     "text": "Standings",
+     "shortText": "Standings",
+     "isExternal": false,
+     "isPremium": false
+    },
+    {
+     "language": "en-US",
+     "rel": [
+      "standings",
+      "sportscenter",
+      "app",
+      "group"
+     ],
+     "href": "sportscenter://x-callback-url/showClubhouse?uid=null&section=standings",
+     "text": "Standings",
+     "shortText": "Standings",
+     "isExternal": false,
+     "isPremium": false
+    },
+    {
+     "language": "en-US",
+     "rel": [
+      "scores",
+      "desktop",
+      "group"
+     ],
+     "href": "https://www.espn.com/college-football/scoreboard/_/group/57",
+     "text": "Scores",
+     "shortText": "Scores",
+     "isExternal": false,
+     "isPremium": false
+    },
+    {
+     "language": "en-US",
+     "rel": [
+      "scores",
+      "sportscenter",
+      "app",
+      "group"
+     ],
+     "href": "sportscenter://x-callback-url/showClubhouse?uid=null&section=scores",
+     "text": "Scores",
+     "shortText": "Scores",
+     "isExternal": false,
+     "isPremium": false
+    },
+    {
+     "language": "en-US",
+     "rel": [
+      "stats",
+      "desktop",
+      "group"
+     ],
+     "href": "https://www.espn.com/college-football/conferences/statistics/_/id/57/ncaa-division-ii",
+     "text": "Stats",
+     "shortText": "Stats",
+     "isExternal": false,
+     "isPremium": false
+    }
+   ]
+  },
+  "35": {
+   "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2023/types/2/groups/35?lang=en&region=us",
+   "uid": "s:20~l:23~g:35",
+   "id": "35",
+   "name": "Division II/III",
+   "abbreviation": "yy",
+   "shortName": "Div II/III",
+   "midsizeName": "Division II/III",
+   "season": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2023?lang=en&region=us"
+   },
+   "children": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2023/types/2/groups/35/children?lang=en&region=us"
+   },
+   "parent": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2023/types/2/groups/99?lang=en&region=us"
+   },
+   "standings": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2023/types/2/groups/35/standings?lang=en&region=us"
+   },
+   "isConference": false,
+   "slug": "div-iiiii",
+   "teams": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2023/types/2/groups/35/teams?lang=en&region=us"
+   },
+   "links": [
+    {
+     "language": "en-US",
+     "rel": [
+      "standings",
+      "desktop",
+      "group"
+     ],
+     "href": "https://www.espn.com/college-football/standings/_/group/35",
+     "text": "Standings",
+     "shortText": "Standings",
+     "isExternal": false,
+     "isPremium": false
+    },
+    {
+     "language": "en-US",
+     "rel": [
+      "standings",
+      "sportscenter",
+      "app",
+      "group"
+     ],
+     "href": "sportscenter://x-callback-url/showClubhouse?uid=null&section=standings",
+     "text": "Standings",
+     "shortText": "Standings",
+     "isExternal": false,
+     "isPremium": false
+    },
+    {
+     "language": "en-US",
+     "rel": [
+      "scores",
+      "desktop",
+      "group"
+     ],
+     "href": "https://www.espn.com/college-football/scoreboard/_/group/35",
+     "text": "Scores",
+     "shortText": "Scores",
+     "isExternal": false,
+     "isPremium": false
+    },
+    {
+     "language": "en-US",
+     "rel": [
+      "scores",
+      "sportscenter",
+      "app",
+      "group"
+     ],
+     "href": "sportscenter://x-callback-url/showClubhouse?uid=null&section=scores",
+     "text": "Scores",
+     "shortText": "Scores",
+     "isExternal": false,
+     "isPremium": false
+    },
+    {
+     "language": "en-US",
+     "rel": [
+      "stats",
+      "desktop",
+      "group"
+     ],
+     "href": "https://www.espn.com/college-football/conferences/statistics/_/id/35/division-iiiii",
+     "text": "Stats",
+     "shortText": "Stats",
+     "isExternal": false,
+     "isPremium": false
+    }
+   ]
+  },
+  "58": {
+   "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2023/types/2/groups/58?lang=en&region=us",
+   "uid": "s:20~l:23~g:58",
+   "id": "58",
+   "name": "NCAA Division III",
+   "abbreviation": "d3",
+   "shortName": "NCAA Division III",
+   "midsizeName": "NCAA Division III",
+   "season": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2023?lang=en&region=us"
+   },
+   "children": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2023/types/2/groups/58/children?lang=en&region=us"
+   },
+   "parent": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2023/types/2/groups/35?lang=en&region=us"
+   },
+   "standings": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2023/types/2/groups/58/standings?lang=en&region=us"
+   },
+   "isConference": false,
+   "slug": "ncaa-division-iii",
+   "teams": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2023/types/2/groups/58/teams?lang=en&region=us"
+   },
+   "links": [
+    {
+     "language": "en-US",
+     "rel": [
+      "standings",
+      "desktop",
+      "group"
+     ],
+     "href": "https://www.espn.com/college-football/standings/_/group/58",
+     "text": "Standings",
+     "shortText": "Standings",
+     "isExternal": false,
+     "isPremium": false
+    },
+    {
+     "language": "en-US",
+     "rel": [
+      "standings",
+      "sportscenter",
+      "app",
+      "group"
+     ],
+     "href": "sportscenter://x-callback-url/showClubhouse?uid=null&section=standings",
+     "text": "Standings",
+     "shortText": "Standings",
+     "isExternal": false,
+     "isPremium": false
+    },
+    {
+     "language": "en-US",
+     "rel": [
+      "scores",
+      "desktop",
+      "group"
+     ],
+     "href": "https://www.espn.com/college-football/scoreboard/_/group/58",
+     "text": "Scores",
+     "shortText": "Scores",
+     "isExternal": false,
+     "isPremium": false
+    },
+    {
+     "language": "en-US",
+     "rel": [
+      "scores",
+      "sportscenter",
+      "app",
+      "group"
+     ],
+     "href": "sportscenter://x-callback-url/showClubhouse?uid=null&section=scores",
+     "text": "Scores",
+     "shortText": "Scores",
+     "isExternal": false,
+     "isPremium": false
+    },
+    {
+     "language": "en-US",
+     "rel": [
+      "stats",
+      "desktop",
+      "group"
+     ],
+     "href": "https://www.espn.com/college-football/conferences/statistics/_/id/58/ncaa-division-iii",
      "text": "Stats",
      "shortText": "Stats",
      "isExternal": false,
@@ -1054,7 +1355,517 @@
    "college": {
     "$ref": "http://sports.core.api.espn.com/v2/colleges/13?lang=en&region=us"
    }
+  },
+  "11": {
+   "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2023/teams/11?lang=en&region=us",
+   "id": "11",
+   "guid": "11a449f5-e962-1e96-2950-cf51b26e1de0",
+   "uid": "s:20~l:23~t:11",
+   "alternateIds": {
+    "sdr": "6616"
+   },
+   "slug": "colorado-mesa-mavericks",
+   "location": "Colorado Mesa",
+   "name": "Mavericks",
+   "nickname": "Colorado Mesa",
+   "abbreviation": "MES",
+   "displayName": "Colorado Mesa Mavericks",
+   "shortDisplayName": "Colorado Mesa",
+   "color": "000000",
+   "isActive": true,
+   "isAllStar": false,
+   "logos": [
+    {
+     "href": "https://a.espncdn.com/i/teamlogos/ncaa/500/11.png",
+     "width": 500,
+     "height": 500,
+     "alt": "",
+     "rel": [
+      "full",
+      "default"
+     ],
+     "lastUpdated": "2022-12-21T00:43Z"
+    },
+    {
+     "href": "https://a.espncdn.com/i/teamlogos/ncaa/500-dark/11.png",
+     "width": 500,
+     "height": 500,
+     "alt": "",
+     "rel": [
+      "full",
+      "dark"
+     ],
+     "lastUpdated": "2022-12-21T00:47Z"
+    },
+    {
+     "href": "https://a.espncdn.com/guid/11a449f5-e962-1e96-2950-cf51b26e1de0/logos/primary_logo_on_primary_color.png",
+     "width": 4096,
+     "height": 4096,
+     "alt": "",
+     "rel": [
+      "full",
+      "primary_logo_on_primary_color"
+     ],
+     "lastUpdated": "2026-03-10T15:29Z"
+    },
+    {
+     "href": "https://a.espncdn.com/guid/11a449f5-e962-1e96-2950-cf51b26e1de0/logos/primary_logo_on_secondary_color.png",
+     "width": 4096,
+     "height": 4096,
+     "alt": "",
+     "rel": [
+      "full",
+      "primary_logo_on_secondary_color"
+     ],
+     "lastUpdated": "2026-03-10T15:29Z"
+    }
+   ],
+   "record": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2023/types/3/teams/11/record?lang=en&region=us"
+   },
+   "venue": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/venues/5882?lang=en&region=us",
+    "id": "5882",
+    "guid": "3fdf4534-6c38-34ae-8905-6f3cbd5f3206",
+    "fullName": "Ralph Stocker Stadium",
+    "address": {
+     "city": "Grand Junction",
+     "state": "CO",
+     "zipCode": "81501",
+     "country": "USA"
+    },
+    "grass": false,
+    "indoor": false,
+    "images": []
+   },
+   "groups": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2023/types/3/groups/57?lang=en&region=us"
+   },
+   "ranks": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2023/teams/11/ranks?lang=en&region=us"
+   },
+   "statistics": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2023/types/3/teams/11/statistics?lang=en&region=us"
+   },
+   "links": [
+    {
+     "language": "en-US",
+     "rel": [
+      "roster",
+      "desktop",
+      "team"
+     ],
+     "href": "https://www.espn.com/college-football/team/roster/_/id/11",
+     "text": "Roster",
+     "shortText": "Roster",
+     "isExternal": false,
+     "isPremium": false
+    },
+    {
+     "language": "en-US",
+     "rel": [
+      "roster",
+      "sportscenter",
+      "app",
+      "team"
+     ],
+     "href": "sportscenter://x-callback-url/showClubhouse?uid=s:20~l:23~t:11&section=roster",
+     "text": "Roster",
+     "shortText": "Roster",
+     "isExternal": false,
+     "isPremium": false
+    },
+    {
+     "language": "en-US",
+     "rel": [
+      "schedule",
+      "desktop",
+      "team"
+     ],
+     "href": "https://www.espn.com/college-football/team/schedule/_/id/11",
+     "text": "Schedule",
+     "shortText": "Schedule",
+     "isExternal": false,
+     "isPremium": false
+    },
+    {
+     "language": "en-US",
+     "rel": [
+      "schedule",
+      "sportscenter",
+      "app",
+      "team"
+     ],
+     "href": "sportscenter://x-callback-url/showClubhouse?uid=s:20~l:23~t:11&section=scores",
+     "text": "Schedule",
+     "shortText": "Schedule",
+     "isExternal": false,
+     "isPremium": false
+    },
+    {
+     "language": "en-US",
+     "rel": [
+      "awards",
+      "desktop",
+      "team"
+     ],
+     "href": "https://www.espn.com/college-football/awards/_/team/11",
+     "text": "Awards",
+     "shortText": "Awards",
+     "isExternal": false,
+     "isPremium": false
+    }
+   ],
+   "injuries": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/teams/11/injuries?lang=en&region=us"
+   },
+   "notes": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/teams/11/notes?lang=en&region=us"
+   },
+   "againstTheSpreadRecords": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2023/types/3/teams/11/ats?lang=en&region=us"
+   },
+   "awards": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2023/teams/11/awards?lang=en&region=us"
+   },
+   "franchise": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/franchises/11?lang=en&region=us"
+   },
+   "events": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2023/teams/11/events?lang=en&region=us"
+   },
+   "college": {
+    "$ref": "http://sports.core.api.espn.com/v2/colleges/11?lang=en&region=us"
+   }
+  },
+  "3": {
+   "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2023/teams/3?lang=en&region=us",
+   "id": "3",
+   "guid": "dc0970a1-ac10-d9cf-7580-eceff9ac93dd",
+   "uid": "s:20~l:23~t:3",
+   "alternateIds": {
+    "sdr": "66073"
+   },
+   "slug": "birmingham-southern-panthers",
+   "location": "Birmingham-Southern",
+   "name": "Panthers",
+   "nickname": "Birm-Southern",
+   "abbreviation": "BIR",
+   "displayName": "Birmingham-Southern Panthers",
+   "shortDisplayName": "Birm-Southern",
+   "color": "000000",
+   "isActive": true,
+   "isAllStar": false,
+   "logos": [
+    {
+     "href": "https://a.espncdn.com/i/teamlogos/ncaa/500/3.png",
+     "width": 500,
+     "height": 500,
+     "alt": "",
+     "rel": [
+      "full",
+      "default"
+     ],
+     "lastUpdated": "2023-02-17T22:25Z"
+    },
+    {
+     "href": "https://a.espncdn.com/i/teamlogos/ncaa/500-dark/3.png",
+     "width": 500,
+     "height": 500,
+     "alt": "",
+     "rel": [
+      "full",
+      "dark"
+     ],
+     "lastUpdated": "2023-02-17T22:34Z"
+    }
+   ],
+   "record": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2023/types/3/teams/3/record?lang=en&region=us"
+   },
+   "venue": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/venues/3871?lang=en&region=us",
+    "id": "3871",
+    "guid": "bec4f72b-df04-3663-a0b1-8c8ca2b1bb9a",
+    "fullName": "General Charles C. Krulak Stadium",
+    "address": {
+     "city": "Birmingham",
+     "state": "AL",
+     "zipCode": "35254",
+     "country": "USA"
+    },
+    "grass": false,
+    "indoor": false,
+    "images": []
+   },
+   "groups": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2023/types/3/groups/58?lang=en&region=us"
+   },
+   "ranks": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2023/teams/3/ranks?lang=en&region=us"
+   },
+   "links": [
+    {
+     "language": "en-US",
+     "rel": [
+      "clubhouse",
+      "desktop",
+      "team"
+     ],
+     "href": "https://www.espn.com/college-football/team/_/id/3/birmingham-southern-panthers",
+     "text": "Clubhouse",
+     "shortText": "Clubhouse",
+     "isExternal": false,
+     "isPremium": false
+    },
+    {
+     "language": "en-US",
+     "rel": [
+      "clubhouse",
+      "mobile",
+      "team"
+     ],
+     "href": "https://www.espn.com/college-football/team/_/id/3/birmingham-southern-panthers",
+     "text": "Clubhouse",
+     "shortText": "Clubhouse",
+     "isExternal": false,
+     "isPremium": false
+    },
+    {
+     "language": "en-US",
+     "rel": [
+      "roster",
+      "desktop",
+      "team"
+     ],
+     "href": "https://www.espn.com/college-football/team/roster/_/id/3",
+     "text": "Roster",
+     "shortText": "Roster",
+     "isExternal": false,
+     "isPremium": false
+    },
+    {
+     "language": "en-US",
+     "rel": [
+      "roster",
+      "sportscenter",
+      "app",
+      "team"
+     ],
+     "href": "sportscenter://x-callback-url/showClubhouse?uid=s:20~l:23~t:3&section=roster",
+     "text": "Roster",
+     "shortText": "Roster",
+     "isExternal": false,
+     "isPremium": false
+    },
+    {
+     "language": "en-US",
+     "rel": [
+      "stats",
+      "desktop",
+      "team"
+     ],
+     "href": "https://www.espn.com/college-football/team/stats/_/id/3",
+     "text": "Statistics",
+     "shortText": "Statistics",
+     "isExternal": false,
+     "isPremium": false
+    },
+    {
+     "language": "en-US",
+     "rel": [
+      "stats",
+      "sportscenter",
+      "app",
+      "team"
+     ],
+     "href": "sportscenter://x-callback-url/showClubhouse?uid=s:20~l:23~t:3&section=stats",
+     "text": "Statistics",
+     "shortText": "Statistics",
+     "isExternal": false,
+     "isPremium": false
+    },
+    {
+     "language": "en-US",
+     "rel": [
+      "schedule",
+      "desktop",
+      "team"
+     ],
+     "href": "https://www.espn.com/college-football/team/schedule/_/id/3",
+     "text": "Schedule",
+     "shortText": "Schedule",
+     "isExternal": false,
+     "isPremium": false
+    },
+    {
+     "language": "en-US",
+     "rel": [
+      "schedule",
+      "sportscenter",
+      "app",
+      "team"
+     ],
+     "href": "sportscenter://x-callback-url/showClubhouse?uid=s:20~l:23~t:3&section=scores",
+     "text": "Schedule",
+     "shortText": "Schedule",
+     "isExternal": false,
+     "isPremium": false
+    },
+    {
+     "language": "en-US",
+     "rel": [
+      "awards",
+      "desktop",
+      "team"
+     ],
+     "href": "https://www.espn.com/college-football/awards/_/team/3",
+     "text": "Awards",
+     "shortText": "Awards",
+     "isExternal": false,
+     "isPremium": false
+    }
+   ],
+   "injuries": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/teams/3/injuries?lang=en&region=us"
+   },
+   "notes": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/teams/3/notes?lang=en&region=us"
+   },
+   "againstTheSpreadRecords": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2023/types/3/teams/3/ats?lang=en&region=us"
+   },
+   "awards": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2023/teams/3/awards?lang=en&region=us"
+   },
+   "franchise": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/franchises/3?lang=en&region=us"
+   },
+   "events": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2023/teams/3/events?lang=en&region=us"
+   },
+   "college": {
+    "$ref": "http://sports.core.api.espn.com/v2/colleges/3?lang=en&region=us"
+   }
+  },
+  "95": {
+   "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2023/teams/95?lang=en&region=us",
+   "id": "95",
+   "guid": "68dc6ae4-459e-65a3-46d8-2d2acbbe433b",
+   "uid": "s:20~l:23~t:95",
+   "alternateIds": {
+    "sdr": "7104"
+   },
+   "slug": "pikeville-bears",
+   "location": "Pikeville",
+   "name": "Bears",
+   "nickname": "Pikeville",
+   "abbreviation": "PIKE",
+   "displayName": "Pikeville Bears",
+   "shortDisplayName": "Pikeville",
+   "isActive": true,
+   "isAllStar": false,
+   "record": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2023/types/3/teams/95/record?lang=en&region=us"
+   },
+   "groups": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2023/types/3/groups/35?lang=en&region=us"
+   },
+   "ranks": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2023/teams/95/ranks?lang=en&region=us"
+   },
+   "links": [
+    {
+     "language": "en-US",
+     "rel": [
+      "roster",
+      "desktop",
+      "team"
+     ],
+     "href": "https://www.espn.com/college-football/team/roster/_/id/95",
+     "text": "Roster",
+     "shortText": "Roster",
+     "isExternal": false,
+     "isPremium": false
+    },
+    {
+     "language": "en-US",
+     "rel": [
+      "roster",
+      "sportscenter",
+      "app",
+      "team"
+     ],
+     "href": "sportscenter://x-callback-url/showClubhouse?uid=s:20~l:23~t:95&section=roster",
+     "text": "Roster",
+     "shortText": "Roster",
+     "isExternal": false,
+     "isPremium": false
+    },
+    {
+     "language": "en-US",
+     "rel": [
+      "schedule",
+      "desktop",
+      "team"
+     ],
+     "href": "https://www.espn.com/college-football/team/schedule/_/id/95",
+     "text": "Schedule",
+     "shortText": "Schedule",
+     "isExternal": false,
+     "isPremium": false
+    },
+    {
+     "language": "en-US",
+     "rel": [
+      "schedule",
+      "sportscenter",
+      "app",
+      "team"
+     ],
+     "href": "sportscenter://x-callback-url/showClubhouse?uid=s:20~l:23~t:95&section=scores",
+     "text": "Schedule",
+     "shortText": "Schedule",
+     "isExternal": false,
+     "isPremium": false
+    },
+    {
+     "language": "en-US",
+     "rel": [
+      "awards",
+      "desktop",
+      "team"
+     ],
+     "href": "https://www.espn.com/college-football/awards/_/team/95",
+     "text": "Awards",
+     "shortText": "Awards",
+     "isExternal": false,
+     "isPremium": false
+    }
+   ],
+   "injuries": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/teams/95/injuries?lang=en&region=us"
+   },
+   "notes": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/teams/95/notes?lang=en&region=us"
+   },
+   "againstTheSpreadRecords": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2023/types/3/teams/95/ats?lang=en&region=us"
+   },
+   "awards": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2023/teams/95/awards?lang=en&region=us"
+   },
+   "franchise": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/franchises/95?lang=en&region=us"
+   },
+   "events": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2023/teams/95/events?lang=en&region=us"
+   },
+   "college": {
+    "$ref": "http://sports.core.api.espn.com/v2/colleges/95?lang=en&region=us"
+   }
   }
  },
- "incomplete": []
+ "incomplete": [],
+ "bundle_version": 2
 }

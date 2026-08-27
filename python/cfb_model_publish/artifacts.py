@@ -16,12 +16,9 @@ GH_TIMEOUT_SECONDS = int(os.getenv("CFB_GH_TIMEOUT_SECONDS", "1800"))
 # falls back to a generic note for any other tag.
 _RELEASE_BODY = {
     "espn_cfb_model_artifacts": (
-        "All CFB model artifacts (EP/WP/QBR/CPOE/fourth-down .ubj + RB-eval .pkl) "
-        "+ model cards."
+        "All CFB model artifacts (EP/WP/QBR/CPOE/fourth-down .ubj + RB-eval .pkl) + model cards."
     ),
-    "espn_cfb_model_pbp": (
-        "College Football model play-by-play (EP/WP/QBR enriched; Python-built)."
-    ),
+    "espn_cfb_model_pbp": ("College Football model play-by-play (EP/WP/QBR enriched; Python-built)."),
     "cfb_ratings": (
         "College Football opponent-adjusted team ratings, one row per team per "
         "season (SP+-style): offensive/defensive/special-teams EPA, FEI, tempo, "
@@ -79,9 +76,15 @@ def _gh_runner(args: list) -> None:
 
 
 def _gh_release_exists(tag: str, repo: str) -> bool:
-    """True if a GitHub release for ``tag`` already exists on ``repo``."""
+    """True if a GitHub release for ``tag`` already exists on ``repo``.
+
+    Deliberately ``gh api`` (REST) and not ``gh release view``: the release
+    commands go through GitHub's GraphQL endpoint, whose quota is a separate --
+    and exhaustible -- budget. A publish must not fail its create-if-missing
+    guard (and then create a duplicate release) because a GraphQL quota ran out.
+    """
     r = subprocess.run(
-        ["gh", "release", "view", tag, "--repo", repo],
+        ["gh", "api", f"repos/{repo}/releases/tags/{tag}", "--silent"],
         capture_output=True,
         timeout=GH_TIMEOUT_SECONDS,
     )
@@ -112,11 +115,7 @@ def upload_artifacts(
     """
     run = runner or _gh_runner
     exists = exists_check or _gh_release_exists
-    files = (
-        sorted(Path(artifacts_dir).glob(pattern))
-        if pattern
-        else plan_uploads(artifacts_dir)
-    )
+    files = sorted(Path(artifacts_dir).glob(pattern)) if pattern else plan_uploads(artifacts_dir)
     created_release = False
     if dry_run:
         print(f"[dry-run] would ensure release {repo}:{tag} exists")

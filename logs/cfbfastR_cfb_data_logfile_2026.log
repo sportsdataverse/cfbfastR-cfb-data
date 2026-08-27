@@ -1,11 +1,12 @@
 From https://github.com/sportsdataverse/cfbfastR-cfb-data
-   22adcf7..926543b  main                  -> origin/main
+   aff6113..9c380b1  main                  -> origin/main
  * [new branch]      AE/update-air-yards-model -> origin/AE/update-air-yards-model
  * [new branch]      feat/adv-missing-datasets -> origin/feat/adv-missing-datasets
  * [new branch]      feat/cfb-era-vars-spread-backfill -> origin/feat/cfb-era-vars-spread-backfill
  * [new branch]      feat/cfb-model-suite-completion -> origin/feat/cfb-model-suite-completion
  * [new branch]      feat/cfb-ratings-builder -> origin/feat/cfb-ratings-builder
  * [new branch]      feat/cfb-ratings-cron -> origin/feat/cfb-ratings-cron
+ * [new branch]      feat/rosters-cfbd-enrich -> origin/feat/rosters-cfbd-enrich
  * [new branch]      fix/cfb-recruiting-guard -> origin/fix/cfb-recruiting-guard
  * [new branch]      fix/cfb-weekly-raw-store -> origin/fix/cfb-weekly-raw-store
  * [new tag]         espn_cfb_adv_defensive -> espn_cfb_adv_defensive
@@ -50,10 +51,19 @@ adv_drives 2026: 0 rows from 946 games
 adv_situational 2026: 0 rows from 946 games
 adv_defensive_players 2026: 0 rows from 946 games
 adv_specialists 2026: 0 rows from 946 games
-rosters 2026: no game_rosters parquet at ../cfb/game_rosters/parquet/game_rosters_2026.parquet (build game_rosters first)
   adv_team_gamelog 2026: 0 rows, skipped
 
 === gamelog: 0 failures ===
+  cfb_schedules 2026: FAILED RuntimeError: CFBD_API_KEY is not set -- cfb_schedules reads the CFBD /games endpoint. Export it (CI: the repo secret) before building this dataset.
+
+=== cfb_schedules: 1 failures ===
+  2026: RuntimeError: CFBD_API_KEY is not set -- cfb_schedules reads the CFBD /games endpoint. Export it (CI: the repo secret) before building this dataset.
+::warning ::cfb_data_build cfb_schedules for season 2026 exited with code 1
+cfb_rosters 2026: FAILED NoESPNDataError('NoESPNDataError: No data found for https://raw.githubusercontent.com/sportsdataverse/cfbfastR-data/main/rosters/parquet/cfb_rosters_2026.parquet')
+
+=== cfb_rosters: 1 failures ===
+  2026: NoESPNDataError('NoESPNDataError: No data found for https://raw.githubusercontent.com/sportsdataverse/cfbfastR-data/main/rosters/parquet/cfb_rosters_2026.parquet')
+::warning ::cfb_data_build cfb_rosters for season 2026 exited with code 1
 /home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/.venv/lib/python3.12/site-packages/sportsdataverse/cfb/cfb_loaders.py:571: UserWarning: load_cfb_pbp: no data for season(s) [2026] (skipped)
   cli_warn("load_cfb_pbp: no data for season(s) {missing} (skipped)".format(missing=missing))
 [summaries 2026] 0 plays, skipped (season has not started)
@@ -90,4 +100,4 @@ rosters 2026: no game_rosters parquet at ../cfb/game_rosters/parquet/game_roster
   cfb_returning_production 2026: 0 rows, skipped (season has no roster data yet)
 
 === returning_production: 0 failures ===
-nothing to commit for: CFB Data Updated (Start: 2026 End: 2026)
+pushed: CFB Data Updated (Start: 2026 End: 2026) (attempt 1)

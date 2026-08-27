@@ -1,4 +1,4 @@
-"""CFB model-training Track 2: fourth-down yards-gained model (5-feat, 76-class multi:softprob).
+"""CFB model-training Track 2: fourth-down yards-gained model (6-feat, 76-class multi:softprob).
 
 Usage:
     from cfb_model_build.model_training.fourth_down import train_from_plays, fd_features, FD_PARAMS, FD_FEATURES

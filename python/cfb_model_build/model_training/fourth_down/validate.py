@@ -1,6 +1,6 @@
 """Validation helpers for the fourth-down yards-gained model.
 
-assert_structure: verifies the 5-feat / 76-class / multi:softprob contract.
+assert_structure: verifies the 6-feat / 76-class / multi:softprob contract.
 calibration_fd:   builds a predicted first-down probability vs empirical rate table.
 """
 from __future__ import annotations

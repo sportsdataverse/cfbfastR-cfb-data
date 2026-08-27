@@ -1,4 +1,4 @@
-"""Build the 5-feature matrix and 76-class label for the fourth-down yards-gained model.
+"""Build the 6-feature matrix and 76-class label for the fourth-down yards-gained model.
 
 Input: a polars DataFrame of final.json plays (or a concat of multiple games).
 Output: (X: pd.DataFrame[5 cols], y: np.ndarray[int]) — no sample weights (decision #11).

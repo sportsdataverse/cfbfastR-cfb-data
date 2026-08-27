@@ -1,6 +1,6 @@
 """Fourth-down yards-gained model trainer.
 
-Trains the 5-feature, 76-class multi:softprob XGBoost model that projects yards gained
+Trains the 6-feature, 76-class multi:softprob XGBoost model that projects yards gained
 on any 3rd/4th-down play. No sample weights (the original model trains without them,
 unlike the EP/WP models in Track 1). Feature input is the X pandas DataFrame returned
 by fd_features(); the caller is responsible for the df -> (X, y) split.
@@ -28,7 +28,7 @@ def train_fourth_down(
         nrounds: Number of boosting rounds (default 157, the confirmed recipe value).
 
     Returns:
-        Trained xgboost.Booster with multi:softprob objective, 5 features, 76 classes.
+        Trained xgboost.Booster with multi:softprob objective, 6 features, 76 classes.
     """
     dtrain = xgb.DMatrix(X[FD_FEATURES], label=y)
     return xgb.train(FD_PARAMS, dtrain, num_boost_round=nrounds)

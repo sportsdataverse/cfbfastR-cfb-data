@@ -29,7 +29,7 @@ Expected `col_name | col_type | col_description` for each per-game-compiled **se
 | [linescores](#linescores) | one row per (team, period) | 5 | `espn_cfb_linescores` |
 | [power_index](#power-index) | one row per team (or per game) | 22 | `espn_cfb_power_index` |
 | [injuries](#injuries) | one row per injury entry | 12 | `espn_cfb_injuries` |
-| [teams](#teams) ‡ | one row per (season, team) | 37 | `espn_cfb_teams` |
+| [teams](#teams) ‡ | one row per (season, team) | 54 | `espn_cfb_teams` |
 | [team_summaries](#team_summaries) † | one row per team per season | 383 | `espn_cfb_team_summaries` |
 | [passing](#passing) † | one row per (team, passer) per season | 43 | `espn_cfb_passing` |
 | [rushing](#rushing) † | one row per (team, rusher) per season | 28 | `espn_cfb_rushing` |

@@ -5,6 +5,7 @@ From https://github.com/sportsdataverse/cfbfastR-cfb-data
  * [new branch]      feat/cfb-model-suite-completion -> origin/feat/cfb-model-suite-completion
  * [new branch]      feat/cfb-ratings-builder -> origin/feat/cfb-ratings-builder
  * [new branch]      feat/cfb-ratings-cron -> origin/feat/cfb-ratings-cron
+ * [new branch]      fix/cfb-recruiting-guard -> origin/fix/cfb-recruiting-guard
  * [new branch]      fix/cfb-weekly-raw-store -> origin/fix/cfb-weekly-raw-store
  * [new tag]         espn_cfb_adv_defensive -> espn_cfb_adv_defensive
  * [new tag]         espn_cfb_adv_drives   -> espn_cfb_adv_drives
@@ -88,16 +89,7 @@ rosters 2026: no game_rosters parquet at ../cfb/game_rosters/parquet/game_roster
   cfb_team_summaries_weekly 2026: 0 rows, skipped
 
 === team_summaries_weekly: 0 failures ===
-  cfb_recruits 2026: FAILED (FileNotFoundError: cfb_recruits 2026: raw store is missing complete classes [2026]. Scrape them first -- a partial window understates talent without erroring.)
-
-=== recruits: 1 failures ===
-  2026: FileNotFoundError
-::warning ::cfb_data_build recruits for season 2026 exited with code 1
-  cfb_team_talent 2026: FAILED (FileNotFoundError: cfb_team_talent 2026: raw store is missing complete classes [2023, 2024, 2025, 2026]. Scrape them first -- a partial window understates talent without erroring.)
-
-=== team_talent: 1 failures ===
-  2026: FileNotFoundError
-::warning ::cfb_data_build team_talent for season 2026 exited with code 1
+::warning::no 247 recruits store at /home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-raw/cfb/recruits/json; skipping recruiting datasets
 /home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/.venv/lib/python3.12/site-packages/sportsdataverse/cfb/cfb_loaders.py:851: UserWarning: load_cfb_rosters: no data for season(s) [2026] (skipped)
   cli_warn("load_cfb_rosters: no data for season(s) {missing} (skipped)".format(missing=missing))
   cfb_returning_production 2026: 0 rows, skipped (season has no roster data yet)

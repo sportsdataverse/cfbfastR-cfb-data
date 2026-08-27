@@ -402,7 +402,11 @@ passer <- week_pbp |>
             !is.na(passer_player_name)
     ) |>
     dplyr::summarize(
-        .by = passer_player_name,
+        # Keyed on the id as well as the name: two players sharing a display name
+        # in the same week would otherwise be summed into one leaderboard row.
+        # Grouping by both keeps the name available for display, and can only
+        # ever SPLIT a group, never merge one.
+        .by = c(passer_player_id, passer_player_name),
         team = dplyr::last(pos_team),
         opponent = dplyr::last(def_pos_team),
         dropbacks = dplyr::n(),
@@ -529,7 +533,11 @@ rusher <- week_pbp |>
             !is.na(rusher_player_name)
     ) |>
     dplyr::summarize(
-        .by = rusher_player_name,
+        # Keyed on the id as well as the name: two players sharing a display name
+        # in the same week would otherwise be summed into one leaderboard row.
+        # Grouping by both keeps the name available for display, and can only
+        # ever SPLIT a group, never merge one.
+        .by = c(rusher_player_id, rusher_player_name),
         pos_team = dplyr::last(pos_team),
         def_pos_team_name = dplyr::last(def_pos_team),
         carries = dplyr::n(),
@@ -642,7 +650,11 @@ receiver <- week_pbp |>
             !is.na(receiver_player_name)
     ) |>
     dplyr::summarize(
-        .by = receiver_player_name,
+        # Keyed on the id as well as the name: two players sharing a display name
+        # in the same week would otherwise be summed into one leaderboard row.
+        # Grouping by both keeps the name available for display, and can only
+        # ever SPLIT a group, never merge one.
+        .by = c(receiver_player_id, receiver_player_name),
         pos_team = dplyr::last(pos_team),
         def_pos_team_name = dplyr::last(def_pos_team),
         targets = dplyr::n(),

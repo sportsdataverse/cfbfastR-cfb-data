@@ -2,6 +2,15 @@
 
 Audit only. **No files were changed by this audit** beyond adding this report.
 
+> **Superseded in this same PR.** This report records the state *before* the
+> commit that introduced the committed-parquet policy. The headline finding
+> below — that `cfb/` is gitignored wholesale and therefore zero datasets have a
+> tracked parquet — was true when the audit ran and is the reason the policy
+> changed. `.gitignore` now excludes `cfb/**` and re-admits directories plus
+> `cfb/**/parquet/*.parquet`, and 2,254 per-season parquet are committed, so the
+> `committed` column in the matrix below reads as the pre-change baseline rather
+> than current state. The gap list in section 4 is still live; the headline is not.
+
 Scope: every directory under `cfbfastR-cfb-data/cfb/` and every CFB-related
 release tag on `sportsdataverse/sportsdataverse-data`. Release inventory taken
 via `gh api repos/sportsdataverse/sportsdataverse-data/releases[/tags/<tag>]`
@@ -18,14 +27,14 @@ per-season parquet committed in the repo at `cfb/<dataset>/parquet/<dataset>_<ye
 **In `cfbfastR-cfb-data`, that rule is currently satisfied by exactly zero
 datasets — because the entire `cfb/` tree is gitignored.**
 
-```
-$ git ls-files cfb/            | wc -l   # → 0
-$ git ls-tree -r origin/main | grep -c '^cfb/'   # → 0
+```text
+git ls-files cfb/                              ->  0
+git ls-tree -r origin/main | grep -c '^cfb/'   ->  0
 ```
 
 `.gitignore` line 11–12:
 
-```
+```gitignore
 # Built dataset artifacts live on sportsdataverse-data release tags, not in git.
 cfb/
 ```
@@ -131,7 +140,7 @@ not retained in this checkout's `cfb/` tree.
 
 `rb_eval` is **not a per-season dataset.** It is the xREPA GAM model output:
 
-```
+```text
 rb_eval/  calibration.{csv,parquet}  rush_plays.parquet  rusher_seasons.parquet
           xrepa_calibration.{csv,parquet,png}  xrepa_final.{json,pkl}  xrepa_loso.parquet
 ```
@@ -146,7 +155,7 @@ should exist. No action.**
 
 `snapshots/` is a through-week cut, two levels deeper than the audited shape:
 
-```
+```text
 snapshots/through_wk01..wk16/{passing,percentiles,receiving,rushing,team_summaries}/{parquet,csv,rds}/
 ```
 

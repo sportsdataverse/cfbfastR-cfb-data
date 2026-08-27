@@ -27,7 +27,7 @@ Expected `col_name | col_type | col_description` for each per-game-compiled **se
 | [schedules](#schedules) | one row per game | 34 | `espn_cfb_schedules` |
 | [cfb_schedules](#cfb_schedules) ‡ | one row per game (all divisions) | 41 | `cfb_schedules` |
 | [linescores](#linescores) | one row per (team, period) | 5 | `espn_cfb_linescores` |
-| [power_index](#power-index) | one row per team (or per game) | 22 | `espn_cfb_power_index` |
+| [power_index](#power_index) | one row per team (or per game) | 22 | `espn_cfb_power_index` |
 | [injuries](#injuries) | one row per injury entry | 12 | `espn_cfb_injuries` |
 | [teams](#teams) ‡ | one row per (season, team) | 54 | `espn_cfb_teams` |
 | [team_summaries](#team_summaries) † | one row per team per season | 383 | `espn_cfb_team_summaries` |
@@ -1199,7 +1199,7 @@ Built by `python -m cfb_data_build --dataset cfb_schedules` (needs
 | start_time_tbd | logical | Whether ESPN has announced the date but not yet the kickoff time. |
 | completed | logical | Whether the game has been played to a final. FALSE covers both future games and cancellations -- read `status` to tell them apart. |
 | neutral_site | logical | Whether the game was played at a neutral site. |
-| conference_game | logical | Whether the two teams share a conference, derived from that season's membership. |
+| conference_game | logical | Whether the game counted as a conference matchup. Taken from the CFBD feed's `conferenceGame` flag, falling back to ESPN's `conference_competition` where that is absent -- it is not recomputed from that season's conference membership, so it can disagree with comparing home_conference to away_conference. |
 | conference_competition | logical | ESPN's own flag on the competition record. Kept alongside `conference_game` because the two measurably disagree (12 of 911 shared 2023 rows). NA for games the ESPN-native feed does not carry. |
 | attendance | integer | Announced attendance. NA is unknown, not zero. |
 | venue_id | integer | ESPN's stadium identifier. Stable across seasons and renames -- the join key for venue metadata in `cfb_team_info`. |

@@ -45,6 +45,7 @@ import polars as pl
 
 from cfb_data_build.config import DatasetSpec
 from cfb_data_build.io import gzip_csv, write_dataset
+from cfb_data_build.teams import DIVISIONS as _TEAM_DIVISIONS
 from cfb_data_ingest import RAW_BASE
 from cfb_data_ingest.schedule import season_game_ids
 
@@ -169,7 +170,11 @@ ID_COLS = ("season", "team_id", "athlete_id", "position_id", "position_parent_id
 
 _POSITION_ID_RE = re.compile(r"/positions/([^/?]+)")
 
-DIVISION_BY_GROUP = {"80": "fbs", "81": "fcs"}
+
+#: Reuse the teams builder's map so the two datasets speak one division
+#: vocabulary. Ordering is load-bearing: it is MOST SPECIFIC FIRST, so a team
+#: listed under both a leaf and its parent takes the leaf.
+DIVISION_BY_GROUP = dict(_TEAM_DIVISIONS)
 
 
 # --------------------------------------------------------------------------- IO
@@ -236,23 +241,34 @@ def load_divisions(
 ) -> pl.DataFrame:
     """``(team_id, division)`` for one season from the raw season team bundle.
 
-    ``divisions`` (group 80 = fbs, 81 = fcs) is the ONLY authoritative division
-    source -- the team payload itself carries no division field. Returns an empty
-    frame when the bundle is absent so the build degrades to a null ``division``
-    rather than failing.
+    The bundle's ``divisions`` map is the ONLY authoritative division source --
+    the team payload itself carries no division field. It holds the whole ESPN
+    group tree, structural nodes included, so the group ids are resolved through
+    the teams builder's most-specific-first map rather than the bundle's own key
+    order. Returns an empty frame when the bundle is absent so the build degrades
+    to a null ``division`` rather than failing.
     """
     doc = _read_json(f"{raw_base}/teams/json/{season}.json", downloader=downloader)
-    rows = []
-    for group_id, team_ids in ((doc or {}).get("divisions") or {}).items():
-        division = DIVISION_BY_GROUP.get(str(group_id))
-        for tid in team_ids or []:
-            rows.append({"team_id": int(tid), "division": division})
-    if not rows:
+    groups = (doc or {}).get("divisions") or {}
+
+    # Walk DIVISION_BY_GROUP in its own most-specific-first order and take the
+    # first hit per team. Do NOT iterate the bundle's own key order with
+    # unique(keep="first"): the bundle carries the structural nodes too (99 has
+    # all 800 of 2023's teams, 90 has 272) and they map to no division, so
+    # whichever happened to come first would blank every real classification.
+    assigned: dict[int, str] = {}
+    for group_id, division in DIVISION_BY_GROUP.items():
+        for tid in groups.get(str(group_id)) or []:
+            assigned.setdefault(int(tid), division)
+
+    if not assigned:
         return pl.DataFrame(schema={"team_id": pl.Int64, "division": pl.Utf8})
-    return (
-        pl.DataFrame(rows)
-        .with_columns(pl.col("team_id").cast(pl.Int64))
-        .unique(subset=["team_id"], keep="first")
+    return pl.DataFrame(
+        {
+            "team_id": list(assigned.keys()),
+            "division": list(assigned.values()),
+        },
+        schema={"team_id": pl.Int64, "division": pl.Utf8},
     )
 
 
@@ -431,7 +447,12 @@ def build_season(
         f" | position {100 * n_pos / n:.1f}% | division {100 * n_div / n:.1f}%",
         flush=True,
     )
-    if write and df.height:
+    if df.height == 0:
+        # A supported season that compiles to nothing means every roster fetch
+        # failed. Returning quietly would skip write_dataset, record no failure,
+        # and let the CLI report success with no artifact for the season.
+        raise RuntimeError(f"cfb_rosters {season}: compiled zero roster rows")
+    if write:
         paths = write_dataset(df, SPEC.dataset, season, SPEC.stem, base=base)
         _gzip_csv(paths)
         if publish:

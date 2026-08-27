@@ -103,9 +103,25 @@ jobs:
           uv run python -m cfb_model_build.model_training train-ep --pbp artifacts/pbp_full.parquet --out artifacts/ep.ubj
           uv run python -m cfb_model_build.model_training train-wp --pbp artifacts/pbp_full.parquet --variant spread --out artifacts/wp_spread.ubj
           # QBR needs the ESPN-QBR reference; scrape it into the raw checkout first.
-          # Cross-repo dependency: scrape_cfb_qbr.py lives in cfbfastR-cfb-raw
-          # (checked out sparse at _raw above) — renaming/moving it there breaks this step.
-          uv run python "$GITHUB_WORKSPACE/_raw/python/scrape_cfb_qbr.py" -s 2004 -e "$(date +%Y)" --out artifacts/espn_qbr.parquet || true
+          # Cross-repo dependency: the QBR scraper lives in cfbfastR-cfb-raw
+          # (checked out sparse at _raw above). cfb-raw is renaming its ESPN scrapers
+          # to numbered stages (python/espn_cfb_NN_<name>_scrape.py). Reader-side-first:
+          # accept BOTH names HERE, before the writer-side rename lands, so no merge
+          # order breaks this step. Prefer the new numbered path; fall back to legacy.
+          # REMOVE the fallback (and this note) once cfb-raw's main no longer ships
+          # python/scrape_cfb_qbr.py.
+          QBR_SCRAPER="$GITHUB_WORKSPACE/_raw/python/espn_cfb_13_qbr_scrape.py"
+          [ -f "$QBR_SCRAPER" ] || QBR_SCRAPER="$GITHUB_WORKSPACE/_raw/python/scrape_cfb_qbr.py"
+          # If NEITHER name is present the cause is upstream (a path change, or a
+          # sparse-checkout that stopped fetching python/) -- not a scrape failure.
+          # Running the missing path anyway and swallowing it with `|| true` buries
+          # that under a "can't open file" line, so say it plainly instead. QBR stays
+          # non-fatal either way: the train step below is already gated on the parquet.
+          if [ -f "$QBR_SCRAPER" ]; then
+            uv run python "$QBR_SCRAPER" -s 2004 -e "$(date +%Y)" --out artifacts/espn_qbr.parquet || true
+          else
+            echo "::warning ::no qbr scraper in _raw (looked for espn_cfb_13_qbr_scrape.py and scrape_cfb_qbr.py); skipping QBR"
+          fi
           if [ -f artifacts/espn_qbr.parquet ]; then \
             uv run python -m cfb_model_build.model_training train-qbr --pbp artifacts/pbp_full.parquet --espn-qbr artifacts/espn_qbr.parquet --out artifacts/qbr.ubj; fi
 

@@ -107,7 +107,7 @@ def test_cfbd_is_canonical_and_espn_only_fallbacks_fill_the_gaps():
     assert row["conference_game"] is True  # CFBD wins over conference_competition
     assert row["conference_competition"] is False  # kept: the two genuinely differ
     assert row["home_abbreviation"] == "HME"
-    assert row["source"] == "cfbd+espn"
+    assert row["season_type"] == "regular" and row["season_type_id"] == 2
 
 
 def test_espn_only_rows_are_unioned_in_with_their_status():
@@ -128,10 +128,10 @@ def test_espn_only_rows_are_unioned_in_with_their_status():
     df = unify(tidy_cfbd([_cfbd()]), espn, 2023).sort("game_id")
     assert df.height == 2
     extra = df.filter(pl.col("game_id") == 99).to_dicts()[0]
-    assert extra["source"] == "espn"
     assert extra["status"] == "STATUS_CANCELED"
     assert extra["completed"] is False
-    assert extra["season_type"] == "regular"  # ESPN's int 2 mapped to CFBD's vocabulary
+    # `source` does not ship: `status` is what identifies an unplayed game.
+    assert extra["season_type"] == "regular" and extra["season_type_id"] == 2
     assert extra["season"] == 2023
 
 

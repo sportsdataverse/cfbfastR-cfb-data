@@ -1139,26 +1139,41 @@ _Release tag: `espn_cfb_schedules`_
 
 One row per game, **all divisions**, keyed on `game_id`. This is the schedule
 the loaders read (`sportsdataverse.cfb.load_cfb_schedule`), and it is the
-UNIFICATION of the two schedule datasets that used to sit side by side:
+UNIFICATION of the two schedule datasets that used to sit side by side.
 
-* **Rows** = the CFBD superset (every division, every season type CFBD
-  publishes, including 2020's `spring_*` COVID season) UNIONed with the games
-  only ESPN carries. Those ESPN-only rows are real schedule facts: in 2020 they
-  are 121 COVID postponements/cancellations CFBD drops because they were never
-  played (56 `STATUS_POSTPONED`, 65 `STATUS_CANCELED`) plus one played game.
-  `status` and `source` tell you which is which.
-* **Columns** = the union of both sources MINUS seven CFBD modeling columns
+**Every column here is ESPN data.** The build reads two feeds -- this repo's
+ESPN-native `schedules` artifact and the CollegeFootballData `/games` endpoint
+-- but CollegeFootballData is a *redistributor* of ESPN, not an independent
+source: `game_id` is an ESPN id on both paths, which is why they join on it at
+all. The two feeds are read for COVERAGE, not provenance, and no column below
+is attributed to CollegeFootballData because none originates there. The only
+values in the `/games` payload that are genuinely NOT ESPN are the modeling
+outputs, and those are excluded (see Columns).
+
+* **Rows** = the redistributed superset (every division, every season type,
+  including 2020's `spring_*` COVID season) UNIONed with the games only the
+  ESPN-native artifact carries. Those extra rows are real schedule facts: in
+  2020 they are 121 COVID postponements/cancellations the redistributed feed
+  drops because they were never played (56 `STATUS_POSTPONED`, 65
+  `STATUS_CANCELED`) plus one offseason all-star game. `status` in
+  (`STATUS_POSTPONED`, `STATUS_CANCELED`) plus `season_type == "offseason"`
+  identifies exactly those 122 rows.
+* **Columns** = the union of both feeds MINUS seven modeling columns
   (`home_pregame_elo`, `away_pregame_elo`, `home_postgame_elo`,
   `away_postgame_elo`, `home_post_win_prob`, `away_post_win_prob`,
-  `excitement_index`). Those are model output, not schedule.
-* **Where the two overlap semantically, CFBD is canonical and ESPN is coalesced
-  in as the fallback** -- one column, not two near-duplicates:
-  `home_points` <- `home_score`, `away_points` <- `away_score`,
-  `completed` <- `status == "STATUS_FINAL"`, `start_date` <- `game_date`,
-  `conference_game` <- `conference_competition`. `game_date` therefore does not
-  ship as its own column (it is `start_date` at coarser string precision --
-  identical instants on all 911 shared 2023 rows), while
+  `excitement_index`). Those are model output, not ESPN schedule facts.
+* **Where the two feeds overlap semantically, one column ships, not two
+  near-duplicates**: `home_points` <- `home_score`, `away_points` <-
+  `away_score`, `completed` <- `status == "STATUS_FINAL"`, `start_date` <-
+  `game_date`, `conference_game` <- `conference_competition`. `game_date`
+  therefore does not ship as its own column (it is `start_date` at coarser
+  string precision -- identical instants on all 911 shared 2023 rows), while
   `conference_competition` DOES, because the two flags measurably disagree.
+* **Season type ships twice because ESPN publishes it twice**: `season_type_id`
+  is ESPN's integer (1 preseason, 2 regular, 3 postseason, 4 offseason, 5
+  spring regular, 6 spring postseason -- verbatim from ESPN's
+  `/seasons/{year}/types`) and `season_type` its snake_cased label. The pair is
+  a strict 1:1 mapping across all 26 seasons.
 * **FBS filtering** uses `fbs_game` / `fbs_participant`, never a comparison
   against `home_division` / `away_division`: those are NA for teams outside the
   `fbs`/`fcs`/`ii`/`iii` classification (2023: 21 NA home, 61 NA away) and an NA
@@ -1175,47 +1190,47 @@ Built by `python -m cfb_data_build --dataset cfb_schedules` (needs
 
 | col_name | col_type | col_description |
 | --- | --- | --- |
-| game_id | integer | Game id (ESPN-style, shared by both sources). Primary key, one row per game. Pinned to a 64-bit integer on every path. |
-| season | integer | Season year the game belongs to. |
-| week | integer | Week number within the season (CFBD; ESPN fallback). |
-| season_type | character | CFBD season-type vocabulary: `regular`, `postseason`, and 2020's COVID `spring_regular` / `spring_postseason`. ESPN-only rows have their integer code mapped into this vocabulary. |
-| start_date | character | Kickoff datetime, ISO-8601 UTC (CFBD `startDate`; ESPN `game_date` is the fallback -- the same instant at coarser precision, so it does not ship as its own column). |
-| start_time_tbd | logical | Whether the kickoff time is still TBD (CFBD). |
-| completed | logical | Whether the game has been played (CFBD `completed`; ESPN `status == "STATUS_FINAL"` is the fallback). |
+| game_id | integer | ESPN game id. Primary key, one row per game; joins every other CFB table. Pinned to a 64-bit integer on every path. |
+| season | integer | Season year the game belongs to. January bowl/playoff games carry the prior calendar year. |
+| week | integer | Week number within the season as ESPN numbers it, restarting at 1 for the postseason. |
+| season_type | character | ESPN's season-type label, snake_cased: `regular`, `postseason`, `offseason`, and 2020's COVID-only `spring_regular` / `spring_postseason`. |
+| season_type_id | integer | ESPN's season-type integer, from `/seasons/{year}/types`: 1 preseason, 2 regular, 3 postseason, 4 offseason, 5 spring regular, 6 spring postseason. Strict 1:1 partner of `season_type`. |
+| start_date | character | Scheduled kickoff instant from ESPN, ISO-8601 UTC (not local time). |
+| start_time_tbd | logical | Whether ESPN has announced the date but not yet the kickoff time. |
+| completed | logical | Whether the game has been played to a final. FALSE covers both future games and cancellations -- read `status` to tell them apart. |
 | neutral_site | logical | Whether the game was played at a neutral site. |
-| conference_game | logical | Whether CFBD considers this a conference matchup (ESPN `conference_competition` is the fallback). |
-| conference_competition | logical | ESPN's own conference-matchup flag. Kept alongside `conference_game` because the two measurably disagree (12 of 911 shared 2023 rows): CFBD derives it from conference membership, ESPN flags the competition. NA for rows ESPN does not carry. |
-| attendance | integer | Reported attendance. |
-| venue_id | integer | CFBD venue id. |
-| venue | character | Venue name. |
-| status | character | ESPN game status enum (`STATUS_FINAL`, `STATUS_POSTPONED`, `STATUS_CANCELED`, ...). The only signal distinguishing a scheduled-then-cancelled game from an unplayed future one. NA for rows ESPN does not carry. |
-| home_id | integer | Home team id. |
-| home_team | character | Home team name. |
-| home_abbreviation | character | Home team abbreviation (ESPN-native; NA for rows ESPN does not carry). |
+| conference_game | logical | Whether the two teams share a conference, derived from that season's membership. |
+| conference_competition | logical | ESPN's own flag on the competition record. Kept alongside `conference_game` because the two measurably disagree (12 of 911 shared 2023 rows). NA for games the ESPN-native feed does not carry. |
+| attendance | integer | Announced attendance. NA is unknown, not zero. |
+| venue_id | integer | ESPN's stadium identifier. Stable across seasons and renames -- the join key for venue metadata in `cfb_team_info`. |
+| venue | character | Stadium name as ESPN spells it that season. Sponsor renames drift the string; join on `venue_id`. |
+| status | character | ESPN game status enum (`STATUS_FINAL`, `STATUS_SCHEDULED`, `STATUS_POSTPONED`, `STATUS_CANCELED`, ...). The signal distinguishing a scheduled-then-cancelled game from an unplayed future one. NA for games the ESPN-native feed does not carry. |
+| home_id | integer | ESPN team id of the home team -- the join key to every team-level CFB table. |
+| home_team | character | Home team's school name as ESPN spells it. Display text; join on `home_id`. |
+| home_abbreviation | character | Home team's short ESPN abbreviation. Not unique league-wide -- display only. NA for games the ESPN-native feed does not carry. |
 | home_division | character | Home team division: `fbs` / `fcs` / `ii` / `iii`, or NA for a team outside that classification. **An NA is a genuinely non-FBS team, not missing data** -- filter with `fbs_game` / `fbs_participant` rather than comparing this column, which yields NULL on NA in polars. |
-| home_conference | character | Home team conference name. |
-| home_points | integer | Points scored by the home team (CFBD `homePoints`; ESPN `home_score` is the fallback). |
-| home_winner | logical | Whether the home team won. ESPN's flag where present, otherwise derived from the points of a completed game; NA when the game is not completed or has no score. |
-| away_id | integer | Away team id. |
-| away_team | character | Away team name. |
-| away_abbreviation | character | Away team abbreviation (ESPN-native; NA for rows ESPN does not carry). |
+| home_conference | character | Home team's conference that season; follows realignment. |
+| home_points | integer | Final points scored by the home team; NA until played. |
+| home_winner | logical | Whether the home team won. ESPN's flag where present, otherwise derived from a completed game's points; NA when not completed or unscored. |
+| away_id | integer | ESPN team id of the away team. |
+| away_team | character | Away team's school name as ESPN spells it. Display text; join on `away_id`. |
+| away_abbreviation | character | Away team's short ESPN abbreviation -- see `home_abbreviation`. |
 | away_division | character | Away team division -- see `home_division`. |
-| away_conference | character | Away team conference name. |
-| away_points | integer | Points scored by the away team (CFBD `awayPoints`; ESPN `away_score` is the fallback). |
+| away_conference | character | Away team's conference that season; follows realignment. |
+| away_points | integer | Final points scored by the away team; NA until played. |
 | away_winner | logical | Whether the away team won -- see `home_winner`. |
 | fbs_game | logical | TRUE when BOTH teams are FBS. Derived with `.eq_missing("fbs")` so an NA division reads FALSE, never NA. (2015: 765, 2023: 792.) |
 | fbs_participant | logical | TRUE when AT LEAST ONE team is FBS. Same NA-reads-FALSE rule. (2015: 870, 2023: 910.) |
-| highlights | character | CFBD highlights link. |
-| notes | character | CFBD free-text game note. |
+| highlights | character | Link to ESPN's highlight package, where one was published. |
+| notes | character | Free-text note ESPN attaches to the game -- usually the bowl or event name. Unstructured; use `playoff_bowl_name` for bowl identity. |
 | playoff_competition | character | Playoff competition the game belongs to (e.g. `cfp`); NA for non-playoff games. |
-| playoff_format | character | Playoff format (e.g. `four_team`, `twelve_team_2025`). |
+| playoff_format | character | Playoff format in effect (e.g. `four_team`, `twelve_team_2025`). |
 | playoff_round | character | Playoff round slug (e.g. `first_round`, `semifinal`). |
 | playoff_round_name | character | Playoff round display name (e.g. "Semifinal"). Snake_cased here; cfbfastR's flatten emitted `playoff_roundName`. |
-| playoff_bracket_slot | character | Playoff bracket slot (e.g. `SF1`, `FR4`). |
+| playoff_bracket_slot | character | Playoff bracket slot (e.g. `SF1`, `FR4`) -- reconstructs the bracket tree. |
 | playoff_home_seed | integer | Home team's playoff seed. |
 | playoff_away_seed | integer | Away team's playoff seed. |
 | playoff_bowl_name | character | Bowl hosting the playoff game (e.g. "Rose Bowl"). |
-| source | character | Which source contributed the row: `cfbd+espn` (both), `cfbd` (CFBD only -- typically a non-FBS matchup ESPN's FBS-scoped feed omits), `espn` (ESPN only -- a scheduled game CFBD dropped because it was never played). |
 
 _Release tag: `cfb_schedules`_
 

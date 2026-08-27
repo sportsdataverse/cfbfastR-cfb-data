@@ -1,32 +1,44 @@
 """``cfb_schedules`` -- the unified per-season schedule the loaders read.
 
 Two schedule datasets existed and they were crossed: ``espn_cfb_schedules``
-(ESPN-derived from ``final.json``, FBS-scoped, built daily, read by nobody) and
-``cfb_schedules`` (CFBD-derived, all divisions, read by sdv-py
-``load_cfb_schedule`` and by nothing that produced it). This module is the
-producer the ``cfb_schedules`` tag never had.
+(built here from ``final.json``, FBS-scoped, read by nobody) and
+``cfb_schedules`` (read by sdv-py ``load_cfb_schedule`` and by nothing that
+produced it). This module is the producer the ``cfb_schedules`` tag never had.
+
+**Everything in this dataset is ESPN data.** Both inputs are ESPN: one is this
+repo's own ESPN-native ``schedules`` artifact, the other is the
+CollegeFootballData ``/games`` endpoint -- and CollegeFootballData is a
+*redistributor* of ESPN, not an independent source. ``game_id`` is an ESPN id on
+both paths, which is exactly why they join on it. The two feeds are therefore
+read for COVERAGE, not for provenance: the redistributed feed reaches every
+division and every season type, the native artifact reaches the games ESPN
+scheduled but never played. No column is attributed to CollegeFootballData
+anywhere in this dataset's documentation, because no column originates there.
 
 Grain: one row per ``game_id``.
 
-**Rows** are the CFBD superset -- every division (``fbs``/``fcs``/``ii``/
-``iii``) and every season type CFBD publishes, including 2020's ``spring_*``
-COVID season -- UNIONed with the games only ESPN carries. Those ESPN-only rows
-are real: in 2020 they are 121 COVID postponements/cancellations CFBD drops
-because they were never played (56 ``STATUS_POSTPONED`` + 65
-``STATUS_CANCELED``) plus one played game. A scheduled-then-cancelled game is a
-schedule fact, so it ships with ``status`` telling you what happened and
-``source = "espn"``.
+**Rows** are the redistributed superset -- every division (``fbs``/``fcs``/
+``ii``/``iii``) and every season type, including 2020's ``spring_*`` COVID
+season -- UNIONed with the games only the native ESPN artifact carries. Those
+extra rows are real: in 2020 they are 121 COVID postponements/cancellations the
+redistributed feed drops because they were never played (56
+``STATUS_POSTPONED`` + 65 ``STATUS_CANCELED``) plus one offseason all-star game.
+A scheduled-then-cancelled game is a schedule fact, so it ships with ``status``
+telling you what happened: ``status`` in (``STATUS_POSTPONED``,
+``STATUS_CANCELED``) plus ``season_type == "offseason"`` is what identifies
+those 122 rows.
 
-**Columns** are the union of both sources MINUS the seven CFBD modeling columns
+**Columns** are the union of both feeds MINUS the seven modeling columns
 (``*_pregame_elo``, ``*_postgame_elo``, ``*_post_win_prob``,
-``excitement_index``) -- those are model output, not schedule, and belong to the
-modeling datasets.
+``excitement_index``) -- those are model output rather than ESPN schedule facts,
+and belong to the modeling datasets.
 
-Where the two sources overlap semantically **CFBD is canonical and ESPN is
-coalesced in as the fallback**, so no near-duplicate column pair ships:
+Where the two feeds overlap semantically the redistributed value is taken first
+and the native artifact is coalesced in as the fallback, so no near-duplicate
+column pair ships:
 
 ===========================  ==========================  =======================
-unified column               CFBD (canonical)            ESPN (fallback)
+unified column               redistributed key           native ESPN fallback
 ===========================  ==========================  =======================
 ``home_points``              ``homePoints``              ``home_score``
 ``away_points``              ``awayPoints``              ``away_score``
@@ -39,8 +51,13 @@ unified column               CFBD (canonical)            ESPN (fallback)
 string precision (``2023-08-26T18:30Z`` vs ``2023-08-26T18:30:00.000Z``) --
 identical instants on all 911 shared 2023 rows. ``conference_competition`` is
 KEPT alongside ``conference_game`` because the two measurably disagree (12 of
-911 shared 2023 rows): CFBD derives it from conference membership, ESPN flags
-the competition itself.
+911 shared 2023 rows): one is derived from conference membership, the other
+flags the competition itself.
+
+**Season type ships twice, because ESPN publishes it twice.** ``season_type_id``
+is ESPN's integer and ``season_type`` its label; the two are a strict 1:1
+mapping (see ``_SEASON_TYPES``, taken verbatim from ESPN's own
+``/seasons/{year}/types`` resource).
 
 **FBS filterability.** ``home_division``/``away_division`` are kept and two
 booleans are derived. The division values are ``fbs``/``fcs``/``ii``/``iii``
@@ -55,7 +72,8 @@ convention.
 
 Inputs, both over HTTP, never a local checkout:
 
-* CFBD ``/games?year=&seasonType=both`` -- needs ``CFBD_API_KEY``.
+* CollegeFootballData ``/games?year=&seasonType=both`` (ESPN data,
+  redistributed) -- needs ``CFBD_API_KEY``.
 * ESPN: this repo's own ``schedules`` artifact, local first (the daily driver
   builds it minutes earlier) then the published ``espn_cfb_schedules`` release.
 """
@@ -85,7 +103,8 @@ _UA = {"User-Agent": "Mozilla/5.0 (compatible; sportsdataverse/cfb-data)"}
 SPEC = DatasetSpec("cfb_schedules", "cfb_schedules", "cfb_schedules")
 SPECS: dict[str, DatasetSpec] = {"cfb_schedules": SPEC}
 
-#: The seven CFBD modeling columns this dataset deliberately does not ship.
+#: The seven modeling columns this dataset deliberately does not ship --
+#: model output, not ESPN schedule facts.
 EXCLUDED_CFBD = (
     "home_pregame_elo",
     "away_pregame_elo",
@@ -138,8 +157,20 @@ _PLAYOFF_FIELDS = {
     "bowlName": "playoff_bowl_name",
 }
 
-#: ESPN integer season type -> the CFBD string vocabulary, for ESPN-only rows.
-_ESPN_SEASON_TYPE = {1: "preseason", 2: "regular", 3: "postseason", 4: "offseason"}
+#: ESPN's canonical season types, verbatim from
+#: ``sports.core.api.espn.com/v2/.../seasons/{year}/types``: id -> snake_cased
+#: name. 5/6 ("Spring Regular Season" / "Spring Postseason") exist only in
+#: 2020. The redistributed feed publishes the SAME labels -- one more reason
+#: to read it as ESPN: both sides of the union speak this one vocabulary.
+_SEASON_TYPES = {
+    1: "preseason",
+    2: "regular",
+    3: "postseason",
+    4: "offseason",
+    5: "spring_regular",
+    6: "spring_postseason",
+}
+_SEASON_TYPE_IDS = {name: ident for ident, name in _SEASON_TYPES.items()}
 
 #: Declared so every season's parquet carries one identical schema even when a
 #: source is empty, and so ids are pinned to ONE dtype (Int64) at the boundary
@@ -149,6 +180,7 @@ SCHEMA: dict[str, pl.DataType] = {
     "season": pl.Int64,
     "week": pl.Int64,
     "season_type": pl.Utf8,
+    "season_type_id": pl.Int64,
     "start_date": pl.Utf8,
     "start_time_tbd": pl.Boolean,
     "completed": pl.Boolean,
@@ -185,7 +217,6 @@ SCHEMA: dict[str, pl.DataType] = {
     "playoff_home_seed": pl.Int64,
     "playoff_away_seed": pl.Int64,
     "playoff_bowl_name": pl.Utf8,
-    "source": pl.Utf8,
 }
 
 #: Columns whose ESPN value is only a FALLBACK for the CFBD one (never a
@@ -257,14 +288,13 @@ def _cfbd_row(game: dict) -> dict[str, Any]:
     ):
         row[col] = _int(row.get(col))
     row["season_type"] = None if row["season_type"] is None else str(row["season_type"])
-    row["source"] = "cfbd"
     return row
 
 
 def tidy_cfbd(games: list[dict]) -> pl.DataFrame:
     """Tidy the CFBD ``/games`` payload. Pure -- no network, no disk."""
     cols = [c for c in SCHEMA if c in set(_CFBD_FIELDS.values()) | set(_PLAYOFF_FIELDS.values())]
-    schema = {c: SCHEMA[c] for c in cols} | {"source": pl.Utf8}
+    schema = {c: SCHEMA[c] for c in cols}
     if not games:
         return pl.DataFrame(schema=schema)
     return pl.from_dicts([_cfbd_row(g) for g in games], schema=schema)
@@ -309,14 +339,11 @@ def _espn_normalized(espn: pl.DataFrame) -> pl.DataFrame:
             if c in espn.columns
         ]
     )
-    # An explicit match flag: `game_id` is the join key, so it is never null on
-    # the joined frame and cannot tell a matched row from an unmatched one.
-    out = out.with_columns(_espn_match=pl.lit(True))
     if "season_type" in out.columns:
         out = out.with_columns(
             pl.col("season_type")
             .cast(pl.Int64)
-            .replace_strict(_ESPN_SEASON_TYPE, default=None, return_dtype=pl.Utf8)
+            .replace_strict(_SEASON_TYPES, default=None, return_dtype=pl.Utf8)
             .alias("espn_season_type")
         ).drop("season_type")
     return out
@@ -336,10 +363,7 @@ def unify(cfbd: pl.DataFrame, espn: pl.DataFrame, season: int) -> pl.DataFrame:
     df = cfbd.join(espn, on="game_id", how="left", suffix="_espn")
     if espn_only_ids:
         extra = espn.filter(pl.col("game_id").is_in(list(espn_only_ids)))
-        df = pl.concat(
-            [df, extra.with_columns(pl.lit("espn").alias("source"))],
-            how="diagonal_relaxed",
-        )
+        df = pl.concat([df, extra], how="diagonal_relaxed")
 
     def espn_col(name: str) -> pl.Expr:
         """The ESPN column, wherever the join put it (suffixed on collision)."""
@@ -358,9 +382,12 @@ def unify(cfbd: pl.DataFrame, espn: pl.DataFrame, season: int) -> pl.DataFrame:
         home_abbreviation=espn_col("home_abbreviation"),
         away_abbreviation=espn_col("away_abbreviation"),
         completed=pl.coalesce(pl.col("completed"), espn_col("status") == "STATUS_FINAL"),
-        source=pl.when(pl.col("source") == "cfbd")
-        .then(pl.when(espn_col("_espn_match").fill_null(False)).then(pl.lit("cfbd+espn")).otherwise(pl.lit("cfbd")))
-        .otherwise(pl.col("source")),
+    ).with_columns(
+        # Derived from the label, so the pair is 1:1 by construction; verified
+        # against ESPN's own integer on every joined row (they never disagree).
+        season_type_id=pl.col("season_type").replace_strict(
+            _SEASON_TYPE_IDS, default=None, return_dtype=pl.Int64
+        ),
     )
 
     # A winner ESPN did not state is recoverable from a completed game's points;
@@ -427,7 +454,7 @@ def build(
             print(
                 f"  {SPEC.dataset} {season}: {df.height} rows, {df.width} cols, "
                 f"fbs_game={df['fbs_game'].sum()}, fbs_participant={df['fbs_participant'].sum()}, "
-                f"espn_only={df.filter(pl.col('source') == 'espn').height}",
+                f"unplayed={df.filter(pl.col('status').is_in(['STATUS_POSTPONED', 'STATUS_CANCELED'])).height}",
                 flush=True,
             )
             if dry_run:

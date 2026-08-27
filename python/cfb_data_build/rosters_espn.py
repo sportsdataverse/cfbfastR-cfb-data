@@ -52,7 +52,7 @@ from cfb_data_build.config import DatasetSpec
 from cfb_data_build.io import gzip_csv, write_dataset
 from cfb_data_build.teams import DIVISIONS as _TEAM_DIVISIONS
 from cfb_data_ingest import RAW_BASE
-from cfb_data_ingest.schedule import season_game_ids
+from cfb_data_ingest.schedule import season_completed_games, season_game_ids
 
 SPEC = DatasetSpec(
     dataset="cfb_rosters",
@@ -607,9 +607,22 @@ def build_season(
         flush=True,
     )
     if df.height == 0:
-        # A supported season that compiles to nothing means every roster fetch
-        # failed. Returning quietly would skip write_dataset, record no failure,
-        # and let the CLI report success with no artifact for the season.
+        # Zero rows means one of two opposite things, so ask the schedule which.
+        # ESPN game rosters are PER-GAME: before kickoff there is nothing to
+        # fetch, so zero rows is the CORRECT answer for the season -- that is
+        # every August, and a build left red all preseason is a build whose next
+        # real failure nobody notices.
+        #
+        # A season that HAS played games and still compiles to nothing does mean
+        # every roster fetch failed, and that must stay loud: returning quietly
+        # would skip write_dataset, record no failure, and let the CLI report
+        # success with no artifact for the season.
+        if season_completed_games(schedule, season) == 0:
+            print(
+                f"  cfb_rosters {season}: 0 rows, skipped (season has not started)",
+                flush=True,
+            )
+            return df
         raise RuntimeError(f"cfb_rosters {season}: compiled zero roster rows")
     if write:
         paths = write_dataset(df, SPEC.dataset, season, SPEC.stem, base=base)

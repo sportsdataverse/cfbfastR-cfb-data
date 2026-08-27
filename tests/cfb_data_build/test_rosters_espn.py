@@ -406,3 +406,36 @@ def test_missing_cfbd_season_builds_empty_typed_frame(monkeypatch):
     assert out.height == 0
     assert out.schema["athlete_id"] == pl.Int64
     assert set(R.CFBD_COLS.values()).issubset(set(out.columns))
+
+
+# --------------------------------------------------------------------------
+# The zero-row guard has to mean two opposite things depending on the season
+# --------------------------------------------------------------------------
+
+
+def _stub_empty_build(monkeypatch, completed: int):
+    """Make build_season compile zero rows, with `completed` games on the schedule."""
+    monkeypatch.setattr(R, "load_positions", lambda *a, **k: {})
+    monkeypatch.setattr(R, "load_divisions", lambda *a, **k: {})
+    monkeypatch.setattr(R, "load_cfbd_rosters", lambda *a, **k: pl.DataFrame(
+        schema={"athlete_id": pl.Int64, **{v: pl.Utf8 for v in R.CFBD_COLS.values()}}))
+    monkeypatch.setattr(R, "season_game_ids", lambda *a, **k: [1, 2, 3])
+    monkeypatch.setattr(R, "fetch_game_rosters", lambda *a, **k: [])  # nothing came back
+    monkeypatch.setattr(R, "season_completed_games", lambda *a, **k: completed)
+
+
+def test_zero_rows_before_kickoff_is_skipped_not_raised(monkeypatch):
+    """August: the schedule is published, no game has been played, so there are
+    no per-game rosters to fetch. Zero rows is the correct answer."""
+    _stub_empty_build(monkeypatch, completed=0)
+    out = R.build_season(2026, write=False, publish=False)
+    assert out.height == 0
+
+
+def test_zero_rows_after_games_played_still_raises(monkeypatch):
+    """In-season: games are complete and we still compiled nothing, which means
+    every roster fetch failed. That must stay loud -- returning quietly would let
+    the CLI report success with no artifact for the season."""
+    _stub_empty_build(monkeypatch, completed=42)
+    with pytest.raises(RuntimeError, match="compiled zero roster rows"):
+        R.build_season(2025, write=False, publish=False)

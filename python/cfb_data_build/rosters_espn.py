@@ -210,21 +210,55 @@ DIVISION_BY_GROUP = dict(_TEAM_DIVISIONS)
 # --------------------------------------------------------------------------- IO
 
 
+def _missing_asset_error():
+    """The exception ``download`` raises for a definitive 404.
+
+    Renamed to ``NoDataError`` in sportsdataverse-py (the error covers any 404,
+    not only ESPN ones); the old name survives as an alias, so accept either and
+    stay compatible with whichever revision the lockfile currently pins.
+    """
+    from sportsdataverse import errors
+
+    return getattr(errors, "NoDataError", None) or errors.NoESPNDataError
+
+
 def _download(url: str) -> str | None:
-    """GET ``url``, returning the body or ``None`` for anything non-200."""
+    """GET ``url``, returning the body or ``None`` for anything non-200.
+
+    A 404 is a RAISE, not a non-200 return: ``download`` treats a definitive
+    "no data" as an exception and never hands back a response to inspect. Callers
+    here read optional, not-yet-published assets (a season's positions reference,
+    a team file), so an absent asset must degrade to ``None`` rather than abort
+    the build. Any other failure -- a 403, an exhausted retry budget -- still
+    propagates, so a fetch that FAILED is never mistaken for one that found
+    nothing.
+    """
     from sportsdataverse.dl_utils import download  # pooled session + retry/backoff
 
-    resp = download(url)
+    try:
+        resp = download(url)
+    except _missing_asset_error():
+        return None
     if getattr(resp, "status_code", 200) != 200 or not getattr(resp, "text", ""):
         return None
     return resp.text
 
 
 def _download_bytes(url: str) -> bytes | None:
-    """GET ``url`` for a BINARY body (parquet), returning ``None`` for non-200."""
+    """GET ``url`` for a BINARY body (parquet), returning ``None`` for a missing asset.
+
+    Same 404-raises rule as :func:`_download`. This one matters most: it fetches
+    the CFBD roster parquet that enriches the ESPN rosters through a LEFT join, so
+    a season CFBD has not published yet must yield null enrichment, not a failed
+    dataset. Before this, a pre-season run raised and took the whole
+    ``cfb_rosters`` build down with it.
+    """
     from sportsdataverse.dl_utils import download
 
-    resp = download(url)
+    try:
+        resp = download(url)
+    except _missing_asset_error():
+        return None
     if getattr(resp, "status_code", 200) != 200:
         return None
     return getattr(resp, "content", None) or None

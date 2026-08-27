@@ -35,10 +35,8 @@ Usage::
 
 from __future__ import annotations
 
-import gzip
 import json
 import re
-import shutil
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any, Callable, Iterable
@@ -46,7 +44,7 @@ from typing import Any, Callable, Iterable
 import polars as pl
 
 from cfb_data_build.config import DatasetSpec
-from cfb_data_build.io import write_dataset
+from cfb_data_build.io import gzip_csv, write_dataset
 from cfb_data_ingest import RAW_BASE
 from cfb_data_ingest.schedule import season_game_ids
 
@@ -404,25 +402,8 @@ def derive_rosters(
 # ------------------------------------------------------------------------ build
 
 
-def _gzip_csv(paths: dict | None) -> None:
-    """Replace the written ``.csv`` with ``.csv.gz``.
-
-    Every sibling ESPN tag (``espn_cfb_game_rosters`` and friends) publishes
-    ``.csv.gz``; the shared ``write_dataset`` still emits plain csv. A full season
-    is ~27 MB raw against ~4 MB gzipped, so the plain file is dropped rather than
-    shipped alongside — one csv artifact, one naming pattern.
-    """
-    if not paths:
-        return
-    csv_path = paths.get("csv")
-    if csv_path is None or not Path(csv_path).exists():
-        return
-    csv_path = Path(csv_path)
-    gz_path = csv_path.with_suffix(csv_path.suffix + ".gz")
-    with open(csv_path, "rb") as src, gzip.GzipFile(gz_path, "wb", mtime=0) as dst:
-        shutil.copyfileobj(src, dst)
-    csv_path.unlink()
-    paths["csv"] = gz_path
+#: Shared with every other builder that ships a gzipped season csv.
+_gzip_csv = gzip_csv
 
 
 def build_season(

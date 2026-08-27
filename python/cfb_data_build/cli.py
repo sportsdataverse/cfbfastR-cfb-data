@@ -39,13 +39,19 @@ TEAMS = ("teams",)
 #: HTTP), with position resolved against the league position reference.
 ROSTERS = ("cfb_rosters",)
 
+#: The unified schedule the `cfb_schedules` tag (and sdv-py `load_cfb_schedule`)
+#: reads: the CFBD all-division superset UNIONed with the ESPN-only rows and
+#: enriched with the ESPN-native fields. Distinct from `schedules`, which stays
+#: the ESPN-native `espn_cfb_schedules` dataset and is one of this one's inputs.
+UNIFIED_SCHEDULES = ("cfb_schedules",)
+
 
 def build_parser() -> argparse.ArgumentParser:
     ap = argparse.ArgumentParser(prog="cfb_data_build")
     ap.add_argument(
         "--dataset",
         required=True,
-        choices=sorted(REGISTRY) + ["summaries", *DERIVED, *FPI, *RECRUITING, *TEAMS, *ROSTERS],
+        choices=sorted(REGISTRY) + ["summaries", *DERIVED, *FPI, *RECRUITING, *TEAMS, *ROSTERS, *UNIFIED_SCHEDULES],
     )
     ap.add_argument("-s", "--start-year", type=int, required=True)
     ap.add_argument("-e", "--end-year", type=int, required=True)
@@ -165,6 +171,21 @@ def main(argv: list[str] | None = None) -> int:
         from cfb_data_build.teams import build as build_teams_range
 
         failures = build_teams_range(
+            args.start_year,
+            args.end_year,
+            base=args.base,
+            publish=args.publish,
+            dry_run=args.dry_run,
+        )
+        print(f"\n=== {args.dataset}: {len(failures)} failures ===")
+        for season, kind in failures:
+            print(f"  {season}: {kind}")
+        return 1 if failures else 0
+
+    if args.dataset in UNIFIED_SCHEDULES:
+        from cfb_data_build.schedules_unified import build as build_schedules_range
+
+        failures = build_schedules_range(
             args.start_year,
             args.end_year,
             base=args.base,

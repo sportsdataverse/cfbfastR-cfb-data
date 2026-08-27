@@ -137,4 +137,5 @@ jobs:
         env:
           GITHUB_PAT: ${{ secrets.SDV_GH_TOKEN }}   # R piggyback (team_summaries)
           GH_TOKEN: ${{ secrets.SDV_GH_TOKEN }}      # gh CLI publish (cfb_data_build)
+          CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }} # cfb_schedules reads the CFBD /games endpoint
         run: bash scripts/daily_cfb_processor.sh -s ${{ env.START_YEAR }} -e ${{ env.END_YEAR }}

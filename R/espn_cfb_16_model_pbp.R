@@ -8,7 +8,11 @@ suppressPackageStartupMessages({
 # NB: guard on publish_dataset (unique to _data_utils.R), NOT write_dataset —
 # library(arrow) above exports its own write_dataset(), so exists("write_dataset")
 # is always TRUE and would skip sourcing, leaving arrow's fn to shadow ours.
-if (!exists("publish_dataset")) source("R/_data_utils.R")
+# inherits = FALSE on purpose: the default searches ATTACHED PACKAGE envs too,
+# so any package exporting a `publish_dataset` would make this guard skip the
+# source and leave every OTHER helper in _data_utils.R undefined -- an error
+# far from its cause. Only the global env should count as "already sourced".
+if (!exists("publish_dataset", inherits = FALSE)) source("R/_data_utils.R")
 
 opt <- optparse::parse_args(optparse::OptionParser(option_list = list(
   optparse::make_option(c("-p", "--parquet"), type = "character",

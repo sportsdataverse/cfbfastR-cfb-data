@@ -13,7 +13,11 @@ if (!exists("read_team_summaries")) source("R/presentation/_summary_paths.R")
 
 cli::cli_h1("CFB Playoff net-stats tables")
 
-current_year <- lubridate::year(Sys.Date())
+# The playoff is played in DECEMBER and JANUARY, so lubridate::year(Sys.Date())
+# returns the NEXT calendar year for every January game and reads the wrong
+# season's summaries -- the season label and the data would disagree exactly when
+# this script matters most. Same helper postweek.R and previews.R use.
+current_year <- cfbfastR:::most_recent_cfb_season()
 # Dataset is republished daily, so label tables with the run date (ET).
 formatted_file_date <- format(Sys.time(), "%F", tz = "America/New_York")
 team.adj <- read_team_summaries(current_year) |>

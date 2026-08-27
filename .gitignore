@@ -2,7 +2,7 @@
 .Rhistory
 .RData
 .Ruserdata
-*.Rproj
+.Rproj.user/
 .DS_Store
 .vscode/
 .claude/

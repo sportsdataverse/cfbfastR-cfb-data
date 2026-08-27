@@ -17,12 +17,11 @@ Example:
 
 from __future__ import annotations
 
-import sys
+from _shim import run_many
 
-from cfb_data_build.cli import main
-
-#: The ten datasets R's stage 04 bundles. Order matches .ADV_MAP then .ADV_EXTRA
-#: in the R twin, so a reader diffing the two files sees the same sequence.
+#: The ten datasets R's stage 04 bundles. Order matches .ADV_MAP then
+#: .ADV_EXTRA in the R twin, so a reader diffing the two files sees the
+#: same sequence.
 ORDER = [
     "adv_team",
     "adv_passing",
@@ -37,27 +36,5 @@ ORDER = [
 ]
 
 
-def run(argv: list[str] | None = None) -> int:
-    argv = list(sys.argv[1:] if argv is None else argv)
-    failed: list[str] = []
-    for dataset in ORDER:
-        print(f"::group::{dataset}", flush=True)
-        try:
-            rc = main(["--dataset", dataset, *argv])
-            if rc:
-                failed.append(dataset)
-        except Exception as exc:  # noqa: BLE001
-            # One section failing must not cost the other nine, but the run still
-            # goes red so somebody looks -- the same contract the sibling
-            # -data repos' `00_all` orchestrators use.
-            print(f"::warning ::{dataset} failed: {exc!r}", flush=True)
-            failed.append(dataset)
-        finally:
-            print("::endgroup::", flush=True)
-    for item in failed:
-        print(f"::error ::{item} failed", flush=True)
-    return 1 if failed else 0
-
-
 if __name__ == "__main__":
-    raise SystemExit(run())
+    raise SystemExit(run_many(ORDER))

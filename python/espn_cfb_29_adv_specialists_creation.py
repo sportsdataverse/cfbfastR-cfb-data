@@ -17,11 +17,9 @@ Example:
 
 from __future__ import annotations
 
-import sys
-
-from cfb_data_build.cli import main
+from _shim import run_dataset
 
 DATASET = "adv_specialists"
 
 if __name__ == "__main__":
-    raise SystemExit(main(["--dataset", DATASET, *sys.argv[1:]]))
+    raise SystemExit(run_dataset(DATASET))

@@ -1062,9 +1062,44 @@ compilation de-duplicated to one row per `(season, team_id, athlete_id)` (the la
 game's attribute values are kept), with the per-game circumstance fields dropped:
 `game_id`, `week`, `starter`, `did_not_play`, `winner`, `order`, `home_away`. All other
 athlete/team identity, physical, status, and media columns from `game_rosters` are
-retained. Note: this dataset is **ESPN-derived** (it supersedes the prior CFBD-sourced
-`espn_cfb_rosters` schema), so it does not carry CFBD-only fields such as hometown/geo,
-recruiting ids, or class year.
+retained.
+
+The **row set is ESPN's** (it supersedes the prior CFBD-sourced `espn_cfb_rosters`
+schema). On top of it, seven CollegeFootballData-only fields are LEFT-joined on
+`athlete_id` under a `cfbd_` prefix — the fields ESPN has no equivalent for. 78
+columns become 85; every ESPN column is untouched.
+
+| col_name | col_type | col_description |
+| --- | --- | --- |
+| cfbd_recruit_ids | character | CFBD recruiting-profile ids for the athlete, as a JSON array string (`"[62208]"`; a lone `[0]` means no profile was matched). The one field with no ESPN counterpart at all, and the link from a roster row into the recruiting datasets. |
+| cfbd_home_city | character | Hometown city (CFBD). |
+| cfbd_home_state | character | Hometown state/province (CFBD), two-letter for US addresses. |
+| cfbd_home_country | character | Hometown country (CFBD), overwhelmingly `USA`. |
+| cfbd_home_latitude | character | Hometown latitude as geocoded by CFBD, carried as published (string). |
+| cfbd_home_longitude | character | Hometown longitude as geocoded by CFBD, carried as published (string). |
+| cfbd_home_county_fips | character | Five-digit county FIPS of the hometown (CFBD) — the join key to US census/county tables. |
+
+> **`cfbd_home_*` is HOMETOWN, not birthplace.** ESPN separately ships
+> `birth_place_city` / `birth_place_state` / `birth_place_country`, which are BIRTH
+> place. The two are different facts and disagree often enough that both are shipped
+> side by side rather than coalesced.
+
+Join mechanics: `athlete_id` is `Int64` on both sides (cast from CFBD's string id at
+the boundary, never via float). CFBD emits an athlete once per team, so a mid-season
+transfer appears twice; the seven fields above are athlete-level and byte-identical
+across those rows (verified 2004–2025), so the CFBD side is deduped to one row per
+athlete before the join and the row count is asserted unchanged afterwards.
+Population is uneven by era — `cfbd_recruit_ids` covers 50.8% of 2008 rows, 77.1% of
+2023 and 97.3% of 2025.
+
+**Known limitation — CFBD carries athletes this dataset does not.** Because the join
+is LEFT, athletes CFBD lists but ESPN's game rosters never do are deliberately
+forgone: **2,125 in 2023** and **4,458 in 2025**, overwhelmingly FCS plus some
+D-II/D-III/NAIA and roughly a hundred on FBS teams. This is *not* a team-coverage
+gap — most of the schools those athletes play for (115 of 197 in 2023, 110 of 193 in
+2025, by team name) already appear in this file; ESPN simply carries a thinner roster
+for them. If fuller athlete coverage is wanted, the follow-up is an OUTER union with
+a source flag, not a change to this join.
 
 _Release tag: `espn_cfb_rosters`_
 

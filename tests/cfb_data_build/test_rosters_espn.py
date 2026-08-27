@@ -205,3 +205,120 @@ def test_columns_espn_never_sent_are_null_filled_not_dropped(positions, division
     for col in ("hand_type", "citizenship", "jersey_right", "display_name"):
         assert col in df.columns
         assert df[col].null_count() == df.height
+
+
+# ------------------------------------------------------- CFBD hometown/recruiting
+
+
+def _cfbd_parquet(rows: list[dict]) -> bytes:
+    """A CFBD-shaped roster parquet in memory (string ids, List(Int32) recruits)."""
+    import io
+
+    buf = io.BytesIO()
+    pl.DataFrame(
+        rows,
+        schema={
+            "athlete_id": pl.Utf8,
+            "team": pl.Utf8,
+            "home_city": pl.Utf8,
+            "home_state": pl.Utf8,
+            "home_country": pl.Utf8,
+            "home_latitude": pl.Utf8,
+            "home_longitude": pl.Utf8,
+            "home_county_fips": pl.Utf8,
+            "recruit_ids": pl.List(pl.Int32),
+            "headshot_url": pl.Utf8,
+        },
+    ).write_parquet(buf)
+    return buf.getvalue()
+
+
+def _cfbd_row(aid: str, team: str, city: str, recruits: list[int]) -> dict:
+    return {
+        "athlete_id": aid,
+        "team": team,
+        "home_city": city,
+        "home_state": "TX",
+        "home_country": "USA",
+        "home_latitude": "30.1",
+        "home_longitude": "-97.7",
+        "home_county_fips": "48453",
+        "recruit_ids": recruits,
+        "headshot_url": "http://x/head.png",
+    }
+
+
+def test_cfbd_loader_normalizes_ids_and_dedupes_transfers():
+    body = _cfbd_parquet(
+        [
+            _cfbd_row("5", "A", "Austin", [111]),
+            _cfbd_row("5", "B", "Austin", [111]),  # transfer: same athlete, two teams
+            _cfbd_row("6", "A", "Waco", [222, 333]),
+        ]
+    )
+    df = R.load_cfbd_rosters(2023, "mem://", fetcher=lambda _u: body)
+
+    assert df.schema["athlete_id"] == pl.Int64  # never via float -> never "5.0"
+    assert df.height == 2  # the transfer collapsed losslessly
+    assert set(df.columns) == {"athlete_id", *R.CFBD_COLS.values()}
+    got = dict(zip(df["athlete_id"], df["cfbd_recruit_ids"]))
+    assert got == {5: "[111]", 6: "[222,333]"}  # one dtype across parquet/rds/csv
+
+
+def test_cfbd_loader_raises_when_a_transfers_rows_disagree():
+    body = _cfbd_parquet(
+        [
+            _cfbd_row("5", "A", "Austin", [111]),
+            _cfbd_row("5", "B", "Dallas", [111]),  # same id, different hometown
+        ]
+    )
+    with pytest.raises(RuntimeError, match="not unique after dedup"):
+        R.load_cfbd_rosters(2023, "mem://", fetcher=lambda _u: body)
+
+
+def test_missing_cfbd_season_degrades_to_null_enrichment(positions, divisions):
+    cfbd = R.load_cfbd_rosters(1999, "mem://", fetcher=lambda _u: None)
+    assert cfbd.height == 0 and cfbd.schema["athlete_id"] == pl.Int64
+
+    payloads = [_game(1, 1, [{"athlete_id": 5, "team_id": 333, "position_href": _pos_href(9)}])]
+    df = R.derive_rosters(R.roster_rows(payloads), positions, divisions, cfbd)
+    assert df.height == 1
+    assert df.row(0, named=True)["cfbd_home_city"] is None
+
+
+def test_cfbd_join_is_left_and_never_changes_the_espn_row_set(positions, divisions):
+    payloads = [
+        _game(
+            1,
+            1,
+            [
+                {"athlete_id": 5, "team_id": 333, "position_href": _pos_href(9)},
+                {"athlete_id": 6, "team_id": 333, "position_href": _pos_href(9)},
+            ],
+        )
+    ]
+    espn_only = R.derive_rosters(R.roster_rows(payloads), positions, divisions)
+
+    # athlete 7 exists only in CFBD (the FCS-coverage case) and must NOT be unioned in.
+    body = _cfbd_parquet(
+        [
+            _cfbd_row("5", "A", "Austin", [111]),
+            _cfbd_row("5", "B", "Austin", [111]),
+            _cfbd_row("7", "C", "Tyler", [999]),
+        ]
+    )
+    cfbd = R.load_cfbd_rosters(2023, "mem://", fetcher=lambda _u: body)
+    df = R.derive_rosters(R.roster_rows(payloads), positions, divisions, cfbd)
+
+    assert df.height == espn_only.height == 2
+    assert 7 not in df["athlete_id"].to_list()
+    assert list(df.columns) == list(R.OUTPUT_COLS) and len(R.OUTPUT_COLS) == 85
+    by_id = {r["athlete_id"]: r for r in df.iter_rows(named=True)}
+    assert by_id[5]["cfbd_home_city"] == "Austin"
+    assert by_id[6]["cfbd_home_city"] is None  # unmatched ESPN row keeps its place
+    # hometown is NOT birthplace: ESPN's own column is untouched by the join.
+    assert by_id[5]["birth_place_city"] is None
+    # every one of the 78 pre-existing columns is byte-identical to the plain build
+    pre = [c for c in R.OUTPUT_COLS if c not in R.CFBD_COLS.values()]
+    assert len(pre) == 78
+    assert df.select(pre).equals(espn_only.select(pre))

@@ -17,6 +17,11 @@ Why this module exists rather than a ``REGISTRY`` row:
 * **Division.** ESPN team payloads carry no division field;
   ``cfb/teams/json/{season}.json`` ``divisions`` (group 80 = fbs, 81 = fcs) is the
   only authoritative source.
+* **Hometown / recruiting.** ESPN publishes BIRTH place (``birth_place_*``) and no
+  recruiting link at all. CollegeFootballData's season roster carries HOME town/geo
+  and ``recruit_ids``; those seven fields are LEFT-joined on ``athlete_id`` under a
+  ``cfbd_`` prefix (:data:`CFBD_COLS`). Hometown is NOT birthplace -- the two are
+  distinct facts and both are shipped.
 
 Everything is read over HTTP from ``RAW_BASE`` (raw.githubusercontent.com) -- the
 same contract as ``R/_data_utils.R``. ``raw_base`` is overridable for offline
@@ -148,7 +153,31 @@ ESPN_COLS: tuple[str, ...] = (
     "position_href",
 )
 
-#: Final column ORDER. Identity, then the resolved position, then the ESPN union.
+#: Where the CollegeFootballData season roster lives. A *different* repo from
+#: :data:`RAW_BASE` -- cfbfastR-data, not cfbfastR-cfb-raw.
+CFBD_ROSTER_BASE = (
+    "https://raw.githubusercontent.com/sportsdataverse/cfbfastR-data/main/rosters/parquet"
+)
+
+#: The CFBD roster fields ESPN has NO equivalent for, mapped source -> output name.
+#: Prefixed ``cfbd_`` so provenance is unambiguous and so ``home_*`` can never be
+#: mistaken for ESPN's ``birth_place_*`` (hometown != birthplace).
+#:
+#: Deliberately EXCLUDED: ``headshot_url`` (ESPN ships ``headshot_href``), ``team``
+#: (ESPN ships the whole team block), ``year`` (0% populated on older seasons;
+#: ESPN's ``experience_*`` covers class standing).
+CFBD_COLS: dict[str, str] = {
+    "recruit_ids": "cfbd_recruit_ids",
+    "home_city": "cfbd_home_city",
+    "home_state": "cfbd_home_state",
+    "home_country": "cfbd_home_country",
+    "home_latitude": "cfbd_home_latitude",
+    "home_longitude": "cfbd_home_longitude",
+    "home_county_fips": "cfbd_home_county_fips",
+}
+
+#: Final column ORDER. Identity, then the resolved position, then the ESPN union,
+#: then the CFBD-only enrichment.
 OUTPUT_COLS: tuple[str, ...] = (
     "season",
     "team_id",
@@ -162,6 +191,7 @@ OUTPUT_COLS: tuple[str, ...] = (
     "position_parent_id",
     "games_rostered",
     *(c for c in ESPN_COLS if c != "athlete_id"),
+    *CFBD_COLS.values(),
 )
 
 #: Int64 everywhere these appear -- they are join keys. Never cast via float
@@ -188,6 +218,16 @@ def _download(url: str) -> str | None:
     if getattr(resp, "status_code", 200) != 200 or not getattr(resp, "text", ""):
         return None
     return resp.text
+
+
+def _download_bytes(url: str) -> bytes | None:
+    """GET ``url`` for a BINARY body (parquet), returning ``None`` for non-200."""
+    from sportsdataverse.dl_utils import download
+
+    resp = download(url)
+    if getattr(resp, "status_code", 200) != 200:
+        return None
+    return getattr(resp, "content", None) or None
 
 
 def _read_json(src: str, *, downloader: Callable[[str], str | None] | None = None):
@@ -270,6 +310,71 @@ def load_divisions(
         },
         schema={"team_id": pl.Int64, "division": pl.Utf8},
     )
+
+
+def load_cfbd_rosters(
+    season: int,
+    cfbd_base: str = CFBD_ROSTER_BASE,
+    *,
+    fetcher: Callable[[str], bytes | None] | None = None,
+) -> pl.DataFrame:
+    """The CFBD-only roster fields for one season, keyed by ``athlete_id`` (Int64).
+
+    CFBD ships ``athlete_id`` as a STRING and ``recruit_ids`` as ``List(Int32)``.
+    Both are normalized here, at the boundary: the id is cast straight from Utf8 to
+    Int64 (never via float -- a float-origin id stringifies as ``"123.0"``), and the
+    recruit list is JSON-encoded to a string so parquet, rds and csv all carry one
+    dtype (the same rule :mod:`cfb_data_build.reshape` applies to every list cell).
+
+    **Deduped to one row per athlete.** CFBD emits an athlete once per team, so a
+    mid-season transfer appears twice (197 such rows in 2021, the worst season). The
+    seven columns taken here are athlete-level facts and are byte-identical across an
+    athlete's rows -- verified 2004-2025, where a full-row ``unique()`` collapses the
+    duplicates to exactly the distinct-id count -- so the dedup is lossless. The
+    post-condition is asserted rather than assumed: a future season where the values
+    genuinely disagree raises instead of silently fanning out the ESPN row set.
+
+    Returns an empty (but correctly typed) frame when the season has no CFBD asset,
+    so the build degrades to null enrichment rather than failing.
+    """
+    schema = {"athlete_id": pl.Int64, **{v: pl.Utf8 for v in CFBD_COLS.values()}}
+    body = (fetcher or _download_bytes)(f"{cfbd_base}/cfb_rosters_{season}.parquet")
+    if not body:
+        return pl.DataFrame(schema=schema)
+
+    import io
+
+    df = pl.read_parquet(io.BytesIO(body))
+    have = [c for c in CFBD_COLS if c in df.columns]
+    df = df.select(["athlete_id", *have]).with_columns(
+        pl.col("athlete_id").cast(pl.Utf8).cast(pl.Int64, strict=False)
+    )
+    if "recruit_ids" in have:
+        df = df.with_columns(
+            pl.col("recruit_ids")
+            .cast(pl.List(pl.Int64))
+            .list.eval(pl.element().cast(pl.Utf8))
+            .list.join(",")
+            .map_elements(
+                lambda v: None if v is None or v == "" else f"[{v}]",
+                return_dtype=pl.Utf8,
+            )
+        )
+    df = df.with_columns(
+        [pl.col(c).cast(pl.Utf8) for c in have if c != "recruit_ids"]
+    ).rename({c: CFBD_COLS[c] for c in have})
+
+    df = df.filter(pl.col("athlete_id").is_not_null()).unique()
+    if df.height != df.get_column("athlete_id").n_unique():
+        raise RuntimeError(
+            f"cfbd rosters {season}: athlete_id is not unique after dedup -- the "
+            "CFBD-only fields disagree between an athlete's rows, so a left join "
+            "would multiply the ESPN row set"
+        )
+    missing = [c for c in schema if c not in df.columns]
+    if missing:
+        df = df.with_columns([pl.lit(None, dtype=pl.Utf8).alias(c) for c in missing])
+    return df.select(list(schema))
 
 
 def _game_roster_url(raw_base: str, game_id: int) -> str:
@@ -356,12 +461,18 @@ def derive_rosters(
     rows: list[dict[str, Any]],
     positions: pl.DataFrame,
     divisions: pl.DataFrame,
+    cfbd: pl.DataFrame | None = None,
 ) -> pl.DataFrame:
     """Collapse athlete-game rows to one row per ``(season, team_id, athlete_id)``.
 
     Last appearance (by week, then game id) supplies the attributes; ``games_rostered``
     counts them. Position is resolved from ``position_href``; ``division`` is joined
-    from the season team bundle.
+    from the season team bundle; the CFBD-only hometown/recruiting fields are LEFT
+    joined from ``cfbd`` on ``athlete_id``.
+
+    The CFBD join is deliberately LEFT: ESPN owns the row set. CFBD carries athletes
+    ESPN omits (mostly FCS) and those are NOT unioned in here -- see ``DATASETS.md``
+    for the coverage accounting.
     """
     if not rows:
         return empty_frame()
@@ -404,6 +515,16 @@ def derive_rosters(
     )
     df = df.join(divisions, on="team_id", how="left")
 
+    if cfbd is not None and cfbd.height:
+        assert cfbd.schema["athlete_id"] == df.schema["athlete_id"] == pl.Int64, (
+            "athlete_id dtype disagreement between roster rows and the CFBD roster"
+        )
+        before = df.height
+        df = df.join(cfbd, on="athlete_id", how="left")
+        assert df.height == before, (
+            f"CFBD left join changed the ESPN row set ({before} -> {df.height})"
+        )
+
     # Null-fill any column ESPN did not send this season, then pin order + dtypes.
     missing = [c for c in OUTPUT_COLS if c not in df.columns]
     if missing:
@@ -426,6 +547,7 @@ def build_season(
     season: int,
     *,
     raw_base: str = RAW_BASE,
+    cfbd_base: str = CFBD_ROSTER_BASE,
     schedule: str | Path | None = None,
     cache_dir: str | Path | None = ".cache/cfb_game_rosters",
     workers: int = 8,
@@ -436,15 +558,18 @@ def build_season(
     """Compile, write and optionally publish one season of ``cfb_rosters``."""
     positions = load_positions(raw_base)
     divisions = load_divisions(season, raw_base)
+    cfbd = load_cfbd_rosters(season, cfbd_base)
     ids = season_game_ids(schedule, [season])
     payloads = fetch_game_rosters(ids, raw_base, cache_dir=cache_dir, workers=workers)
-    df = derive_rosters(roster_rows(payloads), positions, divisions)
+    df = derive_rosters(roster_rows(payloads), positions, divisions, cfbd)
     n = max(1, df.height)
     n_pos = df.filter(pl.col("position").is_not_null()).height
     n_div = df.filter(pl.col("division").is_not_null()).height
+    n_rec = df.filter(pl.col("cfbd_recruit_ids").is_not_null()).height
     print(
         f"cfb_rosters {season}: {df.height} rows from {len(payloads)}/{len(ids)} games"
-        f" | position {100 * n_pos / n:.1f}% | division {100 * n_div / n:.1f}%",
+        f" | position {100 * n_pos / n:.1f}% | division {100 * n_div / n:.1f}%"
+        f" | cfbd_recruit_ids {100 * n_rec / n:.1f}% of {cfbd.height} cfbd athletes",
         flush=True,
     )
     if df.height == 0:

@@ -1064,10 +1064,14 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
             "EPAgame",
             "EPAplay",
             "success",
+            "plays",
             "yards",
+            "rushing_td",
+            "fumbles",
             "yardsplay",
             "yardsgame",
         ],
+        asc_cols=["fumbles"],
     )
 
     wr_data = summarize_receiver(
@@ -1096,11 +1100,16 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
             "EPAgame",
             "EPAplay",
             "success",
+            "comp",
+            "targets",
             "catchpct",
             "yards",
+            "passing_td",
+            "fumbles",
             "yardsplay",
             "yardsgame",
         ],
+        asc_cols=["fumbles"],
     )
 
     schools = _build_schools(plays)

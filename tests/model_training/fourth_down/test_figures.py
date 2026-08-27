@@ -4,7 +4,7 @@ import pytest
 
 pytest.importorskip("plotnine")  # figure rendering needs the optional `figures` group
 
-from model_training.fourth_down.figures import write_fd_figures
+from cfb_model_build.model_training.fourth_down.figures import write_fd_figures
 
 
 def _synth_cal_table():

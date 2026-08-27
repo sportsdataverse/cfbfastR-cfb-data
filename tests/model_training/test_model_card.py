@@ -6,7 +6,7 @@ import json
 import numpy as np
 import pytest
 
-from model_training.model_card import write_xgb_model_card
+from cfb_model_build.model_training.model_card import write_xgb_model_card
 
 
 def test_card_explicit_features(tmp_path):

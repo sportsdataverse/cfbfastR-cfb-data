@@ -1,6 +1,6 @@
 """Model stage 32 (train) -- pregame win probability (Five Factors).
 
-Thin shim over ``python -m pregame_wp``: the directory listing IS the model pipeline,
+Thin shim over ``python -m cfb_model_build.pregame_wp``: the directory listing IS the model pipeline,
 mirroring the numbered dataset stages beside it.
 
 Stage order is ingest -> features -> train -> evaluate/gate -> package ->
@@ -32,7 +32,7 @@ from __future__ import annotations
 import runpy
 import sys
 
-PACKAGE = "pregame_wp"
+PACKAGE = "cfb_model_build.pregame_wp"
 
 if __name__ == "__main__":
     sys.argv[0] = f"python -m {PACKAGE}"

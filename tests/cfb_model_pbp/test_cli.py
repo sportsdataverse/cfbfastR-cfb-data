@@ -4,8 +4,8 @@ import numpy as np
 import polars as pl
 import pytest
 
-from cfb_model_pbp.cli import build_parser, main
-from cfb_model_pbp.schema import MODEL_PBP_COLUMNS
+from cfb_model_build.cfb_model_pbp.cli import build_parser, main
+from cfb_model_build.cfb_model_pbp.schema import MODEL_PBP_COLUMNS
 
 
 def test_parser_requires_out_and_cp_model():
@@ -22,8 +22,8 @@ def test_contract_columns(tmp_path):
     """
     import pandas as pd
     import xgboost as xgb
-    from cpoe.constants import FEATURE_COLS
-    from cpoe.train_cp import train_cp_model
+    from cfb_model_build.cpoe.constants import FEATURE_COLS
+    from cfb_model_build.cpoe.train_cp import train_cp_model
 
     # --- build tiny synthetic cache dir ---
     cache_dir = tmp_path / "cache"

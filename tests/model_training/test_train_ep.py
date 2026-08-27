@@ -1,8 +1,8 @@
 import json
 import numpy as np
 import polars as pl
-from model_training import constants as C
-from model_training.train_ep import train_ep
+from cfb_model_build.model_training import constants as C
+from cfb_model_build.model_training.train_ep import train_ep
 
 
 def _synth_ep_frame(n=400):

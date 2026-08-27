@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import Callable
 
 from cfb_data_build.config import DatasetSpec
-from cfb_model_publish.artifacts import _gh_release_exists, _gh_runner
+from cfb_model_build.cfb_model_publish.artifacts import _gh_release_exists, _gh_runner
 
 # Mirror R PUBLISH_REPOS (``R/_data_utils.R:5``).
 PUBLISH_REPOS: list[str] = ["sportsdataverse/sportsdataverse-data"]

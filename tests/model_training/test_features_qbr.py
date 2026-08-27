@@ -1,6 +1,6 @@
 import polars as pl
-from model_training.features import qbr_matrix
-from model_training.ingest import add_winner
+from cfb_model_build.model_training.features import qbr_matrix
+from cfb_model_build.model_training.ingest import add_winner
 
 
 def test_add_winner_from_final_scores():

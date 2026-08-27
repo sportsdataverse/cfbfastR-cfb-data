@@ -6,8 +6,8 @@ import pandas as pd
 import polars as pl
 import xgboost as xgb
 
-from model_training.fourth_down import constants as C
-from model_training.fourth_down.train import train_fourth_down
+from cfb_model_build.model_training.fourth_down import constants as C
+from cfb_model_build.model_training.fourth_down.train import train_fourth_down
 
 FIX = pathlib.Path(__file__).parent.parent.parent / "fixtures" / "model_training" / "fd_fixture_plays.json"
 
@@ -56,7 +56,7 @@ def test_train_feature_names_match_fd_features():
 
 
 def test_train_from_plays_with_fixture():
-    from model_training.fourth_down.train import train_from_plays
+    from cfb_model_build.model_training.fourth_down.train import train_from_plays
 
     plays = pl.DataFrame(json.loads(FIX.read_text()), infer_schema_length=None)
     m = train_from_plays(plays, nrounds=2)

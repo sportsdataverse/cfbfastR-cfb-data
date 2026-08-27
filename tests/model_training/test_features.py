@@ -1,7 +1,7 @@
 import numpy as np
 import polars as pl
-from model_training import constants as C
-from model_training.features import ep_matrix, wp_matrix
+from cfb_model_build.model_training import constants as C
+from cfb_model_build.model_training.features import ep_matrix, wp_matrix
 
 
 def _frame():

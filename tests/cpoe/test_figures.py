@@ -33,22 +33,22 @@ def cpoe_df() -> pd.DataFrame:
 
 
 def test_figures_imports():
-    from cpoe.figures import plot_calibration_curve  # noqa: F401
+    from cfb_model_build.cpoe.figures import plot_calibration_curve  # noqa: F401
 
 
 def test_plot_calibration_returns_ggplot(calibration_df):
     import plotnine as p9
-    from cpoe.figures import plot_calibration_curve
+    from cfb_model_build.cpoe.figures import plot_calibration_curve
     fig = plot_calibration_curve(calibration_df)
     assert isinstance(fig, p9.ggplot)
 
 
 def test_plot_cpoe_dist_imports():
-    from cpoe.figures import plot_cpoe_distribution  # noqa: F401
+    from cfb_model_build.cpoe.figures import plot_cpoe_distribution  # noqa: F401
 
 
 def test_plot_cpoe_dist_returns_ggplot(cpoe_df):
     import plotnine as p9
-    from cpoe.figures import plot_cpoe_distribution
+    from cfb_model_build.cpoe.figures import plot_cpoe_distribution
     fig = plot_cpoe_distribution(cpoe_df)
     assert isinstance(fig, p9.ggplot)

@@ -1,4 +1,4 @@
-from model_training.fourth_down import constants as C
+from cfb_model_build.model_training.fourth_down import constants as C
 
 
 def test_feature_count():

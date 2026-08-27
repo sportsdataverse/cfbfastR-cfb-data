@@ -1,8 +1,8 @@
 import json
 import numpy as np
 import polars as pl
-from model_training import constants as C
-from model_training.train_wp import train_wp
+from cfb_model_build.model_training import constants as C
+from cfb_model_build.model_training.train_wp import train_wp
 
 
 def _synth_wp_frame(n=400):

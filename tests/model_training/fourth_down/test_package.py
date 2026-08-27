@@ -1,11 +1,11 @@
 def test_fourth_down_package_imports():
-    from model_training import fourth_down
+    from cfb_model_build.model_training import fourth_down
 
     assert hasattr(fourth_down, "__version__")
 
 
 def test_re_exports():
-    from model_training import fourth_down as fd
+    from cfb_model_build.model_training import fourth_down as fd
 
     assert hasattr(fd, "FD_FEATURES")
     assert hasattr(fd, "FD_PARAMS")

@@ -22,7 +22,7 @@ from pathlib import Path
 
 import polars as pl
 
-from model_training.spread_backfill import load_consensus_spreads
+from cfb_model_build.model_training.spread_backfill import load_consensus_spreads
 
 _ROOT = Path(__file__).resolve().parents[4]  # .../sdv-dev
 ODDS = _ROOT / "cfbfastR-dev/cfbfastR-data/betting/parquet/cfb_line_odds.parquet"

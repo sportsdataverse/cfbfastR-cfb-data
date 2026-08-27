@@ -26,11 +26,11 @@ FINAL_DIR = pathlib.Path(
     reason="no backfill final.json on disk; run scrape_cfb_json.py + reprocess_cfb_json.py first",
 )
 def test_full_pipeline_runs_without_error(tmp_path):
-    from rb_eval.aggregate import build_model_data, build_rusher_seasons
-    from rb_eval.features import load_rush_plays
-    from rb_eval.figures import write_xrepa_calibration
-    from rb_eval.train import loso_cv
-    from rb_eval.validate import calibration_table, weighted_cal_error, weighted_r2
+    from cfb_model_build.rb_eval.aggregate import build_model_data, build_rusher_seasons
+    from cfb_model_build.rb_eval.features import load_rush_plays
+    from cfb_model_build.rb_eval.figures import write_xrepa_calibration
+    from cfb_model_build.rb_eval.train import loso_cv
+    from cfb_model_build.rb_eval.validate import calibration_table, weighted_cal_error, weighted_r2
 
     rush_df = load_rush_plays(FINAL_DIR, seasons=None)
     assert rush_df.height > 0, "No rush plays loaded from backfill"

@@ -1,6 +1,6 @@
 """Model stage 31 (train) -- completion-probability model family.
 
-Thin shim over ``python -m cpoe``: the directory listing IS the model pipeline,
+Thin shim over ``python -m cfb_model_build.cpoe``: the directory listing IS the model pipeline,
 mirroring the numbered dataset stages beside it.
 
 Stage order is ingest -> features -> train -> evaluate/gate -> package ->
@@ -32,7 +32,7 @@ from __future__ import annotations
 import runpy
 import sys
 
-PACKAGE = "cpoe"
+PACKAGE = "cfb_model_build.cpoe"
 
 if __name__ == "__main__":
     sys.argv[0] = f"python -m {PACKAGE}"

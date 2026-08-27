@@ -2,7 +2,7 @@ import os
 import pathlib
 import polars as pl
 import pytest
-from model_training.ingest import build_training_frame
+from cfb_model_build.model_training.ingest import build_training_frame
 
 FINAL_DIR = pathlib.Path(
     os.environ.get(
@@ -21,6 +21,6 @@ def test_build_frame_has_labels_and_weights():
     assert df["label"].is_in([0, 1, 2, 3, 4, 5, 6]).all()
     for col in ["Total_W_Scaled", "ScoreDiff_W", "next_score_half"]:
         assert col in df.columns
-    from model_training.constants import EP_SOURCE
+    from cfb_model_build.model_training.constants import EP_SOURCE
     for src in EP_SOURCE.values():
         assert src in df.columns

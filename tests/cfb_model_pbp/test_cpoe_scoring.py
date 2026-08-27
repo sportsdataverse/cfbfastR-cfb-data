@@ -4,7 +4,7 @@ import numpy as np
 import polars as pl
 import pytest
 
-from cfb_model_pbp.build import score_cpoe
+from cfb_model_build.cfb_model_pbp.build import score_cpoe
 
 
 def test_score_cpoe_appends_completion_prob_and_cpoe():
@@ -25,8 +25,8 @@ def test_score_cpoe_appends_completion_prob_and_cpoe():
 def test_score_cpoe_real_model_path(tmp_path):
     """Real-model path: exercises feats[FEATURE_COLS] pandas indexing (regression for polars API misuse)."""
     import xgboost as xgb
-    from cpoe.constants import FEATURE_COLS
-    from cpoe.train_cp import train_cp_model
+    from cfb_model_build.cpoe.constants import FEATURE_COLS
+    from cfb_model_build.cpoe.train_cp import train_cp_model
 
     # Build a tiny synthetic training set (20 rows, 8 features).
     rng = np.random.default_rng(42)

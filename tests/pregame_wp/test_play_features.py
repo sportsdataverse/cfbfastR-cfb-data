@@ -1,5 +1,5 @@
 import polars as pl
-from pregame_wp.play_features import add_play_features
+from cfb_model_build.pregame_wp.play_features import add_play_features
 
 ST_TYPES = ["Kickoff", "Punt", "Field Goal Good"]
 BAD_TYPES = ["Interception", "Sack", "Fumble Recovery (Opponent)"]
@@ -59,7 +59,7 @@ def test_st_type_not_successful():
 
 
 def test_eqppp_computed_for_off_play():
-    from pregame_wp.ep_curve import load_ep_curve
+    from cfb_model_build.pregame_wp.ep_curve import load_ep_curve
     ep = load_ep_curve()
     df = pl.DataFrame([_play("Rush", 1, 10, 10, yard_line=20)])  # yl=20, gain=10 -> ep[30]-ep[20]
     out = add_play_features(df, ep, ST_TYPES, BAD_TYPES)
@@ -67,7 +67,7 @@ def test_eqppp_computed_for_off_play():
 
 
 def test_eqppp_zero_for_st_play():
-    from pregame_wp.ep_curve import load_ep_curve
+    from cfb_model_build.pregame_wp.ep_curve import load_ep_curve
     ep = load_ep_curve()
     df = pl.DataFrame([_play("Kickoff", 0, 0, 60, yard_line=35)])
     out = add_play_features(df, ep, ST_TYPES, BAD_TYPES)

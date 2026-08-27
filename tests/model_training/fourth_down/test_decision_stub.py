@@ -14,7 +14,7 @@ import polars as pl
 import pytest
 import xgboost as xgb
 
-from model_training.fourth_down.fourth_down_decision import get_go_wp_py
+from cfb_model_build.model_training.fourth_down.fourth_down_decision import get_go_wp_py
 
 ART = pathlib.Path(__file__).parents[3] / "python" / "artifacts"
 EP = ART / "ep.ubj"

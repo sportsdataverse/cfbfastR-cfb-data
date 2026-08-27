@@ -1,4 +1,4 @@
-from model_training import constants as C
+from cfb_model_build.model_training import constants as C
 
 
 def test_ep_class_to_score_matches_sdvpy():

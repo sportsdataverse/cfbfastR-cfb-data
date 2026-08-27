@@ -7,7 +7,7 @@ import pathlib
 import pandas as pd
 import pytest
 
-from cpoe.constants import FEATURE_COLS, TARGET_COL
+from cfb_model_build.cpoe.constants import FEATURE_COLS, TARGET_COL
 
 # ---------------------------------------------------------------------------
 # Minimal fixture: two pass plays + one rush, matching final.json structure
@@ -72,37 +72,37 @@ def season_dir(tmp_path: pathlib.Path) -> pathlib.Path:
 
 
 def test_ingest_imports():
-    from cpoe.ingest import load_season_pass_plays  # noqa: F401
+    from cfb_model_build.cpoe.ingest import load_season_pass_plays  # noqa: F401
 
 
 def test_load_season_returns_dataframe(season_dir):
-    from cpoe.ingest import load_season_pass_plays
+    from cfb_model_build.cpoe.ingest import load_season_pass_plays
     df = load_season_pass_plays(season_dir)
     assert isinstance(df, pd.DataFrame)
 
 
 def test_load_season_only_pass_plays(season_dir):
     """Rush play must be excluded; only 2 pass plays."""
-    from cpoe.ingest import load_season_pass_plays
+    from cfb_model_build.cpoe.ingest import load_season_pass_plays
     df = load_season_pass_plays(season_dir)
     assert len(df) == 2
 
 
 def test_load_season_has_feature_cols(season_dir):
-    from cpoe.ingest import load_season_pass_plays
+    from cfb_model_build.cpoe.ingest import load_season_pass_plays
     df = load_season_pass_plays(season_dir)
     for col in FEATURE_COLS:
         assert col in df.columns, f"Missing: {col}"
 
 
 def test_load_season_has_target_col(season_dir):
-    from cpoe.ingest import load_season_pass_plays
+    from cfb_model_build.cpoe.ingest import load_season_pass_plays
     df = load_season_pass_plays(season_dir)
     assert TARGET_COL in df.columns
 
 
 def test_load_season_empty_dir_returns_empty(tmp_path):
-    from cpoe.ingest import load_season_pass_plays
+    from cfb_model_build.cpoe.ingest import load_season_pass_plays
     empty = tmp_path / "empty_season"
     empty.mkdir()
     df = load_season_pass_plays(empty)
@@ -112,7 +112,7 @@ def test_load_season_empty_dir_returns_empty(tmp_path):
 
 def test_load_season_multiple_games(tmp_path: pathlib.Path):
     """Two game JSON files → combined DataFrame."""
-    from cpoe.ingest import load_season_pass_plays
+    from cfb_model_build.cpoe.ingest import load_season_pass_plays
     _write_final_json(tmp_path, "401628455", 2024, _PLAYS_FIXTURE)
     _write_final_json(tmp_path, "401628456", 2024, _PLAYS_FIXTURE)
     df = load_season_pass_plays(tmp_path)
@@ -121,7 +121,7 @@ def test_load_season_multiple_games(tmp_path: pathlib.Path):
 
 def test_load_season_filters_by_season(tmp_path: pathlib.Path):
     """Season filter excludes games from other seasons."""
-    from cpoe.ingest import load_season_pass_plays
+    from cfb_model_build.cpoe.ingest import load_season_pass_plays
     _write_final_json(tmp_path, "401628455", 2024, _PLAYS_FIXTURE)
     _write_final_json(tmp_path, "401620001", 2023, _PLAYS_FIXTURE)
     df = load_season_pass_plays(tmp_path, seasons=[2024])

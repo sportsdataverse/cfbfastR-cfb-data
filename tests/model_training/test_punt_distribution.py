@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import polars as pl
 
-from model_training import punt_distribution as pd_mod
+from cfb_model_build.model_training import punt_distribution as pd_mod
 
 
 def _punts() -> pl.DataFrame:

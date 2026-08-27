@@ -2,7 +2,6 @@
 .Rhistory
 .RData
 .Ruserdata
-.Rproj.user/
 .DS_Store
 .vscode/
 .claude/
@@ -37,5 +36,7 @@ agent/
 
 python/.omc/
 
-# D8: build logs must not be committed inside the source tree
-python/out/*.log
+# D8/P2: build output must not live inside the Python source tree.
+# python/out was a stray scratch dir whose contents were already published to
+# the cfb_ratings release; ignore the whole dir so a rebuild cannot recommit it.
+python/out/

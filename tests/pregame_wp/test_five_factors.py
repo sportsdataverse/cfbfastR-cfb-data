@@ -1,4 +1,4 @@
-from pregame_wp.five_factors import (
+from cfb_model_build.pregame_wp.five_factors import (
     translate,
     create_eff_index,
     create_expl_index,
@@ -49,7 +49,7 @@ def test_expl_index_from_zero_diff():
 def test_finish_drive_index_all_zero():
     row = {"OppPPDDiff": 0.0, "OppRateDiff": 0.0, "OppSRDiff": 0.0}
     # midpoints of each sub-domain
-    from pregame_wp import constants as C
+    from cfb_model_build.pregame_wp import constants as C
     mid_ppd = (C.FIN_DRV_PPD_DOMAIN[2] + C.FIN_DRV_PPD_DOMAIN[3]) / 2
     mid_rate = (C.FIN_DRV_RATE_DOMAIN[2] + C.FIN_DRV_RATE_DOMAIN[3]) / 2
     mid_sr = (C.FIN_DRV_SR_DOMAIN[2] + C.FIN_DRV_SR_DOMAIN[3]) / 2
@@ -75,7 +75,7 @@ def test_turnover_index_balanced():
     }
     idx = create_turnover_index(row)
     # luckDiff=0 → translate(0,-5,5,0,3)=1.5; sack=0→mid=1.5; havoc=0→mid=2.0
-    from pregame_wp import constants as C
+    from cfb_model_build.pregame_wp import constants as C
     mid_luck = (C.TRNOVR_LUCK_DOMAIN[2] + C.TRNOVR_LUCK_DOMAIN[3]) / 2
     mid_sack = (C.TRNOVR_SACK_DOMAIN[2] + C.TRNOVR_SACK_DOMAIN[3]) / 2
     mid_havoc = (C.TRNOVR_HAVOC_DOMAIN[2] + C.TRNOVR_HAVOC_DOMAIN[3]) / 2

@@ -2,7 +2,7 @@ import math
 
 import polars as pl
 import pytest
-from rb_eval.aggregate import summarize_rusher_seasons
+from cfb_model_build.rb_eval.aggregate import summarize_rusher_seasons
 
 
 def _rush_plays(rows: list[dict]) -> pl.DataFrame:
@@ -98,7 +98,7 @@ def test_success_rate_formula():
 
 # --- lag + weight ---
 
-from rb_eval.aggregate import add_season_lag
+from cfb_model_build.rb_eval.aggregate import add_season_lag
 
 
 def _rusher_seasons(rows: list[dict]) -> pl.DataFrame:
@@ -168,7 +168,7 @@ def test_non_consecutive_seasons_produce_adjacent_lag():
 
 # --- orchestration ---
 
-from rb_eval.aggregate import build_rusher_seasons, build_model_data
+from cfb_model_build.rb_eval.aggregate import build_rusher_seasons, build_model_data
 
 
 def _big_rush_frame(n_per_rusher: int = 110, seasons: list[int] | None = None) -> pl.DataFrame:

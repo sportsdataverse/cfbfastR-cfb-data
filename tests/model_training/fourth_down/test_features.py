@@ -5,7 +5,7 @@ import numpy as np
 import polars as pl
 import pytest
 
-from model_training.fourth_down.features import fd_features
+from cfb_model_build.model_training.fourth_down.features import fd_features
 
 FIX = pathlib.Path(__file__).parent.parent.parent / "fixtures" / "model_training" / "fd_fixture_plays.json"
 
@@ -22,7 +22,7 @@ def test_filter_keeps_only_3rd_and_4th():
 
 
 def test_feature_columns_and_order():
-    from model_training.fourth_down.constants import FD_FEATURES
+    from cfb_model_build.model_training.fourth_down.constants import FD_FEATURES
 
     X, y = fd_features(_load_plays())
     assert list(X.columns) == FD_FEATURES

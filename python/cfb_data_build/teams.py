@@ -31,6 +31,7 @@ files in no group at all reads False rather than poisoning the mask with a null.
 
 from __future__ import annotations
 
+import io
 import json
 import re
 import urllib.request
@@ -47,6 +48,66 @@ _ID_RE = re.compile(r"/groups/(\d+)")
 
 SPEC = DatasetSpec("cfb_teams", "cfb_teams", "espn_cfb_teams")
 SPECS: dict[str, DatasetSpec] = {"teams": SPEC}
+
+#: Released per-season CFBD team_info (``cfbd_team_info(year, only_fbs = FALSE)``,
+#: produced by ``cfbfastR-data/add_team_info.R``). Read over HTTP for the same
+#: reason the ESPN bundle is: the published artifact is the input, so a build can
+#: never silently depend on a sibling checkout being fresh.
+TEAM_INFO_BASE = "https://github.com/sportsdataverse/sportsdataverse-data/releases/download/cfb_team_info"
+
+#: CFBD-only fields backported onto the ESPN row, as ``cfbd name -> output name``.
+#: ONLY fields ESPN does not already ship: the 5 shared ones (``abbreviation``,
+#: ``color``, ``venue_id``, ``venue_name``) keep ESPN's value, and CFBD's
+#: ``conference`` lands as ``cfbd_conference`` so it cannot be mistaken for a
+#: member of the ESPN ``conference_*`` family (they disagree -- ESPN resolves a
+#: team to its conference GROUP, CFBD to its own conference string).
+#:
+#: ``classification`` deliberately coexists with ESPN's ``division``/``is_fbs``
+#: rather than replacing them: it is a second, independent opinion on the same
+#: question, sourced from a different provider, and collapsing the two would
+#: destroy the disagreement that makes it worth having.
+CFBD_FIELDS: dict[str, str] = {
+    "school": "school",
+    "mascot": "mascot",
+    "alt_name1": "alt_name1",
+    "alt_name2": "alt_name2",
+    "alt_name3": "alt_name3",
+    "conference": "cfbd_conference",
+    "classification": "classification",
+    "city": "city",
+    "state": "state",
+    "country_code": "country_code",
+    "timezone": "timezone",
+    "latitude": "latitude",
+    "longitude": "longitude",
+    "elevation": "elevation",
+    "capacity": "capacity",
+    "dome": "dome",
+    "grass": "grass",
+}
+
+#: Declared so a season with no CFBD match (or no team_info asset) still ships the
+#: same column set with the same dtypes. ``elevation`` is Utf8 because that is how
+#: CFBD serves it -- not silently re-typed here.
+CFBD_SCHEMA: dict[str, pl.DataType] = {
+    "school": pl.Utf8,
+    "mascot": pl.Utf8,
+    "alt_name1": pl.Utf8,
+    "alt_name2": pl.Utf8,
+    "alt_name3": pl.Utf8,
+    "cfbd_conference": pl.Utf8,
+    "classification": pl.Utf8,
+    "city": pl.Utf8,
+    "state": pl.Utf8,
+    "country_code": pl.Utf8,
+    "timezone": pl.Utf8,
+    "latitude": pl.Float64,
+    "longitude": pl.Float64,
+    "elevation": pl.Utf8,
+    "capacity": pl.Int64,
+    "dome": pl.Boolean,
+    "grass": pl.Boolean,
+}
 
 #: group id -> division label, MOST SPECIFIC FIRST: a team listed under both a
 #: leaf and its parent takes the leaf. ``d2_d3`` and ``d1`` are the honest labels
@@ -182,9 +243,7 @@ def _group_id(ref: str | None) -> int | None:
     return int(m.group(1)) if m else None
 
 
-def _resolve_conference(
-    gid: int | None, conferences: dict, *, max_hops: int = 5
-) -> dict:
+def _resolve_conference(gid: int | None, conferences: dict, *, max_hops: int = 5) -> dict:
     """Walk a team's group up to the CONFERENCE-level group.
 
     ESPN assigns a team to its DIVISION WITHIN a conference whenever one exists
@@ -219,9 +278,7 @@ def _resolve_conference(
     return group
 
 
-def _team_row(
-    season: int, tid: str, team: dict, division: str | None, conferences: dict
-) -> dict:
+def _team_row(season: int, tid: str, team: dict, division: str | None, conferences: dict) -> dict:
     group_id = _group_id(((team or {}).get("groups") or {}).get("$ref"))
     group = conferences.get(str(group_id)) or {}
     conf = _resolve_conference(group_id, conferences)
@@ -245,9 +302,7 @@ def _team_row(
     # exhibitions. ESPN only files all-star squads inside 80/81 (plus the dedicated
     # group 36, empty on every season captured), so restricting it there keeps the
     # flag's meaning AND leaves every pre-expansion FBS/FCS row unchanged.
-    exhibition = division == "all_star" or (
-        division in ("fbs", "fcs") and bool(team) and not conf and logo is None
-    )
+    exhibition = division == "all_star" or (division in ("fbs", "fcs") and bool(team) and not conf and logo is None)
     return {
         "season": season,
         "team_id": _int(team.get("id") or tid),
@@ -294,7 +349,62 @@ def _team_row(
     }
 
 
-def compile_teams(bundle: dict) -> pl.DataFrame:
+def team_info_url(season: int, base: str = TEAM_INFO_BASE) -> str:
+    return f"{base}/cfb_team_info_{season}.parquet"
+
+
+def load_team_info(season: int, *, base: str = TEAM_INFO_BASE, timeout: int = 60) -> pl.DataFrame:
+    """Fetch one season of CFBD team_info. A missing season raises.
+
+    ``team_id`` is widened Int32 -> Int64 HERE, at the boundary, so the join in
+    :func:`enrich_cfbd` compares like for like. Widening an integer is lossless;
+    the id is never routed through float or stringified to make a join line up.
+    """
+    req = urllib.request.Request(team_info_url(season, base), headers=_UA)
+    with urllib.request.urlopen(req, timeout=timeout) as r:
+        df = pl.read_parquet(io.BytesIO(r.read()))
+    return df.with_columns(pl.col("team_id").cast(pl.Int64))
+
+
+def enrich_cfbd(df: pl.DataFrame, team_info: pl.DataFrame | None) -> pl.DataFrame:
+    """Left-join the CFBD-only fields onto the ESPN rows. Pure -- no network.
+
+    LEFT, never inner: ESPN's universe is far larger than CFBD's (857 vs 672 in
+    2023, the difference almost entirely D-II/D-III/NAIA), so an inner join would
+    silently delete two thirds of the dataset. An ESPN team with no CFBD row keeps
+    nulls in the added columns and stays.
+
+    Nothing existing is touched -- no ESPN column is overwritten or renamed, and
+    ``division`` / ``is_fbs`` / ``is_exhibition`` keep their meaning exactly.
+    """
+    cols = list(CFBD_SCHEMA)
+    if team_info is None or team_info.height == 0:
+        return df.with_columns([pl.lit(None, dtype=CFBD_SCHEMA[c]).alias(c) for c in cols])
+    right = team_info.select(
+        [pl.col("team_id")]
+        + [
+            pl.col(src).cast(CFBD_SCHEMA[dst]).alias(dst)
+            for src, dst in CFBD_FIELDS.items()
+            if src in team_info.columns
+        ]
+    )
+    missing = [c for c in cols if c not in right.columns]
+    if missing:
+        right = right.with_columns([pl.lit(None, dtype=CFBD_SCHEMA[c]).alias(c) for c in missing])
+    # A join is only as correct as the dtype agreement on its key, and a duplicate
+    # key on the right silently multiplies rows -- assert both rather than discover
+    # it as a row-count drift three datasets downstream.
+    if df.schema["team_id"] != right.schema["team_id"]:
+        raise ValueError(f"team_id dtype mismatch: espn={df.schema['team_id']} cfbd={right.schema['team_id']}")
+    if right.height != right["team_id"].n_unique():
+        raise ValueError("cfbd team_info has duplicate team_id rows")
+    out = df.join(right.select(["team_id"] + cols), on="team_id", how="left")
+    if out.height != df.height:
+        raise ValueError(f"join changed row count: {df.height} -> {out.height}")
+    return out
+
+
+def compile_teams(bundle: dict, team_info: pl.DataFrame | None = None) -> pl.DataFrame:
     """Tidy one season bundle. Pure -- no network, no disk."""
     season = _int(bundle.get("season"))
     conferences = bundle.get("conferences") or {}
@@ -305,22 +415,26 @@ def compile_teams(bundle: dict) -> pl.DataFrame:
     # rather than vanish from the season it played in. Group 99 (the root, and the
     # whole season universe) carries no division label, so its ids are unioned in
     # from the raw lists rather than through `divisions`.
-    listed = {
-        str(t) for lst in (bundle.get("divisions") or {}).values() for t in lst or []
-    }
+    listed = {str(t) for lst in (bundle.get("divisions") or {}).values() for t in lst or []}
     ids = sorted(listed | set(divisions) | set(teams), key=lambda t: _int(t) or 0)
-    rows = [
-        _team_row(season, tid, teams.get(tid) or {}, divisions.get(tid), conferences)
-        for tid in ids
-    ]
+    rows = [_team_row(season, tid, teams.get(tid) or {}, divisions.get(tid), conferences) for tid in ids]
     if not rows:
-        return pl.DataFrame(schema=SCHEMA)
+        return enrich_cfbd(pl.DataFrame(schema=SCHEMA), None)
     df = pl.from_dicts(rows, schema=SCHEMA)
-    return df.sort("team_id")
+    return enrich_cfbd(df.sort("team_id"), team_info)
 
 
-def build_teams(season: int, *, raw_base: str = RAW_BASE, **_: Any) -> pl.DataFrame:
-    return compile_teams(load_bundle(season, raw_base=raw_base))
+def build_teams(
+    season: int,
+    *,
+    raw_base: str = RAW_BASE,
+    team_info_base: str = TEAM_INFO_BASE,
+    **_: Any,
+) -> pl.DataFrame:
+    return compile_teams(
+        load_bundle(season, raw_base=raw_base),
+        load_team_info(season, base=team_info_base),
+    )
 
 
 def build(
@@ -345,14 +459,20 @@ def build(
                 print(f"  {SPEC.dataset} {season}: 0 rows, skipped", flush=True)
                 failures.append((season, "empty"))
                 continue
-            counts = (
-                df.group_by("division").len().sort("division").rows()
-                if "division" in df.columns
-                else []
+            counts = df.group_by("division").len().sort("division").rows() if "division" in df.columns else []
+            # ESPN real-FBS vs CFBD FBS is the cross-provider check worth seeing on
+            # every build: the two disagree by at most a handful of programs, so a
+            # sudden gap means the join (or a division rule) moved.
+            matched = int(df["school"].is_not_null().sum())
+            real_fbs = int(
+                df.filter((pl.col("is_fbs") == True) & (pl.col("is_exhibition") == False)).height  # noqa: E712
             )
+            cfbd_fbs = int(df.filter(pl.col("classification") == "fbs").height)
             print(
                 f"  {SPEC.dataset} {season}: {df.height} rows, {df.width} cols, "
                 f"is_fbs={int(df['is_fbs'].sum())}, "
+                f"cfbd_matched={matched} ({matched / df.height:.1%}), "
+                f"real_fbs={real_fbs} vs cfbd_fbs={cfbd_fbs}, "
                 + ", ".join(f"{k or 'none'}={v}" for k, v in counts),
                 flush=True,
             )
@@ -364,8 +484,6 @@ def build(
 
                 publish_dataset(SPEC, season, base=base)
         except Exception as exc:  # noqa: BLE001 - one season must not kill the sweep
-            print(
-                f"  FAILED {season}: {type(exc).__name__}: {str(exc)[:150]}", flush=True
-            )
+            print(f"  FAILED {season}: {type(exc).__name__}: {str(exc)[:150]}", flush=True)
             failures.append((season, type(exc).__name__))
     return failures

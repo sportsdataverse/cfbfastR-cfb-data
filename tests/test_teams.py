@@ -14,8 +14,19 @@ import json
 from pathlib import Path
 
 import polars as pl
+import pytest
 
-from cfb_data_build.teams import SCHEMA, bundle_url, compile_teams
+from cfb_data_build.teams import (
+    CFBD_SCHEMA,
+    SCHEMA,
+    bundle_url,
+    compile_teams,
+    enrich_cfbd,
+    team_info_url,
+)
+
+#: compile_teams appends the CFBD backport, so the documented shape is both.
+FULL_SCHEMA = {**SCHEMA, **CFBD_SCHEMA}
 
 FIXTURE = (
     Path(__file__).parent
@@ -32,7 +43,7 @@ def _bundle() -> dict:
 def test_compiles_real_slice():
     df = compile_teams(_bundle())
     assert df.height == 5
-    assert df.schema == SCHEMA
+    assert df.schema == FULL_SCHEMA
     auburn = df.filter(pl.col("team_id") == 2).to_dicts()[0]
     assert auburn["display_name"] == "Auburn Tigers"
     assert auburn["division"] == "fbs"
@@ -109,7 +120,7 @@ def test_empty_bundle_keeps_the_documented_schema():
         {"season": 2023, "divisions": {}, "teams": {}, "conferences": {}}
     )
     assert df.height == 0
-    assert df.schema == SCHEMA
+    assert df.schema == FULL_SCHEMA
 
 
 def test_bundle_url_is_http_not_a_local_path():
@@ -166,3 +177,92 @@ def test_exhibition_flag_does_not_leak_outside_division_i():
     outside = df.filter(~pl.col("division").is_in(["fbs", "fcs"]))
     assert outside.height == 3
     assert outside["is_exhibition"].to_list() == [False, False, False]
+
+
+# --- CFBD backport -------------------------------------------------------------
+#
+# The ESPN universe is much larger than CFBD's, so the join has to be provably
+# left: a regression here deletes two thirds of the dataset, quietly.
+
+
+def _team_info() -> pl.DataFrame:
+    """Two of the fixture's five teams, shaped like the released team_info."""
+    return pl.DataFrame(
+        {
+            "team_id": pl.Series([2, 13], dtype=pl.Int32),  # CFBD ships Int32
+            "school": ["Auburn", "Cal Poly"],
+            "mascot": ["Tigers", "Mustangs"],
+            "alt_name1": ["AUB", "CP"],
+            "alt_name2": [None, None],
+            "alt_name3": [None, None],
+            "conference": ["SEC", "Big Sky"],
+            "classification": ["fbs", "fcs"],
+            "city": ["Auburn", "San Luis Obispo"],
+            "state": ["AL", "CA"],
+            "country_code": ["US", "US"],
+            "timezone": ["America/Chicago", "America/Los_Angeles"],
+            "latitude": [32.6024, 35.2999],
+            "longitude": [-85.4894, -120.6592],
+            "elevation": ["216.7", "70.1"],
+            "capacity": pl.Series([88043, 11075], dtype=pl.Int32),
+            "dome": [False, False],
+            "grass": [True, True],
+        }
+    ).with_columns(pl.col("team_id").cast(pl.Int64))
+
+
+def test_cfbd_backport_is_left_never_inner():
+    df = compile_teams(_bundle(), _team_info())
+    assert df.height == 5  # all five ESPN rows survive
+    matched = df.filter(pl.col("school").is_not_null())
+    assert matched.height == 2
+    # The three unmatched (D-II/D-III) rows keep nulls, not dropped rows.
+    unmatched = df.filter(pl.col("school").is_null())
+    assert unmatched["team_id"].to_list() == [3, 11, 95]
+    assert unmatched["classification"].to_list() == [None, None, None]
+
+
+def test_cfbd_conference_cannot_be_confused_with_the_espn_family():
+    df = compile_teams(_bundle(), _team_info())
+    row = df.filter(pl.col("team_id") == 2).to_dicts()[0]
+    assert row["cfbd_conference"] == "SEC"
+    assert "conference" not in df.columns  # CFBD's bare name never lands
+    # ESPN's own conference columns are untouched by the backport.
+    assert row["conference_name"] == "Southeastern Conference"
+    assert row["conference_id"] == 8
+
+
+def test_cfbd_backport_leaves_espn_semantics_alone():
+    """classification is a second opinion, not a replacement for division/is_fbs."""
+    plain = compile_teams(_bundle())
+    joined = compile_teams(_bundle(), _team_info())
+    for col in ("division", "is_fbs", "is_exhibition", "abbreviation", "color"):
+        assert joined[col].to_list() == plain[col].to_list(), col
+    assert joined.filter(pl.col("team_id") == 2)["classification"].item() == "fbs"
+
+
+def test_join_key_dtype_mismatch_raises_rather_than_papering_over():
+    df = compile_teams(_bundle())
+    bad = _team_info().with_columns(pl.col("team_id").cast(pl.Utf8))
+    with pytest.raises(ValueError, match="team_id dtype mismatch"):
+        enrich_cfbd(df, bad)
+
+
+def test_duplicate_cfbd_rows_raise_rather_than_multiplying_espn_rows():
+    df = compile_teams(_bundle())
+    dup = pl.concat([_team_info(), _team_info().head(1)])
+    with pytest.raises(ValueError, match="duplicate team_id"):
+        enrich_cfbd(df, dup)
+
+
+def test_absent_team_info_still_ships_the_documented_schema():
+    df = compile_teams(_bundle(), None)
+    assert df.schema == FULL_SCHEMA
+    assert df["classification"].null_count() == df.height
+
+
+def test_team_info_url_is_the_release_not_a_local_path():
+    assert team_info_url(2023) == (
+        "https://github.com/sportsdataverse/sportsdataverse-data/"
+        "releases/download/cfb_team_info/cfb_team_info_2023.parquet"
+    )

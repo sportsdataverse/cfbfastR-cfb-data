@@ -28,6 +28,7 @@ Expected `col_name | col_type | col_description` for each per-game-compiled **se
 | [linescores](#linescores) | one row per (team, period) | 5 | `espn_cfb_linescores` |
 | [power_index](#power-index) | one row per team (or per game) | 22 | `espn_cfb_power_index` |
 | [injuries](#injuries) | one row per injury entry | 12 | `espn_cfb_injuries` |
+| [teams](#teams) ‡ | one row per (season, team) | 36 | `espn_cfb_teams` |
 | [team_summaries](#team_summaries) † | one row per team per season | 383 | `espn_cfb_team_summaries` |
 | [passing](#passing) † | one row per (team, passer) per season | 43 | `espn_cfb_passing` |
 | [rushing](#rushing) † | one row per (team, rusher) per season | 28 | `espn_cfb_rushing` |
@@ -41,6 +42,11 @@ Expected `col_name | col_type | col_description` for each per-game-compiled **se
 > opponent-adjusted team and player summaries (the "Binion Box Score"). See the
 > [Season-level summary datasets](#season-level-summary-datasets) section at the end
 > of this file.
+
+> ‡ **Season reference dataset.** `teams` is not reshaped from per-game `final`
+> JSON either: it is compiled by `python/cfb_data_build/teams.py` from the
+> per-season ESPN team + conference bundles that `cfbfastR-cfb-raw` commits at
+> `cfb/teams/json/{season}.json`, read over HTTP.
 
 ---
 
@@ -1196,6 +1202,57 @@ One row per injury entry (one injured athlete per team injury report). Empty (`[
 | week | integer | Week number stamped during compilation when available from the game's competition metadata; may be NA for non-regular-season games. |
 
 _Release tag: `espn_cfb_injuries`_
+
+---
+
+### teams
+
+One row per (season, team) — ESPN's team identity, conference membership, and branding **as of that season**, so a team's conference/colors/logos are point-in-time (2013 Maryland is correctly not in the Big Ten). Built by `python/cfb_data_build/teams.py`, which reads the raw season bundle over HTTP; it does not use `final` JSON.
+
+Division comes from ESPN group membership: group 80 = FBS, group 81 = FCS. Those groups also contain bowl **all-star / exhibition squads** ("SOUTH All-Stars", "Kai Hulakai", "Team Gaither", "TBA" — 12 of 2023's 145 group-80 entries); ESPN's own `isAllStar` flag catches only a third of them, so `is_exhibition` is derived (no conference group and no logo) and is the column to filter on for a real-program count.
+
+`conference_*` is the **conference**, not the division within it: a team's own `groups` `$ref` resolves to e.g. group 7 `"SEC - West"`, whose parent is group 8 `"Southeastern Conference"`. The immediate group is kept as `team_group_*`.
+
+| col_name | col_type | col_description |
+|:---|:---|:---|
+| season | integer | Season year the team identity is as-of. |
+| team_id | integer | ESPN team id (Int64 in every season's parquet — join key). |
+| uid | character | ESPN uid (e.g. "s:20~l:23~t:2"). |
+| guid | character | ESPN team guid. |
+| slug | character | URL slug (e.g. "auburn-tigers"). |
+| abbreviation | character | Team abbreviation (e.g. "AUB"). |
+| display_name | character | Full display name (e.g. "Auburn Tigers"). |
+| short_display_name | character | Short display name (e.g. "Auburn"). |
+| name | character | Team name / mascot (e.g. "Tigers"). |
+| nickname | character | ESPN nickname (usually the school, e.g. "Auburn"). |
+| location | character | School / location (e.g. "Auburn"). |
+| color | character | Primary color hex, no leading "#". |
+| alternate_color | character | Alternate color hex, no leading "#". |
+| is_active | logical | ESPN `isActive`. |
+| is_all_star | logical | ESPN `isAllStar`, verbatim — unreliable; prefer `is_exhibition`. |
+| is_exhibition | logical | Derived: the row is a bowl all-star / exhibition squad rather than a program (no conference group and no logo). |
+| division | character | "fbs" (group 80) or "fcs" (group 81); the only authoritative division signal ESPN gives. |
+| team_group_id | integer | The group ESPN assigns the team to — a division within a conference when one exists (e.g. 7 = "SEC - West"). |
+| team_group_name | character | Name of that immediate group. |
+| conference_id | integer | Conference group id, walked up from `team_group_id` (e.g. 8). |
+| conference_name | character | Conference name (e.g. "Southeastern Conference"). |
+| conference_short_name | character | Conference short name (e.g. "SEC"). |
+| conference_abbreviation | character | Conference abbreviation — ESPN lowercases this at conference level (e.g. "sec"). |
+| conference_midsize_name | character | Conference midsize name (e.g. "SEC"). |
+| conference_slug | character | Conference slug (e.g. "sec"). |
+| conference_is_conference | logical | ESPN `isConference` on the resolved conference group. |
+| conference_parent_id | integer | Parent group of the conference — 80 (FBS) or 81 (FCS); a value other than those means the walk-up could not reach conference level. |
+| team_logo | character | Default full-size team logo URL (`rel` contains "full" + "default"). |
+| team_logo_dark | character | Dark-mode full-size team logo URL (`rel` contains "full" + "dark"). |
+| conference_logo | character | Conference logo URL (conference logos carry no `rel`). |
+| venue_id | integer | ESPN venue id of the team's home venue. |
+| venue_name | character | Venue full name (e.g. "Jordan-Hare Stadium"). |
+| venue_city | character | Venue city. |
+| venue_state | character | Venue state. |
+| venue_indoor | logical | Venue is indoor. |
+| venue_grass | logical | Venue playing surface is grass. |
+
+_Release tag: `espn_cfb_teams`_
 
 ---
 

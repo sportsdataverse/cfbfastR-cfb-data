@@ -24,6 +24,11 @@
 # with CFB_RAW_ROOT if it is not the default sibling checkout.
 set -euo pipefail
 
+# Resolve this repo's interpreter once (never `uv run` in a long build --
+# it re-syncs the env mid-run). CFB_DATA_PY overrides.
+# shellcheck source=scripts/_venv.sh
+source "$(dirname "${BASH_SOURCE[0]}")/_venv.sh" || exit 1
+
 cd "$(dirname "$0")/.."
 
 RAW_ROOT="${CFB_RAW_ROOT:-../cfbfastR-cfb-raw}"
@@ -79,7 +84,7 @@ for ds in $DATASETS; do
   echo "=== $ds ${s}-${e} ==="
   # each season is isolated inside the driver; a bad one is reported, not fatal,
   # so one gap cannot abandon the rest of the sweep
-  PYTHONPATH=python uv run python -m cfb_data_build \
+  PYTHONPATH=python "$PY" -m cfb_data_build \
     --dataset "$ds" \
     --start-year "$s" \
     --end-year "$e" \

@@ -2,7 +2,7 @@
 .Rhistory
 .RData
 .Ruserdata
-*.Rproj
+.Rproj.user/
 .DS_Store
 .vscode/
 .claude/
@@ -36,3 +36,6 @@ agent/
 .agents/
 
 python/.omc/
+
+# D8: build logs must not be committed inside the source tree
+python/out/*.log

@@ -13,6 +13,11 @@
 # Python cache; every later dataset reuses it via --no-fetch.
 set -uo pipefail
 
+# Resolve this repo's interpreter once (never `uv run` in a long build --
+# it re-syncs the env mid-run). CFB_DATA_PY overrides.
+# shellcheck source=scripts/_venv.sh
+source "$(dirname "${BASH_SOURCE[0]}")/_venv.sh" || exit 1
+
 while getopts s:e: flag; do
   case "${flag}" in
     s) START_YEAR=${OPTARG};;
@@ -102,7 +107,7 @@ for i in $(seq "${START_YEAR}" "${END_YEAR}"); do
     # Build one Python dataset (writes to the repo-root cfb/ via --base ../cfb).
     run_py() {
       local ds="$1"; shift
-      (cd python && uv run python -m cfb_data_build --dataset "$ds" --base ../cfb -s "$i" -e "$i" "$@") || {
+      (cd python && "$PY" -m cfb_data_build --dataset "$ds" --base ../cfb -s "$i" -e "$i" "$@") || {
         rc=$?; echo "::warning ::cfb_data_build $ds for season $i exited with code $rc"; SEASON_RC=$rc
       }
     }

@@ -25,13 +25,17 @@ def _dataset_files(spec: DatasetSpec, season: int, base: str | Path) -> list[Pat
     """The on-disk release files for one dataset+season (parquet + rds + csv).
 
     All three released formats ship to the tag — the release is the distribution
-    channel (rds/csv are not committed to this repo).
+    channel (rds/csv are not committed to this repo). The csv is listed in both
+    plain and gzipped form and filtered on existence, so a builder that gzips its
+    csv (``cfb_rosters``) ships ``.csv.gz`` — matching what the sibling ESPN tags
+    already publish — while every other dataset keeps shipping plain ``.csv``.
     """
     root = Path(base) / spec.dataset
     candidates = [
         root / "parquet" / f"{spec.stem}_{season}.parquet",
         root / "rds" / f"{spec.stem}_{season}.rds",
         root / "csv" / f"{spec.stem}_{season}.csv",
+        root / "csv" / f"{spec.stem}_{season}.csv.gz",
     ]
     return [f for f in candidates if f.exists()]
 

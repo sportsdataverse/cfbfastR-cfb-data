@@ -7,8 +7,14 @@
 .vscode/
 .claude/
 /tmp/
-# Built dataset artifacts live on sportsdataverse-data release tags, not in git.
-cfb/
+# Built dataset artifacts: the per-season PARQUET is committed (one file per
+# dataset per season, `cfb/<dataset>/parquet/<dataset>_<year>.parquet`); the
+# csv/rds renditions and any whole-corpus blob stay release-only. Git cannot
+# re-include a path under an excluded directory, so exclude files rather than
+# the cfb/ directory itself, then re-admit directories + the parquet.
+cfb/**
+!cfb/**/
+!cfb/**/parquet/*.parquet
 
 # Python modeling subsystem (python/)
 __pycache__/

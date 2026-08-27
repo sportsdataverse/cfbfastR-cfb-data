@@ -406,3 +406,51 @@ def test_missing_cfbd_season_builds_empty_typed_frame(monkeypatch):
     assert out.height == 0
     assert out.schema["athlete_id"] == pl.Int64
     assert set(R.CFBD_COLS.values()).issubset(set(out.columns))
+
+
+# --------------------------------------------------------- preseason vs failure
+
+
+def _stub_build_season(monkeypatch, *, ids, payloads):
+    """Drive build_season with a chosen (ids, payloads) pair and no I/O."""
+    monkeypatch.setattr(R, "load_positions", lambda *a, **k: pl.DataFrame())
+    monkeypatch.setattr(R, "load_divisions", lambda *a, **k: pl.DataFrame())
+    monkeypatch.setattr(R, "load_cfbd_rosters", lambda *a, **k: pl.DataFrame())
+    monkeypatch.setattr(R, "season_game_ids", lambda *a, **k: ids)
+    monkeypatch.setattr(R, "fetch_game_rosters", lambda *a, **k: payloads)
+    monkeypatch.setattr(R, "roster_rows", lambda payloads: [])
+    monkeypatch.setattr(R, "derive_rosters", lambda *a, **k: R.empty_frame())
+    wrote = []
+    monkeypatch.setattr(R, "write_dataset", lambda *a, **k: wrote.append(a) or [])
+    return wrote
+
+
+def test_preseason_zero_rows_is_skipped_not_a_failure(monkeypatch, capsys):
+    """Games scheduled but not yet played must not red the nightly build.
+
+    ESPN publishes the per-game roster document as soon as a game is
+    scheduled; it carries no participants until the game happens. Two days
+    before the 2026 opener the real run logged `0 rows from 946/946 games` --
+    every payload read, none with athletes -- and the guard called that
+    "every roster fetch failed".
+    """
+    wrote = _stub_build_season(monkeypatch, ids=list(range(946)), payloads=[{}] * 946)
+    out = R.build_season(2026, write=True)
+    assert out.height == 0
+    assert wrote == [], "a zero-row season must not write an artifact"
+    msg = capsys.readouterr().out
+    assert "skipped (no games played yet; 946/946 payloads read)" in msg
+
+
+def test_zero_payloads_read_still_raises(monkeypatch):
+    """The case the guard was written for is preserved: nothing could be read."""
+    _stub_build_season(monkeypatch, ids=list(range(946)), payloads=[])
+    with pytest.raises(RuntimeError, match="0 of 946 game roster payloads could be read"):
+        R.build_season(2026, write=True)
+
+
+def test_no_games_scheduled_is_also_skipped(monkeypatch, capsys):
+    """An unscheduled season has nothing to compile and nothing to report."""
+    _stub_build_season(monkeypatch, ids=[], payloads=[])
+    assert R.build_season(2031, write=True).height == 0
+    assert "skipped (no games scheduled; 0/0 payloads read)" in capsys.readouterr().out

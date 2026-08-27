@@ -607,10 +607,37 @@ def build_season(
         flush=True,
     )
     if df.height == 0:
-        # A supported season that compiles to nothing means every roster fetch
-        # failed. Returning quietly would skip write_dataset, record no failure,
-        # and let the CLI report success with no artifact for the season.
-        raise RuntimeError(f"cfb_rosters {season}: compiled zero roster rows")
+        # Zero rows has two causes and they need opposite handling.
+        #
+        # The fetches failing is the one worth aborting on: returning quietly
+        # would skip write_dataset, record no failure, and let the CLI report
+        # success with no artifact for the season.
+        #
+        # But a season whose games have not been PLAYED yet also compiles to
+        # nothing, and that is not a failure. ESPN publishes the per-game
+        # roster document as soon as a game is scheduled; it carries no
+        # participants until the game happens. Two days before the 2026 opener
+        # this produced `0 rows from 946/946 games` -- every payload fetched,
+        # none with athletes -- and the old guard reported it as "every roster
+        # fetch failed", reddening the nightly build for the whole preseason.
+        # Every sibling dataset in that same run already skips this case
+        # ("pbp 2026: 0 rows from 946 games", "0 plays, skipped (season has
+        # not started)").
+        #
+        # `fetch_game_rosters` returns only the documents it actually read, so
+        # `len(payloads)` vs `len(ids)` separates the two directly.
+        if ids and not payloads:
+            raise RuntimeError(
+                f"cfb_rosters {season}: compiled zero roster rows -- "
+                f"0 of {len(ids)} game roster payloads could be read"
+            )
+        log_target = "no games scheduled" if not ids else "no games played yet"
+        print(
+            f"cfb_rosters {season}: 0 rows, skipped ({log_target};"
+            f" {len(payloads)}/{len(ids)} payloads read)",
+            flush=True,
+        )
+        return df
     if write:
         paths = write_dataset(df, SPEC.dataset, season, SPEC.stem, base=base)
         _gzip_csv(paths)

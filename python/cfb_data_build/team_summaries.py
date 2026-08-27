@@ -1160,7 +1160,7 @@ def _attach_leader_ranks(
     qual = data.filter(min_expr)
     asc_cols = set(asc_cols or [])
     ranks = qual.select(
-        *keys, *[_rank(c, descending=(c in asc_cols)).alias(f"{c}_rank") for c in rank_cols]
+        *keys, *[_rank(c, descending=(c not in asc_cols)).alias(f"{c}_rank") for c in rank_cols]
     )
     pcts = ranks.with_columns(
         *[_pct(f"{c}_rank").alias(f"{c}_pct") for c in rank_cols]

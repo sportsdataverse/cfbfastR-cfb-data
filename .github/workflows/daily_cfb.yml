@@ -20,8 +20,8 @@ on:
   schedule:
     - cron: '0 11 * 8 *'        # August (preseason), offset after -raw
     - cron: '0 11 * 9-11 *'     # Sept-Nov (regular season)
-    - cron: '0 11 1-20 12 *'    # early-mid December
-    - cron: '0 11 1-20 1 *'     # early January (bowls + CFP)
+    - cron: '0 11 * 12 *'       # all December -- most bowls fall Dec 21-31
+    - cron: '0 11 1-25 1 *'     # January bowls + CFP, past the ~Jan 19-20 final
   repository_dispatch:
     types: [daily_cfb_data]
   workflow_dispatch:

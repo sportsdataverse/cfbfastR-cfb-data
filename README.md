@@ -76,3 +76,21 @@ message carries `Start:/End:` years), plus a cron over the CFB calendar (offset 
 `-data` (this repo, R): read `final` JSON over HTTP → reshape each block → parquet/csv/rds →
 piggyback release. Reshape functions are pure and unit-tested offline against a committed
 fixture (`tests/testthat/`).
+
+## Automation & status
+
+<!-- BEGIN GENERATED: status -->
+
+| workflow | schedule | last run |
+|---|---|---|
+| [![cfb_model_pipeline.yml](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/cfb_model_pipeline.yml/badge.svg)](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/cfb_model_pipeline.yml) | day 5 06:00 UTC in Feb | 2026-07-30 |
+| [![cfb_playoff_figures.yml](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/cfb_playoff_figures.yml/badge.svg)](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/cfb_playoff_figures.yml) | on push / PR / dispatch | never run |
+| [![cfb_postweek.yml](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/cfb_postweek.yml/badge.svg)](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/cfb_postweek.yml) | daily 15:00 UTC in Aug-Dec, dow 1 | 2026-08-24 |
+| [![cfb_previews.yml](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/cfb_previews.yml/badge.svg)](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/cfb_previews.yml) | daily 14:00 UTC in Sep-Nov, dow 6; daily 22:00 UTC in Sep-Nov, dow 1-5; daily 14:00 UTC in Dec; days 1-20 14:00 UTC in Jan | never run |
+| [![cfb_ratings_cron.yml](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/cfb_ratings_cron.yml/badge.svg)](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/cfb_ratings_cron.yml) | daily 13:00 UTC in Aug; daily 13:00 UTC in Sep-Nov; daily 13:00 UTC in Dec; days 1-25 13:00 UTC in Jan | 2026-08-27 |
+| [![cfb_recruiting_proj_cron.yml](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/cfb_recruiting_proj_cron.yml/badge.svg)](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/cfb_recruiting_proj_cron.yml) | day 5 12:00 UTC in Dec; day 5 12:00 UTC in Jan-Aug | 2026-08-05 |
+| [![daily_cfb.yml](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/daily_cfb.yml/badge.svg)](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/daily_cfb.yml) | daily 11:00 UTC in Aug; daily 11:00 UTC in Sep-Nov; daily 11:00 UTC in Dec; days 1-25 11:00 UTC in Jan | 2026-08-27 |
+| [![orphan_scripts.yml](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/orphan_scripts.yml/badge.svg)](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/orphan_scripts.yml) | on push / PR / dispatch | 2026-08-28 |
+| [![tests.yml](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/tests.yml/badge.svg)](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/tests.yml) | on push / PR / dispatch | 2026-08-28 |
+
+<!-- END GENERATED: status -->

@@ -17,7 +17,11 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
 PY_DIR = REPO / "python"
-CLAUDE = REPO / "CLAUDE.md"
+#: The registry moved out of CLAUDE.md (2026-08-28). A table this test parses
+#: is repository data, not agent instructions. `models/` rather than
+#: `docs/models/` because `cfb_model_reports` regenerates the latter and
+#: overwrites its README on every run.
+REGISTRY = REPO / "models" / "REGISTRY.md"
 
 #: Stages that legitimately have NO registry row, each with its reason. Keep this
 #: as tight as possible: every name here is a stage the "no stage without a
@@ -67,15 +71,14 @@ def _stages() -> dict[str, str]:
 
 
 def _registry_rows() -> list[str]:
-    """The table rows under '## Model registry'."""
-    text = CLAUDE.read_text(encoding="utf-8")
-    start = text.index("## Model registry")
-    tail = text[start:]
-    end = tail.find("\n## ", 1)
-    block = tail if end == -1 else tail[:end]
+    """The registry table rows.
+
+    The file IS the registry now, rather than a section inside a larger document,
+    so every pipe-table row in it belongs to the registry.
+    """
+    text = REGISTRY.read_text(encoding="utf-8")
     return [
-        ln for ln in block.splitlines()
-        if ln.startswith("|") and not set(ln) <= set("|- ")
+        ln for ln in text.splitlines() if ln.startswith("|") and not set(ln) <= set("|- ")
     ][1:]  # drop the header row
 
 

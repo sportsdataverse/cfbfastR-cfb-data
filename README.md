@@ -91,7 +91,7 @@ fixture (`tests/testthat/`).
 | [![cfb_recruiting_proj_cron.yml](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/cfb_recruiting_proj_cron.yml/badge.svg)](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/cfb_recruiting_proj_cron.yml) | day 5 12:00 UTC in Dec; day 5 12:00 UTC in Jan-Aug | 2026-08-05 |
 | [![daily_cfb.yml](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/daily_cfb.yml/badge.svg)](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/daily_cfb.yml) | daily 11:00 UTC in Aug; daily 11:00 UTC in Sep-Nov; daily 11:00 UTC in Dec; days 1-25 11:00 UTC in Jan | 2026-08-27 |
 | [![orphan_scripts.yml](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/orphan_scripts.yml/badge.svg)](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/orphan_scripts.yml) | on push / PR / dispatch | 2026-08-28 |
-| [![tests.yml](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/tests.yml/badge.svg)](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/tests.yml) | on push / PR / dispatch | 2026-08-28 |
+| [![tests.yml](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/tests.yml/badge.svg)](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/tests.yml) | on PR / push / dispatch | 2026-08-28 |
 
 | release tag | assets | size | last publish |
 |---|---:|---:|---|

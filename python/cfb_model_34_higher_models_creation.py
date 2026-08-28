@@ -15,7 +15,8 @@ publish -> integrate. The numbers leave gaps on purpose:
   renumbering everything after it.
 
 Gates sit upstream of publish and are never lowered. Every artifact this
-pipeline publishes needs a row in the **Model registry** in ``CLAUDE.md`` --
+pipeline publishes needs a row in the **Model registry** in
+``models/REGISTRY.md`` --
 model, artifact, release tag, training data, fitting script, gates, last
 retrain, cadence. ``tests/test_model_registry.py`` enforces that each row's
 fitting script resolves to a real stage here.

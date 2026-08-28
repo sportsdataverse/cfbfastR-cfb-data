@@ -52,9 +52,11 @@ published `model_pbp` dataset.
 
 The registry lives at [`models/REGISTRY.md`](models/REGISTRY.md) -- one row per
 model/artifact, with training data, fitting script, gates at publish, last
-retrain and cadence. Rows are **mandatory for new published models/artifacts**;
-`tests/test_model_registry.py` fails the suite when a stage has no row or a row
-has no stage.
+retrain and cadence. Rows are **mandatory for new published models/artifacts**.
+`tests/test_model_registry.py` is a floor, not a guarantee: it matches on PACKAGE
+names rather than per-model rows, and skips a row citing no in-repo package (an
+sdv-py entry point). It catches a wholly-undocumented stage; it does not prove
+every row is complete. See the header of `models/REGISTRY.md`.
 
 ## Inputs / outputs
 - Input: `https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/json/final/{id}.json`

@@ -1,9 +1,20 @@
 # CFB model registry
 
 The authoritative list of every model and published artifact this repo trains.
-Machine-checked by `tests/test_model_registry.py`, which asserts the registry and
-the numbered model stages describe each other -- a stage with no row, or a row no
-stage can run, fails the suite.
+Machine-checked by `tests/test_model_registry.py`, but know exactly what that
+buys. It asserts that a numbered model stage is mentioned somewhere in this file,
+and that a row citing an in-repo package has a stage exposing it. Two gaps it
+does NOT catch:
+
+- It matches on **package** names (`model_training`, `cpoe`), not per-model rows.
+  Deleting the `ep` row alone still passes, because sibling rows mention
+  `model_training` too.
+- A row citing **no in-repo package** -- an sdv-py entry point, say -- is skipped
+  entirely (`continue` at the `if not cited` branch), so it can lack a stage
+  without failing.
+
+Treat the test as a floor against wholly-undocumented stages, not as proof that
+every row is complete or current.
 
 Moved out of `CLAUDE.md` (2026-08-28): a table that a test parses is repository
 data, not agent instructions, and it does not belong in an instructions file that

@@ -67,7 +67,9 @@ def _rank(col: str, *, descending: bool) -> pl.Expr:
 def _pct(col: str) -> pl.Expr:
     """Calculates a percentile based off the passed rank values.
     
-    The ranks are assumed to always be generated with descending = True"""
+    The _rank function handles if a low or high metric value gets a low/high rank
+    so we can just calculate the percentiles without worrying about direction. 
+    """
     c = pl.col(col)
     N = c.count()
     return 100 * (N - c ) / (N + 1)
@@ -1046,7 +1048,7 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
             "pass_int",
             "sacked"
         ],
-        asc_cols=["pass_int, sacked"]
+        asc_cols=["pass_int", "sacked"]
     )
 
     rb_data = summarize_rusher(

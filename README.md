@@ -76,3 +76,69 @@ message carries `Start:/End:` years), plus a cron over the CFB calendar (offset 
 `-data` (this repo, R): read `final` JSON over HTTP → reshape each block → parquet/csv/rds →
 piggyback release. Reshape functions are pure and unit-tested offline against a committed
 fixture (`tests/testthat/`).
+
+## Automation & status
+
+<!-- BEGIN GENERATED: status -->
+
+| workflow | schedule | last run |
+|---|---|---|
+| [![cfb_model_pipeline.yml](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/cfb_model_pipeline.yml/badge.svg)](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/cfb_model_pipeline.yml) | day 5 06:00 UTC in Feb | 2026-07-30 |
+| [![cfb_playoff_figures.yml](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/cfb_playoff_figures.yml/badge.svg)](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/cfb_playoff_figures.yml) | on dispatch | never run |
+| [![cfb_postweek.yml](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/cfb_postweek.yml/badge.svg)](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/cfb_postweek.yml) | Mondays 15:00 UTC in Aug-Dec | 2026-08-24 |
+| [![cfb_previews.yml](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/cfb_previews.yml/badge.svg)](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/cfb_previews.yml) | Saturdays 14:00 UTC in Sep-Nov; weekdays 22:00 UTC in Sep-Nov; daily 14:00 UTC in Dec; days 1-20 14:00 UTC in Jan | never run |
+| [![cfb_ratings_cron.yml](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/cfb_ratings_cron.yml/badge.svg)](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/cfb_ratings_cron.yml) | daily 13:00 UTC in Aug; daily 13:00 UTC in Sep-Nov; daily 13:00 UTC in Dec; days 1-25 13:00 UTC in Jan | 2026-08-27 |
+| [![cfb_recruiting_proj_cron.yml](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/cfb_recruiting_proj_cron.yml/badge.svg)](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/cfb_recruiting_proj_cron.yml) | day 5 12:00 UTC in Dec; day 5 12:00 UTC in Jan-Aug | 2026-08-05 |
+| [![daily_cfb.yml](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/daily_cfb.yml/badge.svg)](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/daily_cfb.yml) | daily 11:00 UTC in Aug; daily 11:00 UTC in Sep-Nov; daily 11:00 UTC in Dec; days 1-25 11:00 UTC in Jan | 2026-08-27 |
+| [![orphan_scripts.yml](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/orphan_scripts.yml/badge.svg)](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/orphan_scripts.yml) | on push / PR / dispatch | 2026-08-28 |
+| [![tests.yml](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/tests.yml/badge.svg)](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/tests.yml) | on PR / push / dispatch | 2026-08-28 |
+
+| release tag | assets | size | last publish |
+|---|---:|---:|---|
+| [`cfb_crosswalk`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/cfb_crosswalk) | 26 | 1.8 MB | 2026-06-13 |
+| [`cfb_fpi_weekly`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/cfb_fpi_weekly) | 63 | 18.4 MB | 2026-08-01 |
+| [`cfb_model_artifacts`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/cfb_model_artifacts) | 19 | 27.6 MB | 2026-08-27 |
+| [`cfb_ratings`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/cfb_ratings) | 67 | 1.0 MB | 2026-08-27 |
+| [`cfb_ratings_weekly`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/cfb_ratings_weekly) | 66 | 12.7 MB | 2026-08-06 |
+| [`cfb_recruiting_proj`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/cfb_recruiting_proj) | 11 | 0.1 MB | 2026-08-06 |
+| [`cfb_recruits`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/cfb_recruits) | 25 | 1.5 MB | 2026-08-19 |
+| [`cfb_returning_production`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/cfb_returning_production) | 21 | 0.1 MB | 2026-08-06 |
+| [`cfb_schedules`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/cfb_schedules) | 78 | 4.3 MB | 2026-08-27 |
+| [`cfb_team_info`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/cfb_team_info) | 52 | 5.0 MB | 2026-08-27 |
+| [`cfb_team_summaries_weekly`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/cfb_team_summaries_weekly) | 66 | 231.0 MB | 2026-08-06 |
+| [`cfb_team_talent`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/cfb_team_talent) | 22 | 0.2 MB | 2026-08-19 |
+| [`espn_cfb_adv_defensive`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_adv_defensive) | 66 | 6.6 MB | 2026-08-03 |
+| [`espn_cfb_adv_defensive_players`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_adv_defensive_players) | 66 | 13.3 MB | 2026-08-03 |
+| [`espn_cfb_adv_drives`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_adv_drives) | 66 | 6.0 MB | 2026-08-03 |
+| [`espn_cfb_adv_passing`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_adv_passing) | 66 | 23.3 MB | 2026-08-03 |
+| [`espn_cfb_adv_receiving`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_adv_receiving) | 66 | 46.2 MB | 2026-08-03 |
+| [`espn_cfb_adv_rushing`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_adv_rushing) | 66 | 25.3 MB | 2026-08-03 |
+| [`espn_cfb_adv_situational`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_adv_situational) | 66 | 27.4 MB | 2026-08-03 |
+| [`espn_cfb_adv_specialists`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_adv_specialists) | 66 | 14.9 MB | 2026-08-03 |
+| [`espn_cfb_adv_team`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_adv_team) | 66 | 29.0 MB | 2026-08-03 |
+| [`espn_cfb_adv_team_gamelog`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_adv_team_gamelog) | 66 | 31.3 MB | 2026-08-01 |
+| [`espn_cfb_adv_turnover`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_adv_turnover) | 66 | 5.0 MB | 2026-08-03 |
+| [`espn_cfb_betting`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_betting) | 48 | 0.3 MB | 2026-08-27 |
+| [`espn_cfb_drives`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_drives) | 45 | 23.0 MB | 2026-07-18 |
+| [`espn_cfb_game_rosters`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_game_rosters) | 45 | 406.8 MB | 2026-07-18 |
+| [`espn_cfb_injuries`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_injuries) | 0 | 0.0 MB | — |
+| [`espn_cfb_linescores`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_linescores) | 44 | 0.8 MB | 2026-07-18 |
+| [`espn_cfb_model_artifacts`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_model_artifacts) | 22 | 27.5 MB | 2026-06-23 |
+| [`espn_cfb_model_pbp`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_model_pbp) | 47 | 1,163.3 MB | 2026-07-12 |
+| [`espn_cfb_passing`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_passing) | 66 | 5.2 MB | 2026-08-06 |
+| [`espn_cfb_pbp`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_pbp) | 70 | 12,088.7 MB | 2026-08-03 |
+| [`espn_cfb_percentiles`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_percentiles) | 66 | 1.8 MB | 2026-08-06 |
+| [`espn_cfb_play_participants`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_play_participants) | 25 | 85.6 MB | 2026-07-18 |
+| [`espn_cfb_player_box`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_player_box) | 45 | 27.3 MB | 2026-07-18 |
+| [`espn_cfb_player_boxscores`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_player_boxscores) | 0 | 0.0 MB | — |
+| [`espn_cfb_power_index`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_power_index) | 47 | 1.8 MB | 2026-08-27 |
+| [`espn_cfb_receiving`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_receiving) | 66 | 13.6 MB | 2026-08-06 |
+| [`espn_cfb_rosters`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_rosters) | 70 | 115.0 MB | 2026-08-27 |
+| [`espn_cfb_rushing`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_rushing) | 66 | 9.0 MB | 2026-08-06 |
+| [`espn_cfb_schedules`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_schedules) | 48 | 1.4 MB | 2026-08-27 |
+| [`espn_cfb_team_box`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_team_box) | 48 | 2.3 MB | 2026-08-27 |
+| [`espn_cfb_team_boxscores`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_team_boxscores) | 0 | 0.0 MB | — |
+| [`espn_cfb_team_summaries`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_team_summaries) | 66 | 21.8 MB | 2026-08-06 |
+| [`espn_cfb_teams`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_teams) | 78 | 14.3 MB | 2026-08-27 |
+
+<!-- END GENERATED: status -->

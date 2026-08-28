@@ -117,7 +117,7 @@ def test_every_registry_model_is_reachable_from_a_stage():
         # Registry cells cite the FAMILY name as an operator types it
         # (`model_training/train_ep.py`, `python -m cpoe --loso`), not the
         # dotted import path, so match on the last segment.
-        cited = {p for p in on_disk if re.search(rf"\b{re.escape(p.split(".")[-1])}\b", row)}
+        cited = {p for p in on_disk if re.search(rf"\b{re.escape(p.split('.')[-1])}\b", row)}
         if not cited:
             continue  # row cites no in-repo package (e.g. an sdv-py entry point)
         if not (cited & set(stages)):

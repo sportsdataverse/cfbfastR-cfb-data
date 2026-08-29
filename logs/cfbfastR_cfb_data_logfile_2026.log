@@ -1,4 +1,5 @@
 From https://github.com/sportsdataverse/cfbfastR-cfb-data
+   c0ff108..de678cc  main                   -> origin/main
  * [new branch]      AE/update-air-yards-model -> origin/AE/update-air-yards-model
  * [new branch]      docs/automation-status -> origin/docs/automation-status
  * [new branch]      docs/model-registry-out-of-claude -> origin/docs/model-registry-out-of-claude
@@ -33,36 +34,36 @@ From https://github.com/sportsdataverse/cfbfastR-cfb-data
  * [new tag]         espn_cfb_rosters       -> espn_cfb_rosters
  * [new tag]         espn_cfb_schedules     -> espn_cfb_schedules
  * [new tag]         espn_cfb_team_box      -> espn_cfb_team_box
-pbp 2026: 0 rows from 946 games
-play_participants 2026: 0 rows from 946 games
-team_box 2026: 0 rows from 946 games
-player_box 2026: 0 rows from 946 games
-drives 2026: 0 rows from 946 games
-game_rosters 2026: 0 rows from 946 games
-betting 2026: 0 rows from 946 games
-schedules 2026: 0 rows from 946 games
-linescores 2026: 0 rows from 946 games
+pbp 2026: 0 rows from 947 games
+play_participants 2026: 0 rows from 947 games
+team_box 2026: 0 rows from 947 games
+player_box 2026: 0 rows from 947 games
+drives 2026: 0 rows from 947 games
+game_rosters 2026: 0 rows from 947 games
+betting 2026: 0 rows from 947 games
+schedules 2026: 0 rows from 947 games
+linescores 2026: 0 rows from 947 games
   power_index 2026: 1776 rows, 7 cols
 
 === power_index: 0 failures ===
-injuries 2026: 0 rows from 946 games
-adv_team 2026: 0 rows from 946 games
-adv_passing 2026: 0 rows from 946 games
-adv_rushing 2026: 0 rows from 946 games
-adv_receiving 2026: 0 rows from 946 games
-adv_defensive 2026: 0 rows from 946 games
-adv_turnover 2026: 0 rows from 946 games
-adv_drives 2026: 0 rows from 946 games
-adv_situational 2026: 0 rows from 946 games
-adv_defensive_players 2026: 0 rows from 946 games
-adv_specialists 2026: 0 rows from 946 games
+injuries 2026: 0 rows from 947 games
+adv_team 2026: 0 rows from 947 games
+adv_passing 2026: 0 rows from 947 games
+adv_rushing 2026: 0 rows from 947 games
+adv_receiving 2026: 0 rows from 947 games
+adv_defensive 2026: 0 rows from 947 games
+adv_turnover 2026: 0 rows from 947 games
+adv_drives 2026: 0 rows from 947 games
+adv_situational 2026: 0 rows from 947 games
+adv_defensive_players 2026: 0 rows from 947 games
+adv_specialists 2026: 0 rows from 947 games
   adv_team_gamelog 2026: 0 rows, skipped
 
 === gamelog: 0 failures ===
   cfb_schedules 2026: 3734 rows, 41 cols, fbs_game=761, fbs_participant=888, unplayed=0
 
 === cfb_schedules: 0 failures ===
-cfb_rosters 2026: 0 rows from 946/946 games | position 0.0% | division 0.0% | cfbd_recruit_ids 0.0% of 0 cfbd athletes
+cfb_rosters 2026: 0 rows from 947/947 games | position 0.0% | division 0.0% | cfbd_recruit_ids 0.0% of 0 cfbd athletes
   cfb_rosters 2026: 0 rows, skipped (season has not started)
 
 === cfb_rosters: 0 failures ===
@@ -102,4 +103,4 @@ cfb_rosters 2026: 0 rows from 946/946 games | position 0.0% | division 0.0% | cf
   cfb_returning_production 2026: 0 rows, skipped (season has no roster data yet)
 
 === returning_production: 0 failures ===
-nothing to commit for: CFB Data Updated (Start: 2026 End: 2026)
+pushed: CFB Data Updated (Start: 2026 End: 2026) (attempt 1)

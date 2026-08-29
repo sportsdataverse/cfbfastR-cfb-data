@@ -69,6 +69,9 @@ cfb_rosters 2026: 0 rows from 947/947 games | position 0.0% | division 0.0% | cf
 /home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/.venv/lib/python3.12/site-packages/sportsdataverse/cfb/cfb_loaders.py:571: UserWarning: load_cfb_pbp: no data for season(s) [2026] (skipped)
   cli_warn("load_cfb_pbp: no data for season(s) {missing} (skipped)".format(missing=missing))
 [summaries 2026] 0 plays, skipped (season has not started)
+terminate called without an active exception
+scripts/daily_cfb_processor.sh: line 108:  7460 Aborted                 (core dumped) ( cd python && "$PY" -m cfb_data_build --dataset "$ds" --base ../cfb -s "$i" -e "$i" "$@" )
+::warning ::cfb_data_build summaries for season 2026 exited with code 134
 /home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/.venv/lib/python3.12/site-packages/sportsdataverse/cfb/cfb_loaders.py:571: UserWarning: load_cfb_pbp: no data for season(s) [2026] (skipped)
   cli_warn("load_cfb_pbp: no data for season(s) {missing} (skipped)".format(missing=missing))
   !! ratings_weekly 2026: MISSING through_week [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] (0/15 built). Consumers joining week W+1 to through_week W will silently drop those games -- re-run this season before relying on it.

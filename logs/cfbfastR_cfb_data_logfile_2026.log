@@ -62,7 +62,7 @@ adv_specialists 2026: 0 rows from 947 games
   cfb_schedules 2026: 3734 rows, 41 cols, fbs_game=761, fbs_participant=888, unplayed=0
 
 === cfb_schedules: 0 failures ===
-cfb_rosters 2026: 0 rows from 947/947 games | position 0.0% | division 0.0% | cfbd_recruit_ids 0.0% of 0 cfbd athletes
+cfb_rosters 2026: 0 rows from 947/947 games | position 0.0% | division 0.0% | cfbd_recruit_ids 0.0% of 29305 cfbd athletes
   cfb_rosters 2026: 0 rows, skipped (season has not started)
 
 === cfb_rosters: 0 failures ===
@@ -97,9 +97,7 @@ cfb_rosters 2026: 0 rows from 947/947 games | position 0.0% | division 0.0% | cf
 
 === team_summaries_weekly: 0 failures ===
 ::warning::no 247 recruits store at /home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-raw/cfb/recruits/json; skipping recruiting datasets
-/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/.venv/lib/python3.12/site-packages/sportsdataverse/cfb/cfb_loaders.py:851: UserWarning: load_cfb_rosters: no data for season(s) [2026] (skipped)
-  cli_warn("load_cfb_rosters: no data for season(s) {missing} (skipped)".format(missing=missing))
-  cfb_returning_production 2026: 0 rows, skipped (season has no roster data yet)
+  cfb_returning_production 2026: 236 rows
 
 === returning_production: 0 failures ===
-nothing to commit for: CFB Data Updated (Start: 2026 End: 2026)
+pushed: CFB Data Updated (Start: 2026 End: 2026) (attempt 1)

@@ -1,5 +1,38 @@
-Auto packing the repository in background for optimum performance.
-See "git help gc" for manual housekeeping.
+From https://github.com/sportsdataverse/cfbfastR-cfb-data
+ * [new branch]      AE/update-air-yards-model -> origin/AE/update-air-yards-model
+ * [new branch]      docs/automation-status -> origin/docs/automation-status
+ * [new branch]      docs/model-registry-out-of-claude -> origin/docs/model-registry-out-of-claude
+ * [new branch]      feat/adv-missing-datasets -> origin/feat/adv-missing-datasets
+ * [new branch]      feat/cfb-era-vars-spread-backfill -> origin/feat/cfb-era-vars-spread-backfill
+ * [new branch]      feat/cfb-model-suite-completion -> origin/feat/cfb-model-suite-completion
+ * [new branch]      feat/cfb-ratings-builder -> origin/feat/cfb-ratings-builder
+ * [new branch]      feat/cfb-ratings-cron  -> origin/feat/cfb-ratings-cron
+ * [new branch]      feat/rosters-cfbd-enrich -> origin/feat/rosters-cfbd-enrich
+ * [new branch]      fix/bowl-season-cron   -> origin/fix/bowl-season-cron
+ * [new branch]      fix/cfb-recruiting-guard -> origin/fix/cfb-recruiting-guard
+ * [new branch]      fix/cfb-weekly-raw-store -> origin/fix/cfb-weekly-raw-store
+ * [new branch]      fix/preseason-missing-sources -> origin/fix/preseason-missing-sources
+ * [new branch]      fix/preseason-zero-rosters -> origin/fix/preseason-zero-rosters
+ * [new branch]      player_percents        -> origin/player_percents
+ * [new tag]         espn_cfb_adv_defensive -> espn_cfb_adv_defensive
+ * [new tag]         espn_cfb_adv_drives    -> espn_cfb_adv_drives
+ * [new tag]         espn_cfb_adv_passing   -> espn_cfb_adv_passing
+ * [new tag]         espn_cfb_adv_receiving -> espn_cfb_adv_receiving
+ * [new tag]         espn_cfb_adv_rushing   -> espn_cfb_adv_rushing
+ * [new tag]         espn_cfb_adv_situational -> espn_cfb_adv_situational
+ * [new tag]         espn_cfb_adv_team      -> espn_cfb_adv_team
+ * [new tag]         espn_cfb_adv_turnover  -> espn_cfb_adv_turnover
+ * [new tag]         espn_cfb_betting       -> espn_cfb_betting
+ * [new tag]         espn_cfb_drives        -> espn_cfb_drives
+ * [new tag]         espn_cfb_injuries      -> espn_cfb_injuries
+ * [new tag]         espn_cfb_linescores    -> espn_cfb_linescores
+ * [new tag]         espn_cfb_pbp           -> espn_cfb_pbp
+ * [new tag]         espn_cfb_play_participants -> espn_cfb_play_participants
+ * [new tag]         espn_cfb_player_box    -> espn_cfb_player_box
+ * [new tag]         espn_cfb_power_index   -> espn_cfb_power_index
+ * [new tag]         espn_cfb_rosters       -> espn_cfb_rosters
+ * [new tag]         espn_cfb_schedules     -> espn_cfb_schedules
+ * [new tag]         espn_cfb_team_box      -> espn_cfb_team_box
   pos_team: 100.0% of rows resolved to a team name
   def_pos_team: 100.0% of rows resolved to a team name
 pbp 2026: 1233 rows from 948 games
@@ -133,15 +166,11 @@ cfb_rosters 2026: 476 rows from 948/948 games | position 100.0% | division 100.0
   cfb_team_summaries_weekly 2026: 240 rows, 384 cols, 15 weekly snapshots
 
 === team_summaries_weekly: 0 failures ===
-  cfb_recruits 2026: 4453 rows
-
-=== recruits: 0 failures ===
-  cfb_team_talent 2026: 312 rows
-
-=== team_talent: 0 failures ===
+::warning::no 247 recruits store at /home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-raw/cfb/recruits/json; skipping recruiting datasets
   cfb_returning_production 2026: FAILED (ValueError: returning production [cfb_returning_production 2026]: off_returning mean=0.006 is outside [0.05, 0.95]; a real season lands near 0.40-0.60)
 
 === returning_production: 1 failures ===
   2026: ValueError
 ::warning ::cfb_data_build returning_production for season 2026 exited with code 1
-pushed: CFB Data Updated (Start: 2026 End: 2026) (attempt 1)
+push rejected (attempt 1); syncing with origin
+pushed: CFB Data Updated (Start: 2026 End: 2026) (attempt 2)

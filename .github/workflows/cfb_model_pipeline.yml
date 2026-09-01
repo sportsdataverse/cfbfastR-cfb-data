@@ -116,7 +116,8 @@ jobs:
           # order breaks this step. Prefer the new numbered path; fall back to legacy.
           # REMOVE the fallback (and this note) once cfb-raw's main no longer ships
           # python/scrape_cfb_qbr.py.
-          QBR_SCRAPER="$GITHUB_WORKSPACE/_raw/python/espn_cfb_13_qbr_scrape.py"
+          QBR_SCRAPER="$GITHUB_WORKSPACE/_raw/python/espn_cfb_08_qbr_scrape.py"
+          [ -f "$QBR_SCRAPER" ] || QBR_SCRAPER="$GITHUB_WORKSPACE/_raw/python/espn_cfb_13_qbr_scrape.py"
           [ -f "$QBR_SCRAPER" ] || QBR_SCRAPER="$GITHUB_WORKSPACE/_raw/python/scrape_cfb_qbr.py"
           # If NEITHER name is present the cause is upstream (a path change, or a
           # sparse-checkout that stopped fetching python/) -- not a scrape failure.
@@ -126,7 +127,7 @@ jobs:
           if [ -f "$QBR_SCRAPER" ]; then
             uv run python "$QBR_SCRAPER" -s 2004 -e "$(date +%Y)" --out artifacts/espn_qbr.parquet || true
           else
-            echo "::warning ::no qbr scraper in _raw (looked for espn_cfb_13_qbr_scrape.py and scrape_cfb_qbr.py); skipping QBR"
+            echo "::warning ::no qbr scraper in _raw (looked for espn_cfb_08_qbr_scrape.py, espn_cfb_13_qbr_scrape.py and scrape_cfb_qbr.py); skipping QBR"
           fi
           if [ -f artifacts/espn_qbr.parquet ]; then \
             uv run python -m cfb_model_build.model_training train-qbr --pbp artifacts/pbp_full.parquet --espn-qbr artifacts/espn_qbr.parquet --out artifacts/qbr.ubj; fi

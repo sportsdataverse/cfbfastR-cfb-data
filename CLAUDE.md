@@ -37,10 +37,11 @@ The native model suite moved here from `-raw` (2026-06-17). Run from `python/`:
 | `cpoe` | `python -m cfb_model_build.cpoe` | — |
 
 Cross-repo dependency: `.github/workflows/cfb_model_pipeline.yml` runs `cfbfastR-cfb-raw`'s
-QBR scraper (sparse checkout at `_raw`) for the ESPN-QBR reference. The step accepts BOTH
-`python/espn_cfb_13_qbr_scrape.py` (preferred) and the legacy `python/scrape_cfb_qbr.py`, so
-either cfb-raw generation works. Drop the legacy fallback once cfb-raw's `main` stops
-shipping `python/scrape_cfb_qbr.py`.
+QBR scraper (sparse checkout at `_raw`) for the ESPN-QBR reference. The step tries
+`python/espn_cfb_08_qbr_scrape.py` (the current numbered stage; the implementation lives in
+`python/cfb_raw_scrape/scrape_cfb_qbr.py`), falling back to the two legacy names
+(`espn_cfb_13_qbr_scrape.py`, top-level `scrape_cfb_qbr.py`) so any cfb-raw generation works.
+Drop the fallbacks once cfb-raw's numbering is stable.
 
 Supporting packages: `cfb_data_ingest`, `cfb_model_pbp`, `cfb_model_publish`,
 `cfb_model_reports`. Figures: `uv sync --group figures` (plotnine). GAM tests (`rb_eval`):

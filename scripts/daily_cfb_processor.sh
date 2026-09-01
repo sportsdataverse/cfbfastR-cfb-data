@@ -51,6 +51,13 @@ PY_WEEKLY="ratings_weekly team_summaries_weekly"
 # both. run_py does `cd python`, so the raw root must be absolute or resolve
 # from there -- CFB_RAW_ROOT is exported below for exactly that reason.
 PY_RECRUITING="recruits team_talent returning_production"
+
+# Where cfb_data_build caches final.json, relative to python/ (the CLI default).
+# For a multi-season republish on a box that has cfbfastR-cfb-raw checked out,
+# point it at that repo's cfb/json/final: fetch_final skips files that already
+# exist, so the pbp step reads the finals in place instead of re-downloading
+# ~2.7 GB per season from raw.githubusercontent.com.
+CFB_FINAL_CACHE="${CFB_FINAL_CACHE:-.cache/cfb_final}"
 export CFB_RAW_ROOT="${CFB_RAW_ROOT:-$(cd "$(dirname "$0")/../../cfbfastR-cfb-raw" 2>/dev/null && pwd)}"
 
 mkdir -p logs
@@ -107,7 +114,7 @@ for i in $(seq "${START_YEAR}" "${END_YEAR}"); do
     # Build one Python dataset (writes to the repo-root cfb/ via --base ../cfb).
     run_py() {
       local ds="$1"; shift
-      (cd python && "$PY" -m cfb_data_build --dataset "$ds" --base ../cfb -s "$i" -e "$i" "$@") || {
+      (cd python && "$PY" -m cfb_data_build --dataset "$ds" --base ../cfb --cache-dir "$CFB_FINAL_CACHE" -s "$i" -e "$i" "$@") || {
         rc=$?; echo "::warning ::cfb_data_build $ds for season $i exited with code $rc"; SEASON_RC=$rc
       }
     }

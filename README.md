@@ -174,6 +174,99 @@ fixture (`tests/testthat/`).
 
 <!-- END GENERATED: status -->
 
+## Repository layout
+
+<!-- BEGIN GENERATED: layout -->
+
+```
+cfbfastR-cfb-data/
+├── R/   # R pipeline stages and publish toolchain
+│   ├── presentation/
+│   ├── _data_utils.R
+│   ├── espn_cfb_01_pbp_creation.R
+│   ├── espn_cfb_02_team_box_creation.R
+│   ├── espn_cfb_03_player_box_creation.R
+│   ├── espn_cfb_04_adv_box_creation.R
+│   ├── espn_cfb_05_play_participants_creation.R
+│   ├── espn_cfb_06_drives_creation.R
+│   ├── espn_cfb_07_game_rosters_creation.R
+│   ├── espn_cfb_08_rosters_creation.R
+│   ├── espn_cfb_09_betting_creation.R
+│   ├── espn_cfb_10_schedules_creation.R
+│   ├── espn_cfb_11_linescores_creation.R
+│   ├── espn_cfb_12_power_index_creation.R
+│   ├── espn_cfb_14_injuries_creation.R
+│   ├── espn_cfb_15_team_summaries_creation.R
+│   └── … 3 more
+├── cfb/
+│   ├── adv_defensive/
+│   ├── adv_defensive_players/
+│   ├── adv_drives/
+│   ├── adv_passing/
+│   ├── adv_receiving/
+│   ├── adv_rushing/
+│   ├── adv_situational/
+│   ├── adv_specialists/
+│   └── … 31 more
+├── dev/   # working notes, not part of the pipeline
+│   └── session-notes/
+├── docs/   # explainers, model reports and dataset docs
+│   ├── audits/
+│   ├── models/
+│   └── superpowers/
+├── logs/   # per-run logs (gitignored where large)
+├── models/   # model artifacts, cards and the registry
+├── ops/   # cron definitions and runbooks
+├── out/
+│   └── cfb_recruiting_proj/
+├── python/   # Python pipeline stages, numbered in build order
+│   ├── artifacts/
+│   ├── betting/
+│   ├── cfb/
+│   ├── cfb_data_build/
+│   ├── cfb_data_ingest/
+│   ├── cfb_higher_models/
+│   ├── cfb_model_build/
+│   ├── cfb_model_pbp/
+│   ├── cfb_model_publish/
+│   ├── cfb_model_reports/
+│   ├── cpoe/
+│   ├── model_training/
+│   ├── pregame_wp/
+│   ├── rb_eval/
+│   ├── _model_stage.py
+│   ├── _shim.py
+│   └── … 36 more
+├── scripts/   # bash drivers (the daily/weekly entry points)
+│   ├── 10_build_recruiting.sh
+│   ├── _venv.sh
+│   ├── cfb_models.sh
+│   ├── daily_cfb_R_processor.sh
+│   └── daily_cfb_processor.sh
+├── tests/   # test suite
+│   ├── cfb_data_build/
+│   ├── cfb_data_ingest/
+│   ├── cfb_model_pbp/
+│   ├── cfb_model_publish/
+│   ├── cfb_model_reports/
+│   ├── cpoe/
+│   ├── fixtures/
+│   ├── model_training/
+│   ├── pregame_wp/
+│   ├── rb_eval/
+│   ├── testthat/
+│   ├── __init__.py
+│   ├── conftest.py
+│   ├── test_higher_models_features.py
+│   ├── test_model_manifest.py
+│   ├── test_model_registry.py
+│   └── … 6 more
+└── tools/   # repo-local helper scripts
+    └── hooks/
+```
+
+<!-- END GENERATED: layout -->
+
 ## Reports & explainers
 
 <!-- BEGIN GENERATED: reports -->

@@ -1,5 +1,4 @@
 From https://github.com/sportsdataverse/cfbfastR-cfb-data
-   8d0a7b1..09c1bc7  main                   -> origin/main
  * [new branch]      AE/update-air-yards-model -> origin/AE/update-air-yards-model
  * [new branch]      docs/automation-status -> origin/docs/automation-status
  * [new branch]      docs/model-registry-out-of-claude -> origin/docs/model-registry-out-of-claude
@@ -75,9 +74,11 @@ adv_specialists 2026: 61 rows from 948 games
   adv_team_gamelog 2026: 16 rows, 90 cols
 
 === gamelog: 0 failures ===
-  cfb_schedules 2026: 3679 rows, 41 cols, fbs_game=761, fbs_participant=888, unplayed=0
+  cfb_schedules 2026: FAILED TimeoutError: The read operation timed out
 
-=== cfb_schedules: 0 failures ===
+=== cfb_schedules: 1 failures ===
+  2026: TimeoutError: The read operation timed out
+::warning ::cfb_data_build cfb_schedules for season 2026 exited with code 1
 cfb_rosters 2026: 476 rows from 948/948 games | position 100.0% | division 100.0% | cfbd_recruit_ids 98.7% of 29305 cfbd athletes
 
 === cfb_rosters: 0 failures ===

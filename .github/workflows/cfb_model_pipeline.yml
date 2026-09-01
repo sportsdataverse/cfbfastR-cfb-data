@@ -35,6 +35,11 @@ concurrency:
 on:
   workflow_dispatch:
     inputs:
+      stages:
+        description: 'Model families to run (space-separated: core fd cpoe loso model_pbp); empty = all. extras/t4 keep their own toggles.'
+        required: false
+        type: string
+        default: ''
       publish:
         description: 'Publish artifacts + model-PBP to sportsdataverse-data releases'
         required: false
@@ -99,6 +104,7 @@ jobs:
         run: uv run python -m cfb_model_build.model_training ingest --final-dir "$FINAL_DIR" --out artifacts/pbp_full.parquet
 
       - name: Train EP / WP / QBR
+        if: ${{ github.event_name == 'schedule' || !inputs.stages || contains(inputs.stages, 'core') }}
         run: |
           uv run python -m cfb_model_build.model_training train-ep --pbp artifacts/pbp_full.parquet --out artifacts/ep.ubj
           uv run python -m cfb_model_build.model_training train-wp --pbp artifacts/pbp_full.parquet --variant spread --out artifacts/wp_spread.ubj
@@ -126,6 +132,7 @@ jobs:
             uv run python -m cfb_model_build.model_training train-qbr --pbp artifacts/pbp_full.parquet --espn-qbr artifacts/espn_qbr.parquet --out artifacts/qbr.ubj; fi
 
       - name: Train fourth-down
+        if: ${{ github.event_name == 'schedule' || !inputs.stages || contains(inputs.stages, 'fd') }}
         run: uv run python -m cfb_model_build.model_training.fourth_down.cli train-fd --final-dir "$FINAL_DIR" --out artifacts/fd_model.ubj --validate
 
       # The extras trainers are committed but had NO trigger of any kind, so their
@@ -142,6 +149,7 @@ jobs:
           uv run python -m cfb_model_build.model_training train-wp --pbp artifacts/pbp_full.parquet --variant naive --out artifacts/wp_naive.ubj
 
       - name: Train CPOE (+ LOSO) and promote cp model
+        if: ${{ github.event_name == 'schedule' || !inputs.stages || contains(inputs.stages, 'cpoe') }}
         run: |
           uv run python -m cfb_model_build.cpoe --final-dir "$FINAL_DIR" --out-dir artifacts/cpoe --seasons $(seq 2004 "$(date +%Y)") --loso
           cp artifacts/cpoe/cfb_cp_model.ubj artifacts/cfb_cp_model.ubj
@@ -151,6 +159,7 @@ jobs:
       # ---- out-of-fold predictions feed the report calibration metrics ----
       # cfb_model_reports reads these loso_*_oof.parquet files out of --artifacts.
       - name: LOSO out-of-fold predictions (EP / WP / QBR)
+        if: ${{ github.event_name == 'schedule' || !inputs.stages || contains(inputs.stages, 'loso') }}
         run: |
           uv run python -m cfb_model_build.model_training loso --pbp artifacts/pbp_full.parquet --model ep --oof-out artifacts/loso_ep_oof.parquet
           uv run python -m cfb_model_build.model_training loso --pbp artifacts/pbp_full.parquet --model wp --oof-out artifacts/loso_wp_oof.parquet
@@ -159,6 +168,7 @@ jobs:
 
       # ---- scored model play-by-play ----
       - name: Build scored model-PBP
+        if: ${{ github.event_name == 'schedule' || !inputs.stages || contains(inputs.stages, 'model_pbp') }}
         run: uv run python -m cfb_model_build.cfb_model_pbp --final-dir "$FINAL_DIR" --cp-model artifacts/cfb_cp_model.ubj --out artifacts/model_pbp/cfb_model_pbp_full.parquet
 
       # ---- Track 4 (optional; CFBD-sourced, needs the secret) ----

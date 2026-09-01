@@ -142,3 +142,14 @@ fixture (`tests/testthat/`).
 | [`espn_cfb_teams`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_teams) | 78 | 14.3 MB | 2026-08-27 |
 
 <!-- END GENERATED: status -->
+
+## Reports & explainers
+
+<!-- BEGIN GENERATED: reports -->
+
+| Report | What it is | Last updated |
+|---|---|---|
+| [Model registry](models/REGISTRY.md) | model | artifact | gates | retrain, one row per published model | 2026-08-28 |
+| [Model reports & cards](docs/models/) | 12 files, one per item | 2026-08-27 |
+
+<!-- END GENERATED: reports -->

@@ -36,5 +36,9 @@ import sys
 PACKAGE = "cfb_model_build.cpoe"
 
 if __name__ == "__main__":
-    sys.argv[0] = f"python -m {PACKAGE}"
-    runpy.run_module(PACKAGE, run_name="__main__", alter_sys=True)
+    # Fingerprint + ledger runtime (Track C steps 3+5): skips when
+    # hash(package subtree, argv) is unchanged and the argv's --out artifacts
+    # exist; --force retrains. Appends models/ledger.jsonl on success.
+    from _model_stage import run
+
+    raise SystemExit(run(PACKAGE))

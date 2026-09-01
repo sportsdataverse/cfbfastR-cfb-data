@@ -64,3 +64,6 @@ logs/*
 # path, so the output root follows the working directory. 15 GB / 6,941 files
 # here as of 2026-08-29. Never commit it; the real tree is cfb/ at repo root.
 python/cfb/
+
+# per-stage fingerprint store (local skip cache, never committed)
+python/artifacts/.fingerprints.json

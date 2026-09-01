@@ -33,6 +33,7 @@ dev = [
     "pytest>=8.0",
     "joblib>=1.3",
     "optuna>=4.9.0",
+    "pyyaml>=6.0.3",
 ]
 figures = ["plotnine>=0.13", "statsmodels>=0.14", "pillow>=10.0"]
 gam = ["pygam>=0.9"]

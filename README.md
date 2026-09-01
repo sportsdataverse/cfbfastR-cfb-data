@@ -5,6 +5,37 @@ JSON in [`cfbfastR-cfb-raw`](https://github.com/sportsdataverse/cfbfastR-cfb-raw
 heavy lifting (EPA/WPA/QBR, advanced box score) already happened in Python in the `-raw`
 repo — this repo does **no re-enrichment**, only rectangularization into parquet/csv/rds.
 
+
+## Pipeline diagrams
+
+```mermaid
+graph LR;
+    A[cfbfastR-cfb-raw final JSON] --> B[cfbfastR-cfb-data];
+    B --> T1[espn_cfb_model_artifacts];
+    B --> T2[espn_cfb_model_pbp];
+    B --> T3[cfb_ratings];
+    B --> T4[cfb_recruiting_proj];
+    B --> T5[espn_cfb_* dataset tags];
+```
+
+```mermaid
+flowchart TB;
+    subgraph DATA[dataset stages];
+        direction TB;
+        S1[python/espn_cfb_01_pbp_creation.py ... 15_team_summaries_creation.py] --> S2[python/espn_cfb_20_adv_team_creation.py ... 29_adv_specialists_creation.py];
+    end;
+    subgraph MODELS[model stages - scripts/cfb_models.sh];
+        direction TB;
+        M1[python/cfb_model_10_pbp_creation.py] --> M2[python/cfb_model_30_train_creation.py];
+        M2 --> M3[python/cfb_model_31_cpoe_creation.py];
+        M2 --> M4[python/cfb_model_32_pregame_wp_creation.py];
+        M2 --> M5[python/cfb_model_33_rb_eval_creation.py];
+        M3 --> M6[python/cfb_model_60_publish_creation.py];
+        M6 --> M7[python/cfb_model_70_reports_creation.py];
+    end;
+    DATA --> MODELS;
+```
+
 ## What it produces
 
 Per compiled season, one table per dataset (see **[DATASETS.md](DATASETS.md)** for the full
@@ -153,3 +184,47 @@ fixture (`tests/testthat/`).
 | [Model reports & cards](docs/models/) | 17 files, one per item | 2026-09-01 |
 
 <!-- END GENERATED: reports -->
+
+## Consumers
+
+The packages that read what this repo produces:
+
+- **R:** [cfbfastR](https://cfbfastR.sportsdataverse.org) — docs at <https://cfbfastR.sportsdataverse.org>
+- **Python:** [`sportsdataverse.cfb`](https://github.com/sportsdataverse/sportsdataverse-py) — docs at <https://py.sportsdataverse.org>
+
+## Stage inventory
+
+Every numbered pipeline stage in `python/` (auto-listed; run subsets with the `scripts/*.sh` drivers by number or name):
+
+- `python/cfb_model_10_pbp_creation.py`
+- `python/cfb_model_30_train_creation.py`
+- `python/cfb_model_31_cpoe_creation.py`
+- `python/cfb_model_32_pregame_wp_creation.py`
+- `python/cfb_model_33_rb_eval_creation.py`
+- `python/cfb_model_34_higher_models_creation.py`
+- `python/cfb_model_60_publish_creation.py`
+- `python/cfb_model_70_reports_creation.py`
+- `python/espn_cfb_01_pbp_creation.py`
+- `python/espn_cfb_02_team_box_creation.py`
+- `python/espn_cfb_03_player_box_creation.py`
+- `python/espn_cfb_04_adv_box_creation.py`
+- `python/espn_cfb_05_play_participants_creation.py`
+- `python/espn_cfb_06_drives_creation.py`
+- `python/espn_cfb_07_game_rosters_creation.py`
+- `python/espn_cfb_08_rosters_creation.py`
+- `python/espn_cfb_09_betting_creation.py`
+- `python/espn_cfb_10_schedules_creation.py`
+- `python/espn_cfb_11_linescores_creation.py`
+- `python/espn_cfb_12_power_index_creation.py`
+- `python/espn_cfb_14_injuries_creation.py`
+- `python/espn_cfb_15_team_summaries_creation.py`
+- `python/espn_cfb_20_adv_team_creation.py`
+- `python/espn_cfb_21_adv_passing_creation.py`
+- `python/espn_cfb_22_adv_rushing_creation.py`
+- `python/espn_cfb_23_adv_receiving_creation.py`
+- `python/espn_cfb_24_adv_defensive_creation.py`
+- `python/espn_cfb_25_adv_turnover_creation.py`
+- `python/espn_cfb_26_adv_drives_creation.py`
+- `python/espn_cfb_27_adv_situational_creation.py`
+- `python/espn_cfb_28_adv_defensive_players_creation.py`
+- `python/espn_cfb_29_adv_specialists_creation.py`

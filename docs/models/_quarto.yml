@@ -17,6 +17,7 @@ website:
     contents:
       - index.qmd
       - era_model_refresh.md
+      - deepdive.qmd
       - section: "Play-level (Track 1)"
         contents:
           - ep.md

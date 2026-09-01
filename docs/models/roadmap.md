@@ -21,3 +21,7 @@ here where regeneration cannot clobber them).*
 | model_pbp | schema-version contract for consumers | promotion/republish window (scores lag a promotion until the next cron) |
 | cfb_ratings | recruiting prior for early season; intervals | Spearman gates are scale-blind — keep the level-band checks |
 | cfb_recruiting_proj | unblock pred_net_epa via this repo's model_pbp; portal-aware retention | retention Spearman 0.229 (weak ordinal, stated) |
+
+Suite-level EDA / SHAP / identified results live in the compiled Quarto
+companion [deepdive.md](deepdive.md) (source `deepdive.qmd`, rendered by
+`scripts/render_model_docs.sh`).

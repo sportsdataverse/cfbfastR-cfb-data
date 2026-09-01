@@ -67,3 +67,4 @@ python/cfb/
 
 # per-stage fingerprint store (local skip cache, never committed)
 python/artifacts/.fingerprints.json
+docs/models/.cache/

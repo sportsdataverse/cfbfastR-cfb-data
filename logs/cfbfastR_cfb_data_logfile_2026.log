@@ -170,4 +170,5 @@ cfb_rosters 2026: 476 rows from 948/948 games | position 100.0% | division 100.0
   cfb_returning_production 2026: 236 rows
 
 === returning_production: 0 failures ===
-pushed: CFB Data Updated (Start: 2026 End: 2026) (attempt 1)
+push rejected (attempt 1); syncing with origin
+pushed: CFB Data Updated (Start: 2026 End: 2026) (attempt 2)

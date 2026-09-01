@@ -1,5 +1,4 @@
 From https://github.com/sportsdataverse/cfbfastR-cfb-data
-   70c0d0f..a71a3e2  main                   -> origin/main
  * [new branch]      AE/update-air-yards-model -> origin/AE/update-air-yards-model
  * [new branch]      docs/automation-status -> origin/docs/automation-status
  * [new branch]      docs/model-registry-out-of-claude -> origin/docs/model-registry-out-of-claude
@@ -168,9 +167,7 @@ cfb_rosters 2026: 476 rows from 948/948 games | position 100.0% | division 100.0
 
 === team_summaries_weekly: 0 failures ===
 ::warning::no 247 recruits store at /home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-raw/cfb/recruits/json; skipping recruiting datasets
-  cfb_returning_production 2026: FAILED (ValueError: returning production [cfb_returning_production 2026]: off_returning mean=0.006 is outside [0.05, 0.95]; a real season lands near 0.40-0.60)
+  cfb_returning_production 2026: 236 rows
 
-=== returning_production: 1 failures ===
-  2026: ValueError
-::warning ::cfb_data_build returning_production for season 2026 exited with code 1
+=== returning_production: 0 failures ===
 pushed: CFB Data Updated (Start: 2026 End: 2026) (attempt 1)

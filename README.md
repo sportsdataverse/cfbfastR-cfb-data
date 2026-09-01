@@ -150,6 +150,6 @@ fixture (`tests/testthat/`).
 | Report | What it is | Last updated |
 |---|---|---|
 | [Model registry](models/REGISTRY.md) | model | artifact | gates | retrain, one row per published model | 2026-08-28 |
-| [Model reports & cards](docs/models/) | 12 files, one per item | 2026-08-27 |
+| [Model reports & cards](docs/models/) | 17 files, one per item | 2026-09-01 |
 
 <!-- END GENERATED: reports -->

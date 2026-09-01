@@ -1,5 +1,5 @@
 From https://github.com/sportsdataverse/cfbfastR-cfb-data
-   1a805da..70da6a5  main                   -> origin/main
+   c71811d..a4d3d7d  main                   -> origin/main
  * [new branch]      AE/update-air-yards-model -> origin/AE/update-air-yards-model
  * [new branch]      docs/automation-status -> origin/docs/automation-status
  * [new branch]      docs/model-registry-out-of-claude -> origin/docs/model-registry-out-of-claude
@@ -168,9 +168,10 @@ cfb_rosters 2026: 476 rows from 948/948 games | position 100.0% | division 100.0
 
 === team_summaries_weekly: 0 failures ===
 ::warning::no 247 recruits store at /home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-raw/cfb/recruits/json; skipping recruiting datasets
-  cfb_returning_production 2026: FAILED (ColumnNotFoundError: unable to find column "team"; valid columns: ["season", "team_id", "athlete_id", "division", "position_id", "position", "position_abbreviation", "position_name", "position_leaf", "position_parent_id", "games_rostered", "athlete_uid", "athlete_guid", "athlete_type", "first_name", "middle_name", "last_name", "full_name", "display_name", "athlete_display_name", "short_name", "nickname", "slug", "jersey", "jersey_right", "weight", "display_weight", "height", "display_height", "age", "date_of_birth", "hand_type", "hand_abbreviation", "hand_display_value", "linked", "active", "alternate_ids_sdr", "birth_place_city", "birth_place_state", "birth_place_country", "birth_country_alternate_id", "birth_country_abbreviation", "citizenship", "flag_href", "flag_alt", "flag_rel", "headshot_href", "headshot_alt", "experience_years", "experience_display_value", "experience_abbreviation", "status_id", "status_name", "status_type", "status_abbreviation", "draft_display_text", "draft_round", "draft_year", "draft_selection", "draft_team_href", "team_guid", "team_uid", "team_slug", "team_location", "team_name", "team_nickname", "team_abbreviation", "team_display_name", "team_short_display_name", "team_color", "team_alternate_color", "team_alternate_ids_sdr", "is_active", "is_all_star", "logo_href", "logo_dark_href", "athlete_href", "position_href", "cfbd_recruit_ids", "cfbd_home_city", "cfbd_home_state", "cfbd_home_country", "cfbd_home_latitude", "cfbd_home_longitude", "cfbd_home_county_fips"])
+  cfb_returning_production 2026: FAILED (ValueError: returning production [cfb_returning_production 2026]: off_returning mean=0.006 is outside [0.05, 0.95]; a real season lands near 0.40-0.60)
 
 === returning_production: 1 failures ===
-  2026: ColumnNotFoundError
+  2026: ValueError
 ::warning ::cfb_data_build returning_production for season 2026 exited with code 1
-pushed: CFB Data Updated (Start: 2026 End: 2026) (attempt 1)
+push rejected (attempt 1); syncing with origin
+pushed: CFB Data Updated (Start: 2026 End: 2026) (attempt 2)

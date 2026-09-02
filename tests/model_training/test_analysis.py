@@ -68,7 +68,7 @@ def test_export_writes_one_parquet_per_model_and_a_manifest(tmp_path):
         "analysis_xpass.parquet",
     ]
     m = json.loads((tmp_path / "analysis" / "analysis_manifest.json").read_text())
-    assert m["source_frame"] == str(src)
+    assert m["source_frame"] == str(src) and len(m["source_sha256"]) == 64 and m["source_bytes"] == src.stat().st_size
     assert m["models"]["wp"]["features"] == C.WP_SPREAD_FEATURES and m["models"]["wp"]["n_rows"] == 4
     xp = pl.read_parquet(tmp_path / "analysis" / "analysis_xpass.parquet")
     assert xp.columns[-1] == "label" and xp.schema["id"] == pl.Int64  # pinned at the boundary

@@ -13,6 +13,7 @@ order per model).
 
 from __future__ import annotations
 
+import hashlib
 import json
 from datetime import datetime, timezone
 from pathlib import Path
@@ -109,8 +110,14 @@ def export_analysis_frames(pbp: str | Path, out_dir: str | Path, models: tuple[s
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     frames = build_frames(read_source(pbp), models)
+    h = hashlib.sha256()
+    with open(pbp, "rb") as fh:  # ties the frames to the exact bytes the boosters' cards name
+        for chunk in iter(lambda: fh.read(1 << 24), b""):
+            h.update(chunk)
     manifest: dict[str, object] = {
         "source_frame": str(pbp),
+        "source_sha256": h.hexdigest(),
+        "source_bytes": Path(pbp).stat().st_size,
         "written": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "models": {},
     }

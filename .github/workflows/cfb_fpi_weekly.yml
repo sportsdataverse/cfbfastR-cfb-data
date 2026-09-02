@@ -1,0 +1,96 @@
+name: CFB FPI Weekly
+
+# Captures this season's weekly ESPN Football Power Index snapshot
+# (`cfb_fpi_weekly`, stage 13) and publishes it to sportsdataverse-data.
+#
+# WHY THIS HAS ITS OWN SCHEDULE, and does not ride daily_cfb.yml:
+# every other dataset in this repo can be rebuilt from the raw store whenever
+# the daily job recovers. This one cannot. ESPN OVERWRITES the week-1 slot with
+# a late-season computation -- 2024's week 1 is stamped 2024-12-15, LATER than
+# that season's week 16 -- so an as-of-week-N rating exists only in a capture
+# taken during week N, and no backfill can recover one. Coupling an
+# unrecoverable capture to a 25-dataset job means one of its failures costs a
+# week permanently.
+#
+# WHY DAILY rather than a weekly cron: ESPN posts the new week on its own
+# schedule, so a once-a-week trigger can miss the posting day by up to six days
+# and capture a stamp that much less contemporaneous -- which is the whole
+# property this job exists to preserve. A run that finds no new week is a clean
+# no-op: the builder preserves weeks already on disk, appends only new keys, and
+# writes/commits/publishes nothing when the count added is zero (~40 HTTP
+# requests, no commit, exit 0). The season windows mirror daily_cfb.yml's.
+
+# Serialize against every other workflow in this repo that commits: two runs in
+# flight put one behind origin and its push is rejected. Offset +3h from
+# daily_cfb.yml (11:00) and +1h from cfb_ratings_cron.yml (13:00) so the common
+# case does not queue at all.
+concurrency:
+  group: ${{ github.repository }}-commit
+  cancel-in-progress: false
+
+on:
+  schedule:
+    - cron: '0 14 * 8 *'      # August (preseason -- FPI publishes before week 1)
+    - cron: '0 14 * 9-11 *'   # September-November (regular season)
+    - cron: '0 14 * 12 *'     # December -- most bowls fall Dec 21-31
+    - cron: '0 14 1-25 1 *'   # January bowls + CFP, past the ~Jan 19-20 final
+  workflow_dispatch:
+    inputs:
+      season:
+        description: 'Season to capture. Default: the current CFB season.'
+        required: false
+        type: string
+      dry_run:
+        description: 'Build + report only; never write, commit or publish'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  fpi_weekly:
+    runs-on: ubuntu-latest
+    steps:
+      # Full checkout, not sparse: the builder MERGES against the committed
+      # cfb/fpi_weekly parquet to decide what is new, and a checkout without it
+      # would re-fetch the whole season and overwrite the earlier captures this
+      # job exists to preserve.
+      - uses: actions/checkout@v5
+
+      - name: Set up uv + Python
+        uses: astral-sh/setup-uv@v8.1.0
+        with:
+          python-version: '3.12'
+          cache-dependency-glob: python/uv.lock
+
+      - name: Install Python deps
+        working-directory: python
+        run: uv sync --frozen
+
+      - name: Resolve season
+        env:
+          # Via env, not `${{ }}` inline in `run:` -- a dispatch input
+          # interpolated straight into the shell is an injection sink.
+          SEASON_INPUT: ${{ inputs.season }}
+        run: |
+          if [ -n "$SEASON_INPUT" ]; then
+            YR="$SEASON_INPUT"
+          else
+            # The CFB season rolls over on Aug 15, same rule as daily_cfb.yml.
+            # 10# forces base 10 -- bash reads a zero-padded "08" as octal.
+            Y=$(date -u +%Y); M=$((10#$(date -u +%m))); D=$((10#$(date -u +%d)))
+            if [ "$M" -gt 8 ] || { [ "$M" -eq 8 ] && [ "$D" -ge 15 ]; }; then
+              YR=$Y
+            else
+              YR=$((Y - 1))
+            fi
+          fi
+          echo "SEASON=$YR" >> "$GITHUB_ENV"
+          echo "capturing cfb_fpi_weekly for season $YR"
+
+      - name: Capture + publish cfb_fpi_weekly ${{ env.SEASON }}
+        env:
+          GH_TOKEN: ${{ secrets.SDV_GH_TOKEN }}   # gh CLI release upload
+        run: bash scripts/cfb_fpi_weekly.sh -s "$SEASON" ${{ inputs.dry_run && '-n' || '' }}

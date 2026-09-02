@@ -417,3 +417,37 @@ def test_build_writes_the_declared_schema_even_from_a_drifted_prior(tmp_path):
     assert written == {"espn_nfl_injuries/injuries_2026.parquet": 3}
     assert list(on_disk.columns) == list(snap.SCHEMA)
     assert on_disk.schema["athlete_id"] == pl.Int64
+
+
+def test_a_utf8_prior_does_not_leave_the_asset_lexically_sorted():
+    """`diagonal_relaxed` promotes to a supertype, so a prior asset written when
+    these ids were Utf8 makes the merge Utf8 -- and sorting THERE is lexical:
+    "10" before "2". Casting afterwards keeps the wrong order, so the cast has to
+    come first. Concrete: this PR is itself the Utf8 -> Int64 migration."""
+    prior = pl.DataFrame(
+        {
+            "as_of_date": [date(2026, 9, 1)] * 3,
+            "league": ["nfl"] * 3,
+            "team_id": ["10", "2", "1"],
+            "athlete_id": ["1", "2", "3"],
+            "injury_id": ["1", "2", "3"],
+        }
+    )
+    today = pl.DataFrame(
+        [
+            {
+                **{column: None for column in snap.SCHEMA},
+                "as_of_date": date(2026, 9, 2),
+                "league": "nfl",
+                "team_id": 9,
+                "athlete_id": 9,
+                "injury_id": 9,
+            }
+        ],
+        schema=snap.SCHEMA,
+    )
+
+    merged = snap.append_snapshot(prior, today)
+
+    assert merged["team_id"].to_list() == [1, 2, 10, 9]  # numeric, not "1","10","2"
+    assert merged.schema["team_id"] == pl.Int64

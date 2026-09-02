@@ -18,6 +18,16 @@ in-season cron republishes it so the scored frame always tracks both the
 current data AND the current promoted models. The CP model used for CPOE is
 promoted inside the CPOE stage (see [cpoe.md](cpoe.md)).
 
+**Athlete columns (additive, 2026-09-01).** Beside `passer_player_name` the frame now
+carries `passer_player_id`, `rusher_player_name`, `rusher_player_id`,
+`receiver_player_name`, `receiver_player_id` — the ESPN athlete ids sdv-py's
+participants module emits and every final.json already carried (the builder used to
+drop them). Ids are `Int64`, null where ESPN tagged no participant: in 2025 a passer id
+is present on 42.2% of all plays (name: 43.1%), rusher 43.4% (44.3%), receiver 37.6%
+(38.7%); before 2005 ESPN ships no passer ids at all (2004: 0.0% vs names 37.0%). They
+key headshots (`https://a.espncdn.com/i/headshots/college-football/players/full/{id}.png`)
+and stop same-name passers from merging in leader tables.
+
 ## Evaluation
 
 The frame inherits its models' LOSO evaluations (see the per-model reports:

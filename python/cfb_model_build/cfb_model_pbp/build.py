@@ -3,10 +3,26 @@ from __future__ import annotations
 import polars as pl
 
 from cfb_model_build.model_training.ingest import _read_final_plays
-from .schema import CARRY_RENAME, DESCRIPTOR_COLS, IDENTITY_COLS
+from .schema import ATHLETE_ID_COLS, ATHLETE_NAME_COLS, CARRY_RENAME, DESCRIPTOR_COLS, IDENTITY_COLS
 
 _REQUIRED_CARRY = list(CARRY_RENAME.keys())
 _LAST = {"kept": 0, "dropped": 0}
+
+
+def _with_athlete_cols(df: pl.DataFrame) -> pl.DataFrame:
+    """Pin the athlete columns' dtypes and materialize the ones a season's finals lack.
+
+    A season whose finals never carry a key would otherwise publish a parquet WITHOUT the
+    column, and a cross-season concat would fail on schema; a game whose ids are all
+    null infers ``Null`` and would concat to ``Null``/``String``. Cast is strict on purpose:
+    a non-numeric id is a parser regression to surface, not to paper over.
+    """
+    return df.with_columns(
+        [pl.col(c).cast(pl.Int64) if c in df.columns else pl.lit(None, dtype=pl.Int64).alias(c)
+         for c in ATHLETE_ID_COLS]
+        + [pl.col(c).cast(pl.Utf8) if c in df.columns else pl.lit(None, dtype=pl.Utf8).alias(c)
+           for c in ATHLETE_NAME_COLS]
+    )
 
 
 def build_carry_frame(final_dir, seasons=None) -> pl.DataFrame:
@@ -19,7 +35,7 @@ def build_carry_frame(final_dir, seasons=None) -> pl.DataFrame:
     if present_required:
         df = df.drop_nulls(subset=present_required)
     _LAST["kept"], _LAST["dropped"] = df.height, before - df.height
-    df = df.rename({k: v for k, v in CARRY_RENAME.items() if k in df.columns})
+    df = _with_athlete_cols(df.rename({k: v for k, v in CARRY_RENAME.items() if k in df.columns}))
     carry = [c for c in (IDENTITY_COLS + DESCRIPTOR_COLS + list(CARRY_RENAME.values())) if c in df.columns]
     return df.select(carry)
 

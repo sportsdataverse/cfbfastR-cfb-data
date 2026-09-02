@@ -65,14 +65,32 @@ def _rank(col: str, *, descending: bool) -> pl.Expr:
 
 
 def _pct(col: str) -> pl.Expr:
-    """Calculates a percentile based off the passed rank values.
-    
-    The _rank function handles if a low or high metric value gets a low/high rank
-    so we can just calculate the percentiles without worrying about direction. 
+    """Percentile of ``{col}_rank`` AMONG QUALIFIERS THAT HAVE THE METRIC, 0-100.
+
+    ``_rank`` already encodes direction (an ascending column ranks low-is-good),
+    so the percentile needs no direction of its own.
+
+    Two things the rank column alone does not give us:
+
+    * ``_rank`` reproduces R's ``na.last = TRUE`` and hands a null metric a
+      TRAILING rank. That is right for a leaderboard, but a percentile is a
+      user-facing number and "unknown" must not render as "worst" -- so a null
+      metric yields a null percentile, and null rows are excluded from ``n``
+      rather than depressing everyone else's placing.
+    * The position is Weibull, ``(n + 1 - rank) / (n + 1)``, which is symmetric:
+      the best qualifier lands at ``n/(n+1)`` and the worst at ``1/(n+1)``.
+      Nobody is pinned to an exact 0 or 100, which reads better in a UI and
+      leaves room for a future qualifier at either end.
     """
-    c = pl.col(col)
-    N = c.count()
-    return 100 * (N - c ) / (N + 1)
+    src = pl.col(col)
+    rank = pl.col(f"{col}_rank")
+    n = src.is_not_null().sum()
+    return (
+        pl.when(src.is_null())
+        .then(None)
+        .otherwise(100 * (n + 1 - rank) / (n + 1))
+        .cast(pl.Float64)
+    )
 
 
 def add_derived_metrics(plays: pl.DataFrame) -> pl.DataFrame:
@@ -1044,9 +1062,9 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
             "yardsdropback",
             "detmer",
             "detmergame",
-            "passing_td", 
+            "passing_td",
             "pass_int",
-            "sacked"
+            "sacked",
         ],
         asc_cols=["pass_int", "sacked"]
     )
@@ -1155,16 +1173,31 @@ def _add_team_games(df: pl.DataFrame) -> pl.DataFrame:
 
 
 def _attach_leader_ranks(
-    data: pl.DataFrame, *, keys: list[str], min_expr: pl.Expr, rank_cols: list[str],
-    asc_cols: list[str] | None = None
+    data: pl.DataFrame,
+    *,
+    keys: list[str],
+    min_expr: pl.Expr,
+    rank_cols: list[str],
+    asc_cols: list[str] | None = None,
 ) -> pl.DataFrame:
-    """Compute leaderboard ranks among qualifiers, left-joined back (R rank blocks)."""
-    qual = data.filter(min_expr)
-    asc_cols = set(asc_cols or [])
-    ranks = qual.select(
-        *keys, *[_rank(c, descending=(c not in asc_cols)).alias(f"{c}_rank") for c in rank_cols]
+    """Compute leaderboard ranks + percentiles among qualifiers, left-joined back.
+
+    ``min_expr`` is the qualifier gate (R rank blocks), so both the rank and the
+    percentile are AMONG QUALIFIERS -- a receiver at the 50th percentile here sits
+    well above the median receiver. Anything the caller lists in ``asc_cols`` is
+    ranked low-is-good (interceptions, sacks taken, fumbles).
+
+    The percentile is computed on the qualifier frame, not on the rank frame,
+    because it needs the source metric to tell a null apart from a bad value.
+    """
+    asc = set(asc_cols or [])
+    qual = data.filter(min_expr).with_columns(
+        *[_rank(c, descending=(c not in asc)).alias(f"{c}_rank") for c in rank_cols]
     )
-    pcts = ranks.with_columns(
-        *[_pct(f"{c}_rank").alias(f"{c}_pct") for c in rank_cols]
+    qual = qual.with_columns(*[_pct(c).alias(f"{c}_pct") for c in rank_cols])
+    out = qual.select(
+        *keys,
+        *[f"{c}_rank" for c in rank_cols],
+        *[f"{c}_pct" for c in rank_cols],
     )
-    return data.join(pcts, on=keys, how="left")
+    return data.join(out, on=keys, how="left")

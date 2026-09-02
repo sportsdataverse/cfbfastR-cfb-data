@@ -1,0 +1,76 @@
+name: ESPN Injuries Daily Snapshot
+
+# Appends today's league-wide injury report to `espn_{league}_injuries` for all
+# eight ESPN leagues that publish one.
+#
+# Why this is NOT folded into daily_cfb.yml: that workflow's cron is CFB-shaped
+# (Aug-Jan). This stage is cross-league -- NFL, NBA, MLB, NHL, WNBA and the two
+# college hoops leagues each have their own season -- so a CFB-shaped cron would
+# silently drop every league whose season runs when CFB's does not. It runs
+# year-round; the per-league offseason no-op is handled in the script, which
+# refuses to write an empty asset (ledger L54).
+#
+# Cadence is load-bearing. The stage APPENDS to the prior release asset, so a
+# missed day is a permanent hole in the history -- there is no backfill, because
+# ESPN publishes only the current state with no archive.
+#
+# Serialized against itself so a queued run cannot upload over a run that is
+# mid-upload and leave a tag half-written. cancel-in-progress is false for the
+# same reason.
+concurrency:
+  group: espn-injuries-daily
+  cancel-in-progress: false
+
+on:
+  schedule:
+    - cron: '0 13 * * *'   # daily, +2h after daily_cfb.yml (11:00 UTC)
+  workflow_dispatch:
+    inputs:
+      leagues:
+        description: 'Space-separated leagues (default: all)'
+        required: false
+        type: string
+      dry_run:
+        description: 'Build only; plan the uploads without publishing'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: python
+    steps:
+      - name: Checkout cfb-data
+        uses: actions/checkout@v5
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v8.1.0
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+
+      - name: Sync deps
+        run: uv sync --frozen
+
+      # The pinned release does not ship the espn_*_injuries wrappers this stage
+      # calls; install from git until one does. Same reason as cfb_ratings_cron.
+      - name: Install sportsdataverse from git (main)
+        run: |
+          uv pip install \
+            "sportsdataverse @ git+https://github.com/sportsdataverse/sportsdataverse-py.git@main"
+
+      # Every `uv run` passes --no-sync: a bare `uv run` re-syncs from uv.lock
+      # and silently reverts the git install above.
+      - name: Snapshot and publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.SDV_GH_TOKEN }}
+        run: |
+          uv run --no-sync python espn_injuries_daily_snapshot.py \
+            ${{ inputs.leagues && format('-l {0}', inputs.leagues) || '' }} \
+            ${{ inputs.dry_run && '--dry-run' || '--publish' }}

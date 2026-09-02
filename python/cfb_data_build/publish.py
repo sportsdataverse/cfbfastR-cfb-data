@@ -14,7 +14,9 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Callable
 
-from cfb_data_build.config import DatasetSpec
+from sportsdataverse.release import upload_release_sidecars
+
+from cfb_data_build.config import PKG_FUNCTION, DatasetSpec
 from cfb_model_build.cfb_model_publish.artifacts import _gh_release_exists, _gh_runner
 
 # Mirror R PUBLISH_REPOS (``R/_data_utils.R:5``).
@@ -79,6 +81,19 @@ def release_notes(tag: str) -> str:
     return RELEASE_NOTES.get(tag, f"{tag} (CFB dataset, Python-built).")
 
 
+def _stamp(tag: str, run: Callable[[list[str]], object], repo: str) -> None:
+    """Re-stamp a tag's timestamp / package_function sidecars after an upload.
+
+    R's sportsdataverse_save() attaches these to every published tag; the Python
+    publisher dropped them, which left the tag carrying a timestamp.json frozen
+    at the last R run while the data kept moving. Runs LAST so the stamp reflects
+    the finished upload, and only when something actually uploaded -- a stamp on
+    a no-op run would claim data moved when it did not. Goes through the same
+    injected ``run`` as the data assets so tests stay offline.
+    """
+    upload_release_sidecars(tag, runner=run, pkg_function=PKG_FUNCTION.get(tag), repo=repo)
+
+
 def publish_dataset(
     spec: DatasetSpec,
     season: int,
@@ -119,5 +134,7 @@ def publish_dataset(
                 continue
             run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
             count += 1
+        if count:
+            _stamp(spec.tag, run, repo)
         uploaded[repo] = count
     return {"tag": spec.tag, "files": [str(f) for f in files], "uploaded": uploaded}

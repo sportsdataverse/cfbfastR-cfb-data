@@ -70,8 +70,12 @@ from sportsdataverse.cfb import (
     cfb_teams_crosswalk,
 )
 from sportsdataverse.cfb.cfb_schedule import most_recent_cfb_season
+from sportsdataverse.release import upload_release_sidecars
+
+from cfb_model_build.cfb_model_publish.artifacts import PKG_FUNCTION
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+
 logger = logging.getLogger("build_cfb_crosswalk")
 
 DATASETS = ("teams", "schedule", "rosters")
@@ -185,6 +189,17 @@ def upload_assets(paths: List[Path], tag: str, repo: str) -> None:
             check=True,
         )
         logger.info("  uploaded %s", p.name)
+
+    # R's sportsdataverse_save() stamps every tag it writes; this uploader never
+    # did. Runs last so the timestamp describes a finished upload, and only when
+    # something actually uploaded.
+    if paths:
+        upload_release_sidecars(
+            tag,
+            runner=lambda args: subprocess.run(["gh", *args], check=True),
+            pkg_function=PKG_FUNCTION.get(tag, "python/build_cfb_crosswalk.py"),
+            repo=repo,
+        )
 
 
 # ---------------------------------------------------------------------------

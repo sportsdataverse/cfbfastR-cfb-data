@@ -10,6 +10,8 @@ parquet/csv/rds. Sibling of `cfbfastR-cfb-raw` (Python/uv).
 - `Rscript R/releases_init.R` — one-time release-tag creation on both publish repos.
 - `uv run python python/espn_injuries_daily_snapshot.py [-l nfl ...] [--publish]` — daily
   ESPN injuries snapshot, all 8 leagues (see "ESPN injuries" below). Build-only by default.
+- `uv run python python/espn_depthcharts_daily_snapshot.py [-l nfl ...] [--publish]` — daily
+  ESPN depth-chart snapshot, NFL/NBA/MLB only (see "ESPN depth charts" below).
 
 ## Conventions
 - **R reshape is reshape, not re-enrich.** The R pipeline (`R/espn_cfb_0N_*.R`) reads a
@@ -96,6 +98,35 @@ deliberately cross-league even though this is the CFB producer.
   on 2026-09-02); it is recovered from the player-card link.
 - Build-only by default; `--publish` uploads, `--dry-run` plans. Tests:
   `tests/test_espn_injuries_snapshot.py` (offline, no network).
+
+## ESPN depth charts — daily append snapshot (NFL / NBA / MLB only)
+
+`python/espn_depthcharts_daily_snapshot.py`, the second cross-league current-state
+snapshot in this repo. Same contract as injuries: append with `as_of_date`, never
+overwrite, never write a zero-row asset. It **reuses** the injuries stage's
+`read_prior` / `append_snapshot` / `_publish` rather than copying them.
+
+- **Only three leagues have data.** `nfl` (3 groups/team), `nba` and `mlb` (1 each).
+  `nhl`, `wnba` and `cfb` answer HTTP 200 with the `depthchart` key **absent
+  entirely** — ESPN publishes no depth chart for them (probed live 2026-09-02, 3
+  teams each). Wiring them would cost 122 requests a day for zero rows.
+- **`team_transactions` is DEAD** — `{}` (zero top-level keys) on 10 of 10 probes
+  across six leagues. It is deliberately not wired. If it ever returns, transactions
+  are timestamped *events*: the right shape is an append-on-new-id event log, not a
+  daily state snapshot.
+- **`season_coaches` is season-scoped**, so a daily snapshot is repeated bytes.
+  Weekly if ever, never daily.
+- **Cost + pacing:** one request per team, sequential, 1.5s apart — 92 requests,
+  ~2.5 minutes. ESPN 403s under aggressive rate; do not parallelise it.
+- **`position_slot` is load-bearing.** NFL's "3WR 1TE" group ships wr1/wr2/wr3, all
+  carrying position id 1 / abbreviation WR. The grain is
+  `(as_of_date, league, team_id, group_id, position_slot, depth_rank)` — dropping the
+  slot key silently collides three different depth-chart spots.
+- Flatten lives in `sportsdataverse.espn_snapshots.parse_depthchart_snapshot`; ids
+  are cast to this repo's `Int64` once, at the stage's boundary.
+- Output: `espn_{league}_depthcharts` / `depthcharts_{season}.parquet`. Build-only by
+  default; `--publish` uploads, `--dry-run` plans. Tests:
+  `tests/test_espn_depthcharts_snapshot.py` (offline, no network).
 
 ## Inputs / outputs
 - Input: `https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/json/final/{id}.json`

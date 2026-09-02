@@ -9,7 +9,7 @@ import json
 from pathlib import Path
 
 from cfb_data_build import publish
-from cfb_data_build.config import PKG_FUNCTION, REGISTRY
+from cfb_data_build.config import PKG_FUNCTION, REGISTRY, SUMMARIES_REGISTRY
 
 SIDECAR_NAMES = [
     "timestamp.txt",
@@ -49,6 +49,17 @@ def test_stamp_names_the_loader_for_the_tag():
 
 
 def test_every_registry_tag_has_a_package_function():
-    """A new dataset must not publish a tag with no loader named on it."""
-    missing = sorted({s.tag for s in REGISTRY.values()} - set(PKG_FUNCTION))
+    """A new dataset must not publish a tag with no loader named on it.
+
+    Both registries publish through the same publish_dataset(), so a tag missing
+    from either one would ship a timestamp with no package_function beside it.
+    """
+    published = {s.tag for s in REGISTRY.values()} | {s.tag for s in SUMMARIES_REGISTRY.values()}
+    missing = sorted(published - set(PKG_FUNCTION))
     assert missing == [], f"tags with no PKG_FUNCTION entry: {missing}"
+
+
+def test_every_mapping_is_a_named_callable_or_a_producer_path():
+    """Every value is a loader call or a producer script -- never an empty stub."""
+    for tag, fn in sorted(PKG_FUNCTION.items()):
+        assert fn.endswith("()") or fn.endswith(".R") or fn.endswith(".py"), (tag, fn)

@@ -173,15 +173,21 @@ SUMMARIES_REGISTRY: dict[str, DatasetSpec] = {
 # is reused, so re-stamping from Python does not change what a consumer sees.
 # Python-only tags that never had one name the sdv-py loader instead.
 #
-# Keyed by tag, not dataset -- several datasets can share one tag.
-# The publish tests assert every REGISTRY tag has an entry, so a new dataset
-# cannot ship an unnamed tag.
+# Keyed by tag, not dataset -- several datasets can share one tag. BOTH
+# registries publish through the same publish_dataset(), so both are covered;
+# the publish tests assert every tag in either one has an entry, so a new
+# dataset cannot ship an unnamed tag.
 PKG_FUNCTION: dict[str, str] = {
     # no reader in any package: espn_cfb_injuries has no cfbfastR loader and is
     # absent from sdv-py's releases.yaml, so it names its producer stage (the
     # same convention the ncaa_*_rapm tags already carry on their sidecars).
     "espn_cfb_injuries": "R/espn_cfb_14_injuries_creation.R",
+    "espn_cfb_passing": "sportsdataverse.cfb.load_cfb_passing()",
+    "espn_cfb_percentiles": "sportsdataverse.cfb.load_cfb_percentiles()",
+    "espn_cfb_receiving": "sportsdataverse.cfb.load_cfb_receiving()",
+    "espn_cfb_rushing": "sportsdataverse.cfb.load_cfb_rushing()",
     "espn_cfb_schedules": "cfbfastR::load_cfb_schedules()",
+    "espn_cfb_team_summaries": "sportsdataverse.cfb.load_cfb_team_summaries()",
     "espn_cfb_adv_defensive": "sportsdataverse.cfb.load_cfb_adv_defensive()",
     "espn_cfb_adv_defensive_players": "sportsdataverse.cfb.load_cfb_adv_defensive_players()",
     "espn_cfb_adv_drives": "sportsdataverse.cfb.load_cfb_adv_drives()",

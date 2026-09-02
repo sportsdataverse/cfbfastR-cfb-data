@@ -467,25 +467,40 @@ gt_show(
 ```{python}
 # Key on the ESPN athlete id when the frame carries it (stage-10 output from 2026-09-01 on),
 # so two passers who share a name never merge; older release frames fall back to the name.
+# The frame contract allows a null id on a row that still has a name (~2-3% of named
+# passers are regex-fallback names ESPN ships no athlete id for -- see ATHLETE_ID_FLOOR in
+# python/cfb_model_build/cfb_model_pbp/build.py). Keying on the id column alone would DROP
+# those rows and undercount dropbacks / EPA / CPOE, and can push a passer under the
+# 150-dropback cutoff. Coalesce per row instead: id when present, name otherwise.
 has_ids = "passer_player_id" in mp2.columns and mp2["passer_player_id"].null_count() < mp2.height
-key = "passer_player_id" if has_ids else "passer_player_name"
+key_expr = (
+    pl.coalesce(pl.col("passer_player_id").cast(pl.Int64).cast(pl.Utf8), pl.col("passer_player_name"))
+    if has_ids else pl.col("passer_player_name")
+).alias("passer_key")
 qbs = (
-    mp2.filter((pl.col("pass") == 1) & pl.col("epa").is_not_null() & pl.col(key).is_not_null())
-    .with_columns(passer=pl.col("passer_player_name"))
-    .group_by(key)
+    mp2.filter((pl.col("pass") == 1) & pl.col("epa").is_not_null()
+               & pl.col("passer_player_name").is_not_null())
+    .with_columns(key_expr, passer=pl.col("passer_player_name"))
+    .group_by("passer_key")
     .agg(pl.col("passer").first(), pl.col("pos_team_name").last().alias("team"),
          pl.len().alias("dropbacks"), pl.col("epa").mean().alias("epa_play"),
-         pl.col("cpoe").drop_nulls().mean().alias("cpoe"))
+         pl.col("cpoe").drop_nulls().mean().alias("cpoe"),
+         *([pl.col("passer_player_id").drop_nulls().first().alias("passer_player_id")]
+           if has_ids else []))
     .filter(pl.col("dropbacks") >= 150)
     .sort("epa_play", descending=True).head(10)
 )
 cols = ["passer", "team", "dropbacks", "epa_play", "cpoe"]
 if has_ids:
+    # Headshot only where an athlete id survived the coalesce; a name-keyed row gets "".
     qbs = qbs.with_columns(
-        ("<img src='https://a.espncdn.com/i/headshots/college-football/players/full/"
-         + pl.col("passer_player_id").cast(pl.Int64).cast(pl.Utf8) + ".png' height='40'/>").alias("headshot"))
+        pl.when(pl.col("passer_player_id").is_not_null())
+        .then("<img src='https://a.espncdn.com/i/headshots/college-football/players/full/"
+              + pl.col("passer_player_id").cast(pl.Int64).cast(pl.Utf8) + ".png' height='40'/>")
+        .otherwise(pl.lit("")).alias("headshot"))
     cols = ["headshot"] + cols
-sub = (f"source: {mp_source}; keyed by ESPN athlete id (passer_player_id), headshots from a.espncdn.com"
+sub = (f"source: {mp_source}; keyed by ESPN athlete id (passer_player_id) with a name fallback for "
+       "the rows ESPN ships no id for, headshots from a.espncdn.com"
        if has_ids else f"source: {mp_source}; this frame predates the athlete-id columns, so names identify")
 g = (
     GT(qbs.select(cols).to_pandas())

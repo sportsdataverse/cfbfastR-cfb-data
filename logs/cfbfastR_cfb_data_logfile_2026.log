@@ -8,7 +8,6 @@ From https://github.com/sportsdataverse/cfbfastR-cfb-data
  * [new branch]        feat/cfb-model-suite-completion -> origin/feat/cfb-model-suite-completion
  * [new branch]        feat/cfb-ratings-builder -> origin/feat/cfb-ratings-builder
  * [new branch]        feat/cfb-ratings-cron  -> origin/feat/cfb-ratings-cron
- * [new branch]        feat/release-sidecars  -> origin/feat/release-sidecars
  * [new branch]        feat/rosters-cfbd-enrich -> origin/feat/rosters-cfbd-enrich
  * [new branch]        fix/bowl-season-cron   -> origin/fix/bowl-season-cron
  * [new branch]        fix/cfb-recruiting-guard -> origin/fix/cfb-recruiting-guard

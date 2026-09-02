@@ -35,8 +35,23 @@ ATHLETE_ID_FLOOR = 0.9
 ATHLETE_ID_GATE_FROM_SEASON = 2005
 
 
+# A role is only measurable on a frame that HAS the plays it rides on: no completed pass in the
+# newest season means no receiver, and skipping the role is right. But when the plays ARE there
+# and the names are gone, the role is a dropped key, not an inapplicable one -- an upstream rename
+# that took the name column with the id column materializes two all-null columns, and skipping the
+# role would let check_athlete_ids pass on exactly the regression the gate exists to catch.
+_ROLE_APPLIES_ON = {"passer": "pass", "rusher": "rush", "receiver": "completion"}
+
+
+def _role_applies(d: pl.DataFrame, role: str) -> bool:
+    c = _ROLE_APPLIES_ON[role]
+    if c not in d.columns:
+        return True  # descriptor absent -> cannot rule the role out; measure it
+    return bool(d[c].cast(pl.Boolean, strict=False).fill_null(False).any())
+
+
 def athlete_id_coverage(df: pl.DataFrame) -> dict:
-    """Newest season's non-null id / non-null name per role (a role with no names is unmeasurable)."""
+    """Newest season's non-null id / non-null name per role (roles the season has no plays for are skipped)."""
     if df.is_empty() or "season" not in df.columns:
         return {}
     newest = int(df["season"].max())
@@ -44,8 +59,11 @@ def athlete_id_coverage(df: pl.DataFrame) -> dict:
     cov: dict = {"season": newest}
     for role in ("passer", "rusher", "receiver"):
         names = int(d[f"{role}_player_name"].is_not_null().sum())
+        ids = int(d[f"{role}_player_id"].is_not_null().sum())
         if names:
-            cov[role] = round(int(d[f"{role}_player_id"].is_not_null().sum()) / names, 3)
+            cov[role] = round(ids / names, 3)
+        elif _role_applies(d, role):
+            cov[role] = 1.0 if ids else 0.0
     return cov
 
 

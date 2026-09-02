@@ -55,8 +55,10 @@ era refresh (`docs/models/era_model_refresh.md`) promoted `qbr_era` / `fg_era` /
 
 **2026-09-01 (deepdive PR #56).** `model_pbp` gained five additive athlete columns —
 `passer_player_id`, `rusher_player_name`/`_id`, `receiver_player_name`/`_id` (Int64 ids pinned
-at the boundary in `cfb_model_pbp/build.py`, null where ESPN tags no participant; 2025:
-present on 38% of all scored rows, identical to name coverage). No gate changes; the
+at the boundary in `cfb_model_pbp/build.py`, null where ESPN tags no participant). Gate
+`cfb_model_pbp/build.py::check_athlete_ids`: the newest season >= 2005 must carry an id on >= 0.9 of
+named plays per role -- observed in pbp_full 2025 passer 0.979 / rusher 0.980 / receiver 0.972 (the
+2-3% residue is regex-fallback names with no ESPN id); never lowered to pass. No gate changes; the
 `espn_cfb_model_pbp` release picks them up on the next stage-10 + publish run, and sdv-py's
 `load_cfb_model_pbp` returns-schema must be extended in the same step (its live test asserts
 exact column equality against the published asset). `model_training export-analysis` writes

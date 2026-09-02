@@ -22,10 +22,12 @@ promoted inside the CPOE stage (see [cpoe.md](cpoe.md)).
 carries `passer_player_id`, `rusher_player_name`, `rusher_player_id`,
 `receiver_player_name`, `receiver_player_id` — the ESPN athlete ids sdv-py's
 participants module emits and every final.json already carried (the builder used to
-drop them). Ids are `Int64`, null where ESPN tagged no participant: in 2025 a passer id
-is present on 42.2% of all plays (name: 43.1%), rusher 43.4% (44.3%), receiver 37.6%
-(38.7%); before 2005 ESPN ships no passer ids at all (2004: 0.0% vs names 37.0%). They
-key headshots (`https://a.espncdn.com/i/headshots/college-football/players/full/{id}.png`)
+drop them). Ids are `Int64`, null where ESPN tagged no participant. Measured in `pbp_full` 2025: a
+passer id on 42.2% of all plays vs a passer name on 43.1% (id/name 0.979); rusher 43.4% vs
+44.3% (0.980); receiver 37.6% vs 38.7% (0.972) — the 2–3% residue is regex-fallback names
+that carry no ESPN id. Before 2005 ESPN ships no passer ids (2004: 0.0% vs names 37.0%).
+The build refuses (`check_athlete_ids`) when the newest season ≥ 2005 falls below 0.9 on
+any role, so a dropped key can never publish an all-null id column. They key headshots (`https://a.espncdn.com/i/headshots/college-football/players/full/{id}.png`)
 and stop same-name passers from merging in leader tables.
 
 ## Evaluation

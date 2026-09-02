@@ -70,6 +70,7 @@ def test_contract_columns(tmp_path):
             "homeTeamName": "TeamA",
             "awayTeamName": "TeamB",
             "passer_player_name": "QB1",
+            "passer_player_id": 4690158,
         },
         {
             "id": 1002,
@@ -108,6 +109,9 @@ def test_contract_columns(tmp_path):
             "homeTeamName": "TeamA",
             "awayTeamName": "TeamB",
             "passer_player_name": None,
+            "passer_player_id": None,
+            "rusher_player_name": "RB1",
+            "rusher_player_id": 5083848,
         },
     ]
 
@@ -152,3 +156,21 @@ def test_contract_columns(tmp_path):
 
     # scored_date must be a non-null ISO date string.
     assert df["scored_date"][0] is not None
+
+
+def test_refuses_when_athlete_ids_are_absent(tmp_path):
+    """An upstream rename / re-scrape that drops the id keys must fail loudly, not publish all-null ids.
+
+    Rush-only play so no CP booster is loaded; names present, id keys absent -> coverage 0 < 0.9.
+    """
+    cache = tmp_path / "cache"
+    cache.mkdir()
+    play = {"id": 1, "game_id": 5, "season": 2025, "week": 1, "period": 1, "sequenceNumber": 1,
+            "game_play_number": 1, "drive.id": 1, "type.text": "Rush", "pass": False, "rush": True,
+            "completion": False, "EP_start": 1.0, "EP_end": 1.2, "EPA": 0.2, "wp_before": 0.5,
+            "wp_after": 0.5, "wpa": 0.0, "passer_player_name": "QB1", "rusher_player_name": "RB1"}
+    (cache / "5.json").write_text(json.dumps({"season": 2025, "plays": [play]}), encoding="utf-8")
+    out = tmp_path / "o.parquet"
+    with pytest.raises(ValueError, match="athlete id coverage"):
+        main(["--final-dir", str(cache), "--cp-model", "unused.ubj", "--out", str(out), "--seasons", "2025"])
+    assert not out.exists()

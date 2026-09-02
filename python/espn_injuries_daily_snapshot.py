@@ -167,11 +167,16 @@ def read_prior(tag: str, asset: str, *, repo: str = REPO) -> Optional[pl.DataFra
     return pl.read_parquet(io.BytesIO(resp.content))
 
 
-def append_snapshot(prior: Optional[pl.DataFrame], today: pl.DataFrame) -> pl.DataFrame:
+def append_snapshot(
+    prior: Optional[pl.DataFrame],
+    today: pl.DataFrame,
+    sort_keys: Optional[list[str]] = None,
+) -> pl.DataFrame:
     """Append today's rows, replacing any existing rows for the same date.
 
     Idempotent: re-running on the same day replaces that day's rows instead of
-    duplicating them.
+    duplicating them. ``sort_keys`` defaults to this dataset's grain; the depth
+    charts stage passes its own, so the append lives in one place for both.
 
     The merged frame is normalized back to TODAY's contract. In an append
     dataset the prior asset is by construction older than the current schema, so
@@ -180,11 +185,12 @@ def append_snapshot(prior: Optional[pl.DataFrame], today: pl.DataFrame) -> pl.Da
     on) and could widen a join key's dtype to the prior asset's. Columns that
     are genuinely gone are logged as they are dropped -- never silently.
     """
+    sort_keys = sort_keys or SORT_KEYS
     if prior is None or prior.is_empty():
-        return today.sort(SORT_KEYS)
+        return today.sort(sort_keys)
     as_of = today["as_of_date"][0]
     keep = prior.filter(pl.col("as_of_date") != as_of)
-    merged = pl.concat([keep, today], how="diagonal_relaxed").sort(SORT_KEYS)
+    merged = pl.concat([keep, today], how="diagonal_relaxed").sort(sort_keys)
     retired = [c for c in merged.columns if c not in today.columns]
     if retired:
         logger.warning(

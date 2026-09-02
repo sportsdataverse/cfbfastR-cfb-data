@@ -42,7 +42,9 @@ def cached(tag, name):
 # release, and it carries the athlete ids added 2026-09-01); fall back to the release.
 _mp_local = ART / "model_pbp_2025.parquet"
 if _mp_local.is_file():
-    mp, mp_source = pl.read_parquet(_mp_local), "python/artifacts/model_pbp_2025.parquet (stage 10 build tree)"
+    mp = pl.read_parquet(_mp_local)
+    mp_source = (f"python/artifacts/model_pbp_2025.parquet (stage 10 build tree, scored {mp['scored_date'][0]} "
+                 f"with {mp['cp_model_version'][0]})")
 else:
     mp, mp_source = cached("espn_cfb_model_pbp", "model_pbp_2025.parquet"), "espn_cfb_model_pbp release"
 ratings = cached("cfb_ratings", "cfb_ratings_2025.parquet")
@@ -271,26 +273,57 @@ SHAP = {k: shap_sample(BOOSTERS[k], FRAMES[f]) for k, (_, f, _) in SUITE.items()
 ```
 
 ```{python}
+from importlib.metadata import PackageNotFoundError, version as _pkg_version
+try:
+    _sdv_ver = _pkg_version("sportsdataverse")
+except PackageNotFoundError:
+    _sdv_ver = "unknown"
+
 def _where(p, a):
     return str(p.relative_to(ROOT)).replace("\\", "/") if p.is_relative_to(ART) else f"sdv-py bundle/{a}"
 
-prov = pl.DataFrame([{
-    "model": k,
-    "artifact": _where(resolve_booster(a), a),
-    "sha256": sha12(resolve_booster(a)),
-    "bundle": "= sdv-py bundle" if (BUNDLE / a).is_file() and sha12(BUNDLE / a) == sha12(resolve_booster(a)) else "differs",
-    "n_features": BOOSTERS[k].num_features(),
-    "frame_rows": MANIFEST["models"][m]["n_rows"],
-    "sample": SHAP[k][1].shape[0],
-} for k, (a, f, m) in SUITE.items()])
+def _trained_on(p):
+    """basename of the training frame named in the booster's card (<stem>.json or <stem>.card.json), else None"""
+    def find(o):
+        if isinstance(o, dict):
+            if "training_frame" in o:
+                return o["training_frame"]
+            for v in o.values():
+                r = find(v)
+                if r:
+                    return r
+        return None
+    for c in (p.with_suffix(".json"), p.with_suffix(".card.json")):
+        if c.is_file():
+            tf = find(json.loads(c.read_text()))
+            return Path(tf).name if tf else None
+    return None
+
+_src = Path(MANIFEST["source_frame"]).name
+rows = []
+for k, (a, f, m) in SUITE.items():
+    p = resolve_booster(a); tf = _trained_on(p)
+    rows.append({
+        "model": k, "artifact": _where(p, a), "sha256": sha12(p),
+        "bundle": "= sdv-py bundle" if (BUNDLE / a).is_file() and sha12(BUNDLE / a) == sha12(p) else "differs",
+        "trained_on": tf or "n/a (no card)",
+        "frame_ok": "n/a" if tf is None else ("same frame" if tf == _src else "MISMATCH"),
+        "n_features": BOOSTERS[k].num_features(),
+        "frame_rows": MANIFEST["models"][m]["n_rows"], "sample": SHAP[k][1].shape[0],
+    })
+prov = pl.DataFrame(rows)
+# The narrative below is written for the promoted fits; refuse to render prose about a different booster.
+if (prov["bundle"] != "= sdv-py bundle").any() or (prov["frame_ok"] == "MISMATCH").any():
+    raise RuntimeError(f"attributed booster is not the promoted one or was trained on a different frame:\n{prov}")
 gt_show(
     GT(prov.to_pandas())
     .tab_header(title="Which booster each attribution below explains",
-                subtitle=f"analysis frames from {MANIFEST['source_frame']} (export-analysis, {MANIFEST['written'][:10]}); "
-                         "sha256 prefix compared against the .ubj sdv-py ships")
+                subtitle=f"analysis frames from {_src} (sha256 {MANIFEST.get('source_sha256', '?')[:12]}, export-analysis "
+                         f"{MANIFEST['written'][:10]}); booster sha256 compared against the .ubj bundled in sdv-py "
+                         f"{_sdv_ver}; 'trained on' from each booster's card")
     .fmt_number(columns=["frame_rows", "sample"], sep_mark=",", decimals=0)
-    .cols_label(model="Model", artifact="Artifact", sha256="sha256[:12]", bundle="vs bundle",
-                n_features="Features", frame_rows="Frame rows", sample="SHAP sample")
+    .cols_label(model="Model", artifact="Artifact", sha256="sha256[:12]", bundle="vs bundle", trained_on="Trained on",
+                frame_ok="Frame", n_features="Features", frame_rows="Frame rows", sample="SHAP sample")
 )
 ```
 
@@ -434,7 +467,7 @@ gt_show(
 ```{python}
 # Key on the ESPN athlete id when the frame carries it (stage-10 output from 2026-09-01 on),
 # so two passers who share a name never merge; older release frames fall back to the name.
-has_ids = "passer_player_id" in mp2.columns
+has_ids = "passer_player_id" in mp2.columns and mp2["passer_player_id"].null_count() < mp2.height
 key = "passer_player_id" if has_ids else "passer_player_name"
 qbs = (
     mp2.filter((pl.col("pass") == 1) & pl.col("epa").is_not_null() & pl.col(key).is_not_null())

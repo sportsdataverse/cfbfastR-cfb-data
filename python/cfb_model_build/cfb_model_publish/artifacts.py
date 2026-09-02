@@ -4,6 +4,8 @@ import os
 import subprocess
 from pathlib import Path
 
+from sportsdataverse.release import upload_release_sidecars
+
 from cfb_model_build.cfb_model_reports.discovery import discover_models
 
 # Upload timeout. 300s was too short once plain-csv artifacts entered the mix:
@@ -55,6 +57,21 @@ _RELEASE_BODY = {
         "production, prior wins). Built by sdv-py `cfb_recruiting_projection()`."
     ),
 }
+
+
+#: Release sidecar metadata: the loader a consumer reads each tag through.
+#: R's sportsdataverse_save() writes this as package_function.txt/.json beside
+#: every published asset; this publisher dropped it along with the timestamp
+#: pair. Model tags with no loader name this producer instead -- the convention
+#: the ncaa_*_rapm tags already carry on their published sidecars.
+PKG_FUNCTION: dict[str, str] = {
+    "cfb_crosswalk": "sportsdataverse.cfb.load_cfb_teams_crosswalk()",
+    "cfb_fpi_weekly": "sportsdataverse.cfb.load_cfb_fpi_weekly()",
+    "cfb_ratings": "sportsdataverse.cfb.load_cfb_ratings()",
+    "cfb_ratings_weekly": "sportsdataverse.cfb.load_cfb_ratings_weekly()",
+    "espn_cfb_model_pbp": "sportsdataverse.cfb.load_cfb_model_pbp()",
+}
+_PRODUCER = "python/cfb_model_build/cfb_model_publish/artifacts.py"
 
 
 def plan_uploads(artifacts_dir) -> list:
@@ -130,6 +147,13 @@ def upload_artifacts(
             continue
         run(["release", "upload", tag, str(f), "--repo", repo, "--clobber"])
         uploaded += 1
+    # stamp LAST so the timestamp describes a finished upload, and only when
+    # something actually uploaded -- a stamp on a no-op run would claim data
+    # moved when it did not
+    if uploaded:
+        upload_release_sidecars(
+            tag, runner=run, pkg_function=PKG_FUNCTION.get(tag, _PRODUCER), repo=repo
+        )
     return {
         "uploaded": uploaded,
         "files": [str(f) for f in files],

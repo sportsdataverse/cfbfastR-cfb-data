@@ -1,5 +1,20 @@
 import json
+from pathlib import Path
+
 from cfb_model_build.cfb_model_publish.artifacts import plan_uploads, upload_artifacts
+
+
+#: release metadata sidecars -- asserted separately, not a data asset
+SIDECARS = ("timestamp.", "package_function.")
+
+
+def _data_calls(calls):
+    """gh calls minus the four release sidecars."""
+    return [
+        c
+        for c in calls
+        if not (c[:2] == ["release", "upload"] and Path(c[3]).name.startswith(SIDECARS))
+    ]
 
 
 def _seed(tmp_path):
@@ -22,39 +37,59 @@ def _boom(*_a, **_k):
 def test_dry_run_uploads_nothing(tmp_path):
     calls = []
     # dry-run must be network-free: it must NOT probe for release existence.
-    res = upload_artifacts(_seed(tmp_path), "espn_cfb_model_artifacts", "owner/repo",
-                           dry_run=True, runner=lambda args: calls.append(args),
-                           exists_check=_boom)
+    res = upload_artifacts(
+        _seed(tmp_path),
+        "espn_cfb_model_artifacts",
+        "owner/repo",
+        dry_run=True,
+        runner=lambda args: calls.append(args),
+        exists_check=_boom,
+    )
     assert res["uploaded"] == 0 and len(res["files"]) == 4 and calls == []
     assert res["created_release"] is False
 
 
 def test_upload_invokes_runner_per_file(tmp_path):
     calls = []
-    res = upload_artifacts(_seed(tmp_path), "espn_cfb_model_artifacts", "owner/repo",
-                           dry_run=False, runner=lambda args: calls.append(args),
-                           exists_check=lambda tag, repo: True)
-    assert res["uploaded"] == 4 and len(calls) == 4
+    res = upload_artifacts(
+        _seed(tmp_path),
+        "espn_cfb_model_artifacts",
+        "owner/repo",
+        dry_run=False,
+        runner=lambda args: calls.append(args),
+        exists_check=lambda tag, repo: True,
+    )
+    assert res["uploaded"] == 4 and len(_data_calls(calls)) == 4
     assert res["created_release"] is False
     assert not any(c[:2] == ["release", "create"] for c in calls)
 
 
 def test_creates_release_when_missing(tmp_path):
     calls = []
-    res = upload_artifacts(_seed(tmp_path), "espn_cfb_model_artifacts", "owner/repo",
-                           dry_run=False, runner=lambda args: calls.append(args),
-                           exists_check=lambda tag, repo: False)
+    res = upload_artifacts(
+        _seed(tmp_path),
+        "espn_cfb_model_artifacts",
+        "owner/repo",
+        dry_run=False,
+        runner=lambda args: calls.append(args),
+        exists_check=lambda tag, repo: False,
+    )
     # first call creates the release, then one upload per file
     assert calls[0][:4] == ["release", "create", "espn_cfb_model_artifacts", "--repo"]
     assert res["created_release"] is True
-    assert res["uploaded"] == 4 and len(calls) == 5
+    assert res["uploaded"] == 4 and len(_data_calls(calls)) == 5
 
 
 def test_skips_create_when_present(tmp_path):
     calls = []
-    res = upload_artifacts(_seed(tmp_path), "espn_cfb_model_artifacts", "owner/repo",
-                           dry_run=False, runner=lambda args: calls.append(args),
-                           exists_check=lambda tag, repo: True)
+    res = upload_artifacts(
+        _seed(tmp_path),
+        "espn_cfb_model_artifacts",
+        "owner/repo",
+        dry_run=False,
+        runner=lambda args: calls.append(args),
+        exists_check=lambda tag, repo: True,
+    )
     assert res["created_release"] is False
     assert all(c[0:2] != ["release", "create"] for c in calls)
-    assert res["uploaded"] == 4 and len(calls) == 4
+    assert res["uploaded"] == 4 and len(_data_calls(calls)) == 4

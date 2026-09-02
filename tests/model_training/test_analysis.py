@@ -60,7 +60,7 @@ def test_frames_carry_ids_then_the_trainer_feature_order_then_label():
 
 def test_export_writes_one_parquet_per_model_and_a_manifest(tmp_path):
     src = tmp_path / "pbp.parquet"
-    _frame().write_parquet(src)
+    _frame().with_columns(pl.col("id").cast(pl.Utf8)).write_parquet(src)  # pbp_full ships String ids
     rows = export_analysis_frames(src, tmp_path / "analysis", ("wp", "xpass"))
     assert rows == {"wp": 4, "xpass": 2}
     assert sorted(p.name for p in (tmp_path / "analysis").glob("*.parquet")) == [
@@ -70,4 +70,5 @@ def test_export_writes_one_parquet_per_model_and_a_manifest(tmp_path):
     m = json.loads((tmp_path / "analysis" / "analysis_manifest.json").read_text())
     assert m["source_frame"] == str(src)
     assert m["models"]["wp"]["features"] == C.WP_SPREAD_FEATURES and m["models"]["wp"]["n_rows"] == 4
-    assert pl.read_parquet(tmp_path / "analysis" / "analysis_xpass.parquet").columns[-1] == "label"
+    xp = pl.read_parquet(tmp_path / "analysis" / "analysis_xpass.parquet")
+    assert xp.columns[-1] == "label" and xp.schema["id"] == pl.Int64  # pinned at the boundary

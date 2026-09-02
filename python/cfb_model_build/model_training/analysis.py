@@ -63,7 +63,10 @@ def read_source(pbp: str | Path) -> pl.DataFrame:
     """The training frame, restricted to the columns the builders touch."""
     lf = pl.scan_parquet(pbp)
     have = set(lf.collect_schema().names())
-    return lf.select([c for c in needed_columns() if c in have]).collect()
+    df = lf.select([c for c in needed_columns() if c in have]).collect()
+    # The play id is Int64 everywhere else in the chain (model_pbp, load_cfb_pbp) but String in
+    # pbp_full -- pin it once here, strictly: a non-numeric id is a parser regression to surface.
+    return df.with_columns(pl.col("id").cast(pl.Int64)) if "id" in df.columns else df
 
 
 def _ids(df: pl.DataFrame) -> list[str]:
@@ -72,7 +75,9 @@ def _ids(df: pl.DataFrame) -> list[str]:
 
 def _beside(df: pl.DataFrame, X, label: pl.Series) -> pl.DataFrame:
     """ids | trainer matrix (row-aligned, unfiltered builders) | label."""
-    return pl.concat([df.select(_ids(df)), pl.from_pandas(X)], how="horizontal").with_columns(label.alias("label"))
+    # hstack raises on a height mismatch where concat(how="horizontal") would pad with nulls
+    assert X.shape[0] == df.height, f"builder is not row-aligned: {X.shape[0]} vs {df.height}"
+    return df.select(_ids(df)).hstack(pl.from_pandas(X)).with_columns(label.alias("label"))
 
 
 def build_frames(df: pl.DataFrame, models: tuple[str, ...] = MODELS) -> dict[str, pl.DataFrame]:

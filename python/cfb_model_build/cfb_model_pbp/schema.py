@@ -12,7 +12,7 @@ DESCRIPTOR_COLS = [
     # ESPN athlete ids + the two remaining ball-handler names (additive, 2026-09-01). The
     # ids are emitted by sdv-py's participants module and carried by every final.json; the
     # frame used to drop them here. Null where ESPN ships no participant (all passer ids
-    # before 2005; ~42% of all plays carry one in 2025, matching name coverage).
+    # before 2005; ~42% of all plays carry one in 2025, within 0.1% of name coverage).
     "passer_player_id", "rusher_player_name", "rusher_player_id",
     "receiver_player_name", "receiver_player_id",
 ]

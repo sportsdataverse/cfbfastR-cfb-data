@@ -7,7 +7,7 @@ from pathlib import Path
 import polars as pl
 
 from . import __version__
-from .build import build_carry_frame, last_completeness, score_cpoe
+from .build import build_carry_frame, check_athlete_ids, last_completeness, score_cpoe
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -25,6 +25,7 @@ def main(argv=None) -> int:
     plays = _read_final_plays(args.final_dir, args.seasons)
     carry = build_carry_frame(args.final_dir, args.seasons)
     scored = score_cpoe(carry, plays, args.cp_model)
+    cov = check_athlete_ids(scored)  # raises before anything is written
     scored = scored.with_columns(
         model_pbp_version=pl.lit(__version__),
         cp_model_version=pl.lit(Path(args.cp_model).name),
@@ -35,5 +36,5 @@ def main(argv=None) -> int:
     Path(args.out).parent.mkdir(parents=True, exist_ok=True)
     scored.write_parquet(args.out)
     comp = last_completeness()
-    print(f"model_pbp: rows={scored.height} kept={comp['kept']} dropped={comp['dropped']} -> {args.out}")
+    print(f"model_pbp: rows={scored.height} kept={comp['kept']} dropped={comp['dropped']} athlete_ids={cov} -> {args.out}")
     return 0

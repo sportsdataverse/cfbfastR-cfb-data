@@ -7,3 +7,11 @@ def test_schema_contract():
         assert c in MODEL_PBP_COLUMNS
     # EP/WP are carried (renamed) from final.json, not re-scored in SP1
     assert CARRY_RENAME["EPA"] == "epa" and CARRY_RENAME["wp_before"] == "wp_before"
+
+
+def test_athlete_ids_are_in_the_contract():
+    from cfb_model_build.cfb_model_pbp.schema import ATHLETE_ID_COLS, ATHLETE_NAME_COLS
+
+    assert ATHLETE_ID_COLS == ["passer_player_id", "rusher_player_id", "receiver_player_id"]
+    for c in ATHLETE_ID_COLS + ATHLETE_NAME_COLS + ["passer_player_name"]:
+        assert c in MODEL_PBP_COLUMNS

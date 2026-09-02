@@ -52,3 +52,17 @@ era refresh (`docs/models/era_model_refresh.md`) promoted `qbr_era` / `fg_era` /
 | model_pbp (scored PBP) | `cfb_model_pbp_full.parquet` | `espn_cfb_model_pbp` | cfb-raw finals scored with the freshly trained cp model | `python -m cfb_model_build.cfb_model_pbp` | TODO (no documented publish gate; folded into `model_pbp` by `R/espn_cfb_16_model_pbp.R`) | TODO (last pipeline run not recorded here) | annual + dispatch |
 | cfb_ratings | `cfb_ratings_{season}.parquet` + oracle card | `cfb_ratings` | released `espn_cfb_pbp` (2004+) | sdv-py `cfb_ratings()` via `cfb_model_publish ratings` (`cfb_ratings_cron.yml`) | refuses 0-row seasons; ridge refit per run; card written per publish | refit every run | daily in-season (13:00 UTC Aug–Jan), off-season idempotent newest-season refresh |
 | cfb_recruiting_proj | per-season parquet + oracle card | `cfb_recruiting_proj` | roster features (247 talent, blue-chip ratio, returning production, prior wins) | sdv-py `cfb_recruiting_projection()` via `cfb_model_publish recruiting` (`cfb_recruiting_proj_cron.yml`) | refuses 0-row seasons; card written per publish | as-of ridge refit per run | monthly (5th, Dec + Jan–Aug) |
+
+**2026-09-01 (deepdive PR #56).** `model_pbp` gained five additive athlete columns —
+`passer_player_id`, `rusher_player_name`/`_id`, `receiver_player_name`/`_id` (Int64 ids pinned
+at the boundary in `cfb_model_pbp/build.py`, null where ESPN tags no participant). Gate
+`cfb_model_pbp/build.py::check_athlete_ids`: the newest season >= 2005 must carry an id on >= 0.9 of
+named plays per role -- observed in pbp_full 2025 passer 0.979 / rusher 0.980 / receiver 0.972 (the
+2-3% residue is regex-fallback names with no ESPN id); never lowered to pass. No gate changes; the
+`espn_cfb_model_pbp` release picks them up on the next stage-10 + publish run, and sdv-py's
+`load_cfb_model_pbp` returns-schema must be extended in the same step (its live test asserts
+exact column equality against the published asset). `model_training export-analysis` writes
+the per-model **analysis frames** `python/artifacts/analysis/analysis_{ep,wp,xpass,cp}.parquet`
++ `analysis_manifest.json` — play ids beside the exact trainer feature matrix — a build-tree
+artifact (not published) consumed by `docs/models/deepdive.qmd`; the CI pipeline runs it
+right after `ingest`.

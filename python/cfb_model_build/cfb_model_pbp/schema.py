@@ -9,7 +9,21 @@ DESCRIPTOR_COLS = [
     "homeTeamName", "awayTeamName", "type.text", "text", "start.down", "start.distance",
     "start.yardsToEndzone", "pos_score_diff_start", "start.TimeSecsRem", "start.is_home",
     "passing_down", "pass", "rush", "completion", "scoring_play", "statYardage", "passer_player_name",
+    # ESPN athlete ids + the two remaining ball-handler names (additive, 2026-09-01). The
+    # ids are emitted by sdv-py's participants module and carried by every final.json; the
+    # frame used to drop them here. Null where ESPN ships no participant (all passer ids
+    # before 2005; 2025 id/name ratio 0.979; the residue is regex-fallback names).
+    "passer_player_id", "rusher_player_name", "rusher_player_id",
+    "receiver_player_name", "receiver_player_id",
 ]
+
+# Join keys onto ESPN athletes (headshots: a.espncdn.com/i/headshots/college-football/
+# players/full/{id}.png). Pinned Int64 at the boundary -- the dtype load_cfb_pbp declares.
+ATHLETE_ID_COLS = ["passer_player_id", "rusher_player_id", "receiver_player_id"]
+# passer_player_name is also a DESCRIPTOR_COL (it predates the id work), but it is listed
+# here too so all three roles are materialized when a season's finals lack the column --
+# otherwise the coverage gate, which reads {role}_player_name, has nothing to divide by.
+ATHLETE_NAME_COLS = ["passer_player_name", "rusher_player_name", "receiver_player_name"]
 
 PREDICTION_COLS = [
     "ep_before", "ep_after", "epa", "def_epa",

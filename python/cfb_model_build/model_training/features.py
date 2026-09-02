@@ -5,6 +5,7 @@ order, plus the label and weight arrays. WP label is win_indicator =
 (start.pos_team.name == winner), i.e. the posteam NAME compared to the game winner;
 no sample weights for WP (per the cfbscrapR-wpa recipe). EP uses ScoreDiff_W weights.
 """
+
 from __future__ import annotations
 
 import pandas as pd
@@ -61,9 +62,12 @@ def _era(season_col: str = "season") -> pl.Expr:
     """
     lo, mid, hi = C.ERA_BOUNDS
     return (
-        pl.when(pl.col(season_col) <= lo).then(0)
-        .when(pl.col(season_col) <= mid).then(1)
-        .when(pl.col(season_col) <= hi).then(2)
+        pl.when(pl.col(season_col) <= lo)
+        .then(0)
+        .when(pl.col(season_col) <= mid)
+        .then(1)
+        .when(pl.col(season_col) <= hi)
+        .then(2)
         .otherwise(3)
         .cast(pl.Int32)
     )
@@ -122,13 +126,12 @@ def fg_matrix(df: pl.DataFrame, *, era_onehot: bool = False):
     return X, y, None
 
 
-def xpass_matrix(df: pl.DataFrame, *, era_onehot: bool = False):
-    """xPass (pass-vs-rush) matrix: rush|pass plays with non-null down/distance/ytg.
-
-    Returns (X[7 feats, ordered], y=pass int, None). With ``era_onehot`` the ordinal
-    ``era`` factor is replaced by the era0..era3 dummies.
+def xpass_frame(df: pl.DataFrame) -> pl.DataFrame:
+    """The xPass row set (rush|pass plays with non-null down/distance/ytg) with the 7
+    engineered feature columns attached. ``xpass_matrix`` selects from it; the analysis
+    export keeps its ids beside the same features.
     """
-    f = df.filter(
+    return df.filter(
         ((pl.col("rush") == True) | (pl.col("pass") == True))  # noqa: E712
         & pl.col("start.down").is_not_null()
         & pl.col("start.distance").is_not_null()
@@ -142,6 +145,15 @@ def xpass_matrix(df: pl.DataFrame, *, era_onehot: bool = False):
         era=_era("season"),
         period=pl.col("period"),
     )
+
+
+def xpass_matrix(df: pl.DataFrame, *, era_onehot: bool = False):
+    """xPass (pass-vs-rush) matrix: rush|pass plays with non-null down/distance/ytg.
+
+    Returns (X[7 feats, ordered], y=pass int, None). With ``era_onehot`` the ordinal
+    ``era`` factor is replaced by the era0..era3 dummies.
+    """
+    f = xpass_frame(df)
     if era_onehot:
         f = f.with_columns(_era_onehot("season"))
         cols = C.with_era_onehot(C.XPASS_FEATURES)

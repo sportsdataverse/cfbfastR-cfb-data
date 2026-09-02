@@ -103,6 +103,15 @@ jobs:
       - name: Ingest PBP training frame
         run: uv run python -m cfb_model_build.model_training ingest --final-dir "$FINAL_DIR" --out artifacts/pbp_full.parquet
 
+      # ids + the exact engineered feature matrix per model; docs/models/deepdive.qmd reads these
+      - name: Export per-model analysis frames
+        run: uv run python -m cfb_model_build.model_training export-analysis --pbp artifacts/pbp_full.parquet --out-dir artifacts/analysis
+      - name: Upload analysis frames (deepdive input; render locally with scripts/render_model_docs.sh)
+        uses: actions/upload-artifact@v4
+        with:
+          name: analysis-frames
+          path: artifacts/analysis/
+
       - name: Train EP / WP / QBR
         if: ${{ github.event_name == 'schedule' || !inputs.stages || contains(inputs.stages, 'core') }}
         run: |

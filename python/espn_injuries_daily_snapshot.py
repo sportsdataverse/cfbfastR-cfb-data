@@ -172,12 +172,27 @@ def append_snapshot(prior: Optional[pl.DataFrame], today: pl.DataFrame) -> pl.Da
 
     Idempotent: re-running on the same day replaces that day's rows instead of
     duplicating them.
+
+    The merged frame is normalized back to TODAY's contract. In an append
+    dataset the prior asset is by construction older than the current schema, so
+    drift is the normal case, not a hypothesis: ``diagonal_relaxed`` would
+    otherwise carry a retired column into every future write (all-null from here
+    on) and could widen a join key's dtype to the prior asset's. Columns that
+    are genuinely gone are logged as they are dropped -- never silently.
     """
     if prior is None or prior.is_empty():
         return today.sort(SORT_KEYS)
     as_of = today["as_of_date"][0]
     keep = prior.filter(pl.col("as_of_date") != as_of)
-    return pl.concat([keep, today], how="diagonal_relaxed").sort(SORT_KEYS)
+    merged = pl.concat([keep, today], how="diagonal_relaxed").sort(SORT_KEYS)
+    retired = [c for c in merged.columns if c not in today.columns]
+    if retired:
+        logger.warning(
+            "append_dropped_retired_columns %s -- present in the prior asset, not in"
+            " the current schema",
+            retired,
+        )
+    return merged.select(today.columns).cast(dict(today.schema))
 
 
 def build(

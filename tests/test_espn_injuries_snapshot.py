@@ -365,3 +365,55 @@ def test_build_output_is_publishable_end_to_end(tmp_path, monkeypatch):
     monkeypatch.setattr(rel, "sportsdataverse_upload", _fake_upload(calls))
     assert _publish(tmp_path, written, "r/r", dry_run=False) == 0
     assert calls == [("espn_nfl_injuries", ["injuries_2026.parquet"])]
+
+
+def _prior_with_a_retired_column() -> pl.DataFrame:
+    """A prior release asset written by an EARLIER schema.
+
+    Not hypothetical: `team_abbreviation` is exactly the column this stage
+    dropped when it moved onto the library parser, so the first append after
+    that change reads a prior asset that still has it.
+    """
+    return pl.DataFrame(
+        {
+            "as_of_date": [date(2026, 9, 1)],
+            "league": ["nfl"],
+            "season": [2026],
+            "team_id": [22],
+            "team_abbreviation": ["ARI"],  # retired
+            "athlete_id": [4870808],
+            "injury_id": [1],
+            "status": ["Out"],
+        }
+    )
+
+
+def test_a_retired_column_in_the_prior_asset_never_reaches_the_new_write(caplog):
+    """diagonal_relaxed unions the columns, so without normalization a column
+    the schema no longer has rides into every future asset, all-null forever."""
+    today = snap.explode(_payload(), "nfl", date(2026, 9, 2))
+
+    with caplog.at_level("WARNING"):
+        merged = snap.append_snapshot(_prior_with_a_retired_column(), today)
+
+    assert list(merged.columns) == list(snap.SCHEMA)
+    assert dict(merged.schema) == dict(today.schema)  # and no widened join key
+    assert merged.height == 3  # the prior day survives; only its extra column goes
+    assert "append_dropped_retired_columns" in caplog.text
+    assert "team_abbreviation" in caplog.text
+
+
+def test_build_writes_the_declared_schema_even_from_a_drifted_prior(tmp_path):
+    """The end of the path that matters: what lands on disk and gets published."""
+    written = snap.build(
+        ["nfl"],
+        tmp_path,
+        as_of=date(2026, 9, 2),
+        fetch=lambda _: _payload(),
+        prior_reader=lambda *a, **k: _prior_with_a_retired_column(),
+    )
+
+    on_disk = pl.read_parquet(tmp_path / "espn_nfl_injuries" / "injuries_2026.parquet")
+    assert written == {"espn_nfl_injuries/injuries_2026.parquet": 3}
+    assert list(on_disk.columns) == list(snap.SCHEMA)
+    assert on_disk.schema["athlete_id"] == pl.Int64

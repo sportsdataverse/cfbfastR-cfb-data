@@ -264,19 +264,41 @@ def build(
     return written
 
 
-def _publish(out: Path, tags: list[str], repo: str, *, dry_run: bool) -> int:
+def _publish(out: Path, written: dict[str, int], repo: str, *, dry_run: bool) -> int:
+    """Upload ONLY the assets this run wrote, one tag at a time.
+
+    Two things this deliberately does not do:
+
+    * It does not glob the tag directory. ``sportsdataverse_upload`` defaults to
+      ``overwrite=True``, so a stale local parquet left by an earlier run would
+      replace a good release asset -- the empty-league skip stops us WRITING a bad
+      asset, not uploading an old one. ``written`` is keyed ``"<tag>/<asset>"`` and
+      is the exact set this invocation produced.
+    * It does not let one tag end the run. ``sportsdataverse_upload`` raises
+      ``RuntimeError`` when its retries are exhausted, which would abandon every
+      later league -- so a single rate-limited tag would silently cost seven
+      others. Each failure is counted and the loop continues.
+    """
     from sportsdataverse.release import sportsdataverse_upload
 
     failed = 0
-    for tag in tags:
-        files = sorted((out / tag).glob("*.parquet"))
-        if not files:
-            continue
+    by_tag: dict[str, list[Path]] = {}
+    for key in written:
+        tag, _, asset = key.partition("/")
+        path = out / tag / f"{asset}.parquet"
+        if path.is_file():
+            by_tag.setdefault(tag, []).append(path)
+
+    for tag, files in sorted(by_tag.items()):
         if dry_run:
-            print(f"[dry-run] would upload to {tag}: {[f.name for f in files]}")
+            print(f"[dry-run] would upload to {tag}: {[f.name for f in sorted(files)]}")
             continue
-        if not sportsdataverse_upload(files, tag, repo=repo):
-            print(f"WARNING: upload failed for {tag}")
+        try:
+            if not sportsdataverse_upload(sorted(files), tag, repo=repo):
+                print(f"WARNING: upload failed for {tag}")
+                failed += 1
+        except RuntimeError as exc:  # retries exhausted for THIS tag only
+            print(f"WARNING: upload raised for {tag}: {str(exc)[:160]}")
             failed += 1
     return failed
 
@@ -313,8 +335,7 @@ def main(argv: Optional[list[str]] = None) -> int:
         print("no league produced rows -- nothing written, nothing published")
         return 0
     if args.publish or args.dry_run:
-        tags = sorted({key.split("/")[0] for key in written})
-        return 1 if _publish(out, tags, args.repo, dry_run=args.dry_run) else 0
+        return 1 if _publish(out, written, args.repo, dry_run=args.dry_run) else 0
     return 0
 
 

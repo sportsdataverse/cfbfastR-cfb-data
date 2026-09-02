@@ -245,3 +245,59 @@ def test_athlete_id_coverage_makes_a_silent_id_loss_visible():
 
     # an empty frame is not a coverage failure -- it is the empty-league skip
     assert athlete_id_coverage(pl.DataFrame()) == 1.0
+
+
+def _fake_upload(calls, *, raises_for=None):
+    def _upload(files, tag, repo=None, **kw):
+        calls.append((tag, sorted(f.name for f in files)))
+        if raises_for and tag == raises_for:
+            raise RuntimeError("retries exhausted")
+        return True
+
+    return _upload
+
+
+def test_publish_uploads_only_what_this_run_wrote(tmp_path, monkeypatch):
+    """sportsdataverse_upload defaults to overwrite=True, so a stale local file
+    would REPLACE a good release asset. Only `written` may be uploaded."""
+    import sportsdataverse.release as rel
+
+    from espn_injuries_daily_snapshot import _publish
+
+    tag = "espn_nfl_injuries"
+    (tmp_path / tag).mkdir(parents=True)
+    (tmp_path / tag / "injuries_2026.parquet").write_bytes(b"x")
+    (tmp_path / tag / "injuries_1999.parquet").write_bytes(b"stale")  # earlier run
+
+    calls = []
+    monkeypatch.setattr(rel, "sportsdataverse_upload", _fake_upload(calls))
+    assert _publish(tmp_path, {f"{tag}/injuries_2026": 800}, "r/r", dry_run=False) == 0
+    assert calls == [(tag, ["injuries_2026.parquet"])], "the stale asset was uploaded"
+
+
+def test_one_failing_tag_does_not_abandon_the_others(tmp_path, monkeypatch):
+    """A rate-limited league must cost one tag, not the seven that follow it."""
+    import sportsdataverse.release as rel
+
+    from espn_injuries_daily_snapshot import _publish
+
+    written = {}
+    for tag in ("espn_mlb_injuries", "espn_nfl_injuries", "espn_nhl_injuries"):
+        (tmp_path / tag).mkdir(parents=True)
+        (tmp_path / tag / "injuries_2026.parquet").write_bytes(b"x")
+        written[f"{tag}/injuries_2026"] = 10
+
+    calls = []
+    monkeypatch.setattr(
+        rel,
+        "sportsdataverse_upload",
+        _fake_upload(calls, raises_for="espn_mlb_injuries"),
+    )
+    failed = _publish(tmp_path, written, "r/r", dry_run=False)
+
+    assert failed == 1
+    assert [t for t, _ in calls] == [
+        "espn_mlb_injuries",
+        "espn_nfl_injuries",
+        "espn_nhl_injuries",
+    ], "a raise in the first tag stopped the rest"

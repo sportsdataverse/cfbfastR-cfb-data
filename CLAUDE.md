@@ -82,10 +82,18 @@ deliberately cross-league even though this is the CFB producer.
   the same day replaces that day rather than duplicating it.
 - **Never publish an empty snapshot.** A league returning zero athlete rows is logged and
   skipped; no zero-row asset is written. mbb/wbb hit this every offseason day, by design.
+- **The flatten lives in sdv-py, not here.** `sportsdataverse.espn_snapshots.parse_injuries_snapshot`
+  owns the explode and the athlete-id recovery; this stage owns only the producer-specific
+  parts (the season that names the asset, the Int64 cast, the append, the empty-league skip,
+  the publish). Do not re-add a private parser — extend the library one.
 - Output: `espn_{league}_injuries` / `injuries_{season}.parquet`, one row per
-  `(as_of_date, league, team, athlete, injury)`. `team_id` / `athlete_id` are pinned to
-  `Int64` (ESPN ships every id as a numeric string, and omits `athlete.id` on this
-  endpoint — it is recovered from the player links).
+  `(as_of_date, league, team, athlete, injury)`. Every id column is pinned to `Int64` at
+  this boundary: the library parser emits ESPN's own `Utf8`, and this repo publishes `Int64`
+  because every other published ESPN asset does (`espn_cfb_rosters` carries `team_id` /
+  `athlete_id` as `Int64`). The cast is `Utf8 -> Int64` — an integer parse, never through
+  `float` — and a value that would not survive it raises rather than nulling a join key.
+  ESPN omits `athlete.id` on this endpoint entirely (0 of 1,291 records across all 8 leagues
+  on 2026-09-02); it is recovered from the player-card link.
 - Build-only by default; `--publish` uploads, `--dry-run` plans. Tests:
   `tests/test_espn_injuries_snapshot.py` (offline, no network).
 

@@ -15,6 +15,11 @@ and the league endpoint feeds all eight tags. See CLAUDE.md.
 
 One call per league per day -- ~8 requests total, not a per-team fan-out.
 
+The flatten (and the athlete-id recovery ESPN forces on it) lives ONCE, in
+``sportsdataverse.espn_snapshots.parse_injuries_snapshot``; this stage owns only
+what is producer-specific: the season that names the asset, the Int64 id
+convention, the append, the empty-league skip and the publish.
+
 Output: one row per ``(as_of_date, league, team, athlete, injury)``, published as
 ``espn_{league}_injuries`` / ``injuries_{season}.parquet`` (the ``{season}``
 asset template every other release uses, so a YAML loader row works later).
@@ -40,48 +45,44 @@ import argparse
 import importlib
 import io
 import logging
-import re
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Optional
 
 import polars as pl
 import requests
+from sportsdataverse.espn_snapshots import (
+    INJURY_SNAPSHOT_SCHEMA,
+    parse_injuries_snapshot,
+)
 
 logger = logging.getLogger(__name__)
 
 REPO = "sportsdataverse/sportsdataverse-data"
 LEAGUES: tuple[str, ...] = ("nfl", "nba", "wnba", "cfb", "mbb", "wbb", "nhl", "mlb")
 
-#: Explicit so an empty or partly-null league still carries the documented
-#: schema, and so the two join keys are pinned to Int64 at the boundary rather
-#: than inferred per run (ESPN ships every id as a numeric *string*).
+#: Every id ESPN ships on this endpoint. The library parser emits them as Utf8
+#: (ESPN's own wire form); this producer publishes Int64 because every other
+#: published ESPN asset does -- ``espn_cfb_rosters/cfb_rosters_2025.parquet``
+#: carries ``team_id``/``athlete_id``/``position_id`` as Int64, and an injuries
+#: asset keyed Utf8 would not join to it. The cast happens exactly once, here at
+#: the producer boundary, and never inside a second parser.
+ID_COLUMNS = ("team_id", "athlete_id", "injury_id", "type_id", "source_id")
+
+#: The published frame contract: the library's
+#: :data:`~sportsdataverse.espn_snapshots.INJURY_SNAPSHOT_SCHEMA` with the ids
+#: re-pinned to Int64 and ``season`` added (it names the release asset).
+#: Deriving it from the library's schema is what keeps the two in step -- a
+#: column added upstream arrives here instead of silently going missing.
 SCHEMA: dict[str, pl.DataType] = {
     "as_of_date": pl.Date,
     "league": pl.Utf8,
     "season": pl.Int64,
-    "team_id": pl.Int64,
-    "team_display_name": pl.Utf8,
-    "team_abbreviation": pl.Utf8,
-    "athlete_id": pl.Int64,
-    "athlete_display_name": pl.Utf8,
-    "athlete_short_name": pl.Utf8,
-    "position_abbreviation": pl.Utf8,
-    "position_name": pl.Utf8,
-    "injury_id": pl.Int64,
-    "status": pl.Utf8,
-    "type_name": pl.Utf8,
-    "type_abbreviation": pl.Utf8,
-    "type_description": pl.Utf8,
-    "injury_date": pl.Utf8,
-    "detail_type": pl.Utf8,
-    "detail_location": pl.Utf8,
-    "detail_side": pl.Utf8,
-    "detail_return_date": pl.Utf8,
-    "fantasy_status": pl.Utf8,
-    "source": pl.Utf8,
-    "short_comment": pl.Utf8,
-    "long_comment": pl.Utf8,
+    **{
+        name: (pl.Int64 if name in ID_COLUMNS else dtype)
+        for name, dtype in INJURY_SNAPSHOT_SCHEMA.items()
+        if name not in ("as_of_date", "league")
+    },
 }
 
 SORT_KEYS = ["as_of_date", "league", "team_id", "athlete_id", "injury_id"]
@@ -102,24 +103,12 @@ def _int(value: Any) -> Optional[int]:
         return None
 
 
-def _athlete_id(athlete: dict[str, Any]) -> Optional[int]:
-    """ESPN omits ``athlete.id`` on this endpoint; recover it from the player
-    links (100% coverage on all 8 leagues, 2026-09-02) then the headshot."""
-    for link in athlete.get("links") or []:
-        found = re.search(r"/id/(\d+)", str(link.get("href") or ""))
-        if found:
-            return int(found.group(1))
-    found = re.search(
-        r"/(\d+)\.png", str((athlete.get("headshot") or {}).get("href") or "")
-    )
-    return int(found.group(1)) if found else None
-
-
 def athlete_id_coverage(frame: pl.DataFrame) -> float:
     """Share of rows carrying an athlete_id. 1.0 on every league on 2026-09-02.
 
-    ESPN omits ``athlete.id`` on this endpoint, so the id is RECOVERED from the
-    player links (and a headshot fallback). That makes it fragile in a specific
+    ESPN omits ``athlete.id`` on this endpoint (0 of 1,291 records across all 8
+    leagues carried one on 2026-09-02), so the id is RECOVERED from the
+    player-card link by the library parser. That makes it fragile in a specific
     way: if ESPN reshapes those links, every id silently becomes null, the rows
     stay joinable-looking, and nothing fails -- the snapshot just quietly stops
     being usable as a player time series. Measure it so a drop is visible.
@@ -129,51 +118,38 @@ def athlete_id_coverage(frame: pl.DataFrame) -> float:
     return 1.0 - frame["athlete_id"].null_count() / frame.height
 
 
+def _cast_ids(frame: pl.DataFrame) -> pl.DataFrame:
+    """Re-pin the parser's Utf8 ids to this repo's published Int64.
+
+    polars parses ``Utf8 -> Int64`` as an integer, so the float route that turns
+    ``123`` into ``"123.0"`` is never taken. A value that is not an integer
+    becomes null under ``strict=False`` -- and that silent loss is exactly what a
+    join key must not do, so it is asserted against rather than trusted.
+    """
+    cast = frame.with_columns(pl.col(list(ID_COLUMNS)).cast(pl.Int64, strict=False))
+    for column in ID_COLUMNS:
+        lost = cast[column].null_count() - frame[column].null_count()
+        if lost:
+            raise ValueError(f"{column}: {lost} id(s) did not survive the Int64 cast")
+    return cast
+
+
 def explode(payload: dict[str, Any], league: str, as_of: Any) -> pl.DataFrame:
-    """Flatten the nested payload to one row per (team, athlete, injury)."""
+    """Flatten the nested payload to one row per (team, athlete, injury).
+
+    The flatten itself -- including recovering ``athlete_id`` from the player-card
+    link, which ESPN omits from every record on this endpoint -- belongs to
+    :func:`sportsdataverse.espn_snapshots.parse_injuries_snapshot`; this producer
+    only adds what is its own: the ``season`` that names the release asset, and
+    the Int64 id convention its other published assets join on.
+    """
     season = _int((payload.get("season") or {}).get("year"))
-    rows: list[dict[str, Any]] = []
-    for team in payload.get("injuries") or []:
-        team_id = _int(team.get("id"))
-        for inj in team.get("injuries") or []:
-            athlete = inj.get("athlete") or {}
-            position = athlete.get("position") or {}
-            details = inj.get("details") or {}
-            itype = inj.get("type") or {}
-            rows.append(
-                {
-                    "as_of_date": as_of,
-                    "league": league,
-                    "season": season,
-                    "team_id": team_id,
-                    "team_display_name": team.get("displayName"),
-                    "team_abbreviation": (athlete.get("team") or {}).get(
-                        "abbreviation"
-                    ),
-                    "athlete_id": _athlete_id(athlete),
-                    "athlete_display_name": athlete.get("displayName"),
-                    "athlete_short_name": athlete.get("shortName"),
-                    "position_abbreviation": position.get("abbreviation"),
-                    "position_name": position.get("displayName"),
-                    "injury_id": _int(inj.get("id")),
-                    "status": inj.get("status"),
-                    "type_name": itype.get("name"),
-                    "type_abbreviation": itype.get("abbreviation"),
-                    "type_description": itype.get("description"),
-                    "injury_date": inj.get("date"),
-                    "detail_type": details.get("type"),
-                    "detail_location": details.get("location"),
-                    "detail_side": details.get("side"),
-                    "detail_return_date": details.get("returnDate"),
-                    "fantasy_status": (details.get("fantasyStatus") or {}).get(
-                        "description"
-                    ),
-                    "source": (inj.get("source") or {}).get("description"),
-                    "short_comment": inj.get("shortComment"),
-                    "long_comment": inj.get("longComment"),
-                }
-            )
-    return pl.DataFrame(rows, schema=SCHEMA)
+    parsed = parse_injuries_snapshot(payload, league=league, as_of_date=as_of)
+    return (
+        _cast_ids(parsed)
+        .with_columns(pl.lit(season, dtype=pl.Int64).alias("season"))
+        .select(list(SCHEMA))
+    )
 
 
 def read_prior(tag: str, asset: str, *, repo: str = REPO) -> Optional[pl.DataFrame]:
@@ -196,12 +172,27 @@ def append_snapshot(prior: Optional[pl.DataFrame], today: pl.DataFrame) -> pl.Da
 
     Idempotent: re-running on the same day replaces that day's rows instead of
     duplicating them.
+
+    The merged frame is normalized back to TODAY's contract. In an append
+    dataset the prior asset is by construction older than the current schema, so
+    drift is the normal case, not a hypothesis: ``diagonal_relaxed`` would
+    otherwise carry a retired column into every future write (all-null from here
+    on) and could widen a join key's dtype to the prior asset's. Columns that
+    are genuinely gone are logged as they are dropped -- never silently.
     """
     if prior is None or prior.is_empty():
         return today.sort(SORT_KEYS)
     as_of = today["as_of_date"][0]
     keep = prior.filter(pl.col("as_of_date") != as_of)
-    return pl.concat([keep, today], how="diagonal_relaxed").sort(SORT_KEYS)
+    merged = pl.concat([keep, today], how="diagonal_relaxed").sort(SORT_KEYS)
+    retired = [c for c in merged.columns if c not in today.columns]
+    if retired:
+        logger.warning(
+            "append_dropped_retired_columns %s -- present in the prior asset, not in"
+            " the current schema",
+            retired,
+        )
+    return merged.select(today.columns).cast(dict(today.schema))
 
 
 def build(
@@ -285,7 +276,10 @@ def _publish(out: Path, written: dict[str, int], repo: str, *, dry_run: bool) ->
     by_tag: dict[str, list[Path]] = {}
     for key in written:
         tag, _, asset = key.partition("/")
-        path = out / tag / f"{asset}.parquet"
+        # `written` is keyed "<tag>/<asset>" and <asset> already carries its
+        # extension -- appending ".parquet" here made every path miss, so the
+        # loop uploaded nothing and still returned 0 (a silent green publish).
+        path = out / tag / asset
         if path.is_file():
             by_tag.setdefault(tag, []).append(path)
 

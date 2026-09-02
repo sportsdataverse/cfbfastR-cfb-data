@@ -11,7 +11,11 @@ suppressPackageStartupMessages({
 # NB: guard on publish_dataset (unique to _data_utils.R), NOT write_dataset — if
 # arrow is ever attached here it exports write_dataset(), making the guard skip the
 # source() and shadow our writer. (Not attached today, but kept robust.)
-if (!exists("publish_dataset")) source("R/_data_utils.R")
+# inherits = FALSE on purpose: the default searches ATTACHED PACKAGE envs too,
+# so any package exporting a `publish_dataset` would make this guard skip the
+# source and leave every OTHER helper in _data_utils.R undefined -- an error
+# far from its cause. Only the global env should count as "already sourced".
+if (!exists("publish_dataset", inherits = FALSE)) source("R/_data_utils.R")
 
 # Season-level team + player summaries ("Binion Box Score") aggregated from cfbfastR
 # season play-by-play (cfbfastR::load_cfb_pbp): opponent-adjusted EPA plus success /

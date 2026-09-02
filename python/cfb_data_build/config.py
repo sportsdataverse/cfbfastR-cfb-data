@@ -163,3 +163,49 @@ SUMMARIES_REGISTRY: dict[str, DatasetSpec] = {
     "rushing": DatasetSpec("rushing", "cfb_rushing", "espn_cfb_rushing"),
     "receiving": DatasetSpec("receiving", "cfb_receiving", "espn_cfb_receiving"),
 }
+
+
+# --- release sidecar metadata -------------------------------------------------
+# Every published tag carries package_function.txt/.json naming the loader a
+# consumer reaches the data through -- the half of R's sportsdataverse_save()
+# the Python publisher used to drop. Values are NOT invented: where the R
+# producer already published a package_function to the tag, that exact string
+# is reused, so re-stamping from Python does not change what a consumer sees.
+# Python-only tags that never had one name the sdv-py loader instead.
+#
+# Keyed by tag, not dataset -- several datasets can share one tag. BOTH
+# registries publish through the same publish_dataset(), so both are covered;
+# the publish tests assert every tag in either one has an entry, so a new
+# dataset cannot ship an unnamed tag.
+PKG_FUNCTION: dict[str, str] = {
+    # no reader in any package: espn_cfb_injuries has no cfbfastR loader and is
+    # absent from sdv-py's releases.yaml, so it names its producer stage (the
+    # same convention the ncaa_*_rapm tags already carry on their sidecars).
+    "espn_cfb_injuries": "R/espn_cfb_14_injuries_creation.R",
+    "espn_cfb_passing": "sportsdataverse.cfb.load_cfb_passing()",
+    "espn_cfb_percentiles": "sportsdataverse.cfb.load_cfb_percentiles()",
+    "espn_cfb_receiving": "sportsdataverse.cfb.load_cfb_receiving()",
+    "espn_cfb_rushing": "sportsdataverse.cfb.load_cfb_rushing()",
+    "espn_cfb_schedules": "cfbfastR::load_cfb_schedules()",
+    "espn_cfb_team_summaries": "sportsdataverse.cfb.load_cfb_team_summaries()",
+    "espn_cfb_adv_defensive": "sportsdataverse.cfb.load_cfb_adv_defensive()",
+    "espn_cfb_adv_defensive_players": "sportsdataverse.cfb.load_cfb_adv_defensive_players()",
+    "espn_cfb_adv_drives": "sportsdataverse.cfb.load_cfb_adv_drives()",
+    "espn_cfb_adv_passing": "sportsdataverse.cfb.load_cfb_adv_passing()",
+    "espn_cfb_adv_receiving": "sportsdataverse.cfb.load_cfb_adv_receiving()",
+    "espn_cfb_adv_rushing": "sportsdataverse.cfb.load_cfb_adv_rushing()",
+    "espn_cfb_adv_situational": "sportsdataverse.cfb.load_cfb_adv_situational()",
+    "espn_cfb_adv_specialists": "sportsdataverse.cfb.load_cfb_adv_specialists()",
+    "espn_cfb_adv_team": "sportsdataverse.cfb.load_cfb_adv_team()",
+    "espn_cfb_adv_turnover": "sportsdataverse.cfb.load_cfb_adv_turnover()",
+    "espn_cfb_betting": "sportsdataverse.cfb.load_cfb_betting()",
+    "espn_cfb_drives": "sportsdataverse.cfb.load_cfb_drives()",
+    "espn_cfb_game_rosters": "sportsdataverse.cfb.load_cfb_game_rosters()",
+    "espn_cfb_linescores": "sportsdataverse.cfb.load_cfb_linescores()",
+    "espn_cfb_pbp": "cfbfastR::load_cfb_pbp()",
+    "espn_cfb_play_participants": "sportsdataverse.cfb.load_cfb_play_participants()",
+    "espn_cfb_player_box": "sportsdataverse.cfb.load_cfb_player_box()",
+    "espn_cfb_power_index": "sportsdataverse.cfb.load_cfb_power_index()",
+    "espn_cfb_rosters": "cfbfastR::load_cfb_rosters()",
+    "espn_cfb_team_box": "sportsdataverse.cfb.load_cfb_team_box()",
+}

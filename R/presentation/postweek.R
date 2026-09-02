@@ -18,7 +18,10 @@ if (!exists("read_team_summaries")) source("R/presentation/_summary_paths.R")
 
 cli::cli_h1("CFB postweek tables + skeets")
 
-current_year <- lubridate::year(Sys.Date())
+# The CFB season is NOT the calendar year -- it rolls over in August, so
+# lubridate::year(Sys.Date()) returns the WRONG season for every bowl and
+# playoff game in January. `previews.R` already uses this helper; same idiom here.
+current_year <- cfbfastR:::most_recent_cfb_season()
 # Dataset is republished daily, so label tables with the run date (ET).
 formatted_file_date <- format(Sys.time(), "%F", tz = "America/New_York")
 team.adj <- read_team_summaries(current_year) |>
@@ -399,7 +402,11 @@ passer <- week_pbp |>
             !is.na(passer_player_name)
     ) |>
     dplyr::summarize(
-        .by = passer_player_name,
+        # Keyed on the id as well as the name: two players sharing a display name
+        # in the same week would otherwise be summed into one leaderboard row.
+        # Grouping by both keeps the name available for display, and can only
+        # ever SPLIT a group, never merge one.
+        .by = c(passer_player_id, passer_player_name),
         team = dplyr::last(pos_team),
         opponent = dplyr::last(def_pos_team),
         dropbacks = dplyr::n(),
@@ -526,7 +533,11 @@ rusher <- week_pbp |>
             !is.na(rusher_player_name)
     ) |>
     dplyr::summarize(
-        .by = rusher_player_name,
+        # Keyed on the id as well as the name: two players sharing a display name
+        # in the same week would otherwise be summed into one leaderboard row.
+        # Grouping by both keeps the name available for display, and can only
+        # ever SPLIT a group, never merge one.
+        .by = c(rusher_player_id, rusher_player_name),
         pos_team = dplyr::last(pos_team),
         def_pos_team_name = dplyr::last(def_pos_team),
         carries = dplyr::n(),
@@ -639,7 +650,11 @@ receiver <- week_pbp |>
             !is.na(receiver_player_name)
     ) |>
     dplyr::summarize(
-        .by = receiver_player_name,
+        # Keyed on the id as well as the name: two players sharing a display name
+        # in the same week would otherwise be summed into one leaderboard row.
+        # Grouping by both keeps the name available for display, and can only
+        # ever SPLIT a group, never merge one.
+        .by = c(receiver_player_id, receiver_player_name),
         pos_team = dplyr::last(pos_team),
         def_pos_team_name = dplyr::last(def_pos_team),
         targets = dplyr::n(),
@@ -777,42 +792,42 @@ thread_content <- list(
         "text" = glue::glue("🤖 Stand-by for an automated thread of updates:\n\nSeason: {current_week$season}\nWeek: {current_week$week}\nType: {current_week$season_type}\n\nReach out to @akeaswaran.me or @saiemgilani.bsky.social with any concerns!") # ,
     ),
     list(
-        "text" = glue::glue("Adjusted EPA through {formatted_file_date}, P4\n\nLink: https://gameonpaper.com/cfb/year/2024/charts/team/epa"),
+        "text" = glue::glue("Adjusted EPA through {formatted_file_date}, P4\n\nLink: https://gameonpaper.com/cfb/year/{current_year}/charts/team/epa"),
         "images" = glue::glue("./figures/{formatted_file_date}-P4.png"),
         "images_alt" = paste0("Shows team logos plotted by offensive adjusted EPA/play on the X-axis and defensive adjusted EPA/play on the Y-axis for the Power 4 teams as of ", formatted_file_date) # ,
     ),
     list(
-        "text" = glue::glue("Adjusted EPA through {formatted_file_date}, G6\n\nLink: https://gameonpaper.com/cfb/year/2024/charts/team/epa"),
+        "text" = glue::glue("Adjusted EPA through {formatted_file_date}, G6\n\nLink: https://gameonpaper.com/cfb/year/{current_year}/charts/team/epa"),
         "images" = glue::glue("./figures/{formatted_file_date}-G6.png"),
         "images_alt" = paste0("Shows team logos plotted by offensive adjusted EPA/play on the X-axis and defensive adjusted EPA/play on the Y-axis for the Group of 6 teams as of ", formatted_file_date) # ,
     ),
     list(
-        "text" = glue::glue("Net Statistics Leaders through {formatted_file_date}\n\nFull list: https://gameonpaper.com/cfb/year/2024/teams/differential"),
+        "text" = glue::glue("Net Statistics Leaders through {formatted_file_date}\n\nFull list: https://gameonpaper.com/cfb/year/{current_year}/teams/differential"),
         "images" = glue::glue("./figures/{formatted_file_date}-net_stat.png") # ,
         # "images_alt" = ""
     ),
     list(
-        "text" = glue::glue("Offensive Statistics Leaders through {formatted_file_date}\n\nFull list: https://gameonpaper.com/cfb/year/2024/teams/offensive"),
+        "text" = glue::glue("Offensive Statistics Leaders through {formatted_file_date}\n\nFull list: https://gameonpaper.com/cfb/year/{current_year}/teams/offensive"),
         "images" = glue::glue("./figures/{formatted_file_date}-off_stat.png") # ,
         # "images_alt" = ""
     ),
     list(
-        "text" = glue::glue("Defensive Statistics Leaders through {formatted_file_date}\n\nFull list: https://gameonpaper.com/cfb/year/2024/teams/defensive"),
+        "text" = glue::glue("Defensive Statistics Leaders through {formatted_file_date}\n\nFull list: https://gameonpaper.com/cfb/year/{current_year}/teams/defensive"),
         "images" = glue::glue("./figures/{formatted_file_date}-def_stat.png") # ,
         # "images_alt" = ""
     ),
     list(
-        "text" = glue::glue("Weekly Passing Leaders - {formatted_file_date}\n\nFull list: https://gameonpaper.com/cfb/year/2024/players/passing"),
+        "text" = glue::glue("Weekly Passing Leaders - {formatted_file_date}\n\nFull list: https://gameonpaper.com/cfb/year/{current_year}/players/passing"),
         "images" = glue::glue("./figures/{formatted_file_date}-passing.png") # ,
         # "images_alt" = ""
     ),
     list(
-        "text" = glue::glue("Weekly Rushing Leaders - {formatted_file_date}\n\nFull list: https://gameonpaper.com/cfb/year/2024/players/rushing"),
+        "text" = glue::glue("Weekly Rushing Leaders - {formatted_file_date}\n\nFull list: https://gameonpaper.com/cfb/year/{current_year}/players/rushing"),
         "images" = glue::glue("./figures/{formatted_file_date}-rushing.png") # ,
         # "images_alt" = ""
     ),
     list(
-        "text" = glue::glue("Weekly Receiving Leaders - {formatted_file_date}\n\nFull list: https://gameonpaper.com/cfb/year/2024/players/receiving"),
+        "text" = glue::glue("Weekly Receiving Leaders - {formatted_file_date}\n\nFull list: https://gameonpaper.com/cfb/year/{current_year}/players/receiving"),
         "images" = glue::glue("./figures/{formatted_file_date}-receiving.png") # ,
         # "images_alt" = ""
     )

@@ -1,0 +1,101 @@
+# Model stage manifest — the SINGLE home for the model/stage list (Track C
+# step 2). tests/test_model_manifest.py keeps this file, models/REGISTRY.md
+# (per-ROW — the lockstep the registry's own header says its package-level
+# floor test cannot provide), and the numbered cfb_model_* stages in lockstep.
+#
+# Stage numbering (see cfb_model_30's docstring): 10 ingest/model-pbp,
+# 30–34 the model families, 60 publish, 70 reports; 20/40/50 reserved holes.
+# Fitted stages 30–34 route through python/_model_stage.py: fingerprint skip
+# (hash(package subtree, argv)) unless --force, models/ledger.jsonl appended
+# per successful run. Run subsets with scripts/cfb_models.sh.
+#
+# Step 6 (commit promoted artifacts): this repo COMMITS python/artifacts/
+# (tracked .ubj + cards) and the keepers additionally ship in sdv-py's bundled
+# cfb/models/ + the release tags — three durable stores.
+#
+# Feature lists: the CFB model features live with the trainers in
+# cfb_model_build / sdv-py model constants; no features/*.yaml registry here
+# yet (recorded follow-up — generate v1 from the training constants and gate
+# ordered equality, as nfl-data does).
+
+driver: scripts/cfb_models.sh
+
+stages:
+  "10": {file: python/cfb_model_10_pbp_creation.py, package: cfb_model_build.cfb_model_pbp}
+  "30": {file: python/cfb_model_30_train_creation.py, package: cfb_model_build.model_training}
+  "31": {file: python/cfb_model_31_cpoe_creation.py, package: cfb_model_build.cpoe}
+  "32": {file: python/cfb_model_32_pregame_wp_creation.py, package: cfb_model_build.pregame_wp}
+  "33": {file: python/cfb_model_33_rb_eval_creation.py, package: cfb_model_build.rb_eval}
+  "34": {file: python/cfb_model_34_higher_models_creation.py, package: cfb_model_build.cfb_higher_models}
+  "60": {file: python/cfb_model_60_publish_creation.py, package: cfb_model_build.cfb_model_publish}
+  "70": {file: python/cfb_model_70_reports_creation.py, package: cfb_model_build.cfb_model_reports}
+
+# One entry per models/REGISTRY.md row; registry_model MUST equal the row's
+# first cell verbatim (the per-row lockstep key).
+models:
+  ep:
+    registry_model: "ep (next-score EP, 7-class)"
+    stage: "30"
+    artifact: ep_model.ubj
+  wp_spread:
+    registry_model: "wp_spread"
+    stage: "30"
+    artifact: wp_spread.ubj
+  wp_naive:
+    registry_model: "wp_naive"
+    stage: "30"
+    artifact: wp_naive.ubj
+  cpoe:
+    registry_model: "cp / CPOE"
+    stage: "31"
+    artifact: cfb_cp_model.ubj
+  qbr:
+    registry_model: "qbr"
+    stage: "30"
+    artifact: qbr_model.ubj
+  fg:
+    registry_model: "fg"
+    stage: "30"
+    artifact: fg_model.ubj
+  fourth_down:
+    registry_model: "fourth_down"
+    stage: "30"
+    artifact: fd_model.ubj
+  two_pt:
+    registry_model: "two_pt"
+    stage: "30"
+    artifact: two_pt_model.ubj
+  xpass:
+    registry_model: "xpass"
+    stage: "30"
+    artifact: xpass_model.ubj
+  punt:
+    registry_model: "punt distribution"
+    stage: "30"
+    artifact: punt_distribution.parquet
+  rb_eval:
+    registry_model: "rb_eval (xREPA)"
+    stage: "33"
+    artifact: rb_eval GAM .pkl + card
+  pregame_wp:
+    registry_model: "pregame_wp (Five Factors)"
+    stage: "32"
+    artifact: pgwp_model.ubj
+  model_pbp:
+    registry_model: "model_pbp (scored PBP)"
+    stage: "10"
+    artifact: cfb_model_pbp_full.parquet
+  cfb_ratings:
+    registry_model: "cfb_ratings"
+    stage: "60"
+    artifact: cfb_ratings_{season}.parquet
+    notes: compute-on-demand via cfb_model_publish ratings (cfb_ratings_cron.yml)
+  cfb_recruiting_proj:
+    registry_model: "cfb_recruiting_proj"
+    stage: "60"
+    artifact: cfb_recruiting_proj per-season parquet
+    notes: compute-on-demand via cfb_model_publish recruiting (cfb_recruiting_proj_cron.yml)
+
+# Stage 34 (cfb_higher_models) is research-only by recorded decision — no
+# published model, no registry row (see NON_PUBLISHING_STAGES in
+# tests/test_model_registry.py). Stage 70 emits reports ABOUT the others.

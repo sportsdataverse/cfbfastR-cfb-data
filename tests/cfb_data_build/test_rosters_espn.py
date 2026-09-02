@@ -322,3 +322,120 @@ def test_cfbd_join_is_left_and_never_changes_the_espn_row_set(positions, divisio
     pre = [c for c in R.OUTPUT_COLS if c not in R.CFBD_COLS.values()]
     assert len(pre) == 78
     assert df.select(pre).equals(espn_only.select(pre))
+
+
+# --------------------------------------------------------------------------
+# Pre-season degradation: a source that has not published yet
+#
+# These exercise the DOWNLOADERS, not an injected `fetcher=`. The existing
+# `fetcher=lambda _u: None` tests inject past the failure point, which is why a
+# pre-season 404 took the whole `cfb_rosters` build down unnoticed: `download`
+# RAISES on a 404 rather than returning a non-200 response, so the "return None"
+# branch those tests cover was unreachable in production.
+# --------------------------------------------------------------------------
+
+
+def _raising_download(exc):
+    """Stand in for ``dl_utils.download``, recording that it was actually called."""
+    calls = {"n": 0}
+
+    def fake(url, *a, **k):
+        calls["n"] += 1
+        raise exc
+
+    return fake, calls
+
+
+def test_download_bytes_degrades_when_the_asset_is_missing(monkeypatch):
+    """A season CFBD has not published yet must yield ``None``, not an exception.
+
+    ``cfb_rosters`` LEFT-joins the CFBD columns onto the ESPN rosters, so an absent
+    CFBD asset means null enrichment -- never a failed dataset.
+    """
+    import sportsdataverse.dl_utils as dl
+    from sportsdataverse import errors
+
+    missing = getattr(errors, "NoDataError", None) or errors.NoESPNDataError
+    fake, calls = _raising_download(missing("404 for cfb_rosters_2026.parquet"))
+    monkeypatch.setattr(dl, "download", fake)
+
+    assert R._download_bytes("https://example.invalid/cfb_rosters_2026.parquet") is None
+    assert calls["n"] == 1, "download was never called -- the test mocked past the code under test"
+
+
+def test_download_degrades_when_the_asset_is_missing(monkeypatch):
+    """Same rule for the text downloader (positions reference, per-season teams)."""
+    import sportsdataverse.dl_utils as dl
+    from sportsdataverse import errors
+
+    missing = getattr(errors, "NoDataError", None) or errors.NoESPNDataError
+    fake, calls = _raising_download(missing("404"))
+    monkeypatch.setattr(dl, "download", fake)
+
+    assert R._download("https://example.invalid/positions.json") is None
+    assert calls["n"] == 1
+
+
+def test_a_failed_fetch_still_propagates(monkeypatch):
+    """Only a definitive 404 degrades.
+
+    A 403, a rate limit, or an exhausted retry budget means the answer is UNKNOWN.
+    Swallowing those would publish a season with silently-null enrichment and no
+    error -- the failure mode this whole guard exists to prevent.
+    """
+    import sportsdataverse.dl_utils as dl
+
+    fake, calls = _raising_download(RuntimeError("HTTP 403 rate limited"))
+    monkeypatch.setattr(dl, "download", fake)
+
+    with pytest.raises(RuntimeError, match="403"):
+        R._download_bytes("https://example.invalid/cfb_rosters_2025.parquet")
+    assert calls["n"] == 1
+
+
+def test_missing_cfbd_season_builds_empty_typed_frame(monkeypatch):
+    """End to end: the raise becomes an empty frame carrying the pinned schema."""
+    import sportsdataverse.dl_utils as dl
+    from sportsdataverse import errors
+
+    missing = getattr(errors, "NoDataError", None) or errors.NoESPNDataError
+    fake, _ = _raising_download(missing("404"))
+    monkeypatch.setattr(dl, "download", fake)
+
+    out = R.load_cfbd_rosters(2026)
+    assert out.height == 0
+    assert out.schema["athlete_id"] == pl.Int64
+    assert set(R.CFBD_COLS.values()).issubset(set(out.columns))
+
+
+# --------------------------------------------------------------------------
+# The zero-row guard has to mean two opposite things depending on the season
+# --------------------------------------------------------------------------
+
+
+def _stub_empty_build(monkeypatch, completed: int):
+    """Make build_season compile zero rows, with `completed` games on the schedule."""
+    monkeypatch.setattr(R, "load_positions", lambda *a, **k: {})
+    monkeypatch.setattr(R, "load_divisions", lambda *a, **k: {})
+    monkeypatch.setattr(R, "load_cfbd_rosters", lambda *a, **k: pl.DataFrame(
+        schema={"athlete_id": pl.Int64, **{v: pl.Utf8 for v in R.CFBD_COLS.values()}}))
+    monkeypatch.setattr(R, "season_game_ids", lambda *a, **k: [1, 2, 3])
+    monkeypatch.setattr(R, "fetch_game_rosters", lambda *a, **k: [])  # nothing came back
+    monkeypatch.setattr(R, "season_completed_games", lambda *a, **k: completed)
+
+
+def test_zero_rows_before_kickoff_is_skipped_not_raised(monkeypatch):
+    """August: the schedule is published, no game has been played, so there are
+    no per-game rosters to fetch. Zero rows is the correct answer."""
+    _stub_empty_build(monkeypatch, completed=0)
+    out = R.build_season(2026, write=False, publish=False)
+    assert out.height == 0
+
+
+def test_zero_rows_after_games_played_still_raises(monkeypatch):
+    """In-season: games are complete and we still compiled nothing, which means
+    every roster fetch failed. That must stay loud -- returning quietly would let
+    the CLI report success with no artifact for the season."""
+    _stub_empty_build(monkeypatch, completed=42)
+    with pytest.raises(RuntimeError, match="compiled zero roster rows"):
+        R.build_season(2025, write=False, publish=False)

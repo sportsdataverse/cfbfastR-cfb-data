@@ -3,10 +3,81 @@ from __future__ import annotations
 import polars as pl
 
 from cfb_model_build.model_training.ingest import _read_final_plays
-from .schema import CARRY_RENAME, DESCRIPTOR_COLS, IDENTITY_COLS
+from .schema import ATHLETE_ID_COLS, ATHLETE_NAME_COLS, CARRY_RENAME, DESCRIPTOR_COLS, IDENTITY_COLS
 
 _REQUIRED_CARRY = list(CARRY_RENAME.keys())
 _LAST = {"kept": 0, "dropped": 0}
+
+
+def _with_athlete_cols(df: pl.DataFrame) -> pl.DataFrame:
+    """Pin the athlete columns' dtypes and materialize the ones a season's finals lack.
+
+    A season whose finals never carry a key would otherwise publish a parquet WITHOUT the
+    column, and a cross-season concat would fail on schema; a game whose ids are all
+    null infers ``Null`` and would concat to ``Null``/``String``. Cast is strict on purpose:
+    a non-numeric id is a parser regression to surface, not to paper over.
+    """
+    return df.with_columns(
+        [pl.col(c).cast(pl.Int64) if c in df.columns else pl.lit(None, dtype=pl.Int64).alias(c)
+         for c in ATHLETE_ID_COLS]
+        + [pl.col(c).cast(pl.Utf8) if c in df.columns else pl.lit(None, dtype=pl.Utf8).alias(c)
+           for c in ATHLETE_NAME_COLS]
+    )
+
+
+# Athlete-id coverage gate (silent-no-op guard): _with_athlete_cols materializes NULL columns when
+# a key is absent, so an upstream rename / re-scrape that dropped the ids would otherwise publish
+# all-null id columns with no error. Ids ride along with names -- observed in pbp_full 2025:
+# passer id on 42.2% of all plays vs name 43.1% -> id/name 0.979 (rusher 43.4/44.3 = 0.980,
+# receiver 37.6/38.7 = 0.972); the 2-3% residue is regex-fallback names that carry no ESPN id.
+# 2004 = 0.0 (ESPN shipped no passer ids before 2005), hence the season floor. Never lower to pass.
+ATHLETE_ID_FLOOR = 0.9
+ATHLETE_ID_GATE_FROM_SEASON = 2005
+
+
+# A role is only measurable on a frame that HAS the plays it rides on: no completed pass in the
+# newest season means no receiver, and skipping the role is right. But when the plays ARE there
+# and the names are gone, the role is a dropped key, not an inapplicable one -- an upstream rename
+# that took the name column with the id column materializes two all-null columns, and skipping the
+# role would let check_athlete_ids pass on exactly the regression the gate exists to catch.
+_ROLE_APPLIES_ON = {"passer": "pass", "rusher": "rush", "receiver": "completion"}
+
+
+def _role_applies(d: pl.DataFrame, role: str) -> bool:
+    c = _ROLE_APPLIES_ON[role]
+    if c not in d.columns:
+        return True  # descriptor absent -> cannot rule the role out; measure it
+    return bool(d[c].cast(pl.Boolean, strict=False).fill_null(False).any())
+
+
+def athlete_id_coverage(df: pl.DataFrame) -> dict:
+    """Newest season's non-null id / non-null name per role (roles the season has no plays for are skipped)."""
+    if df.is_empty() or "season" not in df.columns:
+        return {}
+    newest = int(df["season"].max())
+    d = df.filter(pl.col("season") == newest)
+    cov: dict = {"season": newest}
+    for role in ("passer", "rusher", "receiver"):
+        names = int(d[f"{role}_player_name"].is_not_null().sum())
+        ids = int(d[f"{role}_player_id"].is_not_null().sum())
+        if names:
+            cov[role] = round(ids / names, 3)
+        elif _role_applies(d, role):
+            cov[role] = 1.0 if ids else 0.0
+    return cov
+
+
+def check_athlete_ids(df: pl.DataFrame) -> dict:
+    """Refuse the build when the newest season (>= 2005) carries names without ids."""
+    cov = athlete_id_coverage(df)
+    if cov and cov["season"] >= ATHLETE_ID_GATE_FROM_SEASON:
+        low = {r: v for r, v in cov.items() if r != "season" and v < ATHLETE_ID_FLOOR}
+        if low:
+            raise ValueError(
+                f"model_pbp REFUSED: athlete id coverage below {ATHLETE_ID_FLOOR} for season {cov['season']}: {low} "
+                "-- ids are emitted upstream by sdv-py's participants module; an all-null id column means the key was dropped"
+            )
+    return cov
 
 
 def build_carry_frame(final_dir, seasons=None) -> pl.DataFrame:
@@ -19,7 +90,7 @@ def build_carry_frame(final_dir, seasons=None) -> pl.DataFrame:
     if present_required:
         df = df.drop_nulls(subset=present_required)
     _LAST["kept"], _LAST["dropped"] = df.height, before - df.height
-    df = df.rename({k: v for k, v in CARRY_RENAME.items() if k in df.columns})
+    df = _with_athlete_cols(df.rename({k: v for k, v in CARRY_RENAME.items() if k in df.columns}))
     carry = [c for c in (IDENTITY_COLS + DESCRIPTOR_COLS + list(CARRY_RENAME.values())) if c in df.columns]
     return df.select(carry)
 

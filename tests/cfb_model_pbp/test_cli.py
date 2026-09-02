@@ -70,6 +70,9 @@ def test_contract_columns(tmp_path):
             "homeTeamName": "TeamA",
             "awayTeamName": "TeamB",
             "passer_player_name": "QB1",
+            "passer_player_id": 4690158,
+            "receiver_player_name": "WR1",
+            "receiver_player_id": 4690159,
         },
         {
             "id": 1002,
@@ -108,6 +111,9 @@ def test_contract_columns(tmp_path):
             "homeTeamName": "TeamA",
             "awayTeamName": "TeamB",
             "passer_player_name": None,
+            "passer_player_id": None,
+            "rusher_player_name": "RB1",
+            "rusher_player_id": 5083848,
         },
     ]
 
@@ -152,3 +158,44 @@ def test_contract_columns(tmp_path):
 
     # scored_date must be a non-null ISO date string.
     assert df["scored_date"][0] is not None
+
+
+def test_refuses_when_athlete_ids_are_absent(tmp_path):
+    """An upstream rename / re-scrape that drops the id keys must fail loudly, not publish all-null ids.
+
+    Rush-only play so no CP booster is loaded; names present, id keys absent -> coverage 0 < 0.9.
+    """
+    cache = tmp_path / "cache"
+    cache.mkdir()
+    play = {"id": 1, "game_id": 5, "season": 2025, "week": 1, "period": 1, "sequenceNumber": 1,
+            "game_play_number": 1, "drive.id": 1, "type.text": "Rush", "pass": False, "rush": True,
+            "completion": False, "EP_start": 1.0, "EP_end": 1.2, "EPA": 0.2, "wp_before": 0.5,
+            "wp_after": 0.5, "wpa": 0.0, "passer_player_name": "QB1", "rusher_player_name": "RB1"}
+    (cache / "5.json").write_text(json.dumps({"season": 2025, "plays": [play]}), encoding="utf-8")
+    out = tmp_path / "o.parquet"
+    with pytest.raises(ValueError, match="athlete id coverage"):
+        main(["--final-dir", str(cache), "--cp-model", "unused.ubj", "--out", str(out), "--seasons", "2025"])
+    assert not out.exists()
+
+
+def test_refuses_when_a_role_has_neither_ids_nor_names(tmp_path):
+    """A rename that drops BOTH keys for a role the season HAS plays for must still fail the gate.
+
+    _with_athlete_cols materializes the missing columns as all-null, so a role scored as
+    "unmeasurable" (no names) used to slip past check_athlete_ids and publish an all-null id
+    column. Zero names on an applicable role now scores 0.0 instead of being skipped; a role
+    the frame has no plays for (no completion -> no receiver) is still skipped.
+    """
+    cache = tmp_path / "cache"
+    cache.mkdir()
+    # A rush play (so no CP booster is loaded): the rusher role APPLIES, but BOTH rusher keys
+    # are absent -- names 0 and ids 0, which used to be scored "unmeasurable" and skipped.
+    play = {"id": 1, "game_id": 5, "season": 2025, "week": 1, "period": 1, "sequenceNumber": 1,
+            "game_play_number": 1, "drive.id": 1, "type.text": "Rush", "pass": False, "rush": True,
+            "completion": False, "EP_start": 1.0, "EP_end": 1.2, "EPA": 0.2, "wp_before": 0.5,
+            "wp_after": 0.5, "wpa": 0.0}
+    (cache / "5.json").write_text(json.dumps({"season": 2025, "plays": [play]}), encoding="utf-8")
+    out = tmp_path / "o.parquet"
+    with pytest.raises(ValueError, match="athlete id coverage"):
+        main(["--final-dir", str(cache), "--cp-model", "unused.ubj", "--out", str(out), "--seasons", "2025"])
+    assert not out.exists()

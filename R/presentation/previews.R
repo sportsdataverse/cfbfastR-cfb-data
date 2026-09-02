@@ -833,12 +833,19 @@ fire_skeet <- function(row, reply = NULL, live_run = FALSE) {
     )
 
 
-    # args = list(
-    #     "text" = skeet_content,
-    #     "images" = clean_file,
-    #     "images_alt" = img_data$alt_text,
-    #     "max_tries" = 1
-    # )
+    # Built as a list and dispatched with do.call so `reply` can be added
+    # conditionally -- skeet() takes it as a named argument. This block used to be
+    # commented out while the call below passed its arguments directly, which left
+    # the `args[["reply"]] <-` line assigning into a name that did not exist: it
+    # errored on every threaded post (`args` resolves to base::args, a closure),
+    # and the reply never reached skeet() even when it did not, so threads broke.
+    args <- list(
+        text = skeet_content,
+        images = paste0(clean_file),
+        images_alt = paste0(img_data$alt_text),
+        max_tries = 1,
+        user = "gameonpaper.com"
+    )
 
     if (!is.null(reply)) {
         args[["reply"]] <- paste0("https://bsky.app/profile/gameonpaper.com/post/", retrieve_skeet_id(reply))
@@ -849,13 +856,7 @@ fire_skeet <- function(row, reply = NULL, live_run = FALSE) {
 
         tryCatch(
             {
-                return(skeet(
-                    text = skeet_content,
-                    images = paste0(clean_file),
-                    images_alt = paste0(img_data$alt_text),
-                    max_tries = 1,
-                    user = "gameonpaper.com"
-                ))
+                return(do.call(skeet, args))
             },
             error = function(e) {
                 cli::cli_alert_danger("skeet failed: {conditionMessage(e)}")

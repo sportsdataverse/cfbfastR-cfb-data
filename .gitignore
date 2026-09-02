@@ -40,3 +40,31 @@ python/.omc/
 # python/out was a stray scratch dir whose contents were already published to
 # the cfb_ratings release; ignore the whole dir so a rebuild cannot recommit it.
 python/out/
+
+# --- build output ---
+# `out/` is the --out default for the publish CLI (cfb_model_publish/cli.py) and
+# for cfb_ratings_cron.yml / cfb_recruiting_proj_cron.yml: parquet staged for
+# release upload, never committed.
+out/
+
+# --- logs/ ---
+# DELIBERATELY TRACKED: cfbfastR_cfb_data_logfile_YYYY.log -- the daily
+# processor's own per-season run record. Everything else under logs/ is an
+# ad-hoc session artifact and is ignored.
+logs/*
+!logs/cfbfastR_cfb_data_logfile_[0-9][0-9][0-9][0-9].log
+*.log
+
+# --- local tooling ---
+.cache/
+.understand-anything/
+
+# Duplicate of the repo-root cfb/ output tree, produced when the builder runs
+# with cwd=python/ -- cfb_data_build/build.py defaults base="cfb", a RELATIVE
+# path, so the output root follows the working directory. 15 GB / 6,941 files
+# here as of 2026-08-29. Never commit it; the real tree is cfb/ at repo root.
+python/cfb/
+
+# per-stage fingerprint store (local skip cache, never committed)
+python/artifacts/.fingerprints.json
+docs/models/.cache/

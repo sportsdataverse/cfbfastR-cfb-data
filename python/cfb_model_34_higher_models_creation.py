@@ -15,7 +15,8 @@ publish -> integrate. The numbers leave gaps on purpose:
   renumbering everything after it.
 
 Gates sit upstream of publish and are never lowered. Every artifact this
-pipeline publishes needs a row in the **Model registry** in ``CLAUDE.md`` --
+pipeline publishes needs a row in the **Model registry** in
+``models/REGISTRY.md`` --
 model, artifact, release tag, training data, fitting script, gates, last
 retrain, cadence. ``tests/test_model_registry.py`` enforces that each row's
 fitting script resolves to a real stage here.
@@ -35,5 +36,9 @@ import sys
 PACKAGE = "cfb_model_build.cfb_higher_models"
 
 if __name__ == "__main__":
-    sys.argv[0] = f"python -m {PACKAGE}"
-    runpy.run_module(PACKAGE, run_name="__main__", alter_sys=True)
+    # Fingerprint + ledger runtime (Track C steps 3+5): skips when
+    # hash(package subtree, argv) is unchanged and the argv's --out artifacts
+    # exist; --force retrains. Appends models/ledger.jsonl on success.
+    from _model_stage import run
+
+    raise SystemExit(run(PACKAGE))

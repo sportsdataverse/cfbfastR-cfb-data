@@ -52,7 +52,7 @@ from cfb_data_build.config import DatasetSpec
 from cfb_data_build.io import gzip_csv, write_dataset
 from cfb_data_build.teams import DIVISIONS as _TEAM_DIVISIONS
 from cfb_data_ingest import RAW_BASE
-from cfb_data_ingest.schedule import season_game_ids
+from cfb_data_ingest.schedule import season_completed_games, season_game_ids
 
 SPEC = DatasetSpec(
     dataset="cfb_rosters",
@@ -210,21 +210,55 @@ DIVISION_BY_GROUP = dict(_TEAM_DIVISIONS)
 # --------------------------------------------------------------------------- IO
 
 
+def _missing_asset_error():
+    """The exception ``download`` raises for a definitive 404.
+
+    Renamed to ``NoDataError`` in sportsdataverse-py (the error covers any 404,
+    not only ESPN ones); the old name survives as an alias, so accept either and
+    stay compatible with whichever revision the lockfile currently pins.
+    """
+    from sportsdataverse import errors
+
+    return getattr(errors, "NoDataError", None) or errors.NoESPNDataError
+
+
 def _download(url: str) -> str | None:
-    """GET ``url``, returning the body or ``None`` for anything non-200."""
+    """GET ``url``, returning the body or ``None`` for anything non-200.
+
+    A 404 is a RAISE, not a non-200 return: ``download`` treats a definitive
+    "no data" as an exception and never hands back a response to inspect. Callers
+    here read optional, not-yet-published assets (a season's positions reference,
+    a team file), so an absent asset must degrade to ``None`` rather than abort
+    the build. Any other failure -- a 403, an exhausted retry budget -- still
+    propagates, so a fetch that FAILED is never mistaken for one that found
+    nothing.
+    """
     from sportsdataverse.dl_utils import download  # pooled session + retry/backoff
 
-    resp = download(url)
+    try:
+        resp = download(url)
+    except _missing_asset_error():
+        return None
     if getattr(resp, "status_code", 200) != 200 or not getattr(resp, "text", ""):
         return None
     return resp.text
 
 
 def _download_bytes(url: str) -> bytes | None:
-    """GET ``url`` for a BINARY body (parquet), returning ``None`` for non-200."""
+    """GET ``url`` for a BINARY body (parquet), returning ``None`` for a missing asset.
+
+    Same 404-raises rule as :func:`_download`. This one matters most: it fetches
+    the CFBD roster parquet that enriches the ESPN rosters through a LEFT join, so
+    a season CFBD has not published yet must yield null enrichment, not a failed
+    dataset. Before this, a pre-season run raised and took the whole
+    ``cfb_rosters`` build down with it.
+    """
     from sportsdataverse.dl_utils import download
 
-    resp = download(url)
+    try:
+        resp = download(url)
+    except _missing_asset_error():
+        return None
     if getattr(resp, "status_code", 200) != 200:
         return None
     return getattr(resp, "content", None) or None
@@ -573,9 +607,22 @@ def build_season(
         flush=True,
     )
     if df.height == 0:
-        # A supported season that compiles to nothing means every roster fetch
-        # failed. Returning quietly would skip write_dataset, record no failure,
-        # and let the CLI report success with no artifact for the season.
+        # Zero rows means one of two opposite things, so ask the schedule which.
+        # ESPN game rosters are PER-GAME: before kickoff there is nothing to
+        # fetch, so zero rows is the CORRECT answer for the season -- that is
+        # every August, and a build left red all preseason is a build whose next
+        # real failure nobody notices.
+        #
+        # A season that HAS played games and still compiles to nothing does mean
+        # every roster fetch failed, and that must stay loud: returning quietly
+        # would skip write_dataset, record no failure, and let the CLI report
+        # success with no artifact for the season.
+        if season_completed_games(schedule, season) == 0:
+            print(
+                f"  cfb_rosters {season}: 0 rows, skipped (season has not started)",
+                flush=True,
+            )
+            return df
         raise RuntimeError(f"cfb_rosters {season}: compiled zero roster rows")
     if write:
         paths = write_dataset(df, SPEC.dataset, season, SPEC.stem, base=base)

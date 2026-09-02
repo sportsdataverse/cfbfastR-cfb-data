@@ -1,93 +1,175 @@
 From https://github.com/sportsdataverse/cfbfastR-cfb-data
-   22adcf7..926543b  main                  -> origin/main
- * [new branch]      AE/update-air-yards-model -> origin/AE/update-air-yards-model
- * [new branch]      feat/adv-missing-datasets -> origin/feat/adv-missing-datasets
- * [new branch]      feat/cfb-era-vars-spread-backfill -> origin/feat/cfb-era-vars-spread-backfill
- * [new branch]      feat/cfb-model-suite-completion -> origin/feat/cfb-model-suite-completion
- * [new branch]      feat/cfb-ratings-builder -> origin/feat/cfb-ratings-builder
- * [new branch]      feat/cfb-ratings-cron -> origin/feat/cfb-ratings-cron
- * [new branch]      fix/cfb-recruiting-guard -> origin/fix/cfb-recruiting-guard
- * [new branch]      fix/cfb-weekly-raw-store -> origin/fix/cfb-weekly-raw-store
- * [new tag]         espn_cfb_adv_defensive -> espn_cfb_adv_defensive
- * [new tag]         espn_cfb_adv_drives   -> espn_cfb_adv_drives
- * [new tag]         espn_cfb_adv_passing  -> espn_cfb_adv_passing
- * [new tag]         espn_cfb_adv_receiving -> espn_cfb_adv_receiving
- * [new tag]         espn_cfb_adv_rushing  -> espn_cfb_adv_rushing
- * [new tag]         espn_cfb_adv_situational -> espn_cfb_adv_situational
- * [new tag]         espn_cfb_adv_team     -> espn_cfb_adv_team
- * [new tag]         espn_cfb_adv_turnover -> espn_cfb_adv_turnover
- * [new tag]         espn_cfb_betting      -> espn_cfb_betting
- * [new tag]         espn_cfb_drives       -> espn_cfb_drives
- * [new tag]         espn_cfb_injuries     -> espn_cfb_injuries
- * [new tag]         espn_cfb_linescores   -> espn_cfb_linescores
- * [new tag]         espn_cfb_pbp          -> espn_cfb_pbp
- * [new tag]         espn_cfb_play_participants -> espn_cfb_play_participants
- * [new tag]         espn_cfb_player_box   -> espn_cfb_player_box
- * [new tag]         espn_cfb_power_index  -> espn_cfb_power_index
- * [new tag]         espn_cfb_rosters      -> espn_cfb_rosters
- * [new tag]         espn_cfb_schedules    -> espn_cfb_schedules
- * [new tag]         espn_cfb_team_box     -> espn_cfb_team_box
-pbp 2026: 0 rows from 946 games
-play_participants 2026: 0 rows from 946 games
-team_box 2026: 0 rows from 946 games
-player_box 2026: 0 rows from 946 games
-drives 2026: 0 rows from 946 games
-game_rosters 2026: 0 rows from 946 games
-betting 2026: 0 rows from 946 games
-schedules 2026: 0 rows from 946 games
-linescores 2026: 0 rows from 946 games
+ * [new branch]        AE/update-air-yards-model -> origin/AE/update-air-yards-model
+ * [new branch]        chore/readme-repository-layout -> origin/chore/readme-repository-layout
+ * [new branch]        docs/automation-status -> origin/docs/automation-status
+ * [new branch]        docs/model-registry-out-of-claude -> origin/docs/model-registry-out-of-claude
+ * [new branch]        feat/adv-missing-datasets -> origin/feat/adv-missing-datasets
+ * [new branch]        feat/cfb-era-vars-spread-backfill -> origin/feat/cfb-era-vars-spread-backfill
+ * [new branch]        feat/cfb-model-suite-completion -> origin/feat/cfb-model-suite-completion
+ * [new branch]        feat/cfb-ratings-builder -> origin/feat/cfb-ratings-builder
+ * [new branch]        feat/cfb-ratings-cron  -> origin/feat/cfb-ratings-cron
+ * [new branch]        feat/release-sidecars  -> origin/feat/release-sidecars
+ * [new branch]        feat/rosters-cfbd-enrich -> origin/feat/rosters-cfbd-enrich
+ * [new branch]        fix/bowl-season-cron   -> origin/fix/bowl-season-cron
+ * [new branch]        fix/cfb-recruiting-guard -> origin/fix/cfb-recruiting-guard
+ * [new branch]        fix/cfb-weekly-raw-store -> origin/fix/cfb-weekly-raw-store
+ * [new branch]        fix/preseason-missing-sources -> origin/fix/preseason-missing-sources
+ * [new branch]        fix/preseason-zero-rosters -> origin/fix/preseason-zero-rosters
+ * [new branch]        player_percents        -> origin/player_percents
+ * [new tag]           espn_cfb_adv_defensive -> espn_cfb_adv_defensive
+ * [new tag]           espn_cfb_adv_drives    -> espn_cfb_adv_drives
+ * [new tag]           espn_cfb_adv_passing   -> espn_cfb_adv_passing
+ * [new tag]           espn_cfb_adv_receiving -> espn_cfb_adv_receiving
+ * [new tag]           espn_cfb_adv_rushing   -> espn_cfb_adv_rushing
+ * [new tag]           espn_cfb_adv_situational -> espn_cfb_adv_situational
+ * [new tag]           espn_cfb_adv_team      -> espn_cfb_adv_team
+ * [new tag]           espn_cfb_adv_turnover  -> espn_cfb_adv_turnover
+ * [new tag]           espn_cfb_betting       -> espn_cfb_betting
+ * [new tag]           espn_cfb_drives        -> espn_cfb_drives
+ * [new tag]           espn_cfb_injuries      -> espn_cfb_injuries
+ * [new tag]           espn_cfb_linescores    -> espn_cfb_linescores
+ * [new tag]           espn_cfb_pbp           -> espn_cfb_pbp
+ * [new tag]           espn_cfb_play_participants -> espn_cfb_play_participants
+ * [new tag]           espn_cfb_player_box    -> espn_cfb_player_box
+ * [new tag]           espn_cfb_power_index   -> espn_cfb_power_index
+ * [new tag]           espn_cfb_rosters       -> espn_cfb_rosters
+ * [new tag]           espn_cfb_schedules     -> espn_cfb_schedules
+ * [new tag]           espn_cfb_team_box      -> espn_cfb_team_box
+  pos_team: 100.0% of rows resolved to a team name
+  def_pos_team: 100.0% of rows resolved to a team name
+pbp 2026: 1233 rows from 948 games
+play_participants 2026: 1136 rows from 948 games
+team_box 2026: 16 rows from 948 games
+player_box 2026: 634 rows from 948 games
+drives 401866408: can only concatenate list (not "dict") to list
+drives 401858201: can only concatenate list (not "dict") to list
+drives 401864570: can only concatenate list (not "dict") to list
+drives 2026: 110 rows from 948 games
+game_rosters 2026: 476 rows from 948 games
+betting 2026: 8 rows from 948 games
+schedules 2026: 8 rows from 948 games
+linescores 2026: 60 rows from 948 games
   power_index 2026: 1776 rows, 7 cols
 
 === power_index: 0 failures ===
-injuries 2026: 0 rows from 946 games
-adv_team 2026: 0 rows from 946 games
-adv_passing 2026: 0 rows from 946 games
-adv_rushing 2026: 0 rows from 946 games
-adv_receiving 2026: 0 rows from 946 games
-adv_defensive 2026: 0 rows from 946 games
-adv_turnover 2026: 0 rows from 946 games
-adv_drives 2026: 0 rows from 946 games
-adv_situational 2026: 0 rows from 946 games
-adv_defensive_players 2026: 0 rows from 946 games
-adv_specialists 2026: 0 rows from 946 games
-rosters 2026: no game_rosters parquet at ../cfb/game_rosters/parquet/game_rosters_2026.parquet (build game_rosters first)
-  adv_team_gamelog 2026: 0 rows, skipped
+injuries 2026: 0 rows from 948 games
+  pos_team: 100.0% of rows resolved to a team name
+adv_team 2026: 16 rows from 948 games
+  pos_team: 100.0% of rows resolved to a team name
+adv_passing 2026: 21 rows from 948 games
+  pos_team: 100.0% of rows resolved to a team name
+adv_rushing 2026: 71 rows from 948 games
+  pos_team: 100.0% of rows resolved to a team name
+adv_receiving 2026: 162 rows from 948 games
+  def_pos_team: 100.0% of rows resolved to a team name
+adv_defensive 2026: 16 rows from 948 games
+  pos_team: 100.0% of rows resolved to a team name
+adv_turnover 2026: 16 rows from 948 games
+  pos_team: 100.0% of rows resolved to a team name
+adv_drives 2026: 16 rows from 948 games
+  pos_team: 100.0% of rows resolved to a team name
+adv_situational 2026: 16 rows from 948 games
+  def_pos_team: 100.0% of rows resolved to a team name
+adv_defensive_players 2026: 81 rows from 948 games
+  pos_team: 100.0% of rows resolved to a team name
+adv_specialists 2026: 61 rows from 948 games
+  adv_team_gamelog 2026: 16 rows, 90 cols
 
 === gamelog: 0 failures ===
-/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/.venv/lib/python3.12/site-packages/sportsdataverse/cfb/cfb_loaders.py:571: UserWarning: load_cfb_pbp: no data for season(s) [2026] (skipped)
-  cli_warn("load_cfb_pbp: no data for season(s) {missing} (skipped)".format(missing=missing))
-[summaries 2026] 0 plays, skipped (season has not started)
-/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/.venv/lib/python3.12/site-packages/sportsdataverse/cfb/cfb_loaders.py:571: UserWarning: load_cfb_pbp: no data for season(s) [2026] (skipped)
-  cli_warn("load_cfb_pbp: no data for season(s) {missing} (skipped)".format(missing=missing))
-  !! ratings_weekly 2026: MISSING through_week [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] (0/15 built). Consumers joining week W+1 to through_week W will silently drop those games -- re-run this season before relying on it.
-  cfb_ratings_weekly 2026: 0 rows, skipped
+  cfb_schedules 2026: 3679 rows, 41 cols, fbs_game=761, fbs_participant=888, unplayed=0
+
+=== cfb_schedules: 0 failures ===
+cfb_rosters 2026: 476 rows from 948/948 games | position 100.0% | division 100.0% | cfbd_recruit_ids 98.7% of 29305 cfbd athletes
+
+=== cfb_rosters: 0 failures ===
+[summaries 2026] percentiles: 99 rows
+[summaries 2026] team_summaries: 16 rows
+[summaries 2026] passing: 21 rows
+[summaries 2026] rushing: 69 rows
+[summaries 2026] receiving: 134 rows
+  cfb_ratings_weekly 2026: 240 rows, 16 cols, 15 weekly snapshots
 
 === ratings_weekly: 0 failures ===
-/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/.venv/lib/python3.12/site-packages/sportsdataverse/cfb/cfb_loaders.py:571: UserWarning: load_cfb_pbp: no data for season(s) [2026] (skipped)
-  cli_warn("load_cfb_pbp: no data for season(s) {missing} (skipped)".format(missing=missing))
-[summaries 2026] 0 plays, skipped (season has not started)
-[summaries 2026] 0 plays, skipped (season has not started)
-[summaries 2026] 0 plays, skipped (season has not started)
-[summaries 2026] 0 plays, skipped (season has not started)
-[summaries 2026] 0 plays, skipped (season has not started)
-[summaries 2026] 0 plays, skipped (season has not started)
-[summaries 2026] 0 plays, skipped (season has not started)
-[summaries 2026] 0 plays, skipped (season has not started)
-[summaries 2026] 0 plays, skipped (season has not started)
-[summaries 2026] 0 plays, skipped (season has not started)
-[summaries 2026] 0 plays, skipped (season has not started)
-[summaries 2026] 0 plays, skipped (season has not started)
-[summaries 2026] 0 plays, skipped (season has not started)
-[summaries 2026] 0 plays, skipped (season has not started)
-[summaries 2026] 0 plays, skipped (season has not started)
-  !! team_summaries_weekly 2026: MISSING through_week [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] (0/15 built). Consumers joining week W+1 to through_week W will silently drop those games -- re-run this season before relying on it.
-  cfb_team_summaries_weekly 2026: 0 rows, skipped
+[summaries 2026] percentiles: 99 rows
+[summaries 2026] team_summaries: 16 rows
+[summaries 2026] passing: 21 rows
+[summaries 2026] rushing: 69 rows
+[summaries 2026] receiving: 134 rows
+[summaries 2026] percentiles: 99 rows
+[summaries 2026] team_summaries: 16 rows
+[summaries 2026] passing: 21 rows
+[summaries 2026] rushing: 69 rows
+[summaries 2026] receiving: 134 rows
+[summaries 2026] percentiles: 99 rows
+[summaries 2026] team_summaries: 16 rows
+[summaries 2026] passing: 21 rows
+[summaries 2026] rushing: 69 rows
+[summaries 2026] receiving: 134 rows
+[summaries 2026] percentiles: 99 rows
+[summaries 2026] team_summaries: 16 rows
+[summaries 2026] passing: 21 rows
+[summaries 2026] rushing: 69 rows
+[summaries 2026] receiving: 134 rows
+[summaries 2026] percentiles: 99 rows
+[summaries 2026] team_summaries: 16 rows
+[summaries 2026] passing: 21 rows
+[summaries 2026] rushing: 69 rows
+[summaries 2026] receiving: 134 rows
+[summaries 2026] percentiles: 99 rows
+[summaries 2026] team_summaries: 16 rows
+[summaries 2026] passing: 21 rows
+[summaries 2026] rushing: 69 rows
+[summaries 2026] receiving: 134 rows
+[summaries 2026] percentiles: 99 rows
+[summaries 2026] team_summaries: 16 rows
+[summaries 2026] passing: 21 rows
+[summaries 2026] rushing: 69 rows
+[summaries 2026] receiving: 134 rows
+[summaries 2026] percentiles: 99 rows
+[summaries 2026] team_summaries: 16 rows
+[summaries 2026] passing: 21 rows
+[summaries 2026] rushing: 69 rows
+[summaries 2026] receiving: 134 rows
+[summaries 2026] percentiles: 99 rows
+[summaries 2026] team_summaries: 16 rows
+[summaries 2026] passing: 21 rows
+[summaries 2026] rushing: 69 rows
+[summaries 2026] receiving: 134 rows
+[summaries 2026] percentiles: 99 rows
+[summaries 2026] team_summaries: 16 rows
+[summaries 2026] passing: 21 rows
+[summaries 2026] rushing: 69 rows
+[summaries 2026] receiving: 134 rows
+[summaries 2026] percentiles: 99 rows
+[summaries 2026] team_summaries: 16 rows
+[summaries 2026] passing: 21 rows
+[summaries 2026] rushing: 69 rows
+[summaries 2026] receiving: 134 rows
+[summaries 2026] percentiles: 99 rows
+[summaries 2026] team_summaries: 16 rows
+[summaries 2026] passing: 21 rows
+[summaries 2026] rushing: 69 rows
+[summaries 2026] receiving: 134 rows
+[summaries 2026] percentiles: 99 rows
+[summaries 2026] team_summaries: 16 rows
+[summaries 2026] passing: 21 rows
+[summaries 2026] rushing: 69 rows
+[summaries 2026] receiving: 134 rows
+[summaries 2026] percentiles: 99 rows
+[summaries 2026] team_summaries: 16 rows
+[summaries 2026] passing: 21 rows
+[summaries 2026] rushing: 69 rows
+[summaries 2026] receiving: 134 rows
+[summaries 2026] percentiles: 99 rows
+[summaries 2026] team_summaries: 16 rows
+[summaries 2026] passing: 21 rows
+[summaries 2026] rushing: 69 rows
+[summaries 2026] receiving: 134 rows
+  cfb_team_summaries_weekly 2026: 240 rows, 384 cols, 15 weekly snapshots
 
 === team_summaries_weekly: 0 failures ===
 ::warning::no 247 recruits store at /home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-raw/cfb/recruits/json; skipping recruiting datasets
-/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/.venv/lib/python3.12/site-packages/sportsdataverse/cfb/cfb_loaders.py:851: UserWarning: load_cfb_rosters: no data for season(s) [2026] (skipped)
-  cli_warn("load_cfb_rosters: no data for season(s) {missing} (skipped)".format(missing=missing))
-  cfb_returning_production 2026: 0 rows, skipped (season has no roster data yet)
+  cfb_returning_production 2026: 236 rows
 
 === returning_production: 0 failures ===
-nothing to commit for: CFB Data Updated (Start: 2026 End: 2026)
+pushed: CFB Data Updated (Start: 2026 End: 2026) (attempt 1)

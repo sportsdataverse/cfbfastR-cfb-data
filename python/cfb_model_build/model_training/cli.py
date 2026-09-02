@@ -1,4 +1,4 @@
-"""CLI: ingest | train-ep | train-wp | train-qbr | validate | figures."""
+"""CLI: ingest | train-ep | train-wp | train-qbr | validate | figures | export-analysis."""
 
 from __future__ import annotations
 
@@ -88,6 +88,13 @@ def build_parser() -> argparse.ArgumentParser:
     f = sub.add_parser("figures")
     f.add_argument("--table", required=True)
     f.add_argument("--out", required=True)
+    ea = sub.add_parser(
+        "export-analysis",
+        help="per-model analysis frames (ids + the exact engineered feature matrix) for docs/models/deepdive.qmd",
+    )
+    ea.add_argument("--pbp", default="pbp_full.parquet")
+    ea.add_argument("--out-dir", default="artifacts/analysis")
+    ea.add_argument("--models", nargs="*", default=None, help="subset of: ep wp xpass cp (default all)")
     return ap
 
 
@@ -262,6 +269,18 @@ def main(argv=None) -> int:
             file=sys.stderr,
         )
         return 2
+    elif args.cmd == "export-analysis":
+        from .analysis import MODELS, export_analysis_frames
+
+        models = tuple(args.models) if args.models else MODELS
+        unknown = set(models) - set(MODELS)
+        if unknown:
+            print(f"export-analysis: unknown models {sorted(unknown)}", file=sys.stderr)
+            return 2
+        rows = export_analysis_frames(args.pbp, args.out_dir, models)
+        for name, n in rows.items():
+            print(f"analysis_{name}.parquet: {n} rows")
+        print(f"wrote {len(rows)} frames + analysis_manifest.json -> {args.out_dir}")
     return 0
 
 

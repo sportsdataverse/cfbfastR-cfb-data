@@ -84,7 +84,13 @@ KNOWN_UNPAIRED: dict[str, str] = {
     },
 }
 
-NON_DATASET_STAGES: set[str] = {"adv_box", "team_summaries"}
+# Numbered shims that are NOT `REGISTRY` rows. `REGISTRY` describes datasets
+# reshaped out of a game's `final.json`; these three are built other ways.
+#   adv_box          orchestrator -- one R stage fans out to ten python datasets
+#   team_summaries   assembled from the 5-table summaries family
+#   fpi_weekly       fetched from the core-v2 powerindex API, not final.json
+#                    (cfb_data_build.fpi, dispatched via cli.FPI)
+NON_DATASET_STAGES: set[str] = {"adv_box", "team_summaries", "fpi_weekly"}
 # --------------------------------------------------------------------------
 # End repo-specific data. Everything below is the shared engine.
 # --------------------------------------------------------------------------
@@ -121,9 +127,7 @@ def _stage_re() -> re.Pattern[str]:
     Pinning the league (rather than accepting any slug) is deliberate: a stray
     file from a sibling league would otherwise be silently adopted as a stage.
     """
-    return re.compile(
-        rf"^(?:espn_)?{re.escape(_league())}_(?P<num>\d{{2}})_(?P<key>.+)_{re.escape(STAGE_SUFFIX)}$"
-    )
+    return re.compile(rf"^(?:espn_)?{re.escape(_league())}_(?P<num>\d{{2}})_(?P<key>.+)_{re.escape(STAGE_SUFFIX)}$")
 
 
 def _stages(subdir: str, suffix: str) -> dict[str, str]:
@@ -239,9 +243,7 @@ def test_non_dataset_exemptions_are_live():
     """An exemption for a shim that no longer exists is dead weight that would
     silently cover a future stage of the same name."""
     stale = sorted(NON_DATASET_STAGES - set(_py_stages()))
-    assert not stale, (
-        f"NON_DATASET_STAGES exempts {stale}, but no such shim exists. Remove the entry."
-    )
+    assert not stale, f"NON_DATASET_STAGES exempts {stale}, but no such shim exists. Remove the entry."
 
 
 def test_unpaired_datasets_are_declared():

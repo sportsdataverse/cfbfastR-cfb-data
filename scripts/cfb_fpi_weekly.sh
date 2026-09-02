@@ -47,8 +47,12 @@ if [ "$BUILD_RC" != "0" ]; then
 fi
 
 cd "$REPO_ROOT" || exit 1
-git config --local user.email "action@github.com"
-git config --local user.name "Github Action"
+# Only when unset. The sibling drivers set this unconditionally because they
+# only ever run in CI; this one is also a documented manual entry point, and a
+# `git config --local` from a worktree writes the SHARED .git/config -- i.e. it
+# would overwrite the human's identity in the primary checkout too.
+git config user.email >/dev/null 2>&1 || git config --local user.email "action@github.com"
+git config user.name  >/dev/null 2>&1 || git config --local user.name "Github Action"
 # Explicit path, and `add` rather than `add -u`: a season's FIRST capture is an
 # untracked new file, every later one is a modification, and this catches both.
 git add -- cfb/fpi_weekly || exit 1

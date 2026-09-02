@@ -101,6 +101,13 @@ Triggered by a `repository_dispatch` from `cfbfastR-cfb-raw` on every push (the 
 message carries `Start:/End:` years), plus a cron over the CFB calendar (offset after
 `-raw`) and manual `workflow_dispatch`. See `.github/workflows/daily_cfb.yml`.
 
+`cfb_fpi_weekly` runs on its OWN in-season schedule
+(`.github/workflows/cfb_fpi_weekly.yml` -> `scripts/cfb_fpi_weekly.sh`, stage 13) rather
+than inside the daily driver. Every other dataset here is rebuildable from the raw store
+whenever the daily job recovers; this one is not -- ESPN overwrites the week-1 slot with a
+late-season computation, so an as-of-week-N rating exists only in a capture taken during
+week N. A run that finds no new week is a clean no-op.
+
 ## Architecture
 
 `-raw` (Python/uv): scrape ESPN → enrich → `cfb/json/final/{id}.json`.
@@ -114,6 +121,7 @@ fixture (`tests/testthat/`).
 
 | workflow | schedule | last run |
 |---|---|---|
+| [![cfb_fpi_weekly.yml](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/cfb_fpi_weekly.yml/badge.svg)](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/cfb_fpi_weekly.yml) | daily 14:00 UTC in Aug; daily 14:00 UTC in Sep-Nov; daily 14:00 UTC in Dec; days 1-25 14:00 UTC in Jan | never run |
 | [![cfb_model_pipeline.yml](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/cfb_model_pipeline.yml/badge.svg)](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/cfb_model_pipeline.yml) | day 5 06:00 UTC in Feb | 2026-07-30 |
 | [![cfb_playoff_figures.yml](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/cfb_playoff_figures.yml/badge.svg)](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/cfb_playoff_figures.yml) | on dispatch | never run |
 | [![cfb_postweek.yml](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/cfb_postweek.yml/badge.svg)](https://github.com/sportsdataverse/cfbfastR-cfb-data/actions/workflows/cfb_postweek.yml) | Mondays 15:00 UTC in Aug-Dec | 2026-08-24 |
@@ -216,6 +224,7 @@ Every numbered pipeline stage in `python/` (auto-listed; run subsets with the `s
 - `python/espn_cfb_10_schedules_creation.py`
 - `python/espn_cfb_11_linescores_creation.py`
 - `python/espn_cfb_12_power_index_creation.py`
+- `python/espn_cfb_13_fpi_weekly_creation.py`
 - `python/espn_cfb_14_injuries_creation.py`
 - `python/espn_cfb_15_team_summaries_creation.py`
 - `python/espn_cfb_20_adv_team_creation.py`

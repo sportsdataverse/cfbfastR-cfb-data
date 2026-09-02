@@ -38,7 +38,13 @@ def cached(tag, name):
         p.write_bytes(r.content)
     return pl.read_parquet(p)
 
-mp = cached("espn_cfb_model_pbp", "model_pbp_2025.parquet")
+# The scored 2025 frame: prefer the stage-10 build-tree output (the same producer as the
+# release, and it carries the athlete ids added 2026-09-01); fall back to the release.
+_mp_local = ART / "model_pbp_2025.parquet"
+if _mp_local.is_file():
+    mp, mp_source = pl.read_parquet(_mp_local), "python/artifacts/model_pbp_2025.parquet (stage 10 build tree)"
+else:
+    mp, mp_source = cached("espn_cfb_model_pbp", "model_pbp_2025.parquet"), "espn_cfb_model_pbp release"
 ratings = cached("cfb_ratings", "cfb_ratings_2025.parquet")
 
 def gt_show(g):
@@ -195,39 +201,208 @@ eps = (
 )
 ```
 
-## SHAP — the EP booster attributed
+## SHAP — the promoted boosters attributed
+
+The five score-time boosters below are the **promoted** artifacts — the
+`python/artifacts/v2/` fits, byte-identical to the `.ubj` files sdv-py bundles
+in `cfb/models/` (the CP booster is read from that bundle). Their feature
+matrices come from the trainer's own analysis export:
+`python -m cfb_model_build.model_training export-analysis` writes
+`python/artifacts/analysis/analysis_{ep,wp,xpass,cp}.parquet` through the very
+`ep_matrix` / `wp_matrix` / `xpass_frame` / `extract_pass_features` code paths
+the fits use, so `spread_time`, `adj_TimeSecsRem`, `ExpScoreDiff_Time_Ratio`,
+`score_diff` and `era` are the engineered columns the boosters actually saw,
+not a re-derivation on this page. TreeSHAP is XGBoost's own
+`pred_contribs=True` (no `shap` dependency); the multiclass EP tensor is 3-D
+and is averaged over its seven class margins, the binary models are 2-D.
 
 ```{python}
-#| fig-cap: "TreeSHAP (class-margin space), mean |contribution| across the 7 next-score classes; 4,000-play sample."
-bst = xgb.Booster()
-bst.load_model(str(ART / "ep.ubj"))
-feats = bst.feature_names
-sample = (
-    pf.select(pl.col("start.TimeSecsRem").alias("TimeSecsRem"),
-              pl.col("start.yardsToEndzone").alias("yards_to_goal"),
-              "distance", "down_1", "down_2", "down_3", "down_4",
-              "pos_score_diff_start")
-    .drop_nulls().collect().sample(n=4000, seed=11)
+#| output: false
+import hashlib, json
+import importlib.resources as ir
+BUNDLE = Path(str(ir.files("sportsdataverse.cfb") / "models"))
+AN = ART / "analysis"
+MANIFEST = json.loads((AN / "analysis_manifest.json").read_text())
+
+def sha12(p):
+    return hashlib.sha256(Path(p).read_bytes()).hexdigest()[:12]
+
+def resolve_booster(name):
+    """The promoted local copy (python/artifacts/v2/) if present, else the sdv-py bundle."""
+    for p in (ART / "v2" / name, BUNDLE / name):
+        if p.is_file():
+            return p
+    raise FileNotFoundError(name)
+
+def load_booster(p):
+    b = xgb.Booster(); b.load_model(str(p)); return b
+
+def shap_sample(bst, frame, n=4000, seed=11):
+    """(sampled rows, |contribution| (n, p), feature names); the bias column is dropped."""
+    feats = bst.feature_names
+    s = frame.drop_nulls(subset=feats)
+    s = s.sample(n=min(n, s.height), seed=seed)
+    X = s.select(feats).to_numpy().astype(np.float32)
+    c = bst.predict(xgb.DMatrix(X, feature_names=feats), pred_contribs=True)
+    sv = np.abs(c[..., :-1])
+    if sv.ndim == 3:          # multi:softprob -> (n, k, p): mean over the k class margins
+        sv = sv.mean(axis=1)
+    return s, sv, feats
+
+def importance_plot(sv, feats, title):
+    sh = pl.DataFrame({"feature": feats, "mean_abs_shap": sv.mean(axis=0).tolist()}).sort("mean_abs_shap", descending=True)
+    return (
+        ggplot(sh.to_pandas(), aes("reorder(feature, mean_abs_shap)", "mean_abs_shap"))
+        + geom_col(fill="#2a6f97") + coord_flip()
+        + labs(x="", y="mean |SHAP| (margin space)", title=title)
+        + theme_minimal()
+    )
+
+SUITE = {  # label -> (artifact, analysis frame, manifest key)
+    "EP (7-class)": ("ep_model.ubj", "analysis_ep.parquet", "ep"),
+    "WP (spread)": ("wp_spread.ubj", "analysis_wp.parquet", "wp"),
+    "WP (naive)": ("wp_naive.ubj", "analysis_wp.parquet", "wp"),
+    "xPass": ("xpass_model.ubj", "analysis_xpass.parquet", "xpass"),
+    "CP": ("cfb_cp_model.ubj", "analysis_cp.parquet", "cp"),
+}
+BOOSTERS = {k: load_booster(resolve_booster(a)) for k, (a, _, _) in SUITE.items()}
+FRAMES = {f: pl.read_parquet(AN / f) for f in {f for _, f, _ in SUITE.values()}}
+SHAP = {k: shap_sample(BOOSTERS[k], FRAMES[f]) for k, (_, f, _) in SUITE.items()}
+```
+
+```{python}
+def _where(p, a):
+    return str(p.relative_to(ROOT)).replace("\\", "/") if p.is_relative_to(ART) else f"sdv-py bundle/{a}"
+
+prov = pl.DataFrame([{
+    "model": k,
+    "artifact": _where(resolve_booster(a), a),
+    "sha256": sha12(resolve_booster(a)),
+    "bundle": "= sdv-py bundle" if (BUNDLE / a).is_file() and sha12(BUNDLE / a) == sha12(resolve_booster(a)) else "differs",
+    "n_features": BOOSTERS[k].num_features(),
+    "frame_rows": MANIFEST["models"][m]["n_rows"],
+    "sample": SHAP[k][1].shape[0],
+} for k, (a, f, m) in SUITE.items()])
+gt_show(
+    GT(prov.to_pandas())
+    .tab_header(title="Which booster each attribution below explains",
+                subtitle=f"analysis frames from {MANIFEST['source_frame']} (export-analysis, {MANIFEST['written'][:10]}); "
+                         "sha256 prefix compared against the .ubj sdv-py ships")
+    .fmt_number(columns=["frame_rows", "sample"], sep_mark=",", decimals=0)
+    .cols_label(model="Model", artifact="Artifact", sha256="sha256[:12]", bundle="vs bundle",
+                n_features="Features", frame_rows="Frame rows", sample="SHAP sample")
 )
-X = sample.select(feats).to_numpy().astype(np.float32)
-contribs = bst.predict(xgb.DMatrix(X, feature_names=feats), pred_contribs=True)
-mean_abs = np.abs(contribs[:, :, :-1]).mean(axis=(0, 1))
-sh = pl.DataFrame({"feature": feats, "mean_abs_shap": mean_abs.tolist()}).sort("mean_abs_shap", descending=True)
+```
+
+```{python}
+#| fig-cap: "EP TreeSHAP (class-margin space), mean |contribution| across the 7 next-score classes; 4,000-play sample."
+_, sv, feats = SHAP["EP (7-class)"]
+importance_plot(sv, feats, "EP TreeSHAP importance")
+```
+
+```{python}
+#| fig-cap: "WP (spread) TreeSHAP, log-odds space; 4,000-play sample. spread_time is the pregame spread decayed by elapsed share."
+_, sv, feats = SHAP["WP (spread)"]
+importance_plot(sv, feats, "WP (spread) TreeSHAP importance")
+```
+
+```{python}
+#| fig-cap: "WP (naive) TreeSHAP, log-odds space; the spread model's 12 shared features without spread_time."
+_, sv, feats = SHAP["WP (naive)"]
+importance_plot(sv, feats, "WP (naive) TreeSHAP importance")
+```
+
+```{python}
+#| fig-cap: "xPass TreeSHAP, log-odds space; rush|pass plays, era is the ordinal rule-era factor (2006/2013/2020 cuts)."
+_, sv, feats = SHAP["xPass"]
+importance_plot(sv, feats, "xPass TreeSHAP importance")
+```
+
+```{python}
+#| fig-cap: "CP TreeSHAP, log-odds space; pass plays only (the 8 game-state features of Approach A)."
+_, sv, feats = SHAP["CP"]
+importance_plot(sv, feats, "CP TreeSHAP importance")
+```
+
+```{python}
+rows = []
+for k, (_, sv, feats) in SHAP.items():
+    m = sv.mean(axis=0); tot = m.sum()
+    for rank, i in enumerate(np.argsort(-m)[:3], start=1):
+        rows.append({"model": k, "rank": rank, "feature": feats[i], "mean_abs_shap": float(m[i]),
+                     "share": float(m[i] / tot)})
+gt_show(
+    GT(pl.DataFrame(rows).to_pandas())
+    .tab_header(title="Top-3 features per booster — mean |SHAP| and share of total attribution",
+                subtitle="margin space (log-odds; EP: class-margin mean); shares sum to 1 over each model's full feature set")
+    .fmt_number(columns="mean_abs_shap", decimals=3)
+    .fmt_percent(columns="share", decimals=1)
+    .cols_label(model="Model", rank="#", feature="Feature", mean_abs_shap="mean |SHAP|", share="Share")
+)
+```
+
+```{python}
+#| fig-cap: "WP (spread) mean |SHAP| by season, 1,500 plays per season. A feature whose weight jumps at a rule-era cut (2006/2013/2020) would be doing the era's work; a flat line means the model reads it the same way in every era."
+bst = BOOSTERS["WP (spread)"]; feats = bst.feature_names
+wpf = FRAMES["analysis_wp.parquet"].drop_nulls(subset=feats)
+strat = (wpf.with_columns(pl.int_range(pl.len()).shuffle(seed=11).over("season").alias("_r"))
+            .filter(pl.col("_r") < 1500).drop("_r"))
+X = strat.select(feats).to_numpy().astype(np.float32)
+sv = np.abs(bst.predict(xgb.DMatrix(X, feature_names=feats), pred_contribs=True)[:, :-1])
+top6 = [feats[i] for i in np.argsort(-sv.mean(axis=0))[:6]]
+by_season = (
+    pl.DataFrame({f: sv[:, i] for i, f in enumerate(feats)}).with_columns(season=strat["season"])
+    .group_by("season", maintain_order=True).agg([pl.col(f).mean() for f in top6]).sort("season")
+    .unpivot(index="season", on=top6, variable_name="feature", value_name="mean_abs_shap")
+)
 (
-    ggplot(sh.to_pandas(), aes("reorder(feature, mean_abs_shap)", "mean_abs_shap"))
-    + geom_col(fill="#2a6f97")
-    + coord_flip()
-    + labs(x="", y="mean |SHAP| (class-margin space)", title="EP TreeSHAP importance")
+    ggplot(by_season.to_pandas(), aes("season", "mean_abs_shap", color="feature"))
+    + geom_line() + geom_point(size=1)
+    + labs(x="season", y="mean |SHAP| (log-odds)", title="WP (spread): attribution by season, top-6 features")
     + theme_minimal()
 )
 ```
 
-Field position dominates, clock second, score state third — the cfbscrapR
-ordering, now attributed play-by-play rather than asserted. The multiclass
-`pred_contribs` tensor is 3-D (the recorded gotcha); the chart aggregates
-|contribution| across the seven class margins and is labeled accordingly.
+What the attributions say — 4,000-play samples (seed 11); the exact values
+are in the top-3 table above:
 
-## Results — the published surfaces, identified
+- **EP.** Field position and clock split the top: `yards_to_goal` 34.4% and
+  `TimeSecsRem` 33.7% of total attribution, score state
+  (`pos_score_diff_start`) third at 16.8%, the four down dummies together
+  about 14%. That is the cfbscrapR ordering attributed play-by-play — on the
+  promoted booster the first two are effectively tied rather than field
+  position clearly first.
+- **WP (spread).** Two score-state terms carry it — `ExpScoreDiff_Time_Ratio`
+  32.8% and `pos_score_diff_start` 32.1% — with `spread_time` the third
+  pillar at 23.4%; no clock or field term exceeds 3%. **WP (naive)** drops
+  `spread_time` and that share does not disappear: `pos_score_diff_start`
+  absorbs it (32.1% → 48.0%), `ExpScoreDiff_Time_Ratio` holds at 31.2%, and
+  `pos_team_receives_2H_kickoff` becomes the third feature (5.5%).
+- **xPass** reads the situation first — `down` 31.3%, `distance` 23.7% — then
+  score (`pos_score_diff` 16.9%), field position (10.6%) and clock (7.9%);
+  `era` and `period` are the tail, so rule-era pass tendency is a small
+  effect once down-and-distance is in.
+- **CP** is the game-state-only Approach A and attributes like one: `down`
+  27.1%, `score_diff` 19.6%, `yards_to_goal` 15.4%, `distance` 9.9%,
+  `period` 8.3%. What an air-yards feature would add is the recorded CPOE
+  feasibility finding; SHAP cannot supply it here.
+- **By season (WP spread, 1,500 plays × 22 seasons).** The score-state terms
+  move within a narrow band — `ExpScoreDiff_Time_Ratio` 1.04–1.15,
+  `pos_score_diff_start` 0.97–1.17 (extremes at 2016 and 2013),
+  `adj_TimeSecsRem` 0.07–0.12 — with no step at the 2006/2013/2020 rule-era
+  cuts. `spread_time` is the exception: 0.31 in 2004, about 1.0 from 2013 on
+  (0.98 in 2025). That ramp is neither a rule effect nor missing data
+  (`spread_time` is non-null in every season): it is the ESPN **default
+  spread**. In the training frame every 2004 and 2005 game carries
+  `homeTeamSpread = ±2.5` with `gameSpreadAvailable = 0`, as do 57% of 2006
+  games, 67% of 2008, 8.7% of 2013 and 5.1% of 2025 — the `cfb_line_odds`
+  consensus backfill closed 2,167 games but not the earliest seasons. A
+  2.5-point placeholder decays to a near-constant, so the booster has nothing
+  to attribute to it, and the early-season WP-spread model runs close to the
+  naive one. The fix is upstream of SHAP — a historical-spread source for
+  2004–2008 — and belongs with the backfill work, not this page.
+
+## Results — the scored surfaces, identified
 
 ```{python}
 # pos_team in this frame is the ESPN team id; recover the display name from
@@ -248,7 +423,7 @@ teams = (
 )
 gt_show(
     GT(teams.select("logo", "offense", "plays", "epa_play").to_pandas())
-    .tab_header(title="Top 10 offenses by EPA/play — 2025 published model_pbp")
+    .tab_header(title="Top 10 offenses by EPA/play — 2025 model_pbp", subtitle=f"source: {mp_source}")
     .fmt_markdown(columns="logo")
     .fmt_number(columns="plays", sep_mark=",", decimals=0)
     .fmt_number(columns="epa_play", decimals=3)
@@ -257,24 +432,37 @@ gt_show(
 ```
 
 ```{python}
+# Key on the ESPN athlete id when the frame carries it (stage-10 output from 2026-09-01 on),
+# so two passers who share a name never merge; older release frames fall back to the name.
+has_ids = "passer_player_id" in mp2.columns
+key = "passer_player_id" if has_ids else "passer_player_name"
 qbs = (
-    mp2.filter((pl.col("pass") == 1) & pl.col("epa").is_not_null()
-               & pl.col("passer_player_name").is_not_null())
-    .group_by("passer_player_name")
-    .agg(pl.col("pos_team_name").last().alias("team"), pl.len().alias("dropbacks"),
-         pl.col("epa").mean().alias("epa_play"),
+    mp2.filter((pl.col("pass") == 1) & pl.col("epa").is_not_null() & pl.col(key).is_not_null())
+    .with_columns(passer=pl.col("passer_player_name"))
+    .group_by(key)
+    .agg(pl.col("passer").first(), pl.col("pos_team_name").last().alias("team"),
+         pl.len().alias("dropbacks"), pl.col("epa").mean().alias("epa_play"),
          pl.col("cpoe").drop_nulls().mean().alias("cpoe"))
     .filter(pl.col("dropbacks") >= 150)
     .sort("epa_play", descending=True).head(10)
 )
-gt_show(
-    GT(qbs.to_pandas())
-    .tab_header(title="Passer EPA/play leaders with CPOE — 2025 (min 150 dropbacks)",
-                subtitle="epa and cpoe are the published model columns; ESPN ships no per-athlete id in this frame, so names identify")
+cols = ["passer", "team", "dropbacks", "epa_play", "cpoe"]
+if has_ids:
+    qbs = qbs.with_columns(
+        ("<img src='https://a.espncdn.com/i/headshots/college-football/players/full/"
+         + pl.col("passer_player_id").cast(pl.Int64).cast(pl.Utf8) + ".png' height='40'/>").alias("headshot"))
+    cols = ["headshot"] + cols
+sub = (f"source: {mp_source}; keyed by ESPN athlete id (passer_player_id), headshots from a.espncdn.com"
+       if has_ids else f"source: {mp_source}; this frame predates the athlete-id columns, so names identify")
+g = (
+    GT(qbs.select(cols).to_pandas())
+    .tab_header(title="Passer EPA/play leaders with CPOE — 2025 (min 150 dropbacks)", subtitle=sub)
     .fmt_number(columns=["epa_play", "cpoe"], decimals=3)
-    .cols_label(passer_player_name="Passer", team="Team", dropbacks="Dropbacks",
-                epa_play="EPA/play", cpoe="CPOE")
+    .cols_label(passer="Passer", team="Team", dropbacks="Dropbacks", epa_play="EPA/play", cpoe="CPOE")
 )
+if has_ids:
+    g = g.fmt_markdown(columns="headshot").cols_label(headshot="")
+gt_show(g)
 ```
 
 ```{python}
@@ -326,7 +514,13 @@ if rank_col:
   `scripts/render_model_docs.sh` (Quarto → GFM, `--output-dir .` because
   this directory is also a Quarto website project). Inputs:
   `python/artifacts/` (LOSO OOF parquets, `pbp_full.parquet`, boosters —
-  regenerate via `scripts/cfb_models.sh`) and the published
+  regenerate via `scripts/cfb_models.sh`), the per-model **analysis frames**
+  `python/artifacts/analysis/` (`CFB_MODELS_ARGS="export-analysis --pbp
+  python/artifacts/pbp_full.parquet --out-dir python/artifacts/analysis"
+  scripts/cfb_models.sh 30`, or the same subcommand via
+  `python -m cfb_model_build.model_training`; the CI pipeline runs it right
+  after `ingest`), the stage-10 scored frame `python/artifacts/model_pbp_2025.parquet`
+  when present (`scripts/cfb_models.sh 10` for the season), and the published
   `espn_cfb_model_pbp` / `cfb_ratings` releases (cached under
   `docs/models/.cache/`, gitignored).
 - **Training data:** seasons 2004–2025 (the corpus table above is computed
@@ -337,13 +531,19 @@ if rank_col:
 
 ## Avenues for improvement & open issues
 
-- **Per-model SHAP for the full suite** — this page attributes EP; wiring the
-  same pass for WP/CP/xpass needs their engineered features
-  (`spread_time`, `adj_TimeSecsRem`, …) exported into an analysis frame by
-  the trainer, which is the cleaner fix than re-deriving them here.
-- **Athlete ids in model_pbp** — the published frame carries passer *names*
-  only; adding ESPN athlete ids would let the leader tables ship headshots
-  the way the NFL/MLB docs do.
+- **Resolved (2026-09-01, PR #56):** *Per-model SHAP for the full suite* —
+  the trainer now exports the engineered feature matrix per model
+  (`export-analysis` → `python/artifacts/analysis/analysis_{ep,wp,xpass,cp}.parquet`,
+  built through the same `*_matrix` code paths the fits use) and this page
+  attributes EP, WP-spread, WP-naive, xPass and CP against the promoted
+  boosters, with a by-season slice for WP.
+- **Resolved (2026-09-01, PR #56):** *Athlete ids in model_pbp* — the ids
+  were never absent upstream (sdv-py's participants module emits them and
+  every final.json carried them); the model_pbp builder's `DESCRIPTOR_COLS`
+  was the drop point. The frame now carries `passer_player_id`,
+  `rusher_player_name`/`_id`, `receiver_player_name`/`_id` (Int64, additive),
+  and the passer table keys on the id and ships headshots. The published
+  release gains the columns on its next stage-10 + publish run.
 - **Known issue:** `python/artifacts/` is a build tree, not committed — a
   fresh clone must run the model pipeline before this page renders. That is
   deliberate (artifacts are large), but it makes this page's reproducibility

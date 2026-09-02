@@ -219,3 +219,29 @@ def test_publish_is_opt_in(tmp_path, monkeypatch, capsys):
 
     assert snap.main(["-l", "nfl", "--out", str(tmp_path)]) == 0
     assert "espn_nfl_injuries/injuries_2026.parquet: 2 rows" in capsys.readouterr().out
+
+
+def test_athlete_id_coverage_makes_a_silent_id_loss_visible():
+    """The id is RECOVERED from ESPN player links, not read from a field.
+
+    If ESPN reshapes those links every id becomes null, the rows still look fine,
+    and the snapshot quietly stops being a usable player time series. The measure
+    is what turns that into a visible warning.
+    """
+    import polars as pl
+
+    from espn_injuries_daily_snapshot import athlete_id_coverage
+
+    full = pl.DataFrame({"athlete_id": pl.Series([1, 2, 3], dtype=pl.Int64)})
+    assert athlete_id_coverage(full) == 1.0
+
+    partial = pl.DataFrame(
+        {"athlete_id": pl.Series([1, None, None, 4], dtype=pl.Int64)}
+    )
+    assert athlete_id_coverage(partial) == 0.5
+
+    none_at_all = pl.DataFrame({"athlete_id": pl.Series([None, None], dtype=pl.Int64)})
+    assert athlete_id_coverage(none_at_all) == 0.0
+
+    # an empty frame is not a coverage failure -- it is the empty-league skip
+    assert athlete_id_coverage(pl.DataFrame()) == 1.0

@@ -115,6 +115,20 @@ def _athlete_id(athlete: dict[str, Any]) -> Optional[int]:
     return int(found.group(1)) if found else None
 
 
+def athlete_id_coverage(frame: pl.DataFrame) -> float:
+    """Share of rows carrying an athlete_id. 1.0 on every league on 2026-09-02.
+
+    ESPN omits ``athlete.id`` on this endpoint, so the id is RECOVERED from the
+    player links (and a headshot fallback). That makes it fragile in a specific
+    way: if ESPN reshapes those links, every id silently becomes null, the rows
+    stay joinable-looking, and nothing fails -- the snapshot just quietly stops
+    being usable as a player time series. Measure it so a drop is visible.
+    """
+    if not frame.height or "athlete_id" not in frame.columns:
+        return 1.0
+    return 1.0 - frame["athlete_id"].null_count() / frame.height
+
+
 def explode(payload: dict[str, Any], league: str, as_of: Any) -> pl.DataFrame:
     """Flatten the nested payload to one row per (team, athlete, injury)."""
     season = _int((payload.get("season") or {}).get("year"))
@@ -215,6 +229,15 @@ def build(
         tag = f"espn_{league}_injuries"
         try:
             today = explode(fetch(league), league, as_of)
+            coverage = athlete_id_coverage(today)
+            if coverage < 1.0:
+                logger.warning(
+                    "injuries_athlete_id_gap league=%s coverage=%.3f rows=%s -- the id is"
+                    " recovered from ESPN player links; a drop here means that shape changed",
+                    league,
+                    coverage,
+                    today.height,
+                )
         except Exception as exc:  # noqa: BLE001 - best-effort: one bad league never sinks the run
             logger.warning("injuries_skip league=%s error=%s", league, str(exc)[:160])
             continue

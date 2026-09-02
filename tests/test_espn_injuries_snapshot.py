@@ -1,8 +1,10 @@
 """Offline tests for the ESPN league-wide injuries daily snapshot.
 
-Covers the four contracts that make the dataset trustworthy: the explode shape,
-the pinned Int64 id dtypes, same-day idempotency of the append, and the hard
-rule that a zero-row league is never written.
+Covers the contracts that make the dataset trustworthy: the explode shape (now
+delegated to ``sportsdataverse.espn_snapshots.parse_injuries_snapshot``), the
+Int64 id boundary and its no-silent-loss guarantee, same-day idempotency of the
+append, the hard rule that a zero-row league is never written, and that the
+publish uploads the assets this run actually produced.
 """
 
 from __future__ import annotations
@@ -81,20 +83,54 @@ def test_explode_shape_and_id_dtypes():
     assert row["athlete_id"] == 4870808  # recovered from links, not a top-level id
     assert row["league"] == "nfl"
     assert row["season"] == 2026
-    assert row["position_abbreviation"] == "RB"
-    assert row["team_abbreviation"] == "ARI"
-    assert row["fantasy_status"] == "QUESTIONABLE"
+    assert row["athlete_position"] == "RB"
+    assert row["detail_fantasy_status"] == "QUESTIONABLE"
 
 
-def test_athlete_id_falls_back_to_headshot():
+def test_schema_tracks_the_library_parser():
+    """The producer schema is the library's, with ids re-pinned and season added.
+
+    Derived rather than restated so a column added upstream cannot go missing
+    here, and so no second copy of the column list can drift from the parser.
+    """
+    from sportsdataverse.espn_snapshots import INJURY_SNAPSHOT_SCHEMA
+
+    assert set(snap.SCHEMA) == set(INJURY_SNAPSHOT_SCHEMA) | {"season"}
+    assert all(snap.SCHEMA[c] == pl.Int64 for c in snap.ID_COLUMNS)
+    assert all(
+        snap.SCHEMA[c] == dtype
+        for c, dtype in INJURY_SNAPSHOT_SCHEMA.items()
+        if c not in snap.ID_COLUMNS
+    )
+
+
+def test_an_unrecoverable_athlete_id_is_null_and_visible():
+    """ESPN omits ``athlete.id`` entirely; the id comes from the player-card
+    link. If that link is not there the id is null -- never guessed -- and the
+    coverage measure is what makes the loss visible instead of silent."""
     payload = _payload(athletes=1)
-    athlete = payload["injuries"][0]["injuries"][0]["athlete"]
-    athlete["links"] = []
-    athlete["headshot"] = {
-        "href": "https://a.espncdn.com/i/headshots/nfl/players/full/12345.png"
-    }
+    payload["injuries"][0]["injuries"][0]["athlete"]["links"] = []
 
-    assert snap.explode(payload, "nfl", date(2026, 9, 2))["athlete_id"][0] == 12345
+    df = snap.explode(payload, "nfl", date(2026, 9, 2))
+
+    assert df["athlete_id"][0] is None
+    assert snap.athlete_id_coverage(df) == 0.0
+
+
+def test_ids_are_cast_through_int_never_float():
+    """``str(123.0)`` is ``"123.0"``: the exact trap the id-dtype rule exists for.
+
+    A float-shaped id must not become 123 by rounding, and must not vanish into
+    a null join key either -- it raises, and ``build`` skips that league.
+    """
+    good = snap.explode(_payload(athletes=1), "nfl", date(2026, 9, 2))
+    assert good["athlete_id"][0] == 4870808
+
+    float_shaped = pl.DataFrame(
+        {c: pl.Series(["123.0"], dtype=pl.Utf8) for c in snap.ID_COLUMNS}
+    )
+    with pytest.raises(ValueError, match="did not survive the Int64 cast"):
+        snap._cast_ids(float_shaped)
 
 
 def test_empty_league_yields_empty_frame_with_schema():
@@ -106,6 +142,7 @@ def test_empty_league_yields_empty_frame_with_schema():
     assert list(df.columns) == list(
         snap.SCHEMA
     )  # empty frames carry the documented schema
+    assert df.schema["athlete_id"] == pl.Int64  # ...including the id dtypes
 
 
 def test_empty_league_is_skipped_not_written(tmp_path):
@@ -271,7 +308,8 @@ def test_publish_uploads_only_what_this_run_wrote(tmp_path, monkeypatch):
 
     calls = []
     monkeypatch.setattr(rel, "sportsdataverse_upload", _fake_upload(calls))
-    assert _publish(tmp_path, {f"{tag}/injuries_2026": 800}, "r/r", dry_run=False) == 0
+    written = {f"{tag}/injuries_2026.parquet": 800}  # exactly build()'s key shape
+    assert _publish(tmp_path, written, "r/r", dry_run=False) == 0
     assert calls == [(tag, ["injuries_2026.parquet"])], "the stale asset was uploaded"
 
 
@@ -285,7 +323,7 @@ def test_one_failing_tag_does_not_abandon_the_others(tmp_path, monkeypatch):
     for tag in ("espn_mlb_injuries", "espn_nfl_injuries", "espn_nhl_injuries"):
         (tmp_path / tag).mkdir(parents=True)
         (tmp_path / tag / "injuries_2026.parquet").write_bytes(b"x")
-        written[f"{tag}/injuries_2026"] = 10
+        written[f"{tag}/injuries_2026.parquet"] = 10
 
     calls = []
     monkeypatch.setattr(
@@ -301,3 +339,29 @@ def test_one_failing_tag_does_not_abandon_the_others(tmp_path, monkeypatch):
         "espn_nfl_injuries",
         "espn_nhl_injuries",
     ], "a raise in the first tag stopped the rest"
+
+
+def test_build_output_is_publishable_end_to_end(tmp_path, monkeypatch):
+    """``build`` writes the files and ``_publish`` uploads THOSE files.
+
+    Both halves passed on hand-written keys while the real handoff uploaded
+    nothing: ``_publish`` re-appended ".parquet" to an asset name that already
+    carried it, every path missed, and the run still returned 0. Only feeding
+    build()'s own return value into _publish can catch that.
+    """
+    import sportsdataverse.release as rel
+
+    from espn_injuries_daily_snapshot import _publish
+
+    written = snap.build(
+        ["nfl"],
+        tmp_path,
+        as_of=date(2026, 9, 2),
+        fetch=lambda _: _payload(),
+        prior_reader=lambda *a, **k: None,
+    )
+
+    calls = []
+    monkeypatch.setattr(rel, "sportsdataverse_upload", _fake_upload(calls))
+    assert _publish(tmp_path, written, "r/r", dry_run=False) == 0
+    assert calls == [("espn_nfl_injuries", ["injuries_2026.parquet"])]

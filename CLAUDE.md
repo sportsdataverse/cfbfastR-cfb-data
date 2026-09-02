@@ -8,6 +8,8 @@ parquet/csv/rds. Sibling of `cfbfastR-cfb-raw` (Python/uv).
 - `Rscript R/espn_cfb_0N_*.R -s YYYY -e YYYY` — build one dataset for a season range.
 - `bash scripts/daily_cfb_R_processor.sh -s YYYY -e YYYY` — build all datasets.
 - `Rscript R/releases_init.R` — one-time release-tag creation on both publish repos.
+- `uv run python python/espn_injuries_daily_snapshot.py [-l nfl ...] [--publish]` — daily
+  ESPN injuries snapshot, all 8 leagues (see "ESPN injuries" below). Build-only by default.
 
 ## Conventions
 - **R reshape is reshape, not re-enrich.** The R pipeline (`R/espn_cfb_0N_*.R`) reads a
@@ -58,6 +60,34 @@ retrain and cadence. Rows are **mandatory for new published models/artifacts**.
 names rather than per-model rows, and skips a row citing no in-repo package (an
 sdv-py entry point). It catches a wholly-undocumented stage; it does not prove
 every row is complete. See the header of `models/REGISTRY.md`.
+
+## ESPN injuries — daily append snapshot, all 8 leagues
+
+`python/espn_injuries_daily_snapshot.py` is the ONLY route to injury data, and it is
+deliberately cross-league even though this is the CFB producer.
+
+- **The per-game stage cannot work.** `R/espn_cfb_14_injuries_creation.R` +
+  `python/espn_cfb_14_injuries_creation.py` read the game-summary `injuries` key, which
+  ESPN always ships as `[]` (verified across the 12 most-recent raw finals). They are
+  structurally incapable of emitting rows; no rerun changes that. Left in place for the
+  R/Python parity chain — do not "fix" or re-run them expecting output.
+- **Where the data actually is:** `espn_<lg>_injuries()` is league-level and takes no
+  arguments, so a full 8-league snapshot is ~8 requests, not a per-team fan-out.
+- **Why here:** `espn_cfb_injuries` is the only injuries tag in the ecosystem, so injuries
+  keep one owner rather than becoming eight near-identical stages across eight `-data`
+  repos. This stage fills that tag and seven siblings.
+- **APPEND, not overwrite.** The endpoint reports current state with no history — the
+  `as_of_date` series *is* the dataset. Each run reads the prior release asset, drops any
+  rows already stamped with today's date, and re-uploads the merged history, so re-running
+  the same day replaces that day rather than duplicating it.
+- **Never publish an empty snapshot.** A league returning zero athlete rows is logged and
+  skipped; no zero-row asset is written. mbb/wbb hit this every offseason day, by design.
+- Output: `espn_{league}_injuries` / `injuries_{season}.parquet`, one row per
+  `(as_of_date, league, team, athlete, injury)`. `team_id` / `athlete_id` are pinned to
+  `Int64` (ESPN ships every id as a numeric string, and omits `athlete.id` on this
+  endpoint — it is recovered from the player links).
+- Build-only by default; `--publish` uploads, `--dry-run` plans. Tests:
+  `tests/test_espn_injuries_snapshot.py` (offline, no network).
 
 ## Inputs / outputs
 - Input: `https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/json/final/{id}.json`

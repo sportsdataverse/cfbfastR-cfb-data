@@ -1,5 +1,9 @@
 """Builder: ESPN CFB injuries.
 
+STRUCTURALLY EMPTY -- do not expect rows. This reads the game-summary ``injuries``
+key, which ESPN always ships as ``[]``. Real injuries come from the league endpoint
+via ``python/espn_injuries_daily_snapshot.py``; see CLAUDE.md "ESPN injuries".
+
 Thin entrypoint. The build lives in ``cfb_data_build``; this file exists so the
 directory listing is the pipeline and each dataset is runnable on its own.
 

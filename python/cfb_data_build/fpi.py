@@ -30,6 +30,7 @@ import concurrent.futures as cf
 import json
 import re
 import urllib.request
+from pathlib import Path
 from typing import Any
 
 import polars as pl
@@ -59,17 +60,13 @@ _MAX_WEEK = 20
 
 
 def _get(url: str, *, timeout: int = 45) -> dict[str, Any]:
-    with urllib.request.urlopen(
-        urllib.request.Request(url, headers=_UA), timeout=timeout
-    ) as r:
+    with urllib.request.urlopen(urllib.request.Request(url, headers=_UA), timeout=timeout) as r:
         return json.load(r)
 
 
 def _week_rows(season: int, season_type: int, week: int) -> list[dict[str, Any]]:
     """One row per team for a single (season, season_type, week) snapshot."""
-    url = (
-        f"{CORE}/seasons/{season}/types/{season_type}/weeks/{week}/powerindex?limit=400"
-    )
+    url = f"{CORE}/seasons/{season}/types/{season_type}/weeks/{week}/powerindex?limit=400"
     try:
         payload = _get(url)
     except Exception as exc:  # noqa: BLE001
@@ -102,9 +99,7 @@ def _week_rows(season: int, season_type: int, week: int) -> list[dict[str, Any]]
     return rows
 
 
-def build_fpi_weekly(
-    season: int, *, base: str = "cfb", workers: int = 6
-) -> pl.DataFrame:
+def build_fpi_weekly(season: int, *, base: str = "cfb", workers: int = 6) -> pl.DataFrame:
     """Weekly FPI snapshots for one season, long over (season_type, week).
 
     Every week slot up to ``_MAX_WEEK`` is probed concurrently and the empty ones
@@ -124,8 +119,18 @@ def build_fpi_weekly(
             rows.extend(r)
     if not rows:
         return pl.DataFrame()
-    df = pl.from_dicts(rows, infer_schema_length=None)
+    return _flag_and_order(pl.from_dicts(rows, infer_schema_length=None))
 
+
+def _flag_and_order(df: pl.DataFrame) -> pl.DataFrame:
+    """Sort, derive the two snapshot-trust flags, and lead with the key columns.
+
+    Split out of :func:`build_fpi_weekly` because the flags are WITHIN-season
+    comparisons: once a merge folds an earlier capture together with a later
+    one (see :func:`merge_preserving_earliest`), both flags have to be
+    recomputed over the combined frame or they describe a frame that no longer
+    exists.
+    """
     # ESPN's WEEK 1 slot is NOT a week-1 snapshot: it is consistently overwritten
     # with a late/final computation. Verified across seasons --
     #   2019 wk1 = 2020-04-07   2022 wk1 = 2022-12-22
@@ -138,9 +143,7 @@ def build_fpi_weekly(
     # Ordered on run_date_time_key (an Int like 20240929040000), not last_updated:
     # the latter is a Utf8 timestamp and polars cannot cum_min a string column.
     key = pl.col("run_date_time_key").cast(pl.Int64, strict=False)
-    later_min = (
-        key.reverse().cum_min().reverse().shift(-1).over(["season", "season_type"])
-    )
+    later_min = key.reverse().cum_min().reverse().shift(-1).over(["season", "season_type"])
 
     # SECOND, INDEPENDENT trap: seasons before 2015 were computed RETROSPECTIVELY.
     # Every week of 2005-2014 carries one identical backfill stamp (2014-08-14 or
@@ -158,9 +161,7 @@ def build_fpi_weekly(
     # backfilled season look contemporaneous.
     yr = pl.col("last_updated").str.slice(0, 4).cast(pl.Int64, strict=False)
     month = pl.col("last_updated").str.slice(5, 2).cast(pl.Int64, strict=False)
-    in_window = ((yr == pl.col("season")) & (month >= 8)) | (
-        (yr == pl.col("season") + 1) & (month <= 2)
-    )
+    in_window = ((yr == pl.col("season")) & (month >= 8)) | ((yr == pl.col("season") + 1) & (month <= 2))
     df = df.with_columns(
         snapshot_out_of_sequence=(key > later_min).fill_null(False),
         snapshot_is_contemporaneous=in_window.fill_null(False),
@@ -176,6 +177,51 @@ def build_fpi_weekly(
     ]
     rest = [c for c in df.columns if c not in lead]
     return df.select([c for c in lead if c in df.columns] + rest)
+
+
+#: Identity of one weekly snapshot row.
+_WEEK_KEY = ["season", "season_type", "week", "team_id"]
+#: Derived in :func:`_flag_and_order`; dropped before a merge so both sides
+#: carry the same columns and the flags are recomputed over the union.
+_FLAG_COLS = ["snapshot_out_of_sequence", "snapshot_is_contemporaneous"]
+
+
+def merge_preserving_earliest(new: pl.DataFrame, existing: pl.DataFrame) -> tuple[pl.DataFrame, int]:
+    """Fold a fresh fetch into an already-captured season, EARLIEST capture wins.
+
+    The in-season cron re-fetches every week slot on every run, so without this
+    the newest fetch would overwrite weeks captured earlier -- and for week 1
+    that is destructive rather than merely redundant: ESPN overwrites the week-1
+    slot with a late-season computation (2024's week 1 is stamped 2024-12-15,
+    later than that season's week 16). A genuine as-of-week-N rating exists ONLY
+    in the capture taken during week N; no later fetch can recover it. So a
+    (season, season_type, week, team_id) already on disk is kept as-is and only
+    genuinely new keys are appended.
+
+    Returns the merged frame and the number of rows added. Zero added means the
+    run found no new snapshot and the caller should skip the write entirely --
+    rewriting identical bytes would churn the manifest and the git mirror for
+    nothing.
+
+    To force a full rebuild of a season (a schema change, say), delete its
+    parquet first: with no base on disk the fetch is written as-is.
+    """
+    if existing.height == 0:
+        return new, new.height
+    fresh = new.join(existing.select(_WEEK_KEY), on=_WEEK_KEY, how="anti")
+    if fresh.height == 0:
+        return existing, 0
+    merged = pl.concat(
+        [existing.drop(_FLAG_COLS, strict=False), fresh.drop(_FLAG_COLS, strict=False)],
+        how="diagonal_relaxed",
+    )
+    return _flag_and_order(merged), fresh.height
+
+
+def _existing_weekly(spec: DatasetSpec, season: int, base: str) -> pl.DataFrame:
+    """The committed parquet for this season, or an empty frame if absent."""
+    path = Path(base) / spec.dataset / "parquet" / f"{spec.stem}_{season}.parquet"
+    return pl.read_parquet(path) if path.exists() else pl.DataFrame()
 
 
 def _game_rows(game_id: int) -> list[dict[str, Any]]:
@@ -212,9 +258,7 @@ def _game_rows(game_id: int) -> list[dict[str, Any]]:
     return rows
 
 
-def build_power_index(
-    season: int, *, base: str = "cfb", schedule: str | None = None, workers: int = 8
-) -> pl.DataFrame:
+def build_power_index(season: int, *, base: str = "cfb", schedule: str | None = None, workers: int = 8) -> pl.DataFrame:
     """Per-game matchup FPI for one season, resolving the refs the asset only linked.
 
     Two rows per game (one per team). Games with no FPI entry -- ESPN only
@@ -232,13 +276,9 @@ def build_power_index(
             rows.extend(r)
     if not rows:
         return pl.DataFrame()
-    df = pl.from_dicts(rows, infer_schema_length=None).with_columns(
-        season=pl.lit(int(season), dtype=pl.Int64)
-    )
+    df = pl.from_dicts(rows, infer_schema_length=None).with_columns(season=pl.lit(int(season), dtype=pl.Int64))
     lead = ["season", "game_id", "team_id"]
-    return df.select(lead + [c for c in df.columns if c not in lead]).sort(
-        ["game_id", "team_id"]
-    )
+    return df.select(lead + [c for c in df.columns if c not in lead]).sort(["game_id", "team_id"])
 
 
 BUILDERS = {"fpi_weekly": build_fpi_weekly, "power_index": build_power_index}
@@ -271,6 +311,18 @@ def build_fpi(
             if df.height == 0:
                 print(f"  {spec.dataset} {season}: 0 rows, skipped", flush=True)
                 continue
+            if dataset == "fpi_weekly":
+                df, added = merge_preserving_earliest(df, _existing_weekly(spec, season, base))
+                if added == 0:
+                    # A clean no-op, not a failure: the in-season cron runs more
+                    # often than ESPN posts a week, so "nothing new" is the
+                    # ordinary outcome and must not write, publish, or exit non-zero.
+                    print(
+                        f"  {spec.dataset} {season}: no new snapshot ({df.height} rows already captured)",
+                        flush=True,
+                    )
+                    continue
+                print(f"  {spec.dataset} {season}: +{added} new rows", flush=True)
             extra = ""
             if "week" in df.columns:
                 extra = f", {df['week'].n_unique()} weeks x {df['team_id'].n_unique()} teams"
@@ -286,8 +338,6 @@ def build_fpi(
 
                 publish_dataset(spec, season, base=base)
         except Exception as exc:  # noqa: BLE001 - one season must not kill the sweep
-            print(
-                f"  FAILED {season}: {type(exc).__name__}: {str(exc)[:150]}", flush=True
-            )
+            print(f"  FAILED {season}: {type(exc).__name__}: {str(exc)[:150]}", flush=True)
             failures.append((season, type(exc).__name__))
     return failures

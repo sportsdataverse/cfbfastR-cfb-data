@@ -184,7 +184,7 @@ def append_snapshot(prior: Optional[pl.DataFrame], today: pl.DataFrame) -> pl.Da
         return today.sort(SORT_KEYS)
     as_of = today["as_of_date"][0]
     keep = prior.filter(pl.col("as_of_date") != as_of)
-    merged = pl.concat([keep, today], how="diagonal_relaxed").sort(SORT_KEYS)
+    merged = pl.concat([keep, today], how="diagonal_relaxed")
     retired = [c for c in merged.columns if c not in today.columns]
     if retired:
         logger.warning(
@@ -192,7 +192,10 @@ def append_snapshot(prior: Optional[pl.DataFrame], today: pl.DataFrame) -> pl.Da
             " the current schema",
             retired,
         )
-    return merged.select(today.columns).cast(dict(today.schema))
+    # sort AFTER the cast, never before: `diagonal_relaxed` promotes a prior Utf8
+    # id column to Utf8, and sorting there is lexical -- "10" lands before "2" and
+    # the cast to Int64 preserves that wrong order.
+    return merged.select(today.columns).cast(dict(today.schema)).sort(SORT_KEYS)
 
 
 def build(

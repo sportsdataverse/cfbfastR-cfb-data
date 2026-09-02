@@ -20,7 +20,10 @@ DESCRIPTOR_COLS = [
 # Join keys onto ESPN athletes (headshots: a.espncdn.com/i/headshots/college-football/
 # players/full/{id}.png). Pinned Int64 at the boundary -- the dtype load_cfb_pbp declares.
 ATHLETE_ID_COLS = ["passer_player_id", "rusher_player_id", "receiver_player_id"]
-ATHLETE_NAME_COLS = ["rusher_player_name", "receiver_player_name"]
+# passer_player_name is also a DESCRIPTOR_COL (it predates the id work), but it is listed
+# here too so all three roles are materialized when a season's finals lack the column --
+# otherwise the coverage gate, which reads {role}_player_name, has nothing to divide by.
+ATHLETE_NAME_COLS = ["passer_player_name", "rusher_player_name", "receiver_player_name"]
 
 PREDICTION_COLS = [
     "ep_before", "ep_after", "epa", "def_epa",

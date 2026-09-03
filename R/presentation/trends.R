@@ -89,8 +89,14 @@ percentiles |>
         title = "The Binion Box Score: 2014-2025",
         subtitle = "How Binion Box Score metric IQRs have evolved through the CollegeFootballData era.",
         caption = "Data from collegefootballdata.com, ESPN, and cfbfastR. Chart created by @gameonpaper.com."
-    ) +
-    ggplot2::guides(
-        legend = ggplot2::guide_legend(position = "bottom")
     )
+# The legend sits INSIDE the panel at c(0.55, 0.15), set in theme() above.
+# A `guides(legend = guide_legend(position = "bottom"))` call used to sit here.
+# guides() is keyed by AESTHETIC (color/fill/size/...); there is no `legend`
+# aesthetic, so ggplot2 silently dropped it and the call never did anything --
+# verified on ggplot2 4.0.3: theme-only and theme+that-call both populate
+# guide-box-inside, while guides(color = ...) populates guide-box-bottom.
+# Removed rather than "fixed" to bottom: the inside coordinates are tuned, and
+# deleting inert code changes no output. To actually move the legend, key it on
+# `color` and drop the two legend.position lines in theme().
 # 1200x800

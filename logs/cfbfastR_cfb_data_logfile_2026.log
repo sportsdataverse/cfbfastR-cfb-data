@@ -48,7 +48,66 @@ game_rosters 2026: 476 rows from 948 games
 betting 2026: 8 rows from 948 games
 schedules 2026: 8 rows from 948 games
 linescores 2026: 60 rows from 948 games
-  power_index 2026: 1776 rows, 7 cols
+  power_index 401858281: ref fetch failed (HTTPError)
+  power_index 401856846: ref fetch failed (HTTPError)
+  power_index 401862814: HTTPError
+  power_index 401869846: HTTPError
+  power_index 401860924: ref fetch failed (HTTPError)
+  power_index 401871095: ref fetch failed (HTTPError)
+  power_index 401856734: ref fetch failed (HTTPError)
+  power_index 401866456: ref fetch failed (HTTPError)
+  power_index 401856740: HTTPError
+  power_index 401856739: ref fetch failed (HTTPError)
+  power_index 401856850: ref fetch failed (HTTPError)
+  power_index 401858515: HTTPError
+  power_index 401862819: ref fetch failed (HTTPError)
+  power_index 401858512: ref fetch failed (HTTPError)
+  power_index 401862820: HTTPError
+  power_index 401858292: ref fetch failed (HTTPError)
+  power_index 401871076: ref fetch failed (HTTPError)
+  power_index 401860911: ref fetch failed (HTTPError)
+  power_index 401866458: ref fetch failed (HTTPError)
+  power_index 401858526: HTTPError
+  power_index 401862824: ref fetch failed (HTTPError)
+  power_index 401856883: ref fetch failed (HTTPError)
+  power_index 401856864: HTTPError
+  power_index 401856858: ref fetch failed (HTTPError)
+  power_index 401856884: ref fetch failed (HTTPError)
+  power_index 401856862: ref fetch failed (HTTPError)
+  power_index 401856859: ref fetch failed (HTTPError)
+  power_index 401858520: HTTPError
+  power_index 401858299: ref fetch failed (HTTPError)
+  power_index 401858295: ref fetch failed (HTTPError)
+  power_index 401871099: HTTPError
+  power_index 401870796: ref fetch failed (HTTPError)
+  power_index 401864538: ref fetch failed (HTTPError)
+  power_index 401856869: HTTPError
+  power_index 401866468: ref fetch failed (HTTPError)
+  power_index 401858302: ref fetch failed (HTTPError)
+  power_index 401858306: HTTPError
+  power_index 401858532: ref fetch failed (HTTPError)
+  power_index 401856748: HTTPError
+  power_index 401862835: HTTPError
+  power_index 401869946: HTTPError
+  power_index 401871081: HTTPError
+  power_index 401862831: ref fetch failed (HTTPError)
+  power_index 401871078: HTTPError
+  power_index 401860918: ref fetch failed (HTTPError)
+  power_index 401856879: ref fetch failed (HTTPError)
+  power_index 401856756: ref fetch failed (HTTPError)
+  power_index 401858543: ref fetch failed (HTTPError)
+  power_index 401856875: ref fetch failed (HTTPError)
+  power_index 401862842: ref fetch failed (HTTPError)
+  power_index 401871103: HTTPError
+  power_index 401864546: HTTPError
+  power_index 401864548: ref fetch failed (HTTPError)
+  power_index 401864548: ref fetch failed (HTTPError)
+  power_index 401869534: HTTPError
+  power_index 401862844: HTTPError
+  power_index 401874405: HTTPError
+  power_index 401874428: HTTPError
+  power_index 401874432: HTTPError
+  power_index 2026: 1702 rows, 7 cols
 
 === power_index: 0 failures ===
 injuries 2026: 0 rows from 948 games

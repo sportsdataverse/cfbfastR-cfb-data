@@ -65,6 +65,9 @@ PRIOR_RHO_LOC, PRIOR_RHO_SCALE = 0.5, 0.3
 #: Sampler gates. A run that fails any of these has no result to report.
 RHAT_MAX = 1.01
 ESS_MIN = 400.0
+#: >1% of as-of points voided voids the WHOLE run and no MAE may be reported
+#: for it (PREREG_hierarchical.md section 3).
+VOID_RUN_LIMIT = 0.01
 
 
 # ---------------------------------------------------------------------------
@@ -387,8 +390,17 @@ def fit_asof(
                 param="centered" if centered else "non-centered",
             )
         )
+    # PRE-REGISTERED (PREREG_hierarchical.md section 1): fit BOTH
+    # parameterizations, require BOTH to clear every gate, and only among the
+    # survivors keep the higher ESS. Returning whichever one happened to
+    # survive would be selecting on ESS alone -- a more confident wrong answer,
+    # which is precisely what bayesian.md section 3 warns against.
+    if errors:
+        raise RuntimeError(
+            f"a parameterization failed the gates ({len(errors)} of 2): {errors}"
+        )
     if not fits:
-        raise RuntimeError(f"both parameterizations failed the gates: {errors}")
+        raise RuntimeError("no parameterization produced a fit")
     return max(fits, key=lambda f: f.diag["min_ess_bulk"])
 
 
@@ -481,12 +493,29 @@ def walk_forward(
     carryover, with its strength ``rho`` estimated rather than set to k=4).
 
     The carryover chain runs forward, so no future season can reach a prior.
-    Returns (per-game predictions, per-fit diagnostics, voided as-of points).
+    Returns (per-game predictions, per-fit diagnostics, voided as-of points,
+    as-of team ratings).
     """
     preds: list[pl.DataFrame] = []
     diags: list[dict] = []
     voids: list[dict] = []
+    ratings: list[pl.DataFrame] = []
     prev = np.zeros(corpus.n_teams)
+
+    def _rating_rows(season: int, tt: int, fit: Fit) -> pl.DataFrame:
+        """The as-of team ratings themselves. Discarding them and keeping only
+        the per-game margins would throw away the thing the model estimates."""
+        return pl.DataFrame(
+            {
+                "season": np.full(corpus.n_teams, season, dtype=np.int64),
+                "asof_t": np.full(corpus.n_teams, tt, dtype=np.int64),
+                "team_id": corpus.team_ids.astype(np.int64),
+                "theta": fit.theta.astype(np.float64),
+                "hfa": np.full(corpus.n_teams, fit.hfa, dtype=np.float64),
+                "tau_team": np.full(corpus.n_teams, fit.tau_team, dtype=np.float64),
+            }
+        )
+
     for s in seasons:
         ts = sorted(corpus.games.filter(pl.col("season") == s)["t"].unique().to_list())
         for tt in ts[1:]:  # the first slot has no in-season history
@@ -519,6 +548,7 @@ def walk_forward(
                     **fit.diag,
                 }
             )
+            ratings.append(_rating_rows(s, tt, fit))
             if verbose:
                 print(
                     f"  {s} t={tt:>3} {fit.param:<12} n_te={te.height:>4} "
@@ -540,19 +570,38 @@ def walk_forward(
                 "under PREREG_hierarchical.md section 3. Use method='eb'."
             ) from exc
         prev = final.theta
+        ratings.append(_rating_rows(s, max(ts) + 1, final))
         if verbose:
             print(
                 f"  {s} FINAL carryover prior set (theta sd {prev.std():.2f})",
                 flush=True,
             )
     if voids:
+        rate = len(voids) / (len(voids) + len(preds))
         print(
             f"VOID as-of points: {len(voids)}/{len(voids) + len(preds)} "
-            f"({100 * len(voids) / (len(voids) + len(preds)):.1f}%) -- "
-            f"{sorted({v['t'] for v in voids})}",
+            f"({100 * rate:.1f}%) -- {sorted({v['t'] for v in voids})}",
             flush=True,
         )
-    return pl.concat(preds), pl.DataFrame(diags), pl.DataFrame(voids)
+        # PRE-REGISTERED (section 3): a single failing as-of point is void, but
+        # more than 1% of them voids the WHOLE RUN and no MAE may be reported
+        # for it. Printing the rate and returning predictions anyway would let
+        # `run` gate a partial OOF set -- the exact "reports success while
+        # doing nothing useful" failure this repo keeps hitting.
+        if rate > VOID_RUN_LIMIT:
+            raise RuntimeError(
+                f"run is VOID: {len(voids)}/{len(voids) + len(preds)} as-of points "
+                f"({100 * rate:.1f}%) failed the sampler gates, above the "
+                f"{100 * VOID_RUN_LIMIT:.0f}% tolerance in PREREG_hierarchical.md "
+                "section 3. No MAE may be reported for this run. For method='mcmc' "
+                "this is the expected, measured outcome -- use method='eb'."
+            )
+    return (
+        pl.concat(preds),
+        pl.DataFrame(diags),
+        pl.DataFrame(voids),
+        pl.concat(ratings),
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -568,6 +617,7 @@ GATE_CAL_SLOPE = (0.80, 1.10)  # observed 0.92 (shipped 0.91, market 1.00)
 GATE_MAX_CAL_ERR = 0.10  # observed 0.029; the shipped surface is 0.430
 GATE_SEASONS_WON_MIN = 0.80  # observed 11/11 vs shipped, 8/9 vs the lean GBM
 GATE_TAU_RANGE = (0.5, 40.0)  # observed 4.81-15.63 across 250 as-of fits
+GATE_P_SEASON_MAX = 0.05  # the pre-registered win condition; observed 0.0000
 
 
 def assert_hierarchical_gate(oof: pl.DataFrame, shipped_pred: np.ndarray) -> dict:
@@ -618,12 +668,20 @@ def assert_hierarchical_gate(oof: pl.DataFrame, shipped_pred: np.ndarray) -> dic
         fail.append(
             f"won {got['seasons_won_frac']:.2f} of seasons < {GATE_SEASONS_WON_MIN}"
         )
+    # The season-clustered test is the pre-registered WIN condition (the
+    # game-level one is anti-conservative by construction -- significance.py's
+    # own header says so). NaN fails: it means the test could not be computed.
+    if not (got["p_season"] < GATE_P_SEASON_MAX):
+        fail.append(
+            f"season-clustered p {got['p_season']:.4f} >= {GATE_P_SEASON_MAX} "
+            "(NaN counts as a failure -- the test did not compute)"
+        )
     if fail:
         raise RuntimeError("hierarchical gate FAILED: " + "; ".join(fail))
     return got
 
 
-def scorecard(joined: pl.DataFrame, seasons: list[int]) -> str:
+def scorecard(joined: pl.DataFrame, seasons: list[int], hist: pl.DataFrame) -> str:
     """The published comparison, reproducible from one command.
 
     Every arm is scored on the IDENTICAL games (`joined`), and the market row is
@@ -640,9 +698,29 @@ def scorecard(joined: pl.DataFrame, seasons: list[int]) -> str:
             "game_id", "season", "week", "margin", "home_won"
         ).with_columns(pl.Series("pred_margin", np.asarray(pred, dtype=float)))
 
-    hist_mean = float(joined["margin"].mean())
+    # WALK-FORWARD, like every other arm: season S's constant is the mean home
+    # margin of seasons STRICTLY BEFORE S. Using `joined["margin"].mean()` would
+    # let each constant prediction see its own season -- and the held-out
+    # outcomes it is being scored against -- which is the same as-of violation
+    # this whole package exists to prevent, just on the baseline arm.
+    prior = pl.DataFrame(
+        [
+            {
+                "season": ss,
+                "_const": float(hist.filter(pl.col("season") < ss)["margin"].mean()),
+            }
+            for ss in sorted(joined["season"].unique().to_list())
+        ]
+    )
+    const = joined.select("season").join(prior, on="season", how="left")["_const"]
+    if const.null_count():
+        raise ValueError(
+            "constant baseline has no prior season for "
+            f"{const.null_count()} rows -- the earliest scored season must have "
+            "history behind it in `hist`"
+        )
     arms = {
-        "constant": _oof(np.full(joined.height, hist_mean)),
+        "constant": _oof(const.to_numpy()),
         "shipped": _oof(shipped_margin(joined)),
         "hierarchical": _oof(joined["pred_margin"].to_numpy()),
     }
@@ -693,6 +771,10 @@ def run(
 ) -> int:
     """Stage entry point: walk forward, gate, write the as-of ratings + preds.
 
+    Writes three artifacts to ``out_dir``: ``hier_<method>_ratings.parquet``
+    (one row per team per as-of point -- the model's actual output),
+    ``_preds.parquet`` (per-game margins) and ``_diag.parquet``.
+
     `method="eb"` is the default deliberately. The MCMC arm is void under the
     pre-registered run rule (its first as-of point of each season is
     structurally unidentified at one game played, at every sampling budget
@@ -704,9 +786,12 @@ def run(
     seasons = seasons or list(range(2014, 2026))
     os.makedirs(out_dir, exist_ok=True)
     corpus = build_corpus(load_games(seasons))
-    preds, diags, voids = walk_forward(corpus, seasons, method=method, **fit_kw)
+    preds, diags, voids, ratings = walk_forward(
+        corpus, seasons, method=method, **fit_kw
+    )
 
-    frame = build_game_frame(seasons).filter(pl.col("season") > min(seasons))
+    hist = build_game_frame(seasons)
+    frame = hist.filter(pl.col("season") > min(seasons))
     joined = frame.join(
         preds.select("game_id", "pred_margin"), on="game_id", how="inner"
     )
@@ -717,10 +802,11 @@ def run(
         shipped_margin(joined),
     )
     print(f"hierarchical gate PASSED on {joined.height} games: {got}")
-    print(scorecard(joined, seasons))
+    print(scorecard(joined, seasons, hist))
 
     preds.write_parquet(f"{out_dir}/hier_{method}_preds.parquet")
     diags.write_parquet(f"{out_dir}/hier_{method}_diag.parquet")
+    ratings.write_parquet(f"{out_dir}/hier_{method}_ratings.parquet")
     if voids.height:
         voids.write_parquet(f"{out_dir}/hier_{method}_void.parquet")
     return 0

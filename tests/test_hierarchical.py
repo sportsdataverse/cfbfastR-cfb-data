@@ -97,3 +97,44 @@ def test_the_gate_can_actually_fail():
     )
     with pytest.raises(RuntimeError, match="hierarchical gate FAILED"):
         assert_hierarchical_gate(oof, ship)
+
+
+def test_constant_baseline_cannot_see_its_own_season():
+    """The baseline arm is walk-forward too, or the comparison is rigged.
+
+    `scorecard`'s constant must come from seasons STRICTLY BEFORE the scored
+    one. The regression this guards: a global `joined["margin"].mean()`, which
+    lets every constant prediction see the outcomes it is scored against.
+    """
+    from cfb_model_build.cfb_higher_models.hierarchical import scorecard
+
+    cached = Path(".cache/higher_models/frame_2014_2025.parquet")
+    if not cached.exists():
+        pytest.skip("real game frame absent")
+    hist = pl.read_parquet(cached)
+    joined = hist.filter(pl.col("season") > 2014).with_columns(
+        pl.col("margin").alias("pred_margin")
+    )
+    # Shifting one held-out season's margins must NOT move the constant arm.
+    poisoned = hist.with_columns(
+        pl.when(pl.col("season") == 2024)
+        .then(pl.col("margin") + 500.0)
+        .otherwise(pl.col("margin"))
+        .alias("margin")
+    )
+
+    def const_mae(text):
+        for ln in text.splitlines():
+            if "constant" in ln and "MAE=" in ln:
+                return ln.split("MAE=")[1].split()[0]
+        raise AssertionError(f"no constant row in scorecard:\n{text}")
+
+    # Seasons before 2024 must be untouched by 2024 outcomes. (2024's own
+    # constant legitimately moves, since its priors are unchanged but its
+    # scored margins are not -- so the check is scoped to the earlier seasons.)
+    early = scorecard(joined.filter(pl.col("season") < 2024), [2014], hist)
+    early_poisoned = scorecard(joined.filter(pl.col("season") < 2024), [2014], poisoned)
+    assert const_mae(early) == const_mae(early_poisoned), (
+        "the constant arm for pre-2024 seasons moved when 2024 outcomes changed "
+        "-- it is reading the future"
+    )

@@ -9,7 +9,13 @@ import sys
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="cfb_higher_models")
     sub = ap.add_subparsers(dest="cmd", required=True)
-    for name in ("backtest", "fit-pregame", "train-game", "experiments", "hierarchical"):
+    for name in (
+        "backtest",
+        "fit-pregame",
+        "train-game",
+        "experiments",
+        "hierarchical",
+    ):
         s = sub.add_parser(name)
         s.add_argument("--seasons", nargs="*", type=int)
         if name != "backtest":
@@ -38,7 +44,9 @@ def main(argv=None) -> int:
                 "the cache is keyed only by season range, so it will serve the "
                 "old data to a run that believes it is testing the new.",
             )
-            s.add_argument("--quick", action="store_true", help="skip the ablation + k sweep")
+            s.add_argument(
+                "--quick", action="store_true", help="skip the ablation + k sweep"
+            )
     args = ap.parse_args(argv)
 
     if args.cmd == "backtest":

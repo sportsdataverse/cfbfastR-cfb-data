@@ -64,6 +64,35 @@ def _rank(col: str, *, descending: bool) -> pl.Expr:
     return pl.when(c.is_null()).then(null_trail).otherwise(base)
 
 
+def _pct(col: str) -> pl.Expr:
+    """Percentile of ``{col}_rank`` AMONG QUALIFIERS THAT HAVE THE METRIC, 0-100.
+
+    ``_rank`` already encodes direction (an ascending column ranks low-is-good),
+    so the percentile needs no direction of its own.
+
+    Two things the rank column alone does not give us:
+
+    * ``_rank`` reproduces R's ``na.last = TRUE`` and hands a null metric a
+      TRAILING rank. That is right for a leaderboard, but a percentile is a
+      user-facing number and "unknown" must not render as "worst" -- so a null
+      metric yields a null percentile, and null rows are excluded from ``n``
+      rather than depressing everyone else's placing.
+    * The position is Weibull, ``(n + 1 - rank) / (n + 1)``, which is symmetric:
+      the best qualifier lands at ``n/(n+1)`` and the worst at ``1/(n+1)``.
+      Nobody is pinned to an exact 0 or 100, which reads better in a UI and
+      leaves room for a future qualifier at either end.
+    """
+    src = pl.col(col)
+    rank = pl.col(f"{col}_rank")
+    n = src.is_not_null().sum()
+    return (
+        pl.when(src.is_null())
+        .then(None)
+        .otherwise(100 * (n + 1 - rank) / (n + 1))
+        .cast(pl.Float64)
+    )
+
+
 def add_derived_metrics(plays: pl.DataFrame) -> pl.DataFrame:
     """Port of the build's possession/EPA/explosive derived-column mutate (lines 554-643)."""
     home = pl.col("pos_team") == pl.col("home")
@@ -1033,7 +1062,11 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
             "yardsdropback",
             "detmer",
             "detmergame",
+            "passing_td",
+            "pass_int",
+            "sacked",
         ],
+        asc_cols=["pass_int", "sacked"]
     )
 
     rb_data = summarize_rusher(
@@ -1051,10 +1084,14 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
             "EPAgame",
             "EPAplay",
             "success",
+            "plays",
             "yards",
+            "rushing_td",
+            "fumbles",
             "yardsplay",
             "yardsgame",
         ],
+        asc_cols=["fumbles"],
     )
 
     wr_data = summarize_receiver(
@@ -1083,11 +1120,16 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
             "EPAgame",
             "EPAplay",
             "success",
+            "comp",
+            "targets",
             "catchpct",
             "yards",
+            "passing_td",
+            "fumbles",
             "yardsplay",
             "yardsgame",
         ],
+        asc_cols=["fumbles"],
     )
 
     schools = _build_schools(plays)
@@ -1131,11 +1173,31 @@ def _add_team_games(df: pl.DataFrame) -> pl.DataFrame:
 
 
 def _attach_leader_ranks(
-    data: pl.DataFrame, *, keys: list[str], min_expr: pl.Expr, rank_cols: list[str]
+    data: pl.DataFrame,
+    *,
+    keys: list[str],
+    min_expr: pl.Expr,
+    rank_cols: list[str],
+    asc_cols: list[str] | None = None,
 ) -> pl.DataFrame:
-    """Compute leaderboard ranks among qualifiers, left-joined back (R rank blocks)."""
-    qual = data.filter(min_expr)
-    ranks = qual.select(
-        *keys, *[_rank(c, descending=True).alias(f"{c}_rank") for c in rank_cols]
+    """Compute leaderboard ranks + percentiles among qualifiers, left-joined back.
+
+    ``min_expr`` is the qualifier gate (R rank blocks), so both the rank and the
+    percentile are AMONG QUALIFIERS -- a receiver at the 50th percentile here sits
+    well above the median receiver. Anything the caller lists in ``asc_cols`` is
+    ranked low-is-good (interceptions, sacks taken, fumbles).
+
+    The percentile is computed on the qualifier frame, not on the rank frame,
+    because it needs the source metric to tell a null apart from a bad value.
+    """
+    asc = set(asc_cols or [])
+    qual = data.filter(min_expr).with_columns(
+        *[_rank(c, descending=(c not in asc)).alias(f"{c}_rank") for c in rank_cols]
     )
-    return data.join(ranks, on=keys, how="left")
+    qual = qual.with_columns(*[_pct(c).alias(f"{c}_pct") for c in rank_cols])
+    out = qual.select(
+        *keys,
+        *[f"{c}_rank" for c in rank_cols],
+        *[f"{c}_pct" for c in rank_cols],
+    )
+    return data.join(out, on=keys, how="left")

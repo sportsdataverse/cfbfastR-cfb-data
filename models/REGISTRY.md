@@ -66,3 +66,27 @@ the per-model **analysis frames** `python/artifacts/analysis/analysis_{ep,wp,xpa
 + `analysis_manifest.json` — play ids beside the exact trainer feature matrix — a build-tree
 artifact (not published) consumed by `docs/models/deepdive.qmd`; the CI pipeline runs it
 right after `ingest`.
+
+**2026-09-02 — a defect in the SHIPPED pregame surface, found while measuring something else.**
+`cfb_game_predict` / `cfb_ratings`' closed-form margin is **worse than a constant in weeks
+2-4**: MAE **18.14** against the constant-home-edge baseline's **16.39**, measured
+walk-forward as-of on 6,480 games (2015-2025) with `require_rating=True`. Cause is the flat
+`net_points_scale` (44.54), which is roughly 4x too large in September when ratings rest on
+one or two games — the errors-in-variables failure `slope_by_games` was hand-built to patch
+and which the shipped constants do not use. It is well-behaved later (14.94 / 14.33 / 14.30
+for weeks 5-8 / 9-12 / 13+). **A consumer reading an early-season `cfb_ratings` margin should
+treat weeks 2-4 as unusable.** Not fixed here; recorded so it is visible at the artifact.
+Evidence: `python -m cfb_model_build.cfb_higher_models hierarchical` prints the same table.
+
+**2026-09-02 (hierarchical team strength) — no registry row, by the recorded rule.**
+A two-level hierarchical team-strength model landed in stage 34
+(`cfb_higher_models/hierarchical.py`, pre-registered at `PREREG_hierarchical.md`, gated by
+`assert_hierarchical_gate`). Measured walk-forward as-of on 6,480 games (2015-2025): **12.83**
+MAE vs the shipped surface's 14.97, the lean 60-feature GBM's 13.06, and the closing line's
+12.27 (season-clustered p < 0.0001, 11/11 seasons). It gets **no row**, because
+`NON_PUBLISHING_STAGES` in `tests/test_model_registry.py` says stage 34 "earns a registry row
+the day one of its models is published, and not before" and this model publishes nothing —
+no tag, no asset. It also has no stored fitted constants (`tau_team`, HFA and the carryover
+`rho` are estimated per fit), so there is nothing here that could go stale the way
+`_RIDGE_LAMBDA = 325` did. Full report:
+`ClaudeCowork/ledgers/2026-09-02-next-ten/reports/cfb-hierarchical.md`.

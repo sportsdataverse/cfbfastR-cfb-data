@@ -99,3 +99,10 @@ models:
 # Stage 34 (cfb_higher_models) is research-only by recorded decision — no
 # published model, no registry row (see NON_PUBLISHING_STAGES in
 # tests/test_model_registry.py). Stage 70 emits reports ABOUT the others.
+#
+# 2026-09-02: stage 34 gained `hierarchical` — a gated, pre-registered team-strength
+# model that beats the shipped pregame surface by 2.14 MAE. It is still NOT listed
+# here, and that is the rule working, not an oversight: the exemption's condition is
+# publication, not quality. The day it publishes a tag it needs BOTH a registry row
+# and an entry above, in the same commit — this lockstep test is what will say so.
+# Its measured numbers live in models/REGISTRY.md's dated notes meanwhile.

@@ -52,6 +52,7 @@ era refresh (`docs/models/era_model_refresh.md`) promoted `qbr_era` / `fg_era` /
 | model_pbp (scored PBP) | `cfb_model_pbp_full.parquet` | `espn_cfb_model_pbp` | cfb-raw finals scored with the freshly trained cp model | `python -m cfb_model_build.cfb_model_pbp` | TODO (no documented publish gate; folded into `model_pbp` by `R/espn_cfb_16_model_pbp.R`) | TODO (last pipeline run not recorded here) | annual + dispatch |
 | cfb_ratings | `cfb_ratings_{season}.parquet` + oracle card | `cfb_ratings` | released `espn_cfb_pbp` (2004+) | sdv-py `cfb_ratings()` via `cfb_model_publish ratings` (`cfb_ratings_cron.yml`) | refuses 0-row seasons; ridge refit per run; card written per publish | refit every run | daily in-season (13:00 UTC Aug–Jan), off-season idempotent newest-season refresh |
 | cfb_recruiting_proj | per-season parquet + oracle card | `cfb_recruiting_proj` | roster features (247 talent, blue-chip ratio, returning production, prior wins) | sdv-py `cfb_recruiting_projection()` via `cfb_model_publish recruiting` (`cfb_recruiting_proj_cron.yml`) | refuses 0-row seasons; card written per publish | as-of ridge refit per run | monthly (5th, Dec + Jan–Aug) |
+| cfb_hierarchical_ratings (two-level team strength) | as-of `theta` per (team, season, week) + per-game `pred_margin` (`artifacts/higher_models/hier_eb_preds.parquet`) | **none yet -- build-only, not published** | released `load_cfb_schedule` final scores 2014-2025 (FBS-participant games, regular + postseason) | `python -m cfb_model_build.cfb_higher_models hierarchical` (`cfb_model_34_higher_models_creation.py`; model in `cfb_higher_models/hierarchical.py`) | `assert_hierarchical_gate` -- MAE <= 13.09 (observed 12.828, season-clustered SE 0.130); beats the shipped surface by >= 1.85 MAE (observed +2.142, 95% CI [1.893, 2.398]); calibration slope in [0.80, 1.10] (observed 0.918); max cal err <= 0.10 (observed 0.029); wins >= 80% of seasons (observed 11/11). MCMC path additionally gated on r-hat < 1.01 / ESS > 400 / 0 divergences | 2026-09-02 | refit per run (closed-form EM, no stored fitted constants) |
 
 **2026-09-01 (deepdive PR #56).** `model_pbp` gained five additive athlete columns —
 `passer_player_id`, `rusher_player_name`/`_id`, `receiver_player_name`/`_id` (Int64 ids pinned
@@ -66,3 +67,15 @@ the per-model **analysis frames** `python/artifacts/analysis/analysis_{ep,wp,xpa
 + `analysis_manifest.json` — play ids beside the exact trainer feature matrix — a build-tree
 artifact (not published) consumed by `docs/models/deepdive.qmd`; the CI pipeline runs it
 right after `ingest`.
+
+**2026-09-02 (hierarchical team strength).** Pre-registered at
+`python/cfb_model_build/cfb_higher_models/PREREG_hierarchical.md`; full report at
+`ClaudeCowork/ledgers/2026-09-02-next-ten/reports/cfb-hierarchical.md`. One fitted
+`tau_team` replaces four hand-tuned constants (attenuation curve, carryover k=4, per-team
+HFA k=40, ridge lambda). Measured walk-forward as-of on 6,480 games (2015-2025):
+hierarchical **12.83** MAE vs the shipped surface 14.97, the lean GBM 13.06, and the closing
+line 12.27. It carries **no stored fitted constants** -- the pooling strength, HFA and the
+carryover `rho` are all estimated per fit -- so there is nothing here that can silently go
+stale the way `_RIDGE_LAMBDA = 325` did. The MCMC arm is VOID under its own pre-registration
+(the first as-of point of each season is structurally unidentified at one game played, at
+every sampling budget tried); the shipped path is the closed-form EM.

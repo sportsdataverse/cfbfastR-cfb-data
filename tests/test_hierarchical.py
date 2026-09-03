@@ -73,3 +73,27 @@ def test_pooling_actually_shrinks(corpus):
         f"{raw['margin'].std():.2f} -- the shrinkage did nothing"
     )
     assert 0.5 < fit.tau_team < 40.0, f"tau_team {fit.tau_team} is degenerate"
+
+
+def test_the_gate_can_actually_fail():
+    """A gate that cannot fail is not a gate.
+
+    Feed the gate the SHIPPED predictions in the hierarchical slot: it must
+    reject them. Uses the committed EB run when present, and otherwise a frame
+    where the two arms are identical (beat_shipped == 0), which must also fail.
+    """
+    from cfb_model_build.cfb_higher_models.backtest import shipped_margin
+    from cfb_model_build.cfb_higher_models.hierarchical import (
+        assert_hierarchical_gate,
+    )
+
+    cached = Path(".cache/higher_models/frame_2014_2025.parquet")
+    if not cached.exists():
+        pytest.skip("real game frame absent")
+    frame = pl.read_parquet(cached).filter(pl.col("season") > 2014)
+    ship = shipped_margin(frame)
+    oof = frame.select("game_id", "season", "margin", "home_won").with_columns(
+        pl.Series("pred_margin", ship)
+    )
+    with pytest.raises(RuntimeError, match="hierarchical gate FAILED"):
+        assert_hierarchical_gate(oof, ship)

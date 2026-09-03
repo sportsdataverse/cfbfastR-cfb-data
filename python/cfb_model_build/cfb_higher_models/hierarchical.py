@@ -107,7 +107,8 @@ def build_corpus(games: pl.DataFrame) -> Corpus:
     """
     g = (
         games.filter(
-            pl.col("season_type").is_in(["regular", "postseason"]) & (pl.col("fbs_participant") == True)  # noqa: E712
+            pl.col("season_type").is_in(["regular", "postseason"])
+            & (pl.col("fbs_participant") == True)  # noqa: E712
         )
         .select(
             pl.col("game_id").cast(pl.Int64),
@@ -119,7 +120,9 @@ def build_corpus(games: pl.DataFrame) -> Corpus:
             pl.col("neutral_site").cast(pl.Boolean),
             pl.col("home_conference").cast(pl.Utf8),
             pl.col("away_conference").cast(pl.Utf8),
-            (pl.col("home_points") - pl.col("away_points")).cast(pl.Float64).alias("margin"),
+            (pl.col("home_points") - pl.col("away_points"))
+            .cast(pl.Float64)
+            .alias("margin"),
         )
         .drop_nulls(["home_id", "away_id", "margin"])
         .with_columns(
@@ -130,7 +133,9 @@ def build_corpus(games: pl.DataFrame) -> Corpus:
         )
     )
 
-    team_ids = np.sort(np.unique(np.concatenate([g["home_id"].to_numpy(), g["away_id"].to_numpy()])))
+    team_ids = np.sort(
+        np.unique(np.concatenate([g["home_id"].to_numpy(), g["away_id"].to_numpy()]))
+    )
     tix = {int(t): i for i, t in enumerate(team_ids)}
 
     long = pl.concat(
@@ -175,7 +180,9 @@ def build_corpus(games: pl.DataFrame) -> Corpus:
         pl.col("home_id").replace_strict(tix, return_dtype=pl.Int32).alias("home_ix"),
         pl.col("away_id").replace_strict(tix, return_dtype=pl.Int32).alias("away_ix"),
         pl.col("neutral_site").cast(pl.Float64).alias("neutral"),
-    ).select("game_id", "season", "week", "t", "home_ix", "away_ix", "neutral", "margin")
+    ).select(
+        "game_id", "season", "week", "t", "home_ix", "away_ix", "neutral", "margin"
+    )
 
     # Fixed observation capacity = the largest single-season game count, so one
     # JIT compile serves every fit.
@@ -216,16 +223,24 @@ def _model(h, a, nz, y, mask, conf_ix, prev, n_teams, n_conf, *, centered: bool)
     rho = numpyro.sample("rho", dist.Normal(PRIOR_RHO_LOC, PRIOR_RHO_SCALE))
 
     if centered:
-        conf = numpyro.sample("conf", dist.Normal(0.0, sigma_conf).expand([n_conf]).to_event(1))
+        conf = numpyro.sample(
+            "conf", dist.Normal(0.0, sigma_conf).expand([n_conf]).to_event(1)
+        )
     else:
-        conf_raw = numpyro.sample("conf_raw", dist.Normal(0.0, 1.0).expand([n_conf]).to_event(1))
+        conf_raw = numpyro.sample(
+            "conf_raw", dist.Normal(0.0, 1.0).expand([n_conf]).to_event(1)
+        )
         conf = numpyro.deterministic("conf", sigma_conf * conf_raw)
 
     loc = conf[conf_ix] + rho * prev
     if centered:
-        theta = numpyro.sample("theta", dist.Normal(loc, tau_team).expand([n_teams]).to_event(1))
+        theta = numpyro.sample(
+            "theta", dist.Normal(loc, tau_team).expand([n_teams]).to_event(1)
+        )
     else:
-        theta_raw = numpyro.sample("theta_raw", dist.Normal(0.0, 1.0).expand([n_teams]).to_event(1))
+        theta_raw = numpyro.sample(
+            "theta_raw", dist.Normal(0.0, 1.0).expand([n_teams]).to_event(1)
+        )
         theta = numpyro.deterministic("theta", loc + tau_team * theta_raw)
 
     mu = theta[h] - theta[a] + hfa * (1.0 - nz)
@@ -241,7 +256,9 @@ def assert_mcmc_healthy(idata, *, label: str) -> dict[str, float]:
     """
     import arviz as az
 
-    s = az.summary(idata, var_names=["sigma_obs", "sigma_conf", "tau_team", "hfa", "rho", "theta"])
+    s = az.summary(
+        idata, var_names=["sigma_obs", "sigma_conf", "tau_team", "hfa", "rho", "theta"]
+    )
     div = int(np.asarray(idata.sample_stats["diverging"]).sum())
     diag = {
         "max_rhat": float(s["r_hat"].max()),
@@ -320,7 +337,9 @@ def fit_asof(
     ``prev`` is the previous season's posterior mean (zeros for the first
     season). The as-of boundary is asserted here, in code.
     """
-    sub = corpus.games.filter((pl.col("season") == season) & (pl.col("t") < week)).sort("game_id")
+    sub = corpus.games.filter((pl.col("season") == season) & (pl.col("t") < week)).sort(
+        "game_id"
+    )
     if sub.height == 0:
         raise ValueError(f"no games before t={week} of {season}")
     # THE BOUNDARY, asserted rather than trusted. On `t`, not `week`: a
@@ -345,7 +364,14 @@ def fit_asof(
     for centered in (True, False):
         label = f"{season}w{week}/{'centered' if centered else 'non-centered'}"
         try:
-            mcmc, idata = _run_nuts(args, centered=centered, seed=seed, warmup=warmup, draws=draws, chains=chains)
+            mcmc, idata = _run_nuts(
+                args,
+                centered=centered,
+                seed=seed,
+                warmup=warmup,
+                draws=draws,
+                chains=chains,
+            )
             diag = assert_mcmc_healthy(idata, label=label)
         except RuntimeError as exc:
             errors.append(str(exc))
@@ -422,7 +448,12 @@ def fit_eb(h, a, nz, y, conf_ix, prev, corpus: Corpus, *, iters: int = 40) -> Fi
         hfa=float(theta[T]),
         tau_team=float(np.sqrt(tau2)),
         sigma_obs=float(np.sqrt(sigma2)),
-        diag={"max_rhat": float("nan"), "min_ess_bulk": float("nan"), "min_ess_tail": float("nan"), "divergences": 0.0},
+        diag={
+            "max_rhat": float("nan"),
+            "min_ess_bulk": float("nan"),
+            "min_ess_tail": float("nan"),
+            "divergences": 0.0,
+        },
         param="eb",
     )
 
@@ -496,13 +527,24 @@ def walk_forward(
                     f"div={fit.diag['divergences']:.0f}",
                     flush=True,
                 )
-        # The carryover fit uses the WHOLE of season s and is never void in
-        # practice (it has the most data of any fit); if it were, the chain
-        # would break silently, so it is allowed to raise.
-        final = fit_asof(corpus, s, max(ts) + 1, prev, method=method, **fit_kw)
+        # The carryover fit feeds the NEXT season's prior, so it may not be
+        # voided quietly -- a broken chain would silently change the model for
+        # every later season. It raises, with the pre-registration named.
+        try:
+            final = fit_asof(corpus, s, max(ts) + 1, prev, method=method, **fit_kw)
+        except RuntimeError as exc:
+            raise RuntimeError(
+                f"the {s} end-of-season fit is VOID, so the carryover prior for "
+                f"{s + 1} cannot be formed and the walk-forward cannot continue. "
+                "For method='mcmc' this is the expected outcome -- the arm is void "
+                "under PREREG_hierarchical.md section 3. Use method='eb'."
+            ) from exc
         prev = final.theta
         if verbose:
-            print(f"  {s} FINAL carryover prior set (theta sd {prev.std():.2f})", flush=True)
+            print(
+                f"  {s} FINAL carryover prior set (theta sd {prev.std():.2f})",
+                flush=True,
+            )
     if voids:
         print(
             f"VOID as-of points: {len(voids)}/{len(voids) + len(preds)} "
@@ -511,3 +553,174 @@ def walk_forward(
             flush=True,
         )
     return pl.concat(preds), pl.DataFrame(diags), pl.DataFrame(voids)
+
+
+# ---------------------------------------------------------------------------
+# gate + stage entry point
+# ---------------------------------------------------------------------------
+#: Every threshold below is DERIVED FROM AN OBSERVED VALUE on the 2026-09-02
+#: run (2015-2025, 6,480 games, `hier-eb`), with the observation recorded beside
+#: it. None is a round number chosen for comfort, and none may be lowered: a
+#: build that trips one has regressed against a measurement, not against taste.
+GATE_MAE_MAX = 13.09  # observed 12.828, season-clustered SE 0.130 -> +2 SE
+GATE_BEAT_SHIPPED_MIN = 1.85  # observed +2.142, 95% CI [1.893, 2.398] -> the CI floor
+GATE_CAL_SLOPE = (0.80, 1.10)  # observed 0.92 (shipped 0.91, market 1.00)
+GATE_MAX_CAL_ERR = 0.10  # observed 0.029; the shipped surface is 0.430
+GATE_SEASONS_WON_MIN = 0.80  # observed 11/11 vs shipped, 8/9 vs the lean GBM
+GATE_TAU_RANGE = (0.5, 40.0)  # observed 4.81-15.63 across 250 as-of fits
+
+
+def assert_hierarchical_gate(oof: pl.DataFrame, shipped_pred: np.ndarray) -> dict:
+    """Fail the build when the fit has regressed against the measured run.
+
+    Asserts on the OUTPUT (the predictions), never on "the code ran" -- the
+    failure class this repo keeps hitting is a component reporting success while
+    doing nothing.
+    """
+    from .metrics import margin_metrics, norm_cdf, wp_metrics
+    from .significance import compare_oof
+
+    y = oof["margin"].to_numpy().astype(float)
+    p = oof["pred_margin"].to_numpy().astype(float)
+    m = margin_metrics(p, y)
+    sd = float(np.std(y - p))
+    w = wp_metrics(norm_cdf(p, sd), oof["home_won"].to_numpy())
+    cmp = compare_oof(
+        oof.select("game_id", "season", "margin").with_columns(
+            pl.Series("pred_margin", shipped_pred)
+        ),
+        oof,
+        name_a="shipped",
+        name_b="hierarchical",
+    )
+    got = {
+        "mae": m["mae"],
+        "cal_slope": m["calibration_slope"],
+        "max_cal_err": w["max_cal_err"],
+        "beat_shipped": cmp.diff,
+        "seasons_won_frac": cmp.seasons_won / max(cmp.n_seasons, 1),
+        "p_season": cmp.p_season,
+    }
+    fail = []
+    if got["mae"] > GATE_MAE_MAX:
+        fail.append(f"MAE {got['mae']:.3f} > {GATE_MAE_MAX}")
+    if got["beat_shipped"] < GATE_BEAT_SHIPPED_MIN:
+        fail.append(
+            f"beats shipped by {got['beat_shipped']:.3f} < {GATE_BEAT_SHIPPED_MIN}"
+        )
+    if not GATE_CAL_SLOPE[0] <= got["cal_slope"] <= GATE_CAL_SLOPE[1]:
+        fail.append(
+            f"calibration slope {got['cal_slope']:.3f} outside {GATE_CAL_SLOPE}"
+        )
+    if got["max_cal_err"] > GATE_MAX_CAL_ERR:
+        fail.append(f"max cal err {got['max_cal_err']:.3f} > {GATE_MAX_CAL_ERR}")
+    if got["seasons_won_frac"] < GATE_SEASONS_WON_MIN:
+        fail.append(
+            f"won {got['seasons_won_frac']:.2f} of seasons < {GATE_SEASONS_WON_MIN}"
+        )
+    if fail:
+        raise RuntimeError("hierarchical gate FAILED: " + "; ".join(fail))
+    return got
+
+
+def scorecard(joined: pl.DataFrame, seasons: list[int]) -> str:
+    """The published comparison, reproducible from one command.
+
+    Every arm is scored on the IDENTICAL games (`joined`), and the market row is
+    the same arms re-scored on the subset that has a closing line -- so a
+    smaller market sample can never flatter one arm against another.
+    """
+    from .backtest import shipped_margin
+    from .market import market_frame
+    from .metrics import evaluate, norm_cdf
+    from .significance import compare_oof
+
+    def _oof(pred):
+        return joined.select(
+            "game_id", "season", "week", "margin", "home_won"
+        ).with_columns(pl.Series("pred_margin", np.asarray(pred, dtype=float)))
+
+    hist_mean = float(joined["margin"].mean())
+    arms = {
+        "constant": _oof(np.full(joined.height, hist_mean)),
+        "shipped": _oof(shipped_margin(joined)),
+        "hierarchical": _oof(joined["pred_margin"].to_numpy()),
+    }
+    out = [f"=== scorecard on {joined.height} identical games ==="]
+    for name, o in arms.items():
+        p = o["pred_margin"].to_numpy()
+        sd = float(np.std(o["margin"].to_numpy() - p))
+        out.append(
+            str(
+                evaluate(
+                    name,
+                    boundary="as_of",
+                    pred_margin=p,
+                    actual_margin=o["margin"].to_numpy(),
+                    prob=norm_cdf(p, sd),
+                    won=o["home_won"].to_numpy(),
+                )
+            )
+        )
+    mk = market_frame(seasons).filter(pl.col("mkt_margin").is_not_null())
+    sub = joined.join(mk, on="game_id", how="inner")
+    if sub.height:
+        e = np.abs(sub["mkt_margin"].to_numpy() - sub["margin"].to_numpy())
+        out.append(
+            f"MARKET closing line (ceiling, never a feature): MAE {e.mean():.4f} on {sub.height} games"
+        )
+        for name, o in arms.items():
+            oo = o.join(sub.select("game_id"), on="game_id", how="inner")
+            ee = np.abs(oo["pred_margin"].to_numpy() - oo["margin"].to_numpy())
+            out.append(f"  {name:<14} MAE on the market subset = {ee.mean():.4f}")
+    for ref in ("shipped", "constant"):
+        out.append(
+            str(
+                compare_oof(
+                    arms[ref], arms["hierarchical"], name_a=ref, name_b="hierarchical"
+                )
+            )
+        )
+    return "\n".join(out)
+
+
+def run(
+    seasons: list[int] | None = None,
+    out_dir: str = "artifacts/higher_models",
+    *,
+    method: str = "eb",
+    **fit_kw,
+) -> int:
+    """Stage entry point: walk forward, gate, write the as-of ratings + preds.
+
+    `method="eb"` is the default deliberately. The MCMC arm is void under the
+    pre-registered run rule (its first as-of point of each season is
+    structurally unidentified at one game played, at every sampling budget
+    tried), and the closed form matched it everywhere both converged -- so the
+    sampler buys nothing here. See ``PREREG_hierarchical.md``.
+    """
+    from .data import build_game_frame, load_games
+
+    seasons = seasons or list(range(2014, 2026))
+    os.makedirs(out_dir, exist_ok=True)
+    corpus = build_corpus(load_games(seasons))
+    preds, diags, voids = walk_forward(corpus, seasons, method=method, **fit_kw)
+
+    frame = build_game_frame(seasons).filter(pl.col("season") > min(seasons))
+    joined = frame.join(
+        preds.select("game_id", "pred_margin"), on="game_id", how="inner"
+    )
+    from .backtest import shipped_margin
+
+    got = assert_hierarchical_gate(
+        joined.select("game_id", "season", "margin", "home_won", "pred_margin"),
+        shipped_margin(joined),
+    )
+    print(f"hierarchical gate PASSED on {joined.height} games: {got}")
+    print(scorecard(joined, seasons))
+
+    preds.write_parquet(f"{out_dir}/hier_{method}_preds.parquet")
+    diags.write_parquet(f"{out_dir}/hier_{method}_diag.parquet")
+    if voids.height:
+        voids.write_parquet(f"{out_dir}/hier_{method}_void.parquet")
+    return 0

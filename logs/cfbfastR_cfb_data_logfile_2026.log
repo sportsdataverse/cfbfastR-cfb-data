@@ -36,135 +36,135 @@ From https://github.com/sportsdataverse/cfbfastR-cfb-data
  * [new tag]           espn_cfb_team_box      -> espn_cfb_team_box
   pos_team: 100.0% of rows resolved to a team name
   def_pos_team: 100.0% of rows resolved to a team name
-pbp 2026: 3117 rows from 948 games
-play_participants 2026: 2914 rows from 948 games
-team_box 2026: 38 rows from 948 games
-player_box 2026: 1689 rows from 948 games
+pbp 2026: 4463 rows from 948 games
+play_participants 2026: 4151 rows from 948 games
+team_box 2026: 54 rows from 948 games
+player_box 2026: 2437 rows from 948 games
 drives 401866408: can only concatenate list (not "dict") to list
 drives 401858201: can only concatenate list (not "dict") to list
 drives 401864570: can only concatenate list (not "dict") to list
-drives 2026: 380 rows from 948 games
-game_rosters 2026: 2891 rows from 948 games
-betting 2026: 19 rows from 948 games
-schedules 2026: 19 rows from 948 games
-linescores 2026: 148 rows from 948 games
+drives 2026: 562 rows from 948 games
+game_rosters 2026: 4699 rows from 948 games
+betting 2026: 27 rows from 948 games
+schedules 2026: 27 rows from 948 games
+linescores 2026: 212 rows from 948 games
   power_index 2026: 1776 rows, 7 cols
 
 === power_index: 0 failures ===
 injuries 2026: 0 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
-adv_team 2026: 38 rows from 948 games
+adv_team 2026: 54 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
-adv_passing 2026: 68 rows from 948 games
+adv_passing 2026: 102 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
-adv_rushing 2026: 212 rows from 948 games
+adv_rushing 2026: 304 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
-adv_receiving 2026: 399 rows from 948 games
+adv_receiving 2026: 570 rows from 948 games
   def_pos_team: 100.0% of rows resolved to a team name
-adv_defensive 2026: 38 rows from 948 games
+adv_defensive 2026: 54 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
-adv_turnover 2026: 38 rows from 948 games
+adv_turnover 2026: 54 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
-adv_drives 2026: 38 rows from 948 games
+adv_drives 2026: 54 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
-adv_situational 2026: 38 rows from 948 games
+adv_situational 2026: 54 rows from 948 games
   def_pos_team: 100.0% of rows resolved to a team name
-adv_defensive_players 2026: 196 rows from 948 games
+adv_defensive_players 2026: 276 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
-adv_specialists 2026: 149 rows from 948 games
-  adv_team_gamelog 2026: 38 rows, 90 cols
+adv_specialists 2026: 211 rows from 948 games
+  adv_team_gamelog 2026: 54 rows, 90 cols
 
 === gamelog: 0 failures ===
   cfb_schedules 2026: 3679 rows, 41 cols, fbs_game=761, fbs_participant=888, unplayed=0
 
 === cfb_schedules: 0 failures ===
-cfb_rosters 2026: 2891 rows from 948/948 games | position 100.0% | division 100.0% | cfbd_recruit_ids 93.7% of 29305 cfbd athletes
+cfb_rosters 2026: 4469 rows from 948/948 games | position 100.0% | division 100.0% | cfbd_recruit_ids 94.0% of 29305 cfbd athletes
 
 === cfb_rosters: 0 failures ===
 [summaries 2026] percentiles: 99 rows
-[summaries 2026] team_summaries: 24 rows
-[summaries 2026] passing: 33 rows
-[summaries 2026] rushing: 107 rows
-[summaries 2026] receiving: 202 rows
-  cfb_ratings_weekly 2026: 360 rows, 16 cols, 15 weekly snapshots
+[summaries 2026] team_summaries: 30 rows
+[summaries 2026] passing: 46 rows
+[summaries 2026] rushing: 145 rows
+[summaries 2026] receiving: 264 rows
+  cfb_ratings_weekly 2026: 450 rows, 16 cols, 15 weekly snapshots
 
 === ratings_weekly: 0 failures ===
 [summaries 2026] percentiles: 99 rows
-[summaries 2026] team_summaries: 24 rows
-[summaries 2026] passing: 33 rows
-[summaries 2026] rushing: 107 rows
-[summaries 2026] receiving: 202 rows
+[summaries 2026] team_summaries: 30 rows
+[summaries 2026] passing: 46 rows
+[summaries 2026] rushing: 145 rows
+[summaries 2026] receiving: 264 rows
 [summaries 2026] percentiles: 99 rows
-[summaries 2026] team_summaries: 24 rows
-[summaries 2026] passing: 33 rows
-[summaries 2026] rushing: 107 rows
-[summaries 2026] receiving: 202 rows
+[summaries 2026] team_summaries: 30 rows
+[summaries 2026] passing: 46 rows
+[summaries 2026] rushing: 145 rows
+[summaries 2026] receiving: 264 rows
 [summaries 2026] percentiles: 99 rows
-[summaries 2026] team_summaries: 24 rows
-[summaries 2026] passing: 33 rows
-[summaries 2026] rushing: 107 rows
-[summaries 2026] receiving: 202 rows
+[summaries 2026] team_summaries: 30 rows
+[summaries 2026] passing: 46 rows
+[summaries 2026] rushing: 145 rows
+[summaries 2026] receiving: 264 rows
 [summaries 2026] percentiles: 99 rows
-[summaries 2026] team_summaries: 24 rows
-[summaries 2026] passing: 33 rows
-[summaries 2026] rushing: 107 rows
-[summaries 2026] receiving: 202 rows
+[summaries 2026] team_summaries: 30 rows
+[summaries 2026] passing: 46 rows
+[summaries 2026] rushing: 145 rows
+[summaries 2026] receiving: 264 rows
 [summaries 2026] percentiles: 99 rows
-[summaries 2026] team_summaries: 24 rows
-[summaries 2026] passing: 33 rows
-[summaries 2026] rushing: 107 rows
-[summaries 2026] receiving: 202 rows
+[summaries 2026] team_summaries: 30 rows
+[summaries 2026] passing: 46 rows
+[summaries 2026] rushing: 145 rows
+[summaries 2026] receiving: 264 rows
 [summaries 2026] percentiles: 99 rows
-[summaries 2026] team_summaries: 24 rows
-[summaries 2026] passing: 33 rows
-[summaries 2026] rushing: 107 rows
-[summaries 2026] receiving: 202 rows
+[summaries 2026] team_summaries: 30 rows
+[summaries 2026] passing: 46 rows
+[summaries 2026] rushing: 145 rows
+[summaries 2026] receiving: 264 rows
 [summaries 2026] percentiles: 99 rows
-[summaries 2026] team_summaries: 24 rows
-[summaries 2026] passing: 33 rows
-[summaries 2026] rushing: 107 rows
-[summaries 2026] receiving: 202 rows
+[summaries 2026] team_summaries: 30 rows
+[summaries 2026] passing: 46 rows
+[summaries 2026] rushing: 145 rows
+[summaries 2026] receiving: 264 rows
 [summaries 2026] percentiles: 99 rows
-[summaries 2026] team_summaries: 24 rows
-[summaries 2026] passing: 33 rows
-[summaries 2026] rushing: 107 rows
-[summaries 2026] receiving: 202 rows
+[summaries 2026] team_summaries: 30 rows
+[summaries 2026] passing: 46 rows
+[summaries 2026] rushing: 145 rows
+[summaries 2026] receiving: 264 rows
 [summaries 2026] percentiles: 99 rows
-[summaries 2026] team_summaries: 24 rows
-[summaries 2026] passing: 33 rows
-[summaries 2026] rushing: 107 rows
-[summaries 2026] receiving: 202 rows
+[summaries 2026] team_summaries: 30 rows
+[summaries 2026] passing: 46 rows
+[summaries 2026] rushing: 145 rows
+[summaries 2026] receiving: 264 rows
 [summaries 2026] percentiles: 99 rows
-[summaries 2026] team_summaries: 24 rows
-[summaries 2026] passing: 33 rows
-[summaries 2026] rushing: 107 rows
-[summaries 2026] receiving: 202 rows
+[summaries 2026] team_summaries: 30 rows
+[summaries 2026] passing: 46 rows
+[summaries 2026] rushing: 145 rows
+[summaries 2026] receiving: 264 rows
 [summaries 2026] percentiles: 99 rows
-[summaries 2026] team_summaries: 24 rows
-[summaries 2026] passing: 33 rows
-[summaries 2026] rushing: 107 rows
-[summaries 2026] receiving: 202 rows
+[summaries 2026] team_summaries: 30 rows
+[summaries 2026] passing: 46 rows
+[summaries 2026] rushing: 145 rows
+[summaries 2026] receiving: 264 rows
 [summaries 2026] percentiles: 99 rows
-[summaries 2026] team_summaries: 24 rows
-[summaries 2026] passing: 33 rows
-[summaries 2026] rushing: 107 rows
-[summaries 2026] receiving: 202 rows
+[summaries 2026] team_summaries: 30 rows
+[summaries 2026] passing: 46 rows
+[summaries 2026] rushing: 145 rows
+[summaries 2026] receiving: 264 rows
 [summaries 2026] percentiles: 99 rows
-[summaries 2026] team_summaries: 24 rows
-[summaries 2026] passing: 33 rows
-[summaries 2026] rushing: 107 rows
-[summaries 2026] receiving: 202 rows
+[summaries 2026] team_summaries: 30 rows
+[summaries 2026] passing: 46 rows
+[summaries 2026] rushing: 145 rows
+[summaries 2026] receiving: 264 rows
 [summaries 2026] percentiles: 99 rows
-[summaries 2026] team_summaries: 24 rows
-[summaries 2026] passing: 33 rows
-[summaries 2026] rushing: 107 rows
-[summaries 2026] receiving: 202 rows
+[summaries 2026] team_summaries: 30 rows
+[summaries 2026] passing: 46 rows
+[summaries 2026] rushing: 145 rows
+[summaries 2026] receiving: 264 rows
 [summaries 2026] percentiles: 99 rows
-[summaries 2026] team_summaries: 24 rows
-[summaries 2026] passing: 33 rows
-[summaries 2026] rushing: 107 rows
-[summaries 2026] receiving: 202 rows
-  cfb_team_summaries_weekly 2026: 360 rows, 384 cols, 15 weekly snapshots
+[summaries 2026] team_summaries: 30 rows
+[summaries 2026] passing: 46 rows
+[summaries 2026] rushing: 145 rows
+[summaries 2026] receiving: 264 rows
+  cfb_team_summaries_weekly 2026: 450 rows, 384 cols, 15 weekly snapshots
 
 === team_summaries_weekly: 0 failures ===
 ::warning::no 247 recruits store at /home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-raw/cfb/recruits/json; skipping recruiting datasets

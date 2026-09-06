@@ -1,5 +1,4 @@
 From https://github.com/sportsdataverse/cfbfastR-cfb-data
-   2e73aabd..ae863701  main                   -> origin/main
  * [new branch]        AE/update-air-yards-model -> origin/AE/update-air-yards-model
  * [new branch]        chore/readme-repository-layout -> origin/chore/readme-repository-layout
  * [new branch]        docs/automation-status -> origin/docs/automation-status
@@ -37,28 +36,20 @@ From https://github.com/sportsdataverse/cfbfastR-cfb-data
  * [new tag]           espn_cfb_team_box      -> espn_cfb_team_box
   pos_team: 100.0% of rows resolved to a team name
   def_pos_team: 100.0% of rows resolved to a team name
-pbp 2026: 9350 rows from 948 games
-play_participants 2026: 8787 rows from 948 games
-team_box 2026: 170 rows from 948 games
-player_box 2026: 5775 rows from 948 games
-drives 401860878: can only concatenate list (not "dict") to list
-drives 401867973: can only concatenate list (not "dict") to list
-drives 401856668: can only concatenate list (not "dict") to list
-drives 401856770: can only concatenate list (not "dict") to list
-drives 401856669: can only concatenate list (not "dict") to list
-drives 401856771: can only concatenate list (not "dict") to list
-drives 401860880: can only concatenate list (not "dict") to list
-drives 401862695: can only concatenate list (not "dict") to list
-drives 401862697: can only concatenate list (not "dict") to list
-drives 401862699: can only concatenate list (not "dict") to list
-drives 401867866: can only concatenate list (not "dict") to list
-drives 401868140: can only concatenate list (not "dict") to list
-drives 401868170: can only concatenate list (not "dict") to list
-drives 401868316: can only concatenate list (not "dict") to list
-drives 401870763: can only concatenate list (not "dict") to list
+pbp 2026: 11052 rows from 948 games
+play_participants 2026: 10405 rows from 948 games
+team_box 2026: 190 rows from 948 games
+player_box 2026: 6733 rows from 948 games
+drives 401866408: can only concatenate list (not "dict") to list
+drives 401858201: can only concatenate list (not "dict") to list
+drives 401864570: can only concatenate list (not "dict") to list
 drives 401858433: can only concatenate list (not "dict") to list
 drives 401856658: can only concatenate list (not "dict") to list
 drives 401856667: can only concatenate list (not "dict") to list
+drives 401856668: can only concatenate list (not "dict") to list
+drives 401856770: can only concatenate list (not "dict") to list
+drives 401856775: can only concatenate list (not "dict") to list
+drives 401858428: can only concatenate list (not "dict") to list
 drives 401858434: can only concatenate list (not "dict") to list
 drives 401856666: can only concatenate list (not "dict") to list
 drives 401856778: can only concatenate list (not "dict") to list
@@ -73,140 +64,148 @@ drives 401862700: can only concatenate list (not "dict") to list
 drives 401864499: can only concatenate list (not "dict") to list
 drives 401866627: can only concatenate list (not "dict") to list
 drives 401856772: can only concatenate list (not "dict") to list
-drives 401858428: can only concatenate list (not "dict") to list
+drives 401860878: can only concatenate list (not "dict") to list
+drives 401867973: can only concatenate list (not "dict") to list
+drives 401856669: can only concatenate list (not "dict") to list
+drives 401856771: can only concatenate list (not "dict") to list
+drives 401860880: can only concatenate list (not "dict") to list
+drives 401862695: can only concatenate list (not "dict") to list
+drives 401862697: can only concatenate list (not "dict") to list
+drives 401862699: can only concatenate list (not "dict") to list
+drives 401868140: can only concatenate list (not "dict") to list
+drives 401868170: can only concatenate list (not "dict") to list
+drives 401868316: can only concatenate list (not "dict") to list
+drives 401870763: can only concatenate list (not "dict") to list
 drives 401856662: can only concatenate list (not "dict") to list
 drives 401858211: can only concatenate list (not "dict") to list
 drives 401869129: can only concatenate list (not "dict") to list
 drives 401856637: can only concatenate list (not "dict") to list
-drives 401856775: can only concatenate list (not "dict") to list
+drives 401867866: can only concatenate list (not "dict") to list
 drives 401858427: can only concatenate list (not "dict") to list
 drives 401858431: can only concatenate list (not "dict") to list
 drives 401869142: can only concatenate list (not "dict") to list
-drives 401866408: can only concatenate list (not "dict") to list
-drives 401858201: can only concatenate list (not "dict") to list
-drives 401864570: can only concatenate list (not "dict") to list
-drives 2026: 911 rows from 948 games
-game_rosters 2026: 7674 rows from 948 games
-betting 2026: 85 rows from 948 games
-schedules 2026: 85 rows from 948 games
-linescores 2026: 478 rows from 948 games
+drives 2026: 1160 rows from 948 games
+game_rosters 2026: 9860 rows from 948 games
+betting 2026: 95 rows from 948 games
+schedules 2026: 95 rows from 948 games
+linescores 2026: 558 rows from 948 games
   power_index 2026: 1776 rows, 7 cols
 
 === power_index: 0 failures ===
 injuries 2026: 0 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
-adv_team 2026: 166 rows from 948 games
+adv_team 2026: 186 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
-adv_passing 2026: 254 rows from 948 games
+adv_passing 2026: 295 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
-adv_rushing 2026: 794 rows from 948 games
+adv_rushing 2026: 931 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
-adv_receiving 2026: 1328 rows from 948 games
+adv_receiving 2026: 1542 rows from 948 games
   def_pos_team: 100.0% of rows resolved to a team name
-adv_defensive 2026: 166 rows from 948 games
+adv_defensive 2026: 186 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
-adv_turnover 2026: 166 rows from 948 games
+adv_turnover 2026: 186 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
-adv_drives 2026: 166 rows from 948 games
+adv_drives 2026: 186 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
-adv_situational 2026: 166 rows from 948 games
+adv_situational 2026: 186 rows from 948 games
   def_pos_team: 100.0% of rows resolved to a team name
-adv_defensive_players 2026: 614 rows from 948 games
+adv_defensive_players 2026: 743 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
-adv_specialists 2026: 511 rows from 948 games
-  adv_team_gamelog 2026: 166 rows, 90 cols
+adv_specialists 2026: 592 rows from 948 games
+  adv_team_gamelog 2026: 186 rows, 90 cols
 
 === gamelog: 0 failures ===
   cfb_schedules 2026: 3679 rows, 41 cols, fbs_game=761, fbs_participant=888, unplayed=0
 
 === cfb_schedules: 0 failures ===
-cfb_rosters 2026: 7444 rows from 948/948 games | position 100.0% | division 100.0% | cfbd_recruit_ids 93.9% of 29305 cfbd athletes
+cfb_rosters 2026: 9630 rows from 948/948 games | position 100.0% | division 100.0% | cfbd_recruit_ids 94.1% of 29305 cfbd athletes
 
 === cfb_rosters: 0 failures ===
 [summaries 2026] percentiles: 99 rows
-[summaries 2026] team_summaries: 77 rows
-[summaries 2026] passing: 111 rows
-[summaries 2026] rushing: 341 rows
-[summaries 2026] receiving: 565 rows
-  cfb_ratings_weekly 2026: 1155 rows, 16 cols, 15 weekly snapshots
+[summaries 2026] team_summaries: 85 rows
+[summaries 2026] passing: 127 rows
+[summaries 2026] rushing: 397 rows
+[summaries 2026] receiving: 639 rows
+  cfb_ratings_weekly 2026: 1275 rows, 16 cols, 15 weekly snapshots
 
 === ratings_weekly: 0 failures ===
 [summaries 2026] percentiles: 99 rows
-[summaries 2026] team_summaries: 77 rows
-[summaries 2026] passing: 111 rows
-[summaries 2026] rushing: 341 rows
-[summaries 2026] receiving: 565 rows
+[summaries 2026] team_summaries: 85 rows
+[summaries 2026] passing: 127 rows
+[summaries 2026] rushing: 397 rows
+[summaries 2026] receiving: 639 rows
 [summaries 2026] percentiles: 99 rows
-[summaries 2026] team_summaries: 77 rows
-[summaries 2026] passing: 111 rows
-[summaries 2026] rushing: 341 rows
-[summaries 2026] receiving: 565 rows
+[summaries 2026] team_summaries: 85 rows
+[summaries 2026] passing: 127 rows
+[summaries 2026] rushing: 397 rows
+[summaries 2026] receiving: 639 rows
 [summaries 2026] percentiles: 99 rows
-[summaries 2026] team_summaries: 77 rows
-[summaries 2026] passing: 111 rows
-[summaries 2026] rushing: 341 rows
-[summaries 2026] receiving: 565 rows
+[summaries 2026] team_summaries: 85 rows
+[summaries 2026] passing: 127 rows
+[summaries 2026] rushing: 397 rows
+[summaries 2026] receiving: 639 rows
 [summaries 2026] percentiles: 99 rows
-[summaries 2026] team_summaries: 77 rows
-[summaries 2026] passing: 111 rows
-[summaries 2026] rushing: 341 rows
-[summaries 2026] receiving: 565 rows
+[summaries 2026] team_summaries: 85 rows
+[summaries 2026] passing: 127 rows
+[summaries 2026] rushing: 397 rows
+[summaries 2026] receiving: 639 rows
 [summaries 2026] percentiles: 99 rows
-[summaries 2026] team_summaries: 77 rows
-[summaries 2026] passing: 111 rows
-[summaries 2026] rushing: 341 rows
-[summaries 2026] receiving: 565 rows
+[summaries 2026] team_summaries: 85 rows
+[summaries 2026] passing: 127 rows
+[summaries 2026] rushing: 397 rows
+[summaries 2026] receiving: 639 rows
 [summaries 2026] percentiles: 99 rows
-[summaries 2026] team_summaries: 77 rows
-[summaries 2026] passing: 111 rows
-[summaries 2026] rushing: 341 rows
-[summaries 2026] receiving: 565 rows
+[summaries 2026] team_summaries: 85 rows
+[summaries 2026] passing: 127 rows
+[summaries 2026] rushing: 397 rows
+[summaries 2026] receiving: 639 rows
 [summaries 2026] percentiles: 99 rows
-[summaries 2026] team_summaries: 77 rows
-[summaries 2026] passing: 111 rows
-[summaries 2026] rushing: 341 rows
-[summaries 2026] receiving: 565 rows
+[summaries 2026] team_summaries: 85 rows
+[summaries 2026] passing: 127 rows
+[summaries 2026] rushing: 397 rows
+[summaries 2026] receiving: 639 rows
 [summaries 2026] percentiles: 99 rows
-[summaries 2026] team_summaries: 77 rows
-[summaries 2026] passing: 111 rows
-[summaries 2026] rushing: 341 rows
-[summaries 2026] receiving: 565 rows
+[summaries 2026] team_summaries: 85 rows
+[summaries 2026] passing: 127 rows
+[summaries 2026] rushing: 397 rows
+[summaries 2026] receiving: 639 rows
 [summaries 2026] percentiles: 99 rows
-[summaries 2026] team_summaries: 77 rows
-[summaries 2026] passing: 111 rows
-[summaries 2026] rushing: 341 rows
-[summaries 2026] receiving: 565 rows
+[summaries 2026] team_summaries: 85 rows
+[summaries 2026] passing: 127 rows
+[summaries 2026] rushing: 397 rows
+[summaries 2026] receiving: 639 rows
 [summaries 2026] percentiles: 99 rows
-[summaries 2026] team_summaries: 77 rows
-[summaries 2026] passing: 111 rows
-[summaries 2026] rushing: 341 rows
-[summaries 2026] receiving: 565 rows
+[summaries 2026] team_summaries: 85 rows
+[summaries 2026] passing: 127 rows
+[summaries 2026] rushing: 397 rows
+[summaries 2026] receiving: 639 rows
 [summaries 2026] percentiles: 99 rows
-[summaries 2026] team_summaries: 77 rows
-[summaries 2026] passing: 111 rows
-[summaries 2026] rushing: 341 rows
-[summaries 2026] receiving: 565 rows
+[summaries 2026] team_summaries: 85 rows
+[summaries 2026] passing: 127 rows
+[summaries 2026] rushing: 397 rows
+[summaries 2026] receiving: 639 rows
 [summaries 2026] percentiles: 99 rows
-[summaries 2026] team_summaries: 77 rows
-[summaries 2026] passing: 111 rows
-[summaries 2026] rushing: 341 rows
-[summaries 2026] receiving: 565 rows
+[summaries 2026] team_summaries: 85 rows
+[summaries 2026] passing: 127 rows
+[summaries 2026] rushing: 397 rows
+[summaries 2026] receiving: 639 rows
 [summaries 2026] percentiles: 99 rows
-[summaries 2026] team_summaries: 77 rows
-[summaries 2026] passing: 111 rows
-[summaries 2026] rushing: 341 rows
-[summaries 2026] receiving: 565 rows
+[summaries 2026] team_summaries: 85 rows
+[summaries 2026] passing: 127 rows
+[summaries 2026] rushing: 397 rows
+[summaries 2026] receiving: 639 rows
 [summaries 2026] percentiles: 99 rows
-[summaries 2026] team_summaries: 77 rows
-[summaries 2026] passing: 111 rows
-[summaries 2026] rushing: 341 rows
-[summaries 2026] receiving: 565 rows
+[summaries 2026] team_summaries: 85 rows
+[summaries 2026] passing: 127 rows
+[summaries 2026] rushing: 397 rows
+[summaries 2026] receiving: 639 rows
 [summaries 2026] percentiles: 99 rows
-[summaries 2026] team_summaries: 77 rows
-[summaries 2026] passing: 111 rows
-[summaries 2026] rushing: 341 rows
-[summaries 2026] receiving: 565 rows
-  cfb_team_summaries_weekly 2026: 1155 rows, 384 cols, 15 weekly snapshots
+[summaries 2026] team_summaries: 85 rows
+[summaries 2026] passing: 127 rows
+[summaries 2026] rushing: 397 rows
+[summaries 2026] receiving: 639 rows
+  cfb_team_summaries_weekly 2026: 1275 rows, 384 cols, 15 weekly snapshots
 
 === team_summaries_weekly: 0 failures ===
 ::warning::no 247 recruits store at /home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-raw/cfb/recruits/json; skipping recruiting datasets

@@ -1,18 +1,21 @@
-"""Feature extraction for the CFB CP model (Approach A, 8 game-state features).
+"""Feature extraction for the CFB CP models (game-state + air-yards variants).
 
 Input: a pandas or polars DataFrame with columns produced by
        CFBPlayProcess.run_processing_pipeline() (or an equivalent ESPN PBP frame
        with `start.*` dot-notation columns, including final.json plays where the
        play-type column is named ``type.text``).
 
-Output: a pandas DataFrame containing FEATURE_COLS + TARGET_COL, one row per
-        pass play (non-pass plays are filtered out).
+Output: a pandas DataFrame containing whichever of AIR_YARDS_FEATURE_COLS are
+        available plus TARGET_COL, one row per pass play (non-pass plays are
+        filtered out).  The three air-yards columns are absent for pre-2025
+        data and nullable where present, so a caller can select rows the
+        air-yards model can score with ``df['air_yards'].notna()``.
 """
 from __future__ import annotations
 
 import pandas as pd
 
-from .constants import FEATURE_COLS, PASS_PLAY_TYPES, TARGET_COL
+from .constants import AIR_YARDS_FEATURE_COLS, PASS_PLAY_TYPES, TARGET_COL
 
 # Mapping from ESPN dot-notation / cfbfastR column names to flat feature names.
 _COL_MAP: dict[str, str] = {
@@ -99,8 +102,28 @@ def extract_pass_features(df: pd.DataFrame) -> pd.DataFrame:
         if col in plays.columns:
             plays[col] = plays[col].astype(int)
 
+    # --- air-yards features (Approach B), present only where ESPN's play text
+    # carried a "caught at"/"thrown to" spot.  These stay NULLABLE on purpose:
+    # a null means "this play has no air-yards data", which is a different thing
+    # from "the throw went 0 yards" or "the QB was not hurried".  xgboost handles
+    # NaN natively as a missing value and learns a default direction for it;
+    # filling 0 would instead teach it that every pre-2025 play was a hurried
+    # screen pass.
+    if "pass_direction" in plays.columns and "pass_is_middle" not in plays.columns:
+        direction = plays["pass_direction"]
+        plays["pass_is_middle"] = (
+            direction.eq("middle").where(direction.notna()).astype(float)
+        )
+    for col in ("air_yards", "qb_hurry", "pass_is_middle"):
+        if col in plays.columns:
+            plays[col] = pd.to_numeric(plays[col], errors="coerce").astype(float)
+
     # Preserve join keys + ``season`` if present so callers can rejoin scored
     # output back to the carry frame without a separate index round-trip.
     extra_passthrough = [c for c in ("game_id", "id", "season") if c in plays.columns]
-    keep = [c for c in FEATURE_COLS + [TARGET_COL] if c in plays.columns] + extra_passthrough
+    # AIR_YARDS_FEATURE_COLS is a superset of FEATURE_COLS, so one list covers
+    # both variants; the trainer picks which subset it fits on.
+    keep = [
+        c for c in AIR_YARDS_FEATURE_COLS + [TARGET_COL] if c in plays.columns
+    ] + extra_passthrough
     return plays[keep].reset_index(drop=True)

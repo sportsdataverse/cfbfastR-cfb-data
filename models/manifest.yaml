@@ -46,9 +46,13 @@ models:
     stage: "30"
     artifact: wp_naive.ubj
   cpoe:
-    registry_model: "cp / CPOE"
+    registry_model: "cp / CPOE (game state)"
     stage: "31"
     artifact: cfb_cp_model.ubj
+  cpoe_air_yards:
+    registry_model: "cp / CPOE (air yards)"
+    stage: "31"
+    artifact: cfb_cp_model_air_yards.ubj
   qbr:
     registry_model: "qbr"
     stage: "30"

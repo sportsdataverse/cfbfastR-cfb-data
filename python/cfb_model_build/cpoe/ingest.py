@@ -21,6 +21,21 @@ import polars as pl
 
 from .features import extract_pass_features
 
+# NOTE on cost: this reads the whole finals corpus (~64 GB across ~20k files,
+# median 3.4 MB) even when training on two seasons, because the only way to
+# learn a file's season is to parse it.
+#
+# A head-read pre-filter was tried and removed: the top-level key order is
+# ``gameId, plays, season, ...``, so the file's own "season" sits after the
+# entire plays array -- megabytes in, unreachable by any sane head window. The
+# "season" that IS near the top of the file belongs to the first PLAY (every
+# play carries its own), and using a nested value as proof of the file's season
+# is only accidentally right. Getting it wrong would silently shrink the
+# training set while still reporting success, which is worse than being slow.
+#
+# If retrain cost becomes a problem, the fix is a cached {file -> season} index
+# built from real parses (keyed on mtime+size), not a cleverer scan of the head.
+
 
 def load_season_pass_plays(
     final_dir: pathlib.Path | str,
@@ -40,9 +55,10 @@ def load_season_pass_plays(
         plays survive the filter.
     """
     frames: list[pl.DataFrame] = []
+    wanted = set(seasons) if seasons is not None else None
     for f in sorted(pathlib.Path(final_dir).glob("*.json")):
-        obj = json.loads(f.read_text())
-        if seasons is not None and obj.get("season") not in seasons:
+        obj = json.loads(f.read_text(encoding="utf-8"))
+        if wanted is not None and obj.get("season") not in wanted:
             continue
         season = obj.get("season")
         plays = obj.get("plays") or []

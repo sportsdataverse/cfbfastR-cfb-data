@@ -23,6 +23,22 @@ FEATURE_COLS: list[str] = [
 
 TARGET_COL: str = "completion"
 
+# Approach B (air yards).  The 8 game-state features above are ~coin-flip for
+# completion prediction on their own -- measured AUC 0.567 / logloss 0.6539
+# against an intercept-only 0.6603.  Throw depth is the signal they are missing:
+# adding it lifts the same rows to AUC 0.764 / logloss 0.5398 (5-fold CV grouped
+# by game, 27,804 plays, 2025-2026).  See AIR_YARDS.md.
+#
+# These come from ESPN play text (`caught at`/`thrown to` spots), NOT from CFBD
+# -- CFBD ships no air-yards field at all, which is what the original Approach B
+# feasibility check found and why it was shelved.  sdv-py's CFB parser derives
+# `air_yards` itself, so the blocker is gone for the ESPN path only.
+AIR_YARDS_FEATURE_COLS: list[str] = FEATURE_COLS + [
+    "air_yards",
+    "pass_is_middle",
+    "qb_hurry",
+]
+
 # ---------------------------------------------------------------------------
 # Throw-depth proxy buckets (yards-to-first-down based; open upper on "long")
 # (lo, hi_inclusive)  —  hi=None means unbounded.
@@ -84,3 +100,12 @@ PASS_PLAY_TYPES = PASS_PLAY_TYPES | {"Pass Completion", "Interception Return"}
 # now spans all four buckets instead of collapsing to era2/era3).
 MIN_SEASON: int = 2004
 MODEL_FILENAME: str = "cfb_cp_model.ubj"
+
+# Air-yards floor.  ESPN only began emitting catch/target spots at scale in 2025
+# (measured coverage: 38.9% of 2025 pass plays, 90.2% of 2026-to-date, ~0 before).
+# The air-yards model therefore trains on 2025+ ONLY -- it does not replace the
+# game-state model, which stays on 2004+ and remains the fallback for the ~96% of
+# the historical corpus that has no air yards.  See AIR_YARDS.md for why the two
+# coexist rather than one superseding the other.
+MIN_SEASON_AIR_YARDS: int = 2025
+AIR_YARDS_MODEL_FILENAME: str = "cfb_cp_model_air_yards.ubj"

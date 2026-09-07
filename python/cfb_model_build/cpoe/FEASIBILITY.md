@@ -1,5 +1,11 @@
 # Track 5 CPOE — Phase 0 Feasibility Analysis
 
+> **Partly superseded (2026-09-07).** The "Approach B INFEASIBLE" verdict
+> below is about **CFBD**, which ships no air-yards field at all -- that part
+> still holds. It does NOT hold for **ESPN**: sdv-py's CFB parser derives
+> `air_yards` from the play text, and an air-yards CP model now trains and
+> ships alongside the game-state one. See [AIR_YARDS.md](AIR_YARDS.md).
+
 ## Source model features (`cpoe_model.R`, StatsBomb AMF)
 
 The R original trains on StatsBomb `tb12_events_dataset_{start}_{end}.csv` joined to
@@ -53,9 +59,14 @@ down, driveId, driveNumber, gameId, home, id, offense, offenseConference,
 offenseScore, offenseTimeouts, period, playNumber, playText, playType, ppa, scoring,
 wallclock, yardline, yardsGained, yardsToGoal`
 
-**Verdict: Approach B INFEASIBLE.** CFBD does not provide air_yards on individual plays
-through any inspected field name. Phase 3 Task 3.2 is SKIPPED. Approach A (8-feature
-game-state model) is the only viable path.
+**Verdict: Approach B INFEASIBLE *via CFBD*.** CFBD does not provide air_yards on individual plays
+through any inspected field name. Phase 3 Task 3.2 was SKIPPED on that basis.
+
+This conclusion was later reopened, and the reopening is the lesson: ruling out
+one provider says nothing about whether the quantity is obtainable. ESPN's play
+text carries catch/target spots, sdv-py derives `air_yards` from them, and the
+air-yards model measurably outperforms the game-state one where it applies.
+See [AIR_YARDS.md](AIR_YARDS.md).
 
 ## True CP lineage note
 

@@ -1066,7 +1066,7 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
             "pass_int",
             "sacked",
         ],
-        asc_cols=["pass_int", "sacked"]
+        asc_cols=["pass_int", "sacked"],
     )
 
     rb_data = summarize_rusher(
@@ -1191,6 +1191,20 @@ def _attach_leader_ranks(
     because it needs the source metric to tell a null apart from a bad value.
     """
     asc = set(asc_cols or [])
+
+    # An asc_cols name that is not in rank_cols is a silent inversion, not a
+    # no-op: direction is applied as `c not in asc` while iterating rank_cols,
+    # so a misspelled or stale entry leaves that metric ranked HIGH-is-good.
+    # For interceptions, sacks taken or fumbles that renders the worst
+    # qualifier at the top of the leaderboard and near the 99th percentile in
+    # the UI, with nothing anywhere reporting a problem. Fail instead.
+    stray = sorted(asc - set(rank_cols))
+    if stray:
+        raise ValueError(
+            f"asc_cols entries missing from rank_cols: {stray}. "
+            "They would be ignored and their metrics ranked high-is-good."
+        )
+
     qual = data.filter(min_expr).with_columns(
         *[_rank(c, descending=(c not in asc)).alias(f"{c}_rank") for c in rank_cols]
     )

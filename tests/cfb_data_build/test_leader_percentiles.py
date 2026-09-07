@@ -15,7 +15,13 @@ board -- and would also inflate the denominator for everyone else.
 
 from __future__ import annotations
 
+import pathlib
+import re
+
 import polars as pl
+import pytest
+
+from cfb_data_build import team_summaries
 
 from cfb_data_build.team_summaries import _attach_leader_ranks
 
@@ -95,3 +101,49 @@ def test_non_qualifiers_get_no_rank_and_no_percentile():
     assert out["epa_rank"].to_list()[2] is None
     # the two qualifiers are ranked among THEMSELVES, not among all three
     assert out["epa_rank"].to_list()[:2] == [1.0, 2.0]
+
+
+def test_an_asc_col_absent_from_rank_cols_is_rejected_not_ignored():
+    """A stray ``asc_cols`` entry inverts a metric silently, so it must raise.
+
+    Direction is applied as ``c not in asc`` while iterating ``rank_cols``. A
+    misspelled or stale ``asc_cols`` name therefore never matches, and the
+    metric it was meant to flip stays ranked high-is-good. For interceptions,
+    sacks taken or fumbles that puts the WORST qualifier at rank 1 and near the
+    99th percentile on the team page -- wrong in the direction a reader is least
+    likely to question, and nothing logs it.
+    """
+    df = _frame([1.0, 2.0, 3.0])
+    with pytest.raises(ValueError, match="missing from rank_cols"):
+        _attach(df, asc_cols=["epa_typo"])
+
+
+def test_production_call_sites_only_flip_columns_they_actually_rank():
+    """The guard above is only useful if the real call sites are checked too.
+
+    Reads the ``asc_cols`` / ``rank_cols`` pairs out of the module source rather
+    than re-declaring them here, so this cannot drift from the producer: a new
+    leader block with a typo'd ascending column fails here instead of shipping
+    an inverted percentile.
+    """
+    src = pathlib.Path(team_summaries.__file__).read_text(encoding="utf-8")
+
+    # Each _attach_leader_ranks(...) call, captured to its closing paren.
+    calls = re.findall(r"_attach_leader_ranks\((.*?)\n    \)", src, flags=re.S)
+    assert calls, "no _attach_leader_ranks call sites found -- did the API move?"
+
+    checked = 0
+    for call in calls:
+        rank_m = re.search(r"rank_cols=\[(.*?)\]", call, flags=re.S)
+        asc_m = re.search(r"asc_cols=\[(.*?)\]", call, flags=re.S)
+        if not (rank_m and asc_m):
+            continue
+        rank_cols = set(re.findall(r'"([^"]+)"', rank_m.group(1)))
+        asc_cols = set(re.findall(r'"([^"]+)"', asc_m.group(1)))
+        assert asc_cols <= rank_cols, (
+            f"asc_cols {sorted(asc_cols - rank_cols)} are not ranked at this "
+            "call site; their metrics would be ranked high-is-good"
+        )
+        checked += 1
+
+    assert checked, "no call site declared both rank_cols and asc_cols"

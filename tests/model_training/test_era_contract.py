@@ -66,3 +66,19 @@ def test_the_published_cut_is_2020_not_2017(tmp_path):
 def test_a_model_without_an_era_feature_publishes_no_contract(tmp_path):
     card = _card(tmp_path, "plain", ["down", "distance", "yards_to_goal"])
     assert "era_contract" not in card
+
+
+def test_mixed_encodings_are_rejected(tmp_path):
+    """Both encodings on one model is not a shape the trainer can produce."""
+    import pytest
+
+    with pytest.raises(ValueError, match="not interchangeable"):
+        _card(tmp_path, "mixed", ["down", "era", "era0", "era1", "era2", "era3"])
+
+
+def test_incomplete_one_hot_is_rejected(tmp_path):
+    """Four bucket labels beside three columns would describe a different model."""
+    import pytest
+
+    with pytest.raises(ValueError, match="incomplete one-hot"):
+        _card(tmp_path, "partial", ["yards_to_goal", "era0", "era1", "era2"])

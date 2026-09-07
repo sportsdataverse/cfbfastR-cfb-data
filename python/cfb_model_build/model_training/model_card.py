@@ -101,7 +101,12 @@ def _era_contract(features: Sequence[str]) -> Optional[Dict[str, Any]]:
     that this repo has never used, and 2018-2020 were scored an era off for it
     (cfbfastR-cfb-data#70).
 
-    Returns ``None`` for a model with no era feature.
+    Returns ``None`` for a model with no era feature. Raises ``ValueError`` on a
+    mixed or incomplete set: a card that published four bucket labels beside a
+    partial ``era0..era2`` column list, or claimed one-hot for a model that also
+    takes the ordinal column, would describe a feature shape the model does not
+    have -- which is the exact failure this contract exists to prevent, so it is
+    an error rather than a best guess.
     """
     from . import constants as C
 
@@ -110,6 +115,17 @@ def _era_contract(features: Sequence[str]) -> Optional[Dict[str, Any]]:
     ordinal = "era" in feats
     if not onehot and not ordinal:
         return None
+    if ordinal and onehot:
+        raise ValueError(
+            f"model takes BOTH the ordinal 'era' and one-hot {onehot}; "
+            "the two encodings are not interchangeable, pick one"
+        )
+    if onehot and len(onehot) != len(C.ERA_ONEHOT_COLS):
+        missing = [c for c in C.ERA_ONEHOT_COLS if c not in onehot]
+        raise ValueError(
+            f"incomplete one-hot era set: has {onehot}, missing {missing}. "
+            "A partial set cannot represent four buckets"
+        )
 
     lo, mid, hi = C.ERA_BOUNDS
     contract: Dict[str, Any] = {

@@ -1,4 +1,5 @@
 From https://github.com/sportsdataverse/cfbfastR-cfb-data
+   7cb57fdf..e31aba0d  main                   -> origin/main
  * [new branch]        AE/update-air-yards-model -> origin/AE/update-air-yards-model
  * [new branch]        chore/readme-repository-layout -> origin/chore/readme-repository-layout
  * [new branch]        docs/automation-status -> origin/docs/automation-status
@@ -8,6 +9,7 @@ From https://github.com/sportsdataverse/cfbfastR-cfb-data
  * [new branch]        feat/cfb-model-suite-completion -> origin/feat/cfb-model-suite-completion
  * [new branch]        feat/cfb-ratings-builder -> origin/feat/cfb-ratings-builder
  * [new branch]        feat/cfb-ratings-cron  -> origin/feat/cfb-ratings-cron
+ * [new branch]        feat/era-contract-in-model-cards -> origin/feat/era-contract-in-model-cards
  * [new branch]        feat/rosters-cfbd-enrich -> origin/feat/rosters-cfbd-enrich
  * [new branch]        fix/bowl-season-cron   -> origin/fix/bowl-season-cron
  * [new branch]        fix/cfb-recruiting-guard -> origin/fix/cfb-recruiting-guard

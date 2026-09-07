@@ -162,9 +162,16 @@ jobs:
         if: ${{ github.event_name == 'schedule' || !inputs.stages || contains(inputs.stages, 'cpoe') }}
         run: |
           uv run python -m cfb_model_build.cpoe --final-dir "$FINAL_DIR" --out-dir artifacts/cpoe --seasons $(seq 2004 "$(date +%Y)") --loso
-          cp artifacts/cpoe/cfb_cp_model.ubj artifacts/cfb_cp_model.ubj
-          cp artifacts/cpoe/cfb_cp_model.json artifacts/cfb_cp_model.json
-          rm -f artifacts/cpoe/cfb_cp_model.ubj artifacts/cpoe/cfb_cp_model.json
+          # --variant defaults to both: the game-state model over the full window
+          # and the air-yards one over the 2025+ rows that carry throw depth.
+          # Promote each pair up to artifacts/ so both sit beside the other models.
+          for m in cfb_cp_model cfb_cp_model_air_yards; do
+            if [ -f "artifacts/cpoe/$m.ubj" ]; then
+              cp "artifacts/cpoe/$m.ubj" "artifacts/$m.ubj"
+              cp "artifacts/cpoe/$m.json" "artifacts/$m.json"
+              rm -f "artifacts/cpoe/$m.ubj" "artifacts/cpoe/$m.json"
+            fi
+          done
 
       # ---- out-of-fold predictions feed the report calibration metrics ----
       # cfb_model_reports reads these loso_*_oof.parquet files out of --artifacts.

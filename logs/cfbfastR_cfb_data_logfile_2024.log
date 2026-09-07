@@ -1,6 +1,8 @@
+From https://github.com/sportsdataverse/cfbfastR-cfb-data
+ * [new branch]        feat/cpoe-air-yards-model -> origin/feat/cpoe-air-yards-model
   pos_team: 100.0% of rows resolved to a team name
   def_pos_team: 100.0% of rows resolved to a team name
-pbp 2024: 162950 rows from 966 games
+pbp 2024: 163142 rows from 966 games
 play_participants 2024: 151764 rows from 966 games
 team_box 2024: 1932 rows from 966 games
 player_box 2024: 78993 rows from 966 games
@@ -18,9 +20,9 @@ adv_team 2024: 1892 rows from 966 games
   pos_team: 100.0% of rows resolved to a team name
 adv_passing 2024: 2950 rows from 966 games
   pos_team: 100.0% of rows resolved to a team name
-adv_rushing 2024: 9956 rows from 966 games
+adv_rushing 2024: 9959 rows from 966 games
   pos_team: 100.0% of rows resolved to a team name
-adv_receiving 2024: 15991 rows from 966 games
+adv_receiving 2024: 15999 rows from 966 games
   def_pos_team: 100.0% of rows resolved to a team name
 adv_defensive 2024: 1892 rows from 966 games
   pos_team: 100.0% of rows resolved to a team name
@@ -30,9 +32,9 @@ adv_drives 2024: 1892 rows from 966 games
   pos_team: 100.0% of rows resolved to a team name
 adv_situational 2024: 1892 rows from 966 games
   def_pos_team: 100.0% of rows resolved to a team name
-adv_defensive_players 2024: 5547 rows from 966 games
+adv_defensive_players 2024: 5558 rows from 966 games
   pos_team: 100.0% of rows resolved to a team name
-adv_specialists 2024: 9347 rows from 966 games
+adv_specialists 2024: 9348 rows from 966 games
   adv_team_gamelog 2024: 1892 rows, 90 cols
 
 === gamelog: 0 failures ===
@@ -46,7 +48,7 @@ cfb_rosters 2024: 27477 rows from 966/966 games | position 100.0% | division 100
 [summaries 2024] team_summaries: 134 rows
 [summaries 2024] passing: 548 rows
 [summaries 2024] rushing: 1644 rows
-[summaries 2024] receiving: 2112 rows
+[summaries 2024] receiving: 2113 rows
   cfb_ratings_weekly 2024: 2068 rows, 16 cols, 16 weekly snapshots
 
 === ratings_weekly: 0 failures ===
@@ -73,72 +75,67 @@ cfb_rosters 2024: 27477 rows from 966/966 games | position 100.0% | division 100
 [summaries 2024] percentiles: 99 rows
 [summaries 2024] team_summaries: 134 rows
 [summaries 2024] passing: 365 rows
-[summaries 2024] rushing: 1216 rows
+[summaries 2024] rushing: 1217 rows
 [summaries 2024] receiving: 1721 rows
 [summaries 2024] percentiles: 99 rows
 [summaries 2024] team_summaries: 134 rows
 [summaries 2024] passing: 384 rows
-[summaries 2024] rushing: 1279 rows
+[summaries 2024] rushing: 1280 rows
 [summaries 2024] receiving: 1785 rows
 [summaries 2024] percentiles: 99 rows
 [summaries 2024] team_summaries: 134 rows
 [summaries 2024] passing: 400 rows
 [summaries 2024] rushing: 1337 rows
-[summaries 2024] receiving: 1834 rows
+[summaries 2024] receiving: 1835 rows
 [summaries 2024] percentiles: 99 rows
 [summaries 2024] team_summaries: 134 rows
 [summaries 2024] passing: 424 rows
 [summaries 2024] rushing: 1401 rows
-[summaries 2024] receiving: 1874 rows
+[summaries 2024] receiving: 1875 rows
 [summaries 2024] percentiles: 99 rows
 [summaries 2024] team_summaries: 134 rows
 [summaries 2024] passing: 449 rows
 [summaries 2024] rushing: 1455 rows
-[summaries 2024] receiving: 1934 rows
+[summaries 2024] receiving: 1935 rows
 [summaries 2024] percentiles: 99 rows
 [summaries 2024] team_summaries: 134 rows
 [summaries 2024] passing: 468 rows
 [summaries 2024] rushing: 1493 rows
-[summaries 2024] receiving: 1970 rows
+[summaries 2024] receiving: 1971 rows
 [summaries 2024] percentiles: 99 rows
 [summaries 2024] team_summaries: 134 rows
 [summaries 2024] passing: 478 rows
 [summaries 2024] rushing: 1530 rows
-[summaries 2024] receiving: 2007 rows
+[summaries 2024] receiving: 2008 rows
 [summaries 2024] percentiles: 99 rows
 [summaries 2024] team_summaries: 134 rows
 [summaries 2024] passing: 498 rows
 [summaries 2024] rushing: 1572 rows
-[summaries 2024] receiving: 2039 rows
+[summaries 2024] receiving: 2040 rows
 [summaries 2024] percentiles: 99 rows
 [summaries 2024] team_summaries: 134 rows
 [summaries 2024] passing: 524 rows
 [summaries 2024] rushing: 1611 rows
-[summaries 2024] receiving: 2082 rows
+[summaries 2024] receiving: 2083 rows
 [summaries 2024] percentiles: 99 rows
 [summaries 2024] team_summaries: 134 rows
 [summaries 2024] passing: 545 rows
 [summaries 2024] rushing: 1641 rows
-[summaries 2024] receiving: 2110 rows
-[summaries 2024] percentiles: 99 rows
-[summaries 2024] team_summaries: 134 rows
-[summaries 2024] passing: 548 rows
-[summaries 2024] rushing: 1643 rows
 [summaries 2024] receiving: 2111 rows
 [summaries 2024] percentiles: 99 rows
 [summaries 2024] team_summaries: 134 rows
 [summaries 2024] passing: 548 rows
-[summaries 2024] rushing: 1644 rows
+[summaries 2024] rushing: 1643 rows
 [summaries 2024] receiving: 2112 rows
+[summaries 2024] percentiles: 99 rows
+[summaries 2024] team_summaries: 134 rows
+[summaries 2024] passing: 548 rows
+[summaries 2024] rushing: 1644 rows
+[summaries 2024] receiving: 2113 rows
   cfb_team_summaries_weekly 2024: 2119 rows, 384 cols, 16 weekly snapshots
 
 === team_summaries_weekly: 0 failures ===
-  cfb_recruits 2024: 4012 rows
-
-=== recruits: 0 failures ===
-  cfb_team_talent 2024: 317 rows
-
-=== team_talent: 0 failures ===
+::warning::no 247 recruits store at /home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-raw/cfb/recruits/json; skipping recruiting datasets
   cfb_returning_production 2024: 229 rows
 
 === returning_production: 0 failures ===

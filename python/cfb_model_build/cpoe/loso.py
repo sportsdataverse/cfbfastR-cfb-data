@@ -77,8 +77,8 @@ def run_loso_cv(
         fold: dict[str, Any] = {
             "season": int(held_out),
             "n_plays": len(y_test),
-            "log_loss": float(log_loss(y_test, preds_clipped)),
-            "brier_score": float(brier_score_loss(y_test, preds_clipped)),
+            "log_loss": float(log_loss(y_test, preds_clipped, labels=[0, 1])),
+            "brier_score": float(brier_score_loss(y_test, preds_clipped, pos_label=1)),
         }
         if return_preds:
             fold["cp_pred"] = preds.tolist()
@@ -141,6 +141,11 @@ def run_grouped_cv(
     if n_groups < n_splits:
         raise ValueError(f"need >= {n_splits} distinct {group_col} values; got {n_groups}")
 
+    # Neither metric may infer its label set from the fold: GroupKFold does not
+    # stratify, so a small or lopsided game group can hand it an all-complete
+    # or all-incomplete split. log_loss then raises ValueError and brier picks
+    # a pos_label by inference -- a CV run that dies (or silently changes
+    # meaning) on the luck of the split. Both are pinned explicitly below.
     X, y = df[feats], df[TARGET_COL].to_numpy()
     folds: list[dict[str, Any]] = []
     for i, (tr, te) in enumerate(GroupKFold(n_splits=n_splits).split(X, y, groups)):
@@ -153,8 +158,8 @@ def run_grouped_cv(
             {
                 "fold": i,
                 "n_plays": int(len(te)),
-                "log_loss": float(log_loss(y[te], preds_clipped)),
-                "brier_score": float(brier_score_loss(y[te], preds_clipped)),
+                "log_loss": float(log_loss(y[te], preds_clipped, labels=[0, 1])),
+                "brier_score": float(brier_score_loss(y[te], preds_clipped, pos_label=1)),
             }
         )
 

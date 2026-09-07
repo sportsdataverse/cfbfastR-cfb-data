@@ -30,7 +30,14 @@ close to a coin flip:
 | C — PR #27's shape (4 game-state features dropped) | 0.5419 | 0.762 |
 
 _5-fold CV grouped by `game_id`, 27,804 pass plays with a known outcome,
-2025–2026. Reproduce: `ClaudeCowork/notes/2026-09-07-cfb-xcp-air-yards/`._
+2025–2026, measured against the **published `sportsdataverse-data` release
+parquet**. Reproduce: `ClaudeCowork/notes/2026-09-07-cfb-xcp-air-yards/`._
+
+The fitting script itself trains on the **`cfbfastR-cfb-raw` finals corpus**
+and reports 0.5395 / Brier 0.1806 over 27,673 plays — a slightly different
+population because it is a different source, not a different result. The
+registry quotes the fitting script's numbers; this file quotes the independent
+confirmation. Both are recorded so neither looks like the other's restatement.
 
 Arm A beats the intercept by 0.0064 of log-loss. That is the entire skill of the
 currently-published CFB CP model, and by extension of the CPOE derived from it.

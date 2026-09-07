@@ -127,6 +127,7 @@ def main(argv: list[str] | None = None) -> int:
         AIR_YARDS_FEATURE_COLS,
         AIR_YARDS_MODEL_FILENAME,
         FEATURE_COLS,
+        MIN_SEASON_AIR_YARDS,
         MODEL_FILENAME,
         TARGET_COL,
     )
@@ -146,14 +147,22 @@ def main(argv: list[str] | None = None) -> int:
                 # 'both' over a pre-2025 corpus is the normal case, not a failure.
                 print(f"Skipping air-yards variant: {msg}.")
                 continue
-            df = all_df[all_df["air_yards"].notna()].reset_index(drop=True)
+            # Season floor as well as non-null air yards. ESPN emitted these
+            # spots only from 2025; a stray pre-2025 play carrying air_yards is
+            # a parse artifact of an era that did not report them, not a sample
+            # from the same regime, and MIN_SEASON_AIR_YARDS would otherwise be
+            # a constant documenting an intent nothing enforces.
+            eligible = all_df["air_yards"].notna()
+            if "season" in all_df.columns:
+                eligible &= all_df["season"] >= MIN_SEASON_AIR_YARDS
+            df = all_df[eligible].reset_index(drop=True)
             feats, fname, mtype = (
                 AIR_YARDS_FEATURE_COLS,
                 AIR_YARDS_MODEL_FILENAME,
                 "cpoe_air_yards",
             )
             if df.empty:
-                msg = "no loaded play has air_yards"
+                msg = f"no loaded play has air_yards in {MIN_SEASON_AIR_YARDS}+"
                 if args.variant == "air_yards":
                     print(f"ERROR: {msg}.", file=sys.stderr)
                     return 1

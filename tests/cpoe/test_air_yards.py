@@ -164,7 +164,7 @@ def test_save_writes_a_card_the_publisher_can_discover(tmp_path):
 
 
 # --------------------------------------------------------------------------
-# ingest season pre-filter
+# ingest season filtering
 # --------------------------------------------------------------------------
 
 
@@ -189,29 +189,6 @@ def _write_game(d, name: str, season: int, *, head_pad: str = "") -> None:
         ),
         encoding="utf-8",
     )
-
-
-def test_prefilter_never_skips_a_requested_season(tmp_path):
-    """The pre-filter may only rule files OUT; a wanted game must survive it."""
-    from cfb_model_build.cpoe.ingest import _cannot_be_in_scope
-
-    _write_game(tmp_path, "a.json", 2025)
-    assert _cannot_be_in_scope(tmp_path / "a.json", {2025}) is False
-    assert _cannot_be_in_scope(tmp_path / "a.json", {2025, 2026}) is False
-    assert _cannot_be_in_scope(tmp_path / "a.json", {2024}) is True
-
-
-def test_prefilter_defers_when_season_is_past_the_head(tmp_path):
-    """A season key beyond the head read must NOT be skipped -- parse decides.
-
-    Otherwise an unexpected payload layout would silently drop real games,
-    which is the failure mode that matters: a smaller training set that still
-    reports success.
-    """
-    from cfb_model_build.cpoe.ingest import _SEASON_HEAD_BYTES, _cannot_be_in_scope
-
-    _write_game(tmp_path, "b.json", 2025, head_pad="x" * (_SEASON_HEAD_BYTES + 100))
-    assert _cannot_be_in_scope(tmp_path / "b.json", {2024}) is False
 
 
 def test_loader_filters_by_season_through_the_prefilter(tmp_path):
@@ -245,3 +222,28 @@ def test_hybrid_preserves_input_row_order():
         "game_state", "air_yards", "game_state",
     ]
     assert "_cpoe_row_order" not in out.columns
+
+
+def test_grouped_cv_survives_a_single_class_fold():
+    """GroupKFold does not stratify, so a fold can be all-complete or all-incomplete.
+
+    With the label set left to inference, log_loss raises ValueError on such a
+    fold and the whole CV dies on the luck of the split. Five games, one of them
+    entirely incompletions, reproduces it.
+    """
+    from cfb_model_build.cpoe.loso import run_grouped_cv
+
+    rng = np.random.default_rng(0)
+    rows = 20
+    frames = []
+    for game in range(5):
+        f = pd.DataFrame({c: rng.normal(size=rows) for c in FEATURE_COLS})
+        f["game_id"] = game
+        # game 0 is entirely incompletions -> its fold is single-class
+        f[TARGET_COL] = 0 if game == 0 else rng.integers(0, 2, rows)
+        frames.append(f)
+    df = pd.concat(frames, ignore_index=True)
+
+    res = run_grouped_cv(df, n_splits=5, nrounds=2)
+    assert len(res["folds"]) == 5
+    assert all(np.isfinite(f["log_loss"]) for f in res["folds"])

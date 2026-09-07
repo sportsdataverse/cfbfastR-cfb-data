@@ -48,10 +48,16 @@ NARRATIVES: dict[str, ModelNarrative] = {
             "completion rate."
         ),
         limitations=(
-            "CPOE is blind to receiver separation, pressure, and air-yards charting we do not "
-            "have, so it captures the *game-state-explainable* part of completion probability "
-            "only. Without a shipped OOF parquet, the calibration claim here is deferred to the "
-            "model card rather than shown out-of-sample."
+            "This model is blind to throw depth, and that turns out to be most of the signal. "
+            "Measured on the plays where air yards are available it beats an intercept-only "
+            "baseline by **0.0064 of log-loss** (AUC 0.567 against 0.500), and its predictions "
+            "barely move: sd(`cp`) 0.065 around a base rate near 0.58. Treat its CPOE as a weak "
+            "game-state residual, not as a measure of passer skill.\n\n"
+            "Where ESPN supplies a catch/target spot (2025 onward) the **`cpoe_air_yards`** "
+            "model supersedes it and reaches AUC 0.764. This one remains the only model that "
+            "can score 2004-2024, which is why both ship. It is still blind to receiver "
+            "separation and coverage. Without a shipped OOF parquet, the calibration claim "
+            "here is deferred to the model card rather than shown out-of-sample."
         ),
         features=(
             "**8 features**, all known before the throw; the binary label is `complete_pass`.\n\n"
@@ -78,6 +84,85 @@ NARRATIVES: dict[str, ModelNarrative] = {
             "Completion probability is driven primarily by `distance` / `yards_to_goal` (throw "
             "depth proxies) and `passing_down`; the clock/score context contributes a smaller "
             "game-script correction."
+        ),
+    ),
+    "cpoe_air_yards": ModelNarrative(
+        summary=(
+            "The air-yards completion-probability model: the same CPOE surface as `cpoe`, but "
+            "with **how far the ball actually travelled** among its inputs. It scores only the "
+            "pass plays where ESPN's play text gave up a catch or target spot, and on those "
+            "plays it supersedes the game-state model."
+        ),
+        recipe=(
+            "An 11-feature XGBoost **binary:logistic** completion model -- the 8 game-state "
+            "features of `cpoe` plus `air_yards`, `pass_is_middle` and `qb_hurry`. `air_yards` "
+            "is derived by the sdv-py CFB parser as `start.yardsToEndzone - air_yardsToEndzone`, "
+            "where the spot comes from a `caught at ...` / `thrown to ...` match on the play "
+            "text. Same nflfastR CP hyper-parameters as the game-state model."
+        ),
+        discussion=(
+            "Throw depth is not a refinement here, it is the bulk of the signal. On identical "
+            "rows the game-state model manages log-loss 0.6539 / AUC 0.567 against an "
+            "intercept-only 0.6603; adding throw depth takes those same rows to **0.5398 / AUC "
+            "0.764**. The gap shows in the predictions rather than only in a metric: sd(`cp`) is "
+            "0.065 for the game-state arm and 0.225 for this one.\n\n"
+            "An AUC jump that size from one feature is also what leakage looks like, so it was "
+            "checked rather than assumed. `air_yards` would be leaky if it existed only on "
+            "completions; it is present on 45.4% of completions and 37.6% of incompletions, "
+            "because the text regex matches `thrown to` as well as `caught at`."
+        ),
+        limitations=(
+            "**Coverage, and it is not missing at random.** ESPN began emitting catch/target "
+            "spots at scale only in 2025: ~0% of pre-2025 pass plays carry air yards, 38.9% of "
+            "2025, and 90.2% of 2026 to date. This model therefore trains on 2025+ and is only "
+            "ever applied to plays that carry the field -- it is never extrapolated onto throws "
+            "whose distance is unknown, which is why the game-state model still ships.\n\n"
+            "**`cp` from the two models is not on a comparable scale.** One is a residual against "
+            "a near-coin-flip baseline, the other against a genuinely predictive one, so a "
+            "leaderboard that averages CPOE across both adds two different quantities -- and "
+            "since coverage climbs steeply season over season, it would read that composition "
+            "change as a trend. Group by the `cp_model` column or restrict to one. For the same "
+            "reason the box score's `xComp` / `CPOE` sum `cp_game_state`, the game-state "
+            "prediction carried on every pass play, rather than the per-play `cp`.\n\n"
+            "Still blind to receiver separation and coverage."
+        ),
+        features=(
+            "**11 features**, all known before the outcome; the binary label is `completion`.\n\n"
+            "| Feature | Type | What it encodes |\n"
+            "|---|---|---|\n"
+            "| `down` | numeric | Current down. |\n"
+            "| `distance` | numeric | Yards to go. |\n"
+            "| `yards_to_goal` | numeric | Field position. |\n"
+            "| `score_diff` | numeric | Possession-team score differential. |\n"
+            "| `seconds_remaining` | numeric | Clock context. |\n"
+            "| `is_home` | binary | Home-field indicator. |\n"
+            "| `period` | numeric | Quarter. |\n"
+            "| `passing_down` | binary | Whether the situation is an obvious passing down. |\n"
+            "| `air_yards` | numeric | Distance the ball travelled past the line of scrimmage. |\n"
+            "| `pass_is_middle` | binary | Throw between the numbers; null when direction is unknown. |\n"
+            "| `qb_hurry` | binary | Passer was hurried on the play. |\n\n"
+            "The three air-yards columns are left **null**, not zero, where the play text did "
+            "not supply them: xgboost reads NaN as missing and learns a default direction, "
+            "whereas filling 0 would assert every such throw was a non-hurried screen up the "
+            "middle."
+        ),
+        model=(
+            "**Algorithm.** XGBoost, `objective=binary:logistic`, nflfastR CP hyper-parameters "
+            "(eta 0.025, max_depth 4, min_child_weight 6, gamma 5, 560 rounds).\n\n"
+            "**Evaluation.** Gated on **GroupKFold(5) by `game_id`**, not LOSO: the model exists "
+            "for 2025+ only, so leave-one-season-out would be two folds with one of them a "
+            "partial season -- too noisy to gate on. Grouping by game also prevents the leak "
+            "that matters at this scale, since passes within one game share a quarterback, an "
+            "offense, an opponent and the weather, and a row-level split would put near-duplicate "
+            "plays on both sides."
+        ),
+        importance=(
+            "`air_yards` dominates: completion probability falls steeply with throw distance, and "
+            "the game-state features that led the 8-feature model (`distance`, `yards_to_goal`) "
+            "were largely acting as weak proxies for it. They are retained because they still "
+            "carry real game-script information -- a throw on 3rd and 18 down two scores is a "
+            "different proposition from the same throw tied in the first quarter -- and cost only "
+            "~0.002 of log-loss to keep."
         ),
     ),
     "ep": ModelNarrative(

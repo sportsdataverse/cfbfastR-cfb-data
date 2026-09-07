@@ -71,6 +71,9 @@ def write_xgb_model_card(
         "source": source,
         "trained_date": date.today().isoformat(),
     }
+    era = _era_contract(feats)
+    if era:
+        card["era_contract"] = era
     if metrics:
         card["metrics"] = metrics
     if extra:
@@ -80,6 +83,62 @@ def write_xgb_model_card(
     card_path.parent.mkdir(parents=True, exist_ok=True)
     card_path.write_text(json.dumps(card, indent=2), encoding="utf-8")
     return card_path
+
+
+def _era_contract(features: Sequence[str]) -> Optional[Dict[str, Any]]:
+    """The rule-era contract for a model, derived from its own feature names.
+
+    Two encodings ship in this bundle and they are NOT interchangeable: the
+    single ordinal ``era`` column (0-3) taken by xpass / two_pt, and the
+    ``era0..era3`` one-hot dummies taken by fg / fd / qbr. Both are cut at the
+    same ``ERA_BOUNDS``, because ``_era()`` and ``_era_onehot()`` derive from
+    that one constant -- but a consumer feeding four dummies where a single
+    ordinal is expected (or vice versa) mislabels every season.
+
+    Emitting this from the feature list means the card cannot disagree with the
+    model it describes, and a consumer can read the cuts instead of keeping its
+    own copy. Both consumers had kept a copy, both drifted to a 2017 third cut
+    that this repo has never used, and 2018-2020 were scored an era off for it
+    (cfbfastR-cfb-data#70).
+
+    Returns ``None`` for a model with no era feature. Raises ``ValueError`` on a
+    mixed or incomplete set: a card that published four bucket labels beside a
+    partial ``era0..era2`` column list, or claimed one-hot for a model that also
+    takes the ordinal column, would describe a feature shape the model does not
+    have -- which is the exact failure this contract exists to prevent, so it is
+    an error rather than a best guess.
+    """
+    from . import constants as C
+
+    feats = list(features or [])
+    onehot = [c for c in C.ERA_ONEHOT_COLS if c in feats]
+    ordinal = "era" in feats
+    if not onehot and not ordinal:
+        return None
+    if ordinal and onehot:
+        raise ValueError(
+            f"model takes BOTH the ordinal 'era' and one-hot {onehot}; "
+            "the two encodings are not interchangeable, pick one"
+        )
+    if onehot and len(onehot) != len(C.ERA_ONEHOT_COLS):
+        missing = [c for c in C.ERA_ONEHOT_COLS if c not in onehot]
+        raise ValueError(
+            f"incomplete one-hot era set: has {onehot}, missing {missing}. "
+            "A partial set cannot represent four buckets"
+        )
+
+    lo, mid, hi = C.ERA_BOUNDS
+    contract: Dict[str, Any] = {
+        "encoding": "one_hot" if onehot else "ordinal",
+        "cuts": [lo, mid, hi],
+        "buckets": [f"<={lo}", f"{lo + 1}-{mid}", f"{mid + 1}-{hi}", f">={hi + 1}"],
+        "note": (
+            "season <= cuts[0] -> 0, <= cuts[1] -> 1, <= cuts[2] -> 2, else 3. "
+            "Both encodings share these cuts; they differ only in SHAPE."
+        ),
+    }
+    contract["columns"] = onehot if onehot else ["era"]
+    return contract
 
 
 def _introspect_features(model: Any) -> list[str]:

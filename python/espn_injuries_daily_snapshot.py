@@ -45,6 +45,7 @@ import argparse
 import importlib
 import io
 import logging
+import os
 import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
@@ -58,6 +59,14 @@ from sportsdataverse.espn_snapshots import (
 )
 
 logger = logging.getLogger(__name__)
+
+#: Wall-clock bound on `gh release create`. Deliberately far shorter than the
+#: 1800s the artifacts publisher allows: that budget is sized for UPLOADING
+#: large assets over a slow link, while this call creates an empty release and
+#: sends no payload. Unbounded, a stalled auth or network hangs the whole stage
+#: -- `_publish` could not move on to later leagues, which is the property this
+#: module is built to keep.
+RELEASE_CREATE_TIMEOUT_SECONDS = int(os.getenv("CFB_GH_CREATE_TIMEOUT_SECONDS", "120"))
 
 REPO = "sportsdataverse/sportsdataverse-data"
 LEAGUES: tuple[str, ...] = ("nfl", "nba", "wnba", "cfb", "mbb", "wbb", "nhl", "mlb")
@@ -272,10 +281,12 @@ def _create_release(tag: str, repo: str) -> bool:
     is treated as success: "already exists" means the postcondition holds, which
     is what the caller actually needs to know.
 
-    Never raises. If ``gh`` cannot even be launched, ``subprocess.run`` raises
-    ``OSError`` before the caller can count the failure -- which would abandon
-    every later league, the exact behaviour ``_publish`` is built to avoid. That
-    is reported and counted like any other failed create.
+    Never raises, and never hangs. If ``gh`` cannot even be launched,
+    ``subprocess.run`` raises ``OSError`` before the caller can count the
+    failure; if auth or the network stalls it would otherwise wait forever.
+    Either one would abandon every later league, the exact behaviour
+    ``_publish`` is built to avoid, so both are reported and counted like any
+    other failed create.
     """
     notes = (
         f"`{tag}` -- daily append-only ESPN snapshots. The endpoint reports current "
@@ -288,7 +299,15 @@ def _create_release(tag: str, repo: str) -> bool:
             ["gh", "release", "create", tag, "--repo", repo, "--title", tag, "--notes", notes],
             capture_output=True,
             text=True,
+            timeout=RELEASE_CREATE_TIMEOUT_SECONDS,
         )
+    except subprocess.TimeoutExpired:
+        # NOT an OSError, so the clause below would not have caught it.
+        print(
+            f"WARNING: gh release create timed out after "
+            f"{RELEASE_CREATE_TIMEOUT_SECONDS}s for {tag}"
+        )
+        return False
     except OSError as exc:  # gh missing / not executable
         print(f"WARNING: could not run gh to create release {tag}: {str(exc)[:160]}")
         return False

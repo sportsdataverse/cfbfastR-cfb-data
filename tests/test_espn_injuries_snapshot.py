@@ -598,3 +598,27 @@ def test_dry_run_reports_the_real_release_status(tmp_path, monkeypatch, capsys):
     assert out == (
         "[dry-run] would upload to espn_nfl_injuries: ['injuries_2026.parquet']"
     ), out
+
+
+def test_create_release_is_bounded_and_a_timeout_is_just_a_failure(monkeypatch, capsys):
+    """A stalled gh must not hang the stage.
+
+    TimeoutExpired is a SubprocessError, NOT an OSError, so the launch-failure
+    clause does not cover it -- an unbounded call would wait forever and no
+    later league would ever publish.
+    """
+    import subprocess
+
+    import espn_injuries_daily_snapshot as snap
+
+    seen = {}
+
+    def stalled(cmd, **kw):
+        seen["timeout"] = kw.get("timeout")
+        raise subprocess.TimeoutExpired(cmd, kw.get("timeout") or 0)
+
+    monkeypatch.setattr(subprocess, "run", stalled)
+    assert snap._create_release("espn_nfl_injuries", "r/r") is False
+    assert seen["timeout"] == snap.RELEASE_CREATE_TIMEOUT_SECONDS
+    assert seen["timeout"], "release create was left unbounded"
+    assert "timed out" in capsys.readouterr().out

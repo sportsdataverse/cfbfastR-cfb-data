@@ -45,6 +45,8 @@ import argparse
 import importlib
 import io
 import logging
+import os
+import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Optional
@@ -57,6 +59,14 @@ from sportsdataverse.espn_snapshots import (
 )
 
 logger = logging.getLogger(__name__)
+
+#: Wall-clock bound on `gh release create`. Deliberately far shorter than the
+#: 1800s the artifacts publisher allows: that budget is sized for UPLOADING
+#: large assets over a slow link, while this call creates an empty release and
+#: sends no payload. Unbounded, a stalled auth or network hangs the whole stage
+#: -- `_publish` could not move on to later leagues, which is the property this
+#: module is built to keep.
+RELEASE_CREATE_TIMEOUT_SECONDS = int(os.getenv("CFB_GH_CREATE_TIMEOUT_SECONDS", "120"))
 
 REPO = "sportsdataverse/sportsdataverse-data"
 LEAGUES: tuple[str, ...] = ("nfl", "nba", "wnba", "cfb", "mbb", "wbb", "nhl", "mlb")
@@ -264,6 +274,52 @@ def build(
     return written
 
 
+def _create_release(tag: str, repo: str) -> bool:
+    """Cut an empty release so the upload that follows has somewhere to go.
+
+    Returns True when the tag is usable afterwards. A race with a concurrent run
+    is treated as success: "already exists" means the postcondition holds, which
+    is what the caller actually needs to know.
+
+    Never raises, and never hangs. If ``gh`` cannot even be launched,
+    ``subprocess.run`` raises ``OSError`` before the caller can count the
+    failure; if auth or the network stalls it would otherwise wait forever.
+    Either one would abandon every later league, the exact behaviour
+    ``_publish`` is built to avoid, so both are reported and counted like any
+    other failed create.
+    """
+    notes = (
+        f"`{tag}` -- daily append-only ESPN snapshots. The endpoint reports current "
+        "state only, so history exists only because it is snapshotted: every row "
+        "carries `as_of_date` and each run appends to the season asset.\n\n"
+        "Created automatically by the ESPN Daily Snapshots stage in `cfbfastR-cfb-data`."
+    )
+    try:
+        proc = subprocess.run(
+            ["gh", "release", "create", tag, "--repo", repo, "--title", tag, "--notes", notes],
+            capture_output=True,
+            text=True,
+            timeout=RELEASE_CREATE_TIMEOUT_SECONDS,
+        )
+    except subprocess.TimeoutExpired:
+        # NOT an OSError, so the clause below would not have caught it.
+        print(
+            f"WARNING: gh release create timed out after "
+            f"{RELEASE_CREATE_TIMEOUT_SECONDS}s for {tag}"
+        )
+        return False
+    except OSError as exc:  # gh missing / not executable
+        print(f"WARNING: could not run gh to create release {tag}: {str(exc)[:160]}")
+        return False
+    if proc.returncode == 0:
+        print(f"created release {repo}:{tag}")
+        return True
+    if "already exists" in (proc.stderr or "").lower():
+        return True
+    print(f"WARNING: could not create release {tag}: {(proc.stderr or '').strip()[:160]}")
+    return False
+
+
 def _publish(out: Path, written: dict[str, int], repo: str, *, dry_run: bool) -> int:
     """Upload ONLY the assets this run wrote, one tag at a time.
 
@@ -278,8 +334,17 @@ def _publish(out: Path, written: dict[str, int], repo: str, *, dry_run: bool) ->
       ``RuntimeError`` when its retries are exhausted, which would abandon every
       later league -- so a single rate-limited tag would silently cost seven
       others. Each failure is counted and the loop continues.
+
+    One thing it DOES do, since 2026-09-07: create a release that does not exist
+    yet. ``gh release upload`` will not create one, and ``sportsdataverse_upload``
+    does not either, so a league whose tag had never been cut failed forever --
+    and failed *slowly*, because the upload retries 20 times with exponential
+    backoff against an error no retry can fix. That is exactly what happened
+    between 09-03 and 09-07: every league except CFB had no tag, so this stage
+    fetched all eight correctly, then burned ~55 minutes re-attempting seven
+    impossible uploads and exited 1 every day.
     """
-    from sportsdataverse.release import sportsdataverse_upload
+    from sportsdataverse.release import gh_cli_release_tags, sportsdataverse_upload
 
     failed = 0
     by_tag: dict[str, list[Path]] = {}
@@ -292,9 +357,33 @@ def _publish(out: Path, written: dict[str, int], repo: str, *, dry_run: bool) ->
         if path.is_file():
             by_tag.setdefault(tag, []).append(path)
 
+    # Cut any missing release ONCE, before the upload loop -- one tag listing
+    # rather than an existence check per league. Listed on dry runs too: it is a
+    # read-only call, and a dry run that labelled every tag "would be created"
+    # regardless of whether it exists would be a plan nobody could trust.
+    existing: set[str] = set()
+    listed = False
+    if by_tag:
+        try:
+            existing = set(gh_cli_release_tags(repo))
+            listed = True
+        except Exception as exc:  # noqa: BLE001 - fall through to upload and let it report
+            print(f"WARNING: could not list releases on {repo} ({str(exc)[:120]}); "
+                  "skipping the ensure-release step")
+            existing = set(by_tag)  # assume present; upload will surface the truth
+
     for tag, files in sorted(by_tag.items()):
         if dry_run:
-            print(f"[dry-run] would upload to {tag}: {[f.name for f in sorted(files)]}")
+            if not listed:
+                note = "  (release status unknown)"
+            elif tag in existing:
+                note = ""
+            else:
+                note = "  (release would be created first)"
+            print(f"[dry-run] would upload to {tag}: {[f.name for f in sorted(files)]}{note}")
+            continue
+        if tag not in existing and not _create_release(tag, repo):
+            failed += 1
             continue
         try:
             if not sportsdataverse_upload(sorted(files), tag, repo=repo):

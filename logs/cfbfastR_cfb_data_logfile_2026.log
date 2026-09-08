@@ -1,4 +1,5 @@
 From https://github.com/sportsdataverse/cfbfastR-cfb-data
+   9414f6c5..0d694450  main                   -> origin/main
  * [new branch]        AE/update-air-yards-model -> origin/AE/update-air-yards-model
  * [new branch]        chore/readme-repository-layout -> origin/chore/readme-repository-layout
  * [new branch]        docs/automation-status -> origin/docs/automation-status
@@ -89,7 +90,18 @@ game_rosters 2026: 10737 rows from 948 games
 betting 2026: 99 rows from 948 games
 schedules 2026: 99 rows from 948 games
 linescores 2026: 590 rows from 948 games
-  power_index 2026: 1776 rows, 7 cols
+  power_index 401858541: ref fetch failed (HTTPError)
+  power_index 401856876: ref fetch failed (HTTPError)
+  power_index 401858316: ref fetch failed (HTTPError)
+  power_index 401856874: ref fetch failed (HTTPError)
+  power_index 401856878: HTTPError
+  power_index 401858317: HTTPError
+  power_index 401861969: HTTPError
+  power_index 401864550: HTTPError
+  power_index 401871082: ref fetch failed (HTTPError)
+  power_index 401869532: HTTPError
+  power_index 401874426: HTTPError
+  power_index 2026: 1763 rows, 7 cols
 
 === power_index: 0 failures ===
 injuries 2026: 0 rows from 948 games

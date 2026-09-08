@@ -559,3 +559,42 @@ def test_create_release_treats_an_existing_tag_as_success(monkeypatch):
 
     monkeypatch.setattr(subprocess, "run", lambda *a, **k: R())
     assert snap._create_release("espn_nfl_injuries", "r/r") is True
+
+
+def test_create_release_survives_gh_not_being_launchable(monkeypatch, capsys):
+    """OSError must not escape: it would abandon every later league.
+
+    _publish is explicitly built so one bad tag cannot end the run. A create that
+    raises before the caller can count it would undo exactly that.
+    """
+    import subprocess
+
+    import espn_injuries_daily_snapshot as snap
+
+    def no_gh(*a, **k):
+        raise FileNotFoundError("gh")
+
+    monkeypatch.setattr(subprocess, "run", no_gh)
+    assert snap._create_release("espn_nfl_injuries", "r/r") is False
+    assert "could not run gh" in capsys.readouterr().out
+
+
+def test_dry_run_reports_the_real_release_status(tmp_path, monkeypatch, capsys):
+    """A dry run that labels an EXISTING tag 'would be created' is a plan nobody
+    can trust, which is the one thing a dry run is for."""
+    import sportsdataverse.release as rel
+
+    import espn_injuries_daily_snapshot as snap
+
+    written = _one_asset(tmp_path)
+    monkeypatch.setattr(rel, "gh_cli_release_tags", lambda repo: ["espn_nfl_injuries"])
+
+    assert snap._publish(tmp_path, written, "r/r", dry_run=True) == 0
+    out = capsys.readouterr().out.strip()
+    # Assert the WHOLE line. Checking only that "would be created first" is
+    # absent passes when the code emits a different wrong annotation instead
+    # (e.g. "status unknown" because it never listed) -- which is exactly what
+    # a first draft of this test did.
+    assert out == (
+        "[dry-run] would upload to espn_nfl_injuries: ['injuries_2026.parquet']"
+    ), out

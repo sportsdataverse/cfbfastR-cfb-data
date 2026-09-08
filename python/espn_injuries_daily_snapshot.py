@@ -271,6 +271,11 @@ def _create_release(tag: str, repo: str) -> bool:
     Returns True when the tag is usable afterwards. A race with a concurrent run
     is treated as success: "already exists" means the postcondition holds, which
     is what the caller actually needs to know.
+
+    Never raises. If ``gh`` cannot even be launched, ``subprocess.run`` raises
+    ``OSError`` before the caller can count the failure -- which would abandon
+    every later league, the exact behaviour ``_publish`` is built to avoid. That
+    is reported and counted like any other failed create.
     """
     notes = (
         f"`{tag}` -- daily append-only ESPN snapshots. The endpoint reports current "
@@ -278,11 +283,15 @@ def _create_release(tag: str, repo: str) -> bool:
         "carries `as_of_date` and each run appends to the season asset.\n\n"
         "Created automatically by the ESPN Daily Snapshots stage in `cfbfastR-cfb-data`."
     )
-    proc = subprocess.run(
-        ["gh", "release", "create", tag, "--repo", repo, "--title", tag, "--notes", notes],
-        capture_output=True,
-        text=True,
-    )
+    try:
+        proc = subprocess.run(
+            ["gh", "release", "create", tag, "--repo", repo, "--title", tag, "--notes", notes],
+            capture_output=True,
+            text=True,
+        )
+    except OSError as exc:  # gh missing / not executable
+        print(f"WARNING: could not run gh to create release {tag}: {str(exc)[:160]}")
+        return False
     if proc.returncode == 0:
         print(f"created release {repo}:{tag}")
         return True
@@ -330,11 +339,15 @@ def _publish(out: Path, written: dict[str, int], repo: str, *, dry_run: bool) ->
             by_tag.setdefault(tag, []).append(path)
 
     # Cut any missing release ONCE, before the upload loop -- one tag listing
-    # rather than an existence check per league.
+    # rather than an existence check per league. Listed on dry runs too: it is a
+    # read-only call, and a dry run that labelled every tag "would be created"
+    # regardless of whether it exists would be a plan nobody could trust.
     existing: set[str] = set()
-    if not dry_run and by_tag:
+    listed = False
+    if by_tag:
         try:
             existing = set(gh_cli_release_tags(repo))
+            listed = True
         except Exception as exc:  # noqa: BLE001 - fall through to upload and let it report
             print(f"WARNING: could not list releases on {repo} ({str(exc)[:120]}); "
                   "skipping the ensure-release step")
@@ -342,8 +355,13 @@ def _publish(out: Path, written: dict[str, int], repo: str, *, dry_run: bool) ->
 
     for tag, files in sorted(by_tag.items()):
         if dry_run:
-            missing = "" if tag in existing else "  (release would be created first)"
-            print(f"[dry-run] would upload to {tag}: {[f.name for f in sorted(files)]}{missing}")
+            if not listed:
+                note = "  (release status unknown)"
+            elif tag in existing:
+                note = ""
+            else:
+                note = "  (release would be created first)"
+            print(f"[dry-run] would upload to {tag}: {[f.name for f in sorted(files)]}{note}")
             continue
         if tag not in existing and not _create_release(tag, repo):
             failed += 1

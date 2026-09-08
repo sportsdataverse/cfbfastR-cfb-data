@@ -451,3 +451,111 @@ def test_a_utf8_prior_does_not_leave_the_asset_lexically_sorted():
 
     assert merged["team_id"].to_list() == [1, 2, 10, 9]  # numeric, not "1","10","2"
     assert merged.schema["team_id"] == pl.Int64
+
+
+# ---------------------------------------------------------------------------
+# ensure-release: gh release upload will not create a release, so a league whose
+# tag was never cut failed forever -- and failed slowly, since the upload retries
+# 20 times with backoff against an error no retry can fix. 09-03..09-07: seven
+# leagues had no tag, so this stage fetched them all, then burned ~55 minutes a
+# day re-attempting impossible uploads.
+# ---------------------------------------------------------------------------
+
+
+def _one_asset(tmp_path, tag="espn_nfl_injuries", asset="injuries_2026.parquet"):
+    (tmp_path / tag).mkdir(parents=True, exist_ok=True)
+    (tmp_path / tag / asset).write_bytes(b"x")
+    return {f"{tag}/{asset}": 1}
+
+
+def test_publish_creates_a_release_that_does_not_exist_yet(tmp_path, monkeypatch):
+    import sportsdataverse.release as rel
+
+    import espn_injuries_daily_snapshot as snap
+
+    written = _one_asset(tmp_path)
+    monkeypatch.setattr(rel, "gh_cli_release_tags", lambda repo: [])  # nothing exists
+
+    created = []
+    monkeypatch.setattr(
+        snap, "_create_release", lambda tag, repo: created.append(tag) or True
+    )
+    uploaded = []
+    monkeypatch.setattr(
+        rel, "sportsdataverse_upload", lambda files, tag, **k: uploaded.append(tag) or True
+    )
+
+    assert snap._publish(tmp_path, written, "r/r", dry_run=False) == 0
+    assert created == ["espn_nfl_injuries"], "missing release was not created"
+    assert uploaded == ["espn_nfl_injuries"], "upload did not follow the create"
+
+
+def test_publish_does_not_recreate_an_existing_release(tmp_path, monkeypatch):
+    import sportsdataverse.release as rel
+
+    import espn_injuries_daily_snapshot as snap
+
+    written = _one_asset(tmp_path)
+    monkeypatch.setattr(rel, "gh_cli_release_tags", lambda repo: ["espn_nfl_injuries"])
+
+    def explode(tag, repo):  # pragma: no cover - must never run
+        raise AssertionError("re-created a release that already exists")
+
+    monkeypatch.setattr(snap, "_create_release", explode)
+    monkeypatch.setattr(rel, "sportsdataverse_upload", lambda files, tag, **k: True)
+
+    assert snap._publish(tmp_path, written, "r/r", dry_run=False) == 0
+
+
+def test_publish_skips_the_upload_when_the_release_cannot_be_created(tmp_path, monkeypatch):
+    """A failed create must NOT fall through into the 20-retry upload backoff."""
+    import sportsdataverse.release as rel
+
+    import espn_injuries_daily_snapshot as snap
+
+    written = _one_asset(tmp_path)
+    monkeypatch.setattr(rel, "gh_cli_release_tags", lambda repo: [])
+    monkeypatch.setattr(snap, "_create_release", lambda tag, repo: False)
+
+    def explode(*a, **k):  # pragma: no cover - must never run
+        raise AssertionError("attempted an upload to a tag that does not exist")
+
+    monkeypatch.setattr(rel, "sportsdataverse_upload", explode)
+
+    assert snap._publish(tmp_path, written, "r/r", dry_run=False) == 1
+
+
+def test_publish_still_uploads_when_the_tag_listing_fails(tmp_path, monkeypatch):
+    """The ensure step is best-effort: it must not become a new way to publish nothing."""
+    import sportsdataverse.release as rel
+
+    import espn_injuries_daily_snapshot as snap
+
+    written = _one_asset(tmp_path)
+
+    def boom(repo):
+        raise RuntimeError("rate limited")
+
+    monkeypatch.setattr(rel, "gh_cli_release_tags", boom)
+    uploaded = []
+    monkeypatch.setattr(
+        rel, "sportsdataverse_upload", lambda files, tag, **k: uploaded.append(tag) or True
+    )
+
+    assert snap._publish(tmp_path, written, "r/r", dry_run=False) == 0
+    assert uploaded == ["espn_nfl_injuries"]
+
+
+def test_create_release_treats_an_existing_tag_as_success(monkeypatch):
+    """A concurrent run winning the race satisfies the postcondition."""
+    import subprocess
+
+    import espn_injuries_daily_snapshot as snap
+
+    class R:
+        returncode = 1
+        stderr = "HTTP 422: Validation Failed (release already exists)"
+        stdout = ""
+
+    monkeypatch.setattr(subprocess, "run", lambda *a, **k: R())
+    assert snap._create_release("espn_nfl_injuries", "r/r") is True

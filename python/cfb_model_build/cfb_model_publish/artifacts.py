@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import subprocess
+import time
 from pathlib import Path
 
 from sportsdataverse.release import upload_release_sidecars
@@ -13,6 +14,12 @@ from cfb_model_build.cfb_model_reports.discovery import discover_models
 # aborting a 22-season publish after one season. Sized for the largest artifact
 # we ship on a slow link; override with CFB_GH_TIMEOUT_SECONDS.
 GH_TIMEOUT_SECONDS = int(os.getenv("CFB_GH_TIMEOUT_SECONDS", "1800"))
+
+# Publish-path retry. Transient 502/503s from the releases API are the observed
+# failure (2 of the last 20 daily runs); a handful of seconds of backoff turns
+# them into a blip instead of a red run and a missing asset.
+GH_RETRY_ATTEMPTS = int(os.getenv("CFB_GH_RETRY_ATTEMPTS", "3"))
+GH_RETRY_BACKOFF_S = float(os.getenv("CFB_GH_RETRY_BACKOFF_S", "5"))
 
 # Release-notes body used when auto-creating a missing release. Keyed by tag;
 # falls back to a generic note for any other tag.
@@ -89,7 +96,37 @@ def plan_uploads(artifacts_dir) -> list:
 
 
 def _gh_runner(args: list) -> None:
-    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+    """Run one ``gh`` invocation, retrying transient GitHub API failures.
+
+    A 502 from the releases API fails the ``gh`` call outright, and the publish
+    stage that owns it dies with the asset unwritten -- run 34161449645 went red
+    on exactly that, a 502 uploading ``timestamp.json`` for ``espn_cfb_team_box``
+    AFTER the season's parquet had already landed. Every caller passes
+    ``--clobber``, so re-running a whole invocation is idempotent even when the
+    failed attempt did land the file.
+
+    Deliberately NOT ``derived.py::_retry``, which returns ``None`` once the
+    attempts run out. Swallowing a publish failure converts a lost release asset
+    into a GREEN run -- the precise failure this repo's concurrency guards were
+    written to prevent -- so the last attempt's exception propagates instead.
+
+    ``TimeoutExpired`` is not retried: ``GH_TIMEOUT_SECONDS`` is already sized
+    for the largest artifact on a slow link, and three of them back to back
+    would stall a publish for an hour and a half rather than fail it.
+    """
+    for attempt in range(1, GH_RETRY_ATTEMPTS + 1):
+        try:
+            subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+            return
+        except subprocess.CalledProcessError as exc:
+            if attempt == GH_RETRY_ATTEMPTS:
+                raise
+            print(
+                f"  gh {' '.join(str(a) for a in args[:2])}: exit {exc.returncode} "
+                f"(attempt {attempt}/{GH_RETRY_ATTEMPTS}, retrying)",
+                flush=True,
+            )
+            time.sleep(GH_RETRY_BACKOFF_S * attempt)
 
 
 def _gh_release_exists(tag: str, repo: str) -> bool:

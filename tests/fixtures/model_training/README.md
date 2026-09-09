@@ -11,3 +11,9 @@
 - `{epa,wpa}-model-test-items.json` — cfbscrapR-lineage reference plays from akeaswaran/cfb-pbp-analysis.
   `wpa-*` is in the shipped 13-feat WP contract (near-parity WP oracle); `epa-*` is 16-feat-lineage
   (ballpark EPA only). Sanity checks, not exact shipped-parity oracles.
+- `published_cards/*.card.json` — byte copies of the seven `cfb_model_artifacts` cards as
+  published 2026-08-02, BEFORE `rebuild-cards` added `era_contract` (#71). They are the
+  pre-image `test_rebuild_cards.py` pins `BUNDLE_MODELS` and the provenance-carry invariant
+  against. Identical to the copies committed at
+  `sportsdataverse-py/sportsdataverse/cfb/models/*.card.json`. Do not regenerate: their whole
+  value is being the un-rebuilt state.

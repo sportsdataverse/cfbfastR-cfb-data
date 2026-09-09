@@ -95,6 +95,8 @@ def build_parser() -> argparse.ArgumentParser:
     ea.add_argument("--pbp", default="pbp_full.parquet")
     ea.add_argument("--out-dir", default="artifacts/analysis")
     ea.add_argument("--models", nargs="*", default=None, help="subset of: ep wp xpass cp (default all)")
+    rc = sub.add_parser("rebuild-cards", help="rewrite model cards from saved boosters")
+    rc.add_argument("--artifacts-dir", required=True, help="directory holding the .ubj files")
     return ap
 
 
@@ -281,6 +283,11 @@ def main(argv=None) -> int:
         for name, n in rows.items():
             print(f"analysis_{name}.parquet: {n} rows")
         print(f"wrote {len(rows)} frames + analysis_manifest.json -> {args.out_dir}")
+    elif args.cmd == "rebuild-cards":
+        from .rebuild_cards import rebuild_all
+
+        for p in rebuild_all(args.artifacts_dir):
+            print(f"wrote {p}")
     return 0
 
 

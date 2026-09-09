@@ -45,3 +45,47 @@ def rebuild_card(model_path: Path | str, *, model_type: str, label: str) -> Path
         features=features,
         model=booster,
     )
+
+
+#: Card ``model_type`` and training label per bundle asset. Derived from the
+#: published cards; `cfb_cp_model` and `fd_model` ship no card at all, which is
+#: why their entries are declared here rather than read back.
+BUNDLE_MODELS: dict[str, tuple[str, str]] = {
+    "ep_model": ("ep", "next_score_label"),
+    "fg_model": ("fg", "made"),
+    "wp_naive": ("wp_naive", "win"),
+    "wp_spread": ("wp_spread", "win"),
+    "cfb_cp_model": ("cp", "complete"),
+    "xpass_model": ("xpass", "pass"),
+    "two_pt_model": ("two_pt", "success"),
+    "fd_model": ("fourth_down", "conversion"),
+    "qbr_model": ("qbr", "qbr"),
+}
+
+
+def rebuild_all(artifacts_dir: Path | str) -> list[Path]:
+    """Rebuild the card for every ``.ubj`` in ``artifacts_dir``.
+
+    Writes each card as ``<stem>.card.json`` -- the filename the published
+    bundle actually reads (e.g. ``fg_model.card.json``). ``rebuild_card``
+    delegates to ``write_xgb_model_card()``, which writes the bare
+    ``<stem>.json`` sibling; that file is renamed into place here so no stray
+    bare-``.json`` card is left beside the ``.card.json`` one consumers read.
+
+    Raises:
+        RuntimeError: If any booster cannot be read. A skipped model would
+            republish an incomplete bundle, which is the failure this exists to
+            prevent -- so one bad file fails the run rather than being logged.
+    """
+    artifacts_dir = Path(artifacts_dir)
+    written: list[Path] = []
+    for ubj in sorted(artifacts_dir.glob("*.ubj")):
+        model_type, label = BUNDLE_MODELS.get(ubj.stem, (ubj.stem, "y"))
+        try:
+            raw_card = rebuild_card(ubj, model_type=model_type, label=label)
+        except Exception as exc:  # noqa: BLE001 - re-raised with the file name
+            raise RuntimeError(f"could not rebuild card for {ubj.name}: {exc}") from exc
+        card_path = ubj.with_suffix(".card.json")
+        raw_card.replace(card_path)
+        written.append(card_path)
+    return written

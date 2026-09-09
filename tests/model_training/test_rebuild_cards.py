@@ -80,3 +80,40 @@ def test_the_model_file_is_not_modified(tmp_path):
     before = p.read_bytes()
     rebuild_card(p, model_type="fg", label="made")
     assert p.read_bytes() == before
+
+
+def test_cli_rebuilds_every_booster_in_a_directory(tmp_path):
+    """One command must cover all nine bundle models, not one at a time."""
+    from cfb_model_build.model_training.rebuild_cards import rebuild_all
+
+    _booster(tmp_path, "fg_model", ["yards_to_goal", *C.ERA_ONEHOT_COLS])
+    _booster(tmp_path, "xpass_model", ["down", "distance", "era"])
+    written = rebuild_all(tmp_path)
+    assert len(written) == 2
+    names = sorted(p.name for p in written)
+    assert names == ["fg_model.card.json", "xpass_model.card.json"]
+    for p in written:
+        assert json.loads(p.read_text(encoding="utf-8"))["era_contract"] is not None
+
+
+def test_rebuild_all_reports_a_model_it_cannot_read(tmp_path):
+    """A silently skipped model would republish an incomplete bundle."""
+    from cfb_model_build.model_training.rebuild_cards import rebuild_all
+
+    _booster(tmp_path, "fg_model", ["yards_to_goal", *C.ERA_ONEHOT_COLS])
+    (tmp_path / "broken.ubj").write_bytes(b"not a booster")
+    with pytest.raises(RuntimeError, match="broken.ubj"):
+        rebuild_all(tmp_path)
+
+
+def test_rebuild_all_writes_the_bundle_card_filename(tmp_path):
+    """The bundle publishes <model>.card.json. Writing <model>.json instead would
+    leave the stale card consumers actually read untouched, and the republish
+    would succeed while changing nothing."""
+    from cfb_model_build.model_training.rebuild_cards import rebuild_all
+
+    _booster(tmp_path, "fg_model", ["yards_to_goal", *C.ERA_ONEHOT_COLS])
+    written = rebuild_all(tmp_path)
+    assert [p.name for p in written] == ["fg_model.card.json"]
+    assert (tmp_path / "fg_model.card.json").exists()
+    assert not (tmp_path / "fg_model.json").exists(), "stray bare-.json card left behind"

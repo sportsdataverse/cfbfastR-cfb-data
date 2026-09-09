@@ -330,7 +330,7 @@ Expected: PASS (8 passed)
 
 - [ ] **Step 5: Verify the CLI end to end**
 
-Run: `uv run python -m cfb_model_build.model_training rebuild-cards --help`
+Run: `PYTHONPATH=python uv run python -m cfb_model_build.model_training rebuild-cards --help`
 Expected: usage text showing `--artifacts-dir`.
 
 - [ ] **Step 6: Commit**
@@ -374,7 +374,10 @@ cat /tmp/ubj_before.txt
 
 ```bash
 cd /mnt/sdv_repos/cfbfastR-cfb-data
-uv run python -m cfb_model_build.model_training rebuild-cards --artifacts-dir /tmp/cfb_bundle
+# PYTHONPATH=python because the package lives under python/, matching this
+# repo's own convention in scripts/cfb_models.sh. Without it the module is
+# not importable and the command fails with ModuleNotFoundError.
+PYTHONPATH=python uv run python -m cfb_model_build.model_training rebuild-cards --artifacts-dir /tmp/cfb_bundle
 ```
 Expected: nine `wrote ...card.json` lines, including `cfb_cp_model.card.json` and `fd_model.card.json`, which did not exist before.
 

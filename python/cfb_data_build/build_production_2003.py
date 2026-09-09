@@ -45,13 +45,21 @@ def _key() -> str:
     raise SystemExit("CFBD_API_KEY not set (env or ~/.Renviron)")
 
 
-H = {"Authorization": f"Bearer {_key()}", "User-Agent": "Mozilla/5.0"}
+_USER_AGENT = "Mozilla/5.0"
 
 
 def _get(url):
-    return json.load(
-        urllib.request.urlopen(urllib.request.Request(url, headers=H), timeout=180)
-    )
+    """GET a CFBD endpoint, keeping the bearer token off any redirect.
+
+    urllib re-sends headers given to `Request(headers=...)` when it follows a
+    redirect -- including to a different host -- which would hand the CFBD API
+    key to whatever that host is. `add_unredirected_header` is the stdlib's
+    mechanism for exactly this: the token goes to collegefootballdata.com and
+    nowhere else, while the User-Agent may travel (CodeRabbit on #76).
+    """
+    request = urllib.request.Request(url, headers={"User-Agent": _USER_AGENT})
+    request.add_unredirected_header("Authorization", f"Bearer {_key()}")
+    return json.load(urllib.request.urlopen(request, timeout=180))
 
 
 def norm(n: str) -> str:

@@ -391,8 +391,10 @@ Expected: `MODELS UNCHANGED`. Any diff is a plan failure — stop and investigat
 ```bash
 cd /tmp/cfb_bundle && python3 - <<'PY'
 import json, glob, os
-ERA_USERS = {"fg_model", "qbr_model", "two_pt_model", "xpass_model"}
-NO_ERA = {"ep_model", "wp_naive", "wp_spread"}
+# Read from the shipped boosters' own feature_names, not assumed:
+# fd_model consumes era0..era3 (one-hot) and cfb_cp_model has no era feature.
+ERA_USERS = {"fg_model", "qbr_model", "two_pt_model", "xpass_model", "fd_model"}
+NO_ERA = {"ep_model", "wp_naive", "wp_spread", "cfb_cp_model"}
 seen = set()
 for f in sorted(glob.glob("*.card.json")):
     stem = os.path.basename(f).replace(".card.json", "")
@@ -413,7 +415,7 @@ assert not missing, f"still cardless: {missing}"
 print(f"  cards present: {len(seen)} (expect 9)")
 PY
 ```
-Expected: `fg_model one_hot cuts=[2006, 2013, 2020]`, `qbr_model one_hot`, `two_pt_model ordinal`, `xpass_model ordinal`, the three no-era models marked correct, and `cards present: 9`.
+Expected: `fg_model one_hot cuts=[2006, 2013, 2020]`, `qbr_model one_hot`, `fd_model one_hot`, `two_pt_model ordinal`, `xpass_model ordinal`, the four no-era models marked correct, and `cards present: 9`. Every one of the nine falls in `ERA_USERS` or `NO_ERA`, so the `else` branch should never print.
 
 - [ ] **Step 6: No commit**
 

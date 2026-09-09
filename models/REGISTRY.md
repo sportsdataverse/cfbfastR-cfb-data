@@ -35,6 +35,17 @@ EP/WP-spread/QBR/FD/CPOE on the full `cfbfastR-cfb-raw` finals corpus (2004–pr
 era refresh (`docs/models/era_model_refresh.md`) promoted `qbr_era` / `fg_era` /
 `wp_spread_backfilled` into the bundle.
 
+**Card contract rebuild, 2026-09-09 (`model_version` 2026.08.27 -> 2026.09.09).** Every
+model in the bundle now publishes a card. `cfb_cp_model` and `fd_model` had none at all;
+the other seven were written 2026-08-02, before `_era_contract()` landed on 2026-09-07
+(#71), so all seven published `era_contract: null`. Cards were regenerated from the
+shipped boosters' own `feature_names` via `rebuild-cards` -- **no model was retrained**
+and every `.ubj` checksum was verified byte-identical before upload. Five models carry a
+contract (`fg`, `qbr`, `fd` one-hot; `two_pt`, `xpass` ordinal; cuts `[2006, 2013, 2020]`);
+`ep`, `wp_naive`, `wp_spread` and `cfb_cp_model` correctly carry none, having no era
+feature. Consumers can now read the era rule from the published card instead of keeping
+private copies -- the duplication that caused #70.
+
 | model | artifact(s) | release tag | training data (seasons/source) | fitting script | gates at publish | last retrain | cadence |
 |---|---|---|---|---|---|---|---|
 | ep (next-score EP, 7-class) | `ep_model.ubj` | `espn_cfb_model_artifacts` + sdv-py bundle | 2004–2025 finals corpus (~2.2M plays) | `model_training/train_ep.py` (`train-ep`) | LOSO EP cal-MAE 0.014 pts; era dummies rejected (cal regression) | 2026-06-17 | annual + dispatch |

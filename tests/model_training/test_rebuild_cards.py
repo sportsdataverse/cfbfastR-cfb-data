@@ -107,8 +107,40 @@ def test_rebuild_all_reports_a_model_it_cannot_read(tmp_path):
 
     _booster(tmp_path, "fg_model", ["yards_to_goal", *C.ERA_ONEHOT_COLS])
     (tmp_path / "qbr_model.ubj").write_bytes(b"not a booster")
-    with pytest.raises(RuntimeError, match="qbr_model.ubj"):
+    with pytest.raises(RuntimeError, match=r"qbr_model\.ubj"):
         rebuild_all(tmp_path)
+
+
+def test_rebuild_all_rolls_back_every_card_when_one_booster_fails(tmp_path):
+    """A half-rebuilt directory looks valid and would republish an inconsistent bundle."""
+    from cfb_model_build.model_training.rebuild_cards import rebuild_all
+
+    _booster(tmp_path, "fg_model", ["yards_to_goal", *C.ERA_ONEHOT_COLS])
+    stale = {"model_type": "fg", "label": "fg_made", "trained_date": "2026-08-02"}
+    fg_card = tmp_path / "fg_model.card.json"
+    fg_card.write_text(json.dumps(stale, indent=2), encoding="utf-8")
+    before = fg_card.read_bytes()
+
+    # Sorts after fg_model, so fg_model's card is already rewritten when this fails.
+    (tmp_path / "qbr_model.ubj").write_bytes(b"not a booster")
+    with pytest.raises(RuntimeError):
+        rebuild_all(tmp_path)
+
+    assert fg_card.read_bytes() == before, "an earlier card survived a failed run"
+    assert not (tmp_path / "qbr_model.card.json").exists()
+    assert not (tmp_path / "fg_model.json").exists()
+
+
+def test_rebuild_all_removes_a_card_it_created_when_a_later_booster_fails(tmp_path):
+    """Rollback must DELETE cards that did not exist, not just restore ones that did."""
+    from cfb_model_build.model_training.rebuild_cards import rebuild_all
+
+    _booster(tmp_path, "fg_model", ["yards_to_goal", *C.ERA_ONEHOT_COLS])
+    (tmp_path / "qbr_model.ubj").write_bytes(b"not a booster")
+    with pytest.raises(RuntimeError):
+        rebuild_all(tmp_path)
+
+    assert list(tmp_path.glob("*.json")) == []
 
 
 def test_rebuild_all_writes_the_bundle_card_filename(tmp_path):
@@ -124,15 +156,27 @@ def test_rebuild_all_writes_the_bundle_card_filename(tmp_path):
     assert not (tmp_path / "fg_model.json").exists(), "stray bare-.json card left behind"
 
 
-PREIMAGE_DIR = Path("/tmp/cards_preimage")
+#: The seven `cfb_model_artifacts` cards exactly as published 2026-08-02, committed
+#: so these two tests -- the only coverage for both Critical findings this branch
+#: shipped -- always run. They used to point at /tmp/cards_preimage, which nothing
+#: in this repo or in CI ever creates, so both silently skipped everywhere but the
+#: one workstation that had rebuilt the bundle by hand.
+PREIMAGE_DIR = Path(__file__).resolve().parents[1] / "fixtures" / "model_training" / "published_cards"
 
-pytestmark_preimage = pytest.mark.skipif(
-    not PREIMAGE_DIR.is_dir(),
-    reason="pre-rebuild published cards not available at /tmp/cards_preimage",
-)
+
+def test_the_published_card_fixtures_are_present():
+    """A missing fixture must fail, never skip: a skip reads as coverage."""
+    assert sorted(p.name for p in PREIMAGE_DIR.glob("*.card.json")) == [
+        "ep_model.card.json",
+        "fg_model.card.json",
+        "qbr_model.card.json",
+        "two_pt_model.card.json",
+        "wp_naive.card.json",
+        "wp_spread.card.json",
+        "xpass_model.card.json",
+    ]
 
 
-@pytestmark_preimage
 def test_bundle_models_matches_the_published_cards():
     """BUNDLE_MODELS is hand-maintained, so pin it to the cards it claims to describe.
 
@@ -157,16 +201,33 @@ def test_bundle_models_matches_the_published_cards():
     assert set(BUNDLE_MODELS) - set(published) == {"cfb_cp_model", "fd_model"}
 
 
-@pytestmark_preimage
 def test_rebuild_preserves_every_published_provenance_field():
-    """A rebuild may ADD era_contract and refresh features. Nothing else moves."""
-    from cfb_model_build.model_training.rebuild_cards import PRESERVED_FIELDS
+    """A rebuild may ADD era_contract and refresh features. Nothing else moves.
 
-    card = json.loads((PREIMAGE_DIR / "fg_model.card.json").read_text(encoding="utf-8"))
+    Asserted against the inverted set: everything on a published card that is not
+    recomputed from the booster is carried, so a field added to the card format
+    later cannot silently drop the way a fixed whitelist would have dropped it.
+    """
+    from cfb_model_build.model_training.rebuild_cards import REBUILT_FIELDS
+
+    for card_file in sorted(PREIMAGE_DIR.glob("*.card.json")):
+        card = json.loads(card_file.read_text(encoding="utf-8"))
+        for field in ("objective", "training_seasons", "n_training_rows", "hyperparameters",
+                      "num_boost_round", "training_frame", "trained_date", "source",
+                      "xgboost_version"):
+            assert field not in REBUILT_FIELDS, f"{field} would be recomputed, not carried"
+            assert field in card, f"{card_file.name}: {field}"
+        # Only features/n_features are recomputed on today's cards; model_type and
+        # label are recomputed too but pinned equal by the test above, and
+        # era_contract is the one field a rebuild adds.
+        assert set(card) & REBUILT_FIELDS == {"features", "n_features", "model_type", "label"}
+
+    # qbr_model publishes n_training_rows: null, so the "actually carries a value"
+    # half is spot-checked on fg_model, which populates every provenance field.
+    fg = json.loads((PREIMAGE_DIR / "fg_model.card.json").read_text(encoding="utf-8"))
     for field in ("objective", "training_seasons", "n_training_rows", "hyperparameters",
                   "num_boost_round", "training_frame", "trained_date"):
-        assert field in PRESERVED_FIELDS
-        assert card[field] is not None
+        assert fg[field] is not None
 
 
 def test_rebuild_merges_into_an_existing_card(tmp_path):
@@ -186,6 +247,9 @@ def test_rebuild_merges_into_an_existing_card(tmp_path):
         "trained_date": "2026-08-02",
         "num_boost_round": 60,
         "training_frame": "artifacts/pbp_full_v2.parquet",
+        # Not a field the rebuild knows about. The fixed whitelist this replaced
+        # dropped exactly this on the next rebuild.
+        "calibration": {"method": "isotonic", "fitted_on": 2025},
     }
     (tmp_path / "fg_model.card.json").write_text(json.dumps(prior, indent=2), encoding="utf-8")
 
@@ -219,5 +283,5 @@ def test_a_missing_artifacts_dir_fails(tmp_path):
 def test_an_artifacts_dir_with_no_boosters_fails(tmp_path):
     from cfb_model_build.model_training.rebuild_cards import rebuild_all
 
-    with pytest.raises(FileNotFoundError, match="no .ubj"):
+    with pytest.raises(FileNotFoundError, match=r"no \.ubj"):
         rebuild_all(tmp_path)

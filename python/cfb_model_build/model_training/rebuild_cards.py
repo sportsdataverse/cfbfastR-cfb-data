@@ -23,30 +23,26 @@ from pathlib import Path
 
 import xgboost as xgb
 
+from cfb_model_build.cpoe.constants import TARGET_COL as CP_TARGET_COL
+from cfb_model_build.model_training.fourth_down.constants import FD_YARDS_GAINED_COL
 from cfb_model_build.model_training.model_card import _introspect_features, write_xgb_model_card
 
-#: Card fields that describe the training run rather than the booster. A rebuild
-#: cannot derive any of them, so they are read back off the existing card and
-#: passed through unchanged.
-PRESERVED_FIELDS: tuple[str, ...] = (
-    "objective",
-    "training_seasons",
-    "n_training_rows",
-    "hyperparameters",
-    "num_boost_round",
-    "training_frame",
-    "trained_date",
-    "xgboost_version",
-    "source",
-    "metrics",
+#: The only card fields a rebuild is allowed to recompute: `features` /
+#: `n_features` / `era_contract` are read straight off the booster, and
+#: `model_type` / `label` are the caller's declared contract for the model.
+#: EVERYTHING ELSE on the prior card is carried through verbatim -- the set is
+#: inverted deliberately, because the whitelist this replaced silently dropped
+#: any card field added after it was written.
+REBUILT_FIELDS: frozenset[str] = frozenset(
+    {"features", "n_features", "era_contract", "model_type", "label"}
 )
 
 
 def rebuild_card(model_path: Path | str, *, model_type: str, label: str) -> Path:
     """Rewrite ``<model_path>.card.json`` from the booster's own feature names.
 
-    Merges into the existing card when there is one: every field in
-    :data:`PRESERVED_FIELDS` is carried through verbatim, so the rebuild adds
+    Merges into the existing card when there is one: every field NOT in
+    :data:`REBUILT_FIELDS` is carried through verbatim, so the rebuild adds
     ``era_contract`` and refreshes ``features``/``n_features`` and nothing else.
 
     Args:
@@ -75,7 +71,7 @@ def rebuild_card(model_path: Path | str, *, model_type: str, label: str) -> Path
     prior: dict = {}
     if card_path.exists():
         prior = json.loads(card_path.read_text(encoding="utf-8"))
-    carried = {k: prior[k] for k in PRESERVED_FIELDS if k in prior}
+    carried = {k: v for k, v in prior.items() if k not in REBUILT_FIELDS}
 
     raw_card = write_xgb_model_card(
         model_path,
@@ -95,30 +91,36 @@ def rebuild_card(model_path: Path | str, *, model_type: str, label: str) -> Path
 
 #: Card ``model_type`` and training label per bundle asset. The seven models that
 #: ship a card were read back from it (``jq -r '.model_type, .label'``); only
-#: `cfb_cp_model` and `fd_model`, which ship no card at all, are declared here
-#: from their training code. Pinned by
+#: `cfb_cp_model` and `fd_model`, which shipped no card at all, are declared here
+#: from their training code -- and their labels are IMPORTED from the constants
+#: that training reads, because hand-typing them is what published `cp`/`complete`
+#: and `fourth_down`/`conversion`. Pinned by
 #: ``test_bundle_models_matches_the_published_cards``.
 BUNDLE_MODELS: dict[str, tuple[str, str]] = {
     "ep_model": ("ep", "next_score_label"),
     "fg_model": ("fg", "fg_made"),
     "wp_naive": ("wp_naive", "label"),
     "wp_spread": ("wp_spread", "label"),
-    "cfb_cp_model": ("cp", "complete"),
+    # cpoe/train_cp.py `save_cp_model(model_type="cpoe")`, cpoe/cli.py `mtype = "cpoe"`.
+    "cfb_cp_model": ("cpoe", CP_TARGET_COL),
     "xpass_model": ("xpass", "is_pass"),
     "two_pt_model": ("two_pt", "two_point_success"),
-    "fd_model": ("fourth_down", "conversion"),
+    # fourth_down/cli.py `write_xgb_model_card(model_type="fourth_down", label=FD_YARDS_GAINED_COL)`.
+    "fd_model": ("fourth_down", FD_YARDS_GAINED_COL),
     "qbr_model": ("qbr", "qbr"),
 }
 
 
 def rebuild_all(artifacts_dir: Path | str) -> list[Path]:
-    """Rebuild the card for every ``.ubj`` in ``artifacts_dir``.
+    """Rebuild the card for every ``.ubj`` in ``artifacts_dir``, all-or-nothing.
 
     Every stem is checked against :data:`BUNDLE_MODELS` before anything is
     written, so an unmapped model fails the run before it can half-replace the
-    bundle. Writing itself is NOT transactional: a booster that fails to load
-    part-way through leaves the cards already written in place. Re-run after
-    fixing the bad file -- a rebuild is idempotent.
+    bundle. Writing is transactional: the pre-run bytes of every card this run
+    could touch are held, and any failure restores them (deleting the ones that
+    did not exist), so a failed run leaves the directory exactly as it found it.
+    A half-rebuilt directory looks valid and could be republished as an
+    inconsistent bundle, which is the failure this exists to prevent.
 
     Raises:
         FileNotFoundError: If ``artifacts_dir`` is not a directory, or holds no
@@ -127,8 +129,8 @@ def rebuild_all(artifacts_dir: Path | str) -> list[Path]:
         KeyError: If a ``.ubj`` stem is not in :data:`BUNDLE_MODELS`. Guessing
             ``label="y"`` would publish a card that lies about the model.
         RuntimeError: If any booster cannot be read. A skipped model would
-            republish an incomplete bundle, which is the failure this exists to
-            prevent -- so one bad file fails the run rather than being logged.
+            republish an incomplete bundle, so one bad file fails the run --
+            after every card already written has been rolled back.
     """
     artifacts_dir = Path(artifacts_dir)
     if not artifacts_dir.is_dir():
@@ -143,11 +145,24 @@ def rebuild_all(artifacts_dir: Path | str) -> list[Path]:
             "model_type and label they were trained with"
         )
 
+    # Both the real card and the bare-.json scratch sibling write_xgb_model_card
+    # lays down on the way to it.
+    touched = [p for b in boosters for p in (b.with_suffix(".card.json"), b.with_suffix(".json"))]
+    preimage = {p: p.read_bytes() for p in touched if p.exists()}
+
     written: list[Path] = []
-    for ubj in boosters:
-        model_type, label = BUNDLE_MODELS[ubj.stem]
-        try:
-            written.append(rebuild_card(ubj, model_type=model_type, label=label))
-        except Exception as exc:  # noqa: BLE001 - re-raised with the file name
-            raise RuntimeError(f"could not rebuild card for {ubj.name}: {exc}") from exc
+    try:
+        for ubj in boosters:
+            model_type, label = BUNDLE_MODELS[ubj.stem]
+            try:
+                written.append(rebuild_card(ubj, model_type=model_type, label=label))
+            except Exception as exc:  # noqa: BLE001 - re-raised with the file name
+                raise RuntimeError(f"could not rebuild card for {ubj.name}: {exc}") from exc
+    except BaseException:
+        for p in touched:
+            if p in preimage:
+                p.write_bytes(preimage[p])
+            elif p.exists():
+                p.unlink()
+        raise
     return written

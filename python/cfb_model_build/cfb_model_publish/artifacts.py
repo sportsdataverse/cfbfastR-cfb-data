@@ -20,6 +20,16 @@ GH_TIMEOUT_SECONDS = int(os.getenv("CFB_GH_TIMEOUT_SECONDS", "1800"))
 # them into a blip instead of a red run and a missing asset.
 GH_RETRY_ATTEMPTS = int(os.getenv("CFB_GH_RETRY_ATTEMPTS", "3"))
 GH_RETRY_BACKOFF_S = float(os.getenv("CFB_GH_RETRY_BACKOFF_S", "5"))
+# A zero/negative attempt count makes the retry range empty, so `_gh_runner`
+# would return without ever invoking gh -- and the caller counts that as an
+# upload. Silently publishing nothing is the failure this whole change exists to
+# prevent, so an unusable setting fails at import rather than at publish time.
+if GH_RETRY_ATTEMPTS < 1:
+    raise ValueError(f"CFB_GH_RETRY_ATTEMPTS must be >= 1, got {GH_RETRY_ATTEMPTS}")
+if not (GH_RETRY_BACKOFF_S >= 0) or GH_RETRY_BACKOFF_S == float("inf"):
+    raise ValueError(
+        f"CFB_GH_RETRY_BACKOFF_S must be finite and >= 0, got {GH_RETRY_BACKOFF_S}"
+    )
 
 # Release-notes body used when auto-creating a missing release. Keyed by tag;
 # falls back to a generic note for any other tag.
@@ -27,7 +37,9 @@ _RELEASE_BODY = {
     "espn_cfb_model_artifacts": (
         "All CFB model artifacts (EP/WP/QBR/CPOE/fourth-down .ubj + RB-eval .pkl) + model cards."
     ),
-    "espn_cfb_model_pbp": ("College Football model play-by-play (EP/WP/QBR enriched; Python-built)."),
+    "espn_cfb_model_pbp": (
+        "College Football model play-by-play (EP/WP/QBR enriched; Python-built)."
+    ),
     "cfb_ratings": (
         "College Football opponent-adjusted team ratings, one row per team per "
         "season (SP+-style): offensive/defensive/special-teams EPA, FEI, tempo, "
@@ -95,6 +107,27 @@ def plan_uploads(artifacts_dir) -> list:
     return out
 
 
+def _is_repeatable(args: list) -> bool:
+    """True only for a `gh release upload --clobber`, the one safe-to-repeat call.
+
+    `gh release create` also routes through this runner and is NOT idempotent --
+    it takes no --clobber, so if GitHub created the release but the command still
+    exited nonzero, a second attempt fails with "already exists" and the publish
+    dies anyway, having gained nothing (Sourcery + CodeRabbit on #76).
+
+    --clobber is checked, not assumed: it is what makes a repeat safe when the
+    failed attempt already landed the file. The 502 that motivated this retry
+    was a `release upload`, so scoping it here fixes the observed failure and
+    introduces no new one.
+    """
+    return (
+        len(args) >= 2
+        and args[0] == "release"
+        and args[1] == "upload"
+        and "--clobber" in args
+    )
+
+
 def _gh_runner(args: list) -> None:
     """Run one ``gh`` invocation, retrying transient GitHub API failures.
 
@@ -114,16 +147,17 @@ def _gh_runner(args: list) -> None:
     for the largest artifact on a slow link, and three of them back to back
     would stall a publish for an hour and a half rather than fail it.
     """
-    for attempt in range(1, GH_RETRY_ATTEMPTS + 1):
+    attempts = GH_RETRY_ATTEMPTS if _is_repeatable(args) else 1
+    for attempt in range(1, attempts + 1):
         try:
             subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
             return
         except subprocess.CalledProcessError as exc:
-            if attempt == GH_RETRY_ATTEMPTS:
+            if attempt == attempts:
                 raise
             print(
                 f"  gh {' '.join(str(a) for a in args[:2])}: exit {exc.returncode} "
-                f"(attempt {attempt}/{GH_RETRY_ATTEMPTS}, retrying)",
+                f"(attempt {attempt}/{attempts}, retrying)",
                 flush=True,
             )
             time.sleep(GH_RETRY_BACKOFF_S * attempt)
@@ -169,7 +203,11 @@ def upload_artifacts(
     """
     run = runner or _gh_runner
     exists = exists_check or _gh_release_exists
-    files = sorted(Path(artifacts_dir).glob(pattern)) if pattern else plan_uploads(artifacts_dir)
+    files = (
+        sorted(Path(artifacts_dir).glob(pattern))
+        if pattern
+        else plan_uploads(artifacts_dir)
+    )
     created_release = False
     if dry_run:
         print(f"[dry-run] would ensure release {repo}:{tag} exists")

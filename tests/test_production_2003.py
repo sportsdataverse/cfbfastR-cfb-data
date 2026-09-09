@@ -31,8 +31,18 @@ EXPECTED_SCHEMA = {
 
 @pytest.fixture(scope="module")
 def table() -> pl.DataFrame:
-    if not TABLE.exists():
-        pytest.skip(f"{TABLE} not vendored")
+    """Fail, never skip, when the artifact is absent.
+
+    These tests exist to protect the vendored parquet. Skipping on a missing
+    file meant deleting it turned the whole contract suite green -- the exact
+    regression this module guards against (CodeRabbit on #76). The file is
+    committed, so absence is a real failure, not an unsupported environment.
+    """
+    assert TABLE.exists(), (
+        f"{TABLE} is missing; it is committed to the repo and "
+        "cfb_returning_production(2004) reads it -- rebuild with "
+        "`python -m cfb_data_build.build_production_2003`"
+    )
     return pl.read_parquet(TABLE)
 
 

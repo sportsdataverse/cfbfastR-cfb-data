@@ -81,3 +81,77 @@ def test_timeout_is_not_retried(monkeypatch):
     with pytest.raises(subprocess.TimeoutExpired):
         artifacts._gh_runner(["release", "upload", "tag", "big.parquet", "--clobber"])
     assert len(calls) == 1
+
+
+def test_release_create_is_never_retried(monkeypatch):
+    """`gh release create` is not idempotent and takes no --clobber.
+
+    It routes through this same runner (artifacts.py, the create-if-missing
+    guard). If GitHub created the release but the command still exited nonzero,
+    a second attempt fails with "already exists" and the publish dies anyway --
+    so retrying buys nothing and risks a confusing second failure.
+    """
+    calls = []
+
+    def fake_run(args, **kwargs):
+        calls.append(args)
+        raise _boom()
+
+    monkeypatch.setattr(artifacts.subprocess, "run", fake_run)
+    with pytest.raises(subprocess.CalledProcessError):
+        artifacts._gh_runner(["release", "create", "tag", "--repo", "o/r", "--title", "tag"])
+    assert len(calls) == 1, "a non-idempotent create must run exactly once"
+
+
+def test_an_upload_without_clobber_is_not_retried(monkeypatch):
+    """--clobber is what makes a repeat safe; without it, do not repeat."""
+    calls = []
+
+    def fake_run(args, **kwargs):
+        calls.append(args)
+        raise _boom()
+
+    monkeypatch.setattr(artifacts.subprocess, "run", fake_run)
+    with pytest.raises(subprocess.CalledProcessError):
+        artifacts._gh_runner(["release", "upload", "tag", "f.json"])
+    assert len(calls) == 1
+
+
+@pytest.mark.parametrize(
+    "args,repeatable",
+    [
+        (["release", "upload", "t", "f.parquet", "--clobber"], True),
+        (["release", "upload", "t", "f.parquet"], False),
+        (["release", "create", "t", "--repo", "o/r"], False),
+        (["api", "repos/o/r/releases/tags/t"], False),
+        (["release"], False),
+        ([], False),
+    ],
+)
+def test_is_repeatable_classification(args, repeatable):
+    assert artifacts._is_repeatable(args) is repeatable
+
+
+def test_an_unusable_attempt_count_is_rejected_at_import(monkeypatch):
+    """0 attempts made the retry range empty, so _gh_runner returned without
+    ever invoking gh -- and the caller counted that as an upload. Publishing
+    nothing while reporting success is the failure this change exists to stop.
+    """
+    import importlib
+
+    monkeypatch.setenv("CFB_GH_RETRY_ATTEMPTS", "0")
+    with pytest.raises(ValueError, match="must be >= 1"):
+        importlib.reload(artifacts)
+    monkeypatch.delenv("CFB_GH_RETRY_ATTEMPTS")
+    importlib.reload(artifacts)  # leave the module usable for the rest of the suite
+
+
+def test_a_negative_backoff_is_rejected_at_import(monkeypatch):
+    """time.sleep() raises on a negative delay, masking the CalledProcessError."""
+    import importlib
+
+    monkeypatch.setenv("CFB_GH_RETRY_BACKOFF_S", "-1")
+    with pytest.raises(ValueError, match="finite and >= 0"):
+        importlib.reload(artifacts)
+    monkeypatch.delenv("CFB_GH_RETRY_BACKOFF_S")
+    importlib.reload(artifacts)

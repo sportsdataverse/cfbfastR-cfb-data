@@ -13,7 +13,6 @@ From https://github.com/sportsdataverse/cfbfastR-cfb-data
  * [new branch]        fix/bowl-season-cron   -> origin/fix/bowl-season-cron
  * [new branch]        fix/cfb-recruiting-guard -> origin/fix/cfb-recruiting-guard
  * [new branch]        fix/cfb-weekly-raw-store -> origin/fix/cfb-weekly-raw-store
- * [new branch]        fix/model-card-contract-completion -> origin/fix/model-card-contract-completion
  * [new branch]        fix/preseason-missing-sources -> origin/fix/preseason-missing-sources
  * [new branch]        fix/preseason-zero-rosters -> origin/fix/preseason-zero-rosters
  * [new tag]           espn_cfb_adv_defensive -> espn_cfb_adv_defensive
@@ -213,5 +212,4 @@ cfb_rosters 2026: 10507 rows from 948/948 games | position 100.0% | division 100
   cfb_returning_production 2026: 236 rows
 
 === returning_production: 0 failures ===
-push rejected (attempt 1); syncing with origin
-pushed: CFB Data Updated (Start: 2026 End: 2026) (attempt 2)
+pushed: CFB Data Updated (Start: 2026 End: 2026) (attempt 1)

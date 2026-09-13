@@ -1,5 +1,4 @@
 From https://github.com/sportsdataverse/cfbfastR-cfb-data
-   e4ec7639..fd534668  main                   -> origin/main
  * [new branch]        AE/update-air-yards-model -> origin/AE/update-air-yards-model
  * [new branch]        chore/readme-repository-layout -> origin/chore/readme-repository-layout
  * [new branch]        docs/automation-status -> origin/docs/automation-status
@@ -273,30 +272,10 @@ cfb_rosters 2026: 13814 rows from 948/948 games | position 100.0% | division 100
 [summaries 2026] rushing: 654 rows
 [summaries 2026] receiving: 1032 rows
   cfb_team_summaries_weekly 2026: 1968 rows, 384 cols, 15 weekly snapshots
-HTTP 502: Server Error (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/560869988)
-  gh release upload: exit 1 (attempt 1/3, retrying)
-HTTP 500 (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/560869988)
-  gh release upload: exit 1 (attempt 2/3, retrying)
-HTTP 502: Server Error (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/560870144)
-  gh release upload: exit 1 (attempt 1/3, retrying)
-HTTP 500 (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/560870144)
-  gh release upload: exit 1 (attempt 2/3, retrying)
-HTTP 500 (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/560870144)
-  FAILED 2026: CalledProcessError: Command '['gh', 'release', 'upload', 'cfb_team_summaries_weekly', '/tmp/sdv_sidecars_r_v36t7d/timestamp.json', '--repo', 'sportsdataverse/sportsdatave
 
-=== team_summaries_weekly: 1 failures ===
-  2026: CalledProcessError
-::warning ::cfb_data_build team_summaries_weekly for season 2026 exited with code 1
+=== team_summaries_weekly: 0 failures ===
 ::warning::no 247 recruits store at /home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-raw/cfb/recruits/json; skipping recruiting datasets
   cfb_returning_production 2026: 236 rows
-HTTP 500 (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/560870276)
-  gh release upload: exit 1 (attempt 1/3, retrying)
-HTTP 500 (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/560870276)
-  gh release upload: exit 1 (attempt 2/3, retrying)
-HTTP 500 (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/560870276)
-  cfb_returning_production 2026: FAILED (CalledProcessError: Command '['gh', 'release', 'upload', 'cfb_returning_production', '../cfb/cfb_returning_production/parquet/cfb_returning_production_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.)
 
-=== returning_production: 1 failures ===
-  2026: CalledProcessError
-::warning ::cfb_data_build returning_production for season 2026 exited with code 1
+=== returning_production: 0 failures ===
 pushed: CFB Data Updated (Start: 2026 End: 2026) (attempt 1)

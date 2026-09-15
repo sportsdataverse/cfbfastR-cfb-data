@@ -38,6 +38,7 @@ agreement numbers as descriptive, not as a parity bar.
 
 from __future__ import annotations
 
+import warnings
 from pathlib import Path
 
 import numpy as np
@@ -289,3 +290,30 @@ def test_unresolved_spellings_are_reported() -> None:
     teams = pl.read_parquet(FIX / "cfbd_teams_2025.parquet")
     with pytest.warns(UserWarning, match="matched no CFBD school"):
         season_reference(2025, teams=teams, schools=["Alabama"])
+
+
+def test_a_season_before_the_coverage_floors_builds_with_nulls() -> None:
+    """2004 predates every table but the QB one; the line must still build.
+
+    Regression: the collision guard once removed the empty-mapping path, so a
+    pre-coverage season raised ColumnNotFoundError instead of leaving those
+    columns null.
+    """
+    teams = pl.read_parquet(FIX / "cfbd_teams_2025.parquet")
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        out = season_reference(2004, teams=teams, schools=teams["team"].to_list())
+    assert out.height == teams.height
+    for col in ("off_rtprod", "def_rtprod", "ovr_rtprod", "team_talent_weighted"):
+        assert out[col].null_count() == out.height, col
+    # the QB table does reach 2004
+    assert out["qb_name"].null_count() < out.height
+
+
+def test_match_team_names_on_an_empty_table_returns_a_typed_frame() -> None:
+    empty = pl.DataFrame(
+        schema={"season": pl.Int64, "team": pl.Utf8, "off_rtprod": pl.Float64}
+    )
+    out, missing = match_team_names(empty, ["Alabama"])
+    assert out.height == 0 and missing == []
+    assert "team" in out.columns and out.schema["off_rtprod"] == pl.Float64

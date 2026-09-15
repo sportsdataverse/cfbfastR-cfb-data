@@ -163,6 +163,13 @@ def match_team_names(
                     f"with different values -- fix the reference table"
                 )
         mapped = best.to_dicts()
+    if not mapped:
+        # a season that predates this table (the line is built from 2004, the
+        # tables start later) must leave its columns null, not raise
+        empty = (
+            frame.head(0).drop(column).with_columns(pl.lit(None, pl.Utf8).alias("team"))
+        )
+        return empty, missing
     out = (
         frame.join(pl.DataFrame(mapped), on=column, how="inner")
         .drop(column)

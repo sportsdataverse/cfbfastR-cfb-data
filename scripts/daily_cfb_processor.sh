@@ -27,7 +27,7 @@ done
 END_YEAR=${END_YEAR:-$START_YEAR}
 
 PY_FIRST="pbp"
-PY_REST="play_participants team_box player_box drives game_rosters betting schedules linescores power_index injuries adv_team adv_passing adv_rushing adv_receiving adv_defensive adv_turnover adv_drives adv_situational adv_defensive_players adv_specialists adv_player_usage adv_position_group_usage adv_tackles adv_position_group_tackles adv_team_usage adv_drive_scripting usage_players usage_position_groups usage_tackles usage_position_group_tackles usage_teams usage_drive_scripting adv_st_kickers adv_st_punters adv_st_returners adv_st_blocks adv_st_team usage_st_kickers usage_st_punters usage_st_returners usage_st_blocks usage_st_team team_tendencies coach_tendencies coach_careers"
+PY_REST="play_participants team_box player_box drives game_rosters betting schedules linescores power_index injuries adv_team adv_passing adv_rushing adv_receiving adv_defensive adv_turnover adv_drives adv_situational adv_defensive_players adv_specialists adv_player_usage adv_position_group_usage adv_tackles adv_position_group_tackles adv_team_usage adv_drive_scripting usage_players usage_position_groups usage_tackles usage_position_group_tackles usage_teams usage_drive_scripting adv_st_kickers adv_st_punters adv_st_returners adv_st_blocks adv_st_team usage_st_kickers usage_st_punters usage_st_returners usage_st_blocks usage_st_team team_tendencies coach_tendencies"
 # Derived datasets -- each reads an artifact an earlier step produced, so order
 # matters: gamelog <- adv_team.
 PY_DERIVED="gamelog"
@@ -172,6 +172,22 @@ for i in $(seq "${START_YEAR}" "${END_YEAR}"); do
     ANY_FAILED=1
   fi
 done
+
+# coach_careers sums EVERY written coach_tendencies season into one season-less
+# file, so it is built and published once, after the loop, never per season (a
+# per-season cut would publish a partial career table mid-run).
+{
+  CAREERS_RC=0
+  (cd python && "$PY" -m cfb_data_build --dataset coach_careers --base ../cfb --cache-dir "$CFB_FINAL_CACHE" -s "$END_YEAR" -e "$END_YEAR" --no-fetch --publish) || CAREERS_RC=$?
+  sdv_commit_push "CFB Data Updated (coach careers through $END_YEAR)" cfb || CAREERS_RC=${CAREERS_RC:-1}
+  echo "CAREERS_RC=$CAREERS_RC" > /tmp/_rc_careers
+} 2>&1 | tee -a "logs/cfbfastR_cfb_data_logfile_${END_YEAR}.log"
+# the tee pipeline ran the block in a subshell: read its verdict back
+CAREERS_RC=$(sed 's/CAREERS_RC=//' /tmp/_rc_careers 2>/dev/null); rm -f /tmp/_rc_careers
+if [ "${CAREERS_RC:-1}" != "0" ]; then
+  echo "::error ::coach_careers build/publish exited with code ${CAREERS_RC:-?}"
+  ANY_FAILED=1
+fi
 
 Rscript R/run_summary.R -s "$START_YEAR" -e "$END_YEAR" || true
 # A rejected push is a FAILED run, not a green one. Release assets upload on a

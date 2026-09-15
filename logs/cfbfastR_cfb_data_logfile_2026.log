@@ -1,12 +1,10 @@
 From https://github.com/sportsdataverse/cfbfastR-cfb-data
-   d6297b3e..4e819d59  main                   -> origin/main
  * [new branch]        AE/update-air-yards-model -> origin/AE/update-air-yards-model
  * [new branch]        chore/readme-repository-layout -> origin/chore/readme-repository-layout
  * [new branch]        docs/automation-status -> origin/docs/automation-status
  * [new branch]        docs/model-registry-out-of-claude -> origin/docs/model-registry-out-of-claude
  * [new branch]        feat/adv-missing-datasets -> origin/feat/adv-missing-datasets
  * [new branch]        feat/cfb-era-vars-spread-backfill -> origin/feat/cfb-era-vars-spread-backfill
- * [new branch]        feat/cfb-matchup       -> origin/feat/cfb-matchup
  * [new branch]        feat/cfb-model-suite-completion -> origin/feat/cfb-model-suite-completion
  * [new branch]        feat/cfb-ratings-builder -> origin/feat/cfb-ratings-builder
  * [new branch]        feat/cfb-ratings-cron  -> origin/feat/cfb-ratings-cron
@@ -39,8 +37,7 @@ From https://github.com/sportsdataverse/cfbfastR-cfb-data
   pos_team: 100.0% of rows resolved to a team name
   def_pos_team: 100.0% of rows resolved to a team name
 pbp 2026: 20118 rows from 948 games
-coaches 2026: CFBD returned no coach-seasons; existing rows kept
-2026: 0 coach-seasons, 0 cleanly attributed
+2026: 138 coach-seasons, 138 cleanly attributed
 play_participants 2026: 18877 rows from 948 games
 team_box 2026: 370 rows from 948 games
 player_box 2026: 12380 rows from 948 games
@@ -210,23 +207,9 @@ usage_st_blocks 2026: 19 rows from 948 games
 usage_st_team 2026: 215 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
 team_tendencies 2026: 216 rows from 948 games
-Traceback (most recent call last):
-  File "<frozen runpy>", line 198, in _run_module_as_main
-  File "<frozen runpy>", line 88, in _run_code
-  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
-    raise SystemExit(main())
-                     ^^^^^^
-  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 222, in main
-    build_dataset(
-  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 368, in build_dataset
-    build_season(
-  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 273, in build_season
-    coaches = require_coaches(
-              ^^^^^^^^^^^^^^^^
-  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/tendencies.py", line 83, in require_coaches
-    raise RuntimeError(
-RuntimeError: coach_tendencies 2026: no attributed coach-seasons in data/cfb_coach_seasons.csv; refresh it with `python -m cfb_data_build.coaches -s 2026 -e 2026` (needs CFBD_API_KEY)
-::warning ::cfb_data_build coach_tendencies for season 2026 exited with code 1
+  coaches: 138 attributed team-seasons for 2026
+  pos_team: 100.0% of rows resolved to a team name
+coach_tendencies 2026: 138 rows from 948 games
   adv_team_gamelog 2026: 357 rows, 90 cols
 
 === gamelog: 0 failures ===
@@ -337,9 +320,18 @@ cfb_rosters 2026: 13814 rows from 948/948 games | position 100.0% | division 100
   cfb_team_summaries_weekly 2026: 1968 rows, 384 cols, 15 weekly snapshots
 
 === team_summaries_weekly: 0 failures ===
+  cfb_matchup_features 2026: 1649 rows, 45 cols
+https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/cfb_matchup_features
+
+=== matchup_features: 0 failures ===
+/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/matchup_features.py:507: UserWarning: Comparisons with None always result in null. Consider using `.is_null()` or `.is_not_null()`.
+  prior = secs.filter(pl.col("play_date") < date)["sec_since_prev"]
+  cfb_matchup_line 2026: 761 rows, 268 cols
+https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/cfb_matchup_line
+
+=== matchup_line: 0 failures ===
 ::warning::no 247 recruits store at /home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-raw/cfb/recruits/json; skipping recruiting datasets
   cfb_returning_production 2026: 236 rows
 
 === returning_production: 0 failures ===
-push rejected (attempt 1); syncing with origin
-pushed: CFB Data Updated (Start: 2026 End: 2026) (attempt 2)
+pushed: CFB Data Updated (Start: 2026 End: 2026) (attempt 1)

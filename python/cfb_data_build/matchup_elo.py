@@ -14,9 +14,11 @@ The pipeline's rules, in order:
 3. opponent-ELO rolls: for each team, the sum / mean / median of the
    (filled) pregame ELO of the opponents it faced EARLIER in the season, by
    real date -- never the current game;
-4. a regular-season week-1 row has no prior opponents, so it takes the team's
-   final roll of the prior season, else the 10th percentile of those finals
-   over prior-season FBS teams (sum falls back to 11 x the ELO percentile).
+4. a week-1 row (any season type -- the source has no guard, so a CFP
+   week-1 row with a null roll takes it too) with no prior opponents takes the
+   team's final roll of the prior season, else the 10th percentile of those
+   finals over prior-season FBS teams (sum falls back to 11 x the ELO
+   percentile).
 
 Team names are CFBD's; the matchup line applies its own display mapping.
 """
@@ -102,13 +104,19 @@ def fbs_elo_10th(games: pl.DataFrame) -> pl.DataFrame:
     )
 
 
-def fill_pregame_elo(games: pl.DataFrame, prev_final: pl.DataFrame) -> pl.DataFrame:
-    """Rules 1 and 2: carry-forward, then the FBS/FCS percentile substitution."""
-    pct = fbs_elo_10th(games)
-    global_10th = pct["elo_10th"].drop_nulls()
-    global_10th = (
-        float(global_10th.median()) if global_10th.len() else _DEFAULT_ELO_10TH
-    )
+def fill_pregame_elo(
+    games: pl.DataFrame, prev_final: pl.DataFrame, *, pool: pl.DataFrame | None = None
+) -> pl.DataFrame:
+    """Rules 1 and 2: carry-forward, then the FBS/FCS percentile substitution.
+
+    The percentile is taken over the CARRIED-FORWARD values (the source computes
+    it after its prior-final coalesce), so a preseason build -- every CFBD
+    pregame ELO still null -- substitutes the 10th percentile of last season's
+    finals, not a constant. ``pool`` (more seasons in the same shape, carried
+    forward the same way) feeds the all-seasons fallback the source uses when a
+    season has no FBS-vs-FBS ELO at all; without it the fallback is the
+    percentile over ``games`` itself, then 1200.
+    """
     out = games
     for side in ("home", "away"):
         out = (
@@ -126,24 +134,31 @@ def fill_pregame_elo(games: pl.DataFrame, prev_final: pl.DataFrame) -> pl.DataFr
             )
             .drop(f"_{side}_prev")
         )
+    pct = fbs_elo_10th(out)
+    pooled = (
+        fbs_elo_10th(pl.concat([out, pool], how="diagonal_relaxed"))
+        if pool is not None
+        else pct
+    )
+    fallback = pooled["elo_10th"].drop_nulls()
+    global_10th = (
+        float(fallback.quantile(0.10, interpolation="linear"))
+        if fallback.len()
+        else _DEFAULT_ELO_10TH
+    )
     out = out.join(pct, on="season", how="left").with_columns(
         elo_10th=pl.col("elo_10th").fill_null(global_10th)
     )
     for side in ("home", "away"):
         elo, div = pl.col(f"{side}_pregame_elo"), pl.col(f"{side}_division")
-        out = out.join(
-            prev_final.rename({"team": f"{side}_team", "prev_elo": f"_{side}_prev"}),
-            on=f"{side}_team",
-            how="left",
-        )
+        # after the coalesce a still-null FBS value has no prior final either,
+        # so both null branches take the percentile; FCS always does
         out = out.with_columns(
-            pl.when(elo.is_null() & (div == "fbs"))
-            .then(pl.coalesce(f"_{side}_prev", "elo_10th"))
-            .when(elo.is_null() | (div == "fcs"))
+            pl.when(elo.is_null() | (div == "fcs"))
             .then(pl.col("elo_10th"))
             .otherwise(elo)
             .alias(f"{side}_pregame_elo")
-        ).drop(f"_{side}_prev")
+        )
     return out.drop("elo_10th")
 
 
@@ -278,10 +293,10 @@ def season_elo(
     """
     cur, prev = elo_games(games), elo_games(prev_games)
     prev_final = prior_final_elo(prev)
-    cur_filled = fill_pregame_elo(cur, prev_final)
     # the prior season's rolls are rebuilt from its frozen master rows, whose
     # ELO carried no further carry-forward
     prev_filled = fill_pregame_elo(prev, prev_final.clear())
+    cur_filled = fill_pregame_elo(cur, prev_final, pool=prev_filled)
     scope_cur = matchup_scope(games).select("game_id")
     scope_prev = matchup_scope(prev_games).select("game_id")
     rolls = fill_week1_rolls(

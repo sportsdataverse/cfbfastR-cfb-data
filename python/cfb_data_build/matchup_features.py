@@ -276,6 +276,14 @@ def load_wepa_weights(path: str | Path) -> dict[str, float]:
             f"wepa weights do not match the flag inventory: missing={sorted(expected - set(weights))}"
             f" extra={sorted(set(weights) - expected)}"
         )
+    # the source pairs weights with flags BY POSITION (map2); the port pairs by
+    # name, so a regenerated file whose key order drifted must fail loudly
+    # rather than silently re-weight
+    order = [f"{side}_{name}_weight" for side in ("off", "def") for name in FLAG_NAMES]
+    if list(weights) != order:
+        raise ValueError(
+            "wepa weights are not in flag order; regenerate from the source's column order"
+        )
     return {k: float(v) for k, v in weights.items()}
 
 
@@ -441,7 +449,11 @@ def play_pace(plays: pl.DataFrame) -> pl.DataFrame:
     )
     prev_gsr = pl.col("gsr").shift(1).over(["game_id", "drive_id"])
     return ordered.with_columns(
-        sec_since_prev=pl.when(prev_gsr.is_null() | pl.col("gsr").is_null())
+        # R: a play with a null drive_id yields NA (is.na(prev_drive_id)); polars
+        # would group the nulls together and emit gaps between them
+        sec_since_prev=pl.when(
+            prev_gsr.is_null() | pl.col("gsr").is_null() | pl.col("drive_id").is_null()
+        )
         .then(None)
         .otherwise(pl.max_horizontal(prev_gsr - pl.col("gsr"), pl.lit(0.0)))
     )
@@ -519,6 +531,9 @@ def pace_history(pbp: pl.DataFrame) -> pl.DataFrame:
             )
         )
     off, deff = sides
+    # a null team (a play with no offense/defense label) is not a team row; R's
+    # full_join would match the NAs into one row, polars would emit two
+    off, deff = off.drop_nulls("team"), deff.drop_nulls("team")
     return off.join(deff, on=["season", "team", "game_id"], how="full", coalesce=True)
 
 
@@ -633,6 +648,13 @@ def _side_features(
 
 
 def _pace(plays: pl.DataFrame, team: str, side: str) -> dict[str, float | None]:
+    """One side's pace over the as-of plays.
+
+    Deliberate divergence: the source's loop tests ``mean > 50`` on this value
+    and an all-null mean makes that test error, which its error handler turns
+    into dropping EVERY row of that team for the season. The port keeps the
+    rows (pace null, the other 34 features intact). No 2025 team hits it.
+    """
     play_col = "offense_play" if side == "off" else "defense_play"
     paced = play_pace(plays.filter(pl.col(play_col) == team))
     return {

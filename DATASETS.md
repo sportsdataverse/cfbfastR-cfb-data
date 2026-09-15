@@ -1674,7 +1674,7 @@ release + CFBD `/games`.
 |---|---|
 | keys | `season`, `week`, `season_type`, `game_id`, `start_date`, `team_id`, `team` |
 | offense (`off_*`) / defense (`def_*`), 17 each | `plays_per_game`, `3d_per_game`, `epa`, `pass_epa`, `rush_epa`, `rroe`, `1st_down_rush_rate`, `scoring_opp_rate_oe`, `pts_per_scoring_opp`, `starting_fp`, `wepa`, `success_rate`, `early_success_rate`, `late_success_rate`, `pass_success_rate`, `rush_success_rate`, `3rd_down_pct` |
-| pace | `off_sec_per_play_mean`, `off_sec_per_play_median`, `def_sec_per_play_mean`, `def_sec_per_play_median` |
+| pace | `off_sec_per_play_mean`, `off_sec_per_play_median`, `def_sec_per_play_mean`, `def_sec_per_play_median` — the loop's definition (rush/pass plays with a scored `ppa`); the line's pace columns use the unfiltered expanding definition, as the source's two files do |
 
 `3rd_down_pct` is the share of downs 1–3 that were third downs (not a conversion rate);
 `rroe` is `rush − P(rush)` from the bundled `rush_expect` glm; `scoring_opp_rate_oe` is
@@ -1699,3 +1699,8 @@ column order is `cfb_data_build.matchup_line.LINE_COLUMNS`:
 | team / venue meta (25 × home/away) | `mascot` … `dome` — null until the team-info join lands |
 | opponent ELO (3 × home/away) | `opp_elo_roll_avg`, `opp_elo_roll_median`, `opp_elo_roll_sum` — expanding over the team's prior FBS-vs-FBS opponents' pregame ELO by real date; week 1 from the prior season's final |
 | `game_type` | `regular` / `playoff` |
+
+Semantics inherited from the source's FROZEN seasons (its in-flight season briefly differs):
+opponent-ELO rolls run over FBS-vs-FBS games only, so a team's FCS opener never counts and its
+week-2 row is null; a team's opener never reads its own game (the source's in-season rule
+did, for the first game only) and takes the prior season's full-season values instead.

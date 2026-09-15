@@ -27,6 +27,7 @@ import polars as pl
 
 from cfb_data_build.matchup_elo import matchup_scope
 from cfb_data_build.matchup_features import (
+    dedupe_plays,
     TEAM_FEATURE_COLUMNS,
     augment_plays,
     load_coefficients,
@@ -160,10 +161,15 @@ def fetch_cfbd_lines(season: int, *, api_key: str | None = None) -> list[dict]:
 
 
 def load_pbp(season: int) -> pl.DataFrame:
-    """The ``cfbfastR_cfb_pbp`` release for one season (sdv-py loader)."""
+    """The ``cfbfastR_cfb_pbp`` release for one season, deduped as the source dedupes it.
+
+    The release carries ~10-20k duplicate play rows per season; every unit and
+    every parity oracle sees the frame AFTER ``distinct(game_id, id_play,
+    game_play_number)``, so the dedupe belongs at the load, not in each caller.
+    """
     from sportsdataverse.cfb import load_cfb_pbp_r
 
-    return load_cfb_pbp_r([season])
+    return dedupe_plays(load_cfb_pbp_r([season]))
 
 
 def augmented_season(pbp: pl.DataFrame) -> pl.DataFrame:
@@ -181,8 +187,23 @@ def fbs_teams(games: pl.DataFrame) -> list[str]:
     return sorted(set(scope["home_team"]) | set(scope["away_team"]))
 
 
+def schedule_games(games: pl.DataFrame) -> pl.DataFrame:
+    """The (game_id, date, teams) list the as-of loop iterates: the CFBD schedule.
+
+    The source iterates the schedule, not the plays, so a scheduled game whose
+    plays never landed in the release still gets a row (features from the
+    games before it). Display spellings, dates as UTC calendar days.
+    """
+    return to_display_names(games, "home_team", "away_team").select(
+        "game_id",
+        start_date=pl.col("start_date").str.slice(0, 10).str.to_date(),
+        home_team="home_team",
+        away_team="away_team",
+    )
+
+
 def played_games(plays: pl.DataFrame) -> pl.DataFrame:
-    """The (game_id, date, teams) list the as-of loop iterates, from the pbp."""
+    """The games present in the plays (what the R oracle capture iterated)."""
     return plays.unique(subset=["game_id"], maintain_order=True).select(
         "game_id", start_date=pl.col("play_date"), home_team="home", away_team="away"
     )
@@ -233,7 +254,7 @@ def build_matchup_features(season: int, *, base: str = "cfb") -> pl.DataFrame:
     scoring = load_coefficients(ARTIFACTS / "scoring_opp_coef.json")
     teams = fbs_teams(games)
     feats = team_game_features(
-        plays, played_games(plays), teams, scoring, first_game_same_day=False
+        plays, schedule_games(games), teams, scoring, first_game_same_day=False
     )
     # a listed team with no rows means its spelling matched no play -- the
     # silent-drop failure the display mapping exists to prevent
@@ -282,7 +303,7 @@ def build_matchup_line_season(season: int, *, base: str = "cfb") -> pl.DataFrame
     scoring = load_coefficients(ARTIFACTS / "scoring_opp_coef.json")
     teams = fbs_teams(games)
     feats = team_game_features(
-        plays, played_games(plays), teams, scoring, first_game_same_day=False
+        plays, schedule_games(games), teams, scoring, first_game_same_day=False
     )
     prev_pbp = load_pbp(season - 1)
     prev_plays = augmented_season(prev_pbp)

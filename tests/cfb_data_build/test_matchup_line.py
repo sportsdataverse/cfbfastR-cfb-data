@@ -123,13 +123,22 @@ def test_features_pace_and_lines_match() -> None:
             how="left",
         )
         assert j.height >= 20
+        pf = (
+            _rd("team_pace_full.csv")
+            .filter(pl.col("season") == 2024)
+            .with_columns(pl.col("team").replace(TEAM_NAME_MAPPING))
+            .rename({"team": f"{side}_team"})
+        )
+        j = j.join(pf, on=f"{side}_team", how="left", suffix="_full")
         for c in PACE_COLS:
-            got, want = (
-                j[f"{side}_{c}"],
-                j[f"{c}_right"] if f"{c}_right" in j.columns else j[c],
-            )
-            both = got.is_not_null() & want.is_not_null()
-            assert (got.filter(both) - want.filter(both)).abs().max() <= 1e-6, c
+            got = j[f"{side}_{c}"]
+            want = j[f"{c}_right"] if f"{c}_right" in j.columns else j[c]
+            fill = j[f"{c}_full"] if f"{c}_full" in j.columns else j[c]
+            # where pace_hist has a value the line carries it exactly; where it
+            # has none (the opener) the line carries the prior-season fill
+            has = want.is_not_null()
+            assert (got.filter(has) - want.filter(has)).abs().max() <= 1e-6, c
+            assert got.filter(~has).equals(fill.filter(~has)), c
     for c in ("spread", "spread_open", "over_under", "over_under_open"):
         _close(py[c], oracle[c], 1e-9, c)
 

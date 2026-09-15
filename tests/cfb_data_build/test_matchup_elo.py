@@ -19,7 +19,15 @@ from pathlib import Path
 import numpy as np
 import polars as pl
 
-from cfb_data_build.matchup_elo import consensus_lines, season_elo
+from cfb_data_build.matchup_elo import (
+    consensus_lines,
+    elo_games,
+    fill_pregame_elo,
+    matchup_scope,
+    opponent_elo_rolls,
+    prior_final_elo,
+    season_elo,
+)
 
 FIX = Path(__file__).parent / "fixtures" / "matchup"
 
@@ -102,7 +110,11 @@ def test_pregame_elo_and_opponent_rolls_match_line() -> None:
         # (game_id, team) is not
         assert j["matched"].null_count() == 0, f"{side}: unmatched (game_id, team) rows"
         strict = j.filter(~pl.col("game_id").is_in(list(FROZEN_ARTIFACTS[side])))
-        assert strict.height >= j.height - 2
+        partitioned = j.filter(
+            pl.col("game_id").is_in(list(FROZEN_ARTIFACTS[side]))
+        ).height
+        assert partitioned == len(FROZEN_ARTIFACTS[side])
+        assert strict.height == j.height - partitioned
         for stat in ("sum", "avg", "median"):
             _close(
                 strict[f"py_{stat}"],
@@ -115,8 +127,22 @@ def test_pregame_elo_and_opponent_rolls_match_line() -> None:
     sjs = rolls.filter(
         (pl.col("game_id") == 401760358) & (pl.col("team") == "San José State")
     )
-    assert sjs["opp_elo_roll_sum"].item() == 15889.0
-    assert abs(sjs["opp_elo_roll_avg"].item() - 15889.0 / 11) < 1e-9
+    # expected: the roll at SJSU's last 2024 FBS-vs-FBS game, from the fixture
+    # itself (a CFBD revision moves both sides together, never this literal)
+    prev_filled = fill_pregame_elo(
+        elo_games(prev), prior_final_elo(elo_games(prev)).clear()
+    )
+    prev_rolls = opponent_elo_rolls(
+        prev_filled.join(
+            matchup_scope(prev).select("game_id"), on="game_id", how="semi"
+        )
+    )
+    final = (
+        prev_rolls.filter(pl.col("team") == "San José State").sort("game_date").tail(1)
+    )
+    assert sjs["opp_elo_roll_sum"].item() == final["opp_elo_roll_sum"].item()
+    assert abs(sjs["opp_elo_roll_avg"].item() - final["opp_elo_roll_avg"].item()) < 1e-9
+    assert final["opp_elo_roll_sum"].item() > 10_000  # a real final, not a fallback
 
 
 #: Week-1 rows whose oracle value is an artifact of the frozen master, not of

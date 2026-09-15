@@ -21,10 +21,12 @@ drive number>`.
 | `rush_expect_coef.json` | 13 | logistic glm coefficients; rank 12/13 — `score_diff` aliased (null) and dropped by R's `predict` | snapshot `models/rp_mod_3.rds` |
 | `rp_features_sample.csv` | 5,000 × 15 | rush/pass plays with the 12 rush-expectation features + R's `rp` prediction — the shipped applier is gated against it in `tests/cfb_matchup/test_glm_parity.py` (max diff 1e-15) | R capture, `set.seed(2025)` sample |
 | `team_features_full_2025.csv` | 136 × 36 | per FBS team, FULL-season 2025 features (38-col family; the pipeline's prior-season priors file) | snapshot `data/prev_season_epa_data_2025.csv` (June 2026 run) |
-| `team_features_asof_2025.csv` | 1,740 × 44 | per FBS team-game, the loop's as-of features + game meta — `capture_team_features.R`, the loop function verbatim over today's release | R capture 2026-09-15 |
+| `team_features_asof_2025.csv` | 1,740 × 44 | per FBS team-game, the loop's as-of features + game meta — `capture_team_features.R`: the loop FUNCTION verbatim, but iterating the games present in the release (the source iterates the CFBD schedule; for 2025 the two differ by one bowl with no plays, dropped from the line anyway) | R capture 2026-09-15 |
 | `team_features_full_2025_r.csv` | 136 × 44 | the same loop with the pipeline's synthetic future game (whole season) | R capture 2026-09-15 |
 | `cfbd_games_elo_2024.parquet`, `cfbd_games_elo_2025.parquet` | 3,801 / 3,831 × 23 | CFBD `/games` rows with pregame / postgame ELO, divisions, points, notes | CFBD API 2026-09-15 |
 | `cfbd_lines_2025.parquet` | 3,345 × 6 | CFBD `/lines` rows, one per (game, provider) | CFBD API 2026-09-15 |
+| `team_features_full_2024.csv` | 229 × 36 | per team, FULL-season 2024 features — the priors file the source's 2025 run read (`prev_*` and the week-1 fill of every delivered 2025 row) | snapshot `data/prev_season_epa_data_2024.csv` (written by the source's 2025 preseason run, June 2025) |
+| `team_pace_full.csv` | 3,046 × 6 | per (season, team) full-season pace 2014–2025 (the source's `tools/build_pace_full.R`; the 2024 rows fill the delivered 2025 openers) | snapshot `data/team_pace_full.csv` (June 2026 build) |
 | `pace_hist_2025.csv` | 3,314 × 7 | per (season, team, game_id) as-of-date pace (off/def sec-per-play mean + median) | snapshot `data/pace_hist_2014_2025.csv`, season 2025 slice |
 | `matchup_line_2025.csv` | 773 × 268 | the delivered matchup line, season 2025 (bowls excluded, CFP kept) | snapshot `output/cfb_data_2026_week_1.csv`, season 2025 slice |
 

@@ -37,9 +37,29 @@ def test_usage_sections_build_from_the_fixture_final():
     scripting = build_dataset_frame(REGISTRY["adv_drive_scripting"], game)
     assert set(scripting["script"].to_list()) == {"scripted", "non_scripted"}
     tackles = build_dataset_frame(REGISTRY["adv_tackles"], game)
-    if tackles.height:  # the fixture's participants predate position ids; tackle lists may be absent
-        for _, g in tackles.group_by("def_pos_team"):
-            assert abs(g["tackle_share"].sum() - 1.0) < 1e-9
+    assert tackles.height
+    for _, g in tackles.group_by("def_pos_team"):
+        assert abs(g["tackle_share"].sum() - 1.0) < 1e-9
+
+
+def test_stored_participants_give_real_tacklers_and_position_groups():
+    """The stored participants predate *_position_id and hold numpy-repr list cells.
+
+    "['5152441' '5220449']" once decoded to ONE glued id, and position groups were
+    empty; the game roster now supplies positions and every tackler is a real athlete.
+    """
+    game = _game()
+    roster_ids = {str(r["athlete_id"]) for r in game["game_rosters"]}
+    cells = [v for r in game["play_participants"] for k, v in r.items() if k.endswith("_ids") and isinstance(v, str)]
+    assert any("' '" in v for v in cells)  # the numpy shape under test is really in the fixture
+    tackles = build_dataset_frame(REGISTRY["adv_tackles"], game)
+    unknown = set(tackles["player_id"].drop_nulls().cast(pl.Utf8)) - roster_ids
+    assert tackles.height and not unknown, sorted(unknown)[:5]
+    assert tackles["position_group"].null_count() == 0
+    # (position_group_usage is not asserted: this fixture's plays carry no rusher /
+    # receiver ids, so there is nothing to group -- sdv-py's usage-box tests cover it)
+    group_tackles = build_dataset_frame(REGISTRY["adv_position_group_tackles"], game)
+    assert set(group_tackles["position_group"].to_list()) & {"DL", "LB", "DB"}
 
 
 def test_leaderboard_aggregation_recomputes_rates():

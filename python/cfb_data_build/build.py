@@ -165,6 +165,9 @@ def _usage_box(game: dict[str, Any]) -> dict[str, list[dict[str, Any]]]:
             pl.from_dicts(plays, infer_schema_length=None) if plays else pl.DataFrame(),
             pl.from_dicts(parts, infer_schema_length=None) if parts else None,
             league="cfb",
+            # the stored participants predate *_position_id; the game roster
+            # carries every athlete's position, so position groups come from it
+            rosters=game.get("game_rosters"),
         )
     return _USAGE_CACHE[key]
 

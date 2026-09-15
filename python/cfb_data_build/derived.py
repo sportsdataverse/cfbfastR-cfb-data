@@ -71,6 +71,12 @@ SPECS: dict[str, DatasetSpec] = {
         "cfb_team_summaries_weekly",
         "cfb_team_summaries_weekly",
     ),
+    "matchup_features": DatasetSpec(
+        "cfb_matchup_features", "cfb_matchup_features", "cfb_matchup_features"
+    ),
+    "matchup_line": DatasetSpec(
+        "cfb_matchup_line", "cfb_matchup_line", "cfb_matchup_line"
+    ),
 }
 
 
@@ -102,7 +108,9 @@ def schedule_master_available(schedule_path: "Path | None" = None) -> bool:
     return True
 
 
-def week_cutoffs(season: int, schedule_path: "Path | None" = None) -> list[tuple[int, str]]:
+def week_cutoffs(
+    season: int, schedule_path: "Path | None" = None
+) -> list[tuple[int, str]]:
     """(week, last-kickoff-date) for the season's REGULAR-season weeks, ascending.
 
     Regular season only: the postseason restarts week numbering at 1 (ESPN's own
@@ -376,10 +384,24 @@ def _report_gaps(
         )
 
 
+def _build_matchup_features(season: int, *, base: str = "cfb") -> pl.DataFrame:
+    from cfb_data_build.matchup_build import build_matchup_features
+
+    return build_matchup_features(season, base=base)
+
+
+def _build_matchup_line(season: int, *, base: str = "cfb") -> pl.DataFrame:
+    from cfb_data_build.matchup_build import build_matchup_line_season
+
+    return build_matchup_line_season(season, base=base)
+
+
 BUILDERS = {
     "gamelog": build_gamelog,
     "ratings_weekly": build_ratings_weekly,
     "team_summaries_weekly": build_team_summaries_weekly,
+    "matchup_features": _build_matchup_features,
+    "matchup_line": _build_matchup_line,
 }
 
 

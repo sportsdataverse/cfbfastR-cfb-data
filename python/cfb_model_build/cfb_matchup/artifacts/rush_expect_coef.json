@@ -1,0 +1,26 @@
+{
+  "formula": "rush ~ pos_team_score + def_pos_team_score + score_diff + half +      period + TimeSecsRem + down + distance + yards_to_goal +      ep_before + wp_before + rz_play",
+  "family": "binomial",
+  "link": "logit",
+  "nobs": 1304773,
+  "rank": 12,
+  "n_coef": 13,
+  "n_aliased": 1,
+  "xlevels": {},
+  "contrasts": {},
+  "coefficients": {
+    "(Intercept)": -0.254387077273238,
+    "pos_team_score": -0.015514646364582,
+    "def_pos_team_score": 0.0157336129560136,
+    "score_diff": null,
+    "half": -0.00373323085800693,
+    "period": 0.090759478379985,
+    "TimeSecsRem": 8.45880602635552e-05,
+    "down": -0.420180060163778,
+    "distance": -0.0979648217568546,
+    "yards_to_goal": 0.0124296883766969,
+    "ep_before": 0.130053894740031,
+    "wp_before": 1.2475947713296,
+    "rz_play": 0.454610086285794
+  }
+}

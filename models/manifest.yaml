@@ -27,12 +27,25 @@ stages:
   "32": {file: python/cfb_model_32_pregame_wp_creation.py, package: cfb_model_build.pregame_wp}
   "33": {file: python/cfb_model_33_rb_eval_creation.py, package: cfb_model_build.rb_eval}
   "34": {file: python/cfb_model_34_higher_models_creation.py, package: cfb_model_build.cfb_higher_models}
+  "35": {file: python/cfb_model_35_matchup_creation.py, package: cfb_model_build.cfb_matchup}
   "60": {file: python/cfb_model_60_publish_creation.py, package: cfb_model_build.cfb_model_publish}
   "70": {file: python/cfb_model_70_reports_creation.py, package: cfb_model_build.cfb_model_reports}
 
 # One entry per models/REGISTRY.md row; registry_model MUST equal the row's
 # first cell verbatim (the per-row lockstep key).
 models:
+  matchup_scoring_opp:
+    registry_model: "matchup scoring_opp (drive scoring-opportunity glm)"
+    stage: "35"
+    artifact: scoring_opp_coef.json
+  matchup_rush_expect:
+    registry_model: "matchup rush_expect (P(rush) glm)"
+    stage: "35"
+    artifact: rush_expect_coef.json
+  matchup_wepa_weights:
+    registry_model: "matchup wepa_weights (120 situational EPA weights)"
+    stage: "35"
+    artifact: wepa_weights.json
   ep:
     registry_model: "ep (next-score EP, 7-class)"
     stage: "30"

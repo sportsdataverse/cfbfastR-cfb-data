@@ -1662,3 +1662,40 @@ team's number against the FBS field. No team identity columns.
 _Release tag: `espn_cfb_percentiles`_
 
 ---
+
+### cfb_matchup_features
+
+Per FBS team-game as-of matchup features (stage 41, `cfb_data_build.matchup_build`), one row
+per (season, game_id, team). Every value is computed from the team's plays dated strictly
+before the game; a team's first game of the season is null. Sources: the `cfbfastR_cfb_pbp`
+release + CFBD `/games`.
+
+| Column group | Columns |
+|---|---|
+| keys | `season`, `week`, `season_type`, `game_id`, `start_date`, `team_id`, `team` |
+| offense (`off_*`) / defense (`def_*`), 17 each | `plays_per_game`, `3d_per_game`, `epa`, `pass_epa`, `rush_epa`, `rroe`, `1st_down_rush_rate`, `scoring_opp_rate_oe`, `pts_per_scoring_opp`, `starting_fp`, `wepa`, `success_rate`, `early_success_rate`, `late_success_rate`, `pass_success_rate`, `rush_success_rate`, `3rd_down_pct` |
+| pace | `off_sec_per_play_mean`, `off_sec_per_play_median`, `def_sec_per_play_mean`, `def_sec_per_play_median` |
+
+`3rd_down_pct` is the share of downs 1–3 that were third downs (not a conversion rate);
+`rroe` is `rush − P(rush)` from the bundled `rush_expect` glm; `scoring_opp_rate_oe` is
+observed minus expected scoring-opportunity rate per drive from the bundled `scoring_opp` glm;
+`wepa` is EPA scaled by the 120 bundled situational weights (`cfb_model_build/cfb_matchup/artifacts/`).
+
+### cfb_matchup_line
+
+Per FBS-vs-FBS game (bowls dropped, CFP kept), the 268-column matchup line (stage 42). The
+column order is `cfb_data_build.matchup_line.LINE_COLUMNS`:
+
+| Column group | Columns |
+|---|---|
+| game meta (22) | `game_id`, `season`, `week`, `season_type`, `start_date`, `venue_id`, `neutral_site`, `conference_game`, `notes`, `home_team_id`, `home_team`, `away_team_id`, `away_team`, `home_conference`, `away_conference`, `home_division`, `away_division`, `home_pregame_elo`, `away_pregame_elo`, `home_points`, `away_points`, `home_mov` |
+| side inputs (15 × home/away) | `join_name`, `team_talent_weighted`, `talent`, `off_rtprod`, `def_rtprod`, `ovr_rtprod`, `head_coach`, `hc_tenure`, `oc_cont`, `dc_cont`, `athlete_id`, `qb_name`, `returning_qb`, `qb_starter_years`, `qb_games` — null until the side-input joins land |
+| features (34 × home/away) | the `cfb_matchup_features` offense/defense block for that game; regular-season week 1 carries the prior season's full-season values |
+| prior season (34 × prev_home/prev_away) | the prior season's full-season values |
+| pace (4 × home/away) | as-of-date pace, prior-season full-season pace when none |
+| lines | `spread_open`, `spread`, `over_under`, `over_under_open` — provider mean of CFBD `/lines` (`pk` → 0) |
+| weather (10) | `temperature` … `weather_condition` — null until the weather join lands |
+| `prev_season` | `season − 1` |
+| team / venue meta (25 × home/away) | `mascot` … `dome` — null until the team-info join lands |
+| opponent ELO (3 × home/away) | `opp_elo_roll_avg`, `opp_elo_roll_median`, `opp_elo_roll_sum` — expanding over the team's prior FBS-vs-FBS opponents' pregame ELO by real date; week 1 from the prior season's final |
+| `game_type` | `regular` / `playoff` |

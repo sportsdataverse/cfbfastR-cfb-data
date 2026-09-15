@@ -17,7 +17,15 @@ from cfb_data_build.config import REGISTRY
 #   gamelog                  adv_team + schedule context, one row per team-GAME
 #   ratings_weekly           cfb_ratings at each week's end, long format
 #   team_summaries_weekly    summaries at each week's end, long format
-DERIVED = ("gamelog", "ratings_weekly", "team_summaries_weekly")
+#   matchup_features         per FBS team-game as-of matchup features (stage 41)
+#   matchup_line             per FBS-vs-FBS game, the 268-col matchup line (stage 42)
+DERIVED = (
+    "gamelog",
+    "ratings_weekly",
+    "team_summaries_weekly",
+    "matchup_features",
+    "matchup_line",
+)
 
 # ESPN Football Power Index. Separate from DERIVED because these are fetched from
 # the core-v2 API rather than derived from an already-built artifact.
@@ -51,7 +59,16 @@ def build_parser() -> argparse.ArgumentParser:
     ap.add_argument(
         "--dataset",
         required=True,
-        choices=sorted(REGISTRY) + ["summaries", *DERIVED, *FPI, *RECRUITING, *TEAMS, *ROSTERS, *UNIFIED_SCHEDULES],
+        choices=sorted(REGISTRY)
+        + [
+            "summaries",
+            *DERIVED,
+            *FPI,
+            *RECRUITING,
+            *TEAMS,
+            *ROSTERS,
+            *UNIFIED_SCHEDULES,
+        ],
     )
     ap.add_argument("-s", "--start-year", type=int, required=True)
     ap.add_argument("-e", "--end-year", type=int, required=True)
@@ -62,14 +79,22 @@ def build_parser() -> argparse.ArgumentParser:
         help="summaries only: cumulative snapshot through week W (default: full season)",
     )
     ap.add_argument("--cache-dir", default=".cache/cfb_final")
-    ap.add_argument("--schedule", default=None, help="schedule master path/URL (default: raw URL)")
-    ap.add_argument("--no-fetch", action="store_true", help="use cached final.json only")
-    ap.add_argument("--publish", action="store_true", help="upload to the espn_cfb_* release")
+    ap.add_argument(
+        "--schedule", default=None, help="schedule master path/URL (default: raw URL)"
+    )
+    ap.add_argument(
+        "--no-fetch", action="store_true", help="use cached final.json only"
+    )
+    ap.add_argument(
+        "--publish", action="store_true", help="upload to the espn_cfb_* release"
+    )
     ap.add_argument("--base", default="cfb", help="output root directory")
     ap.add_argument(
         "--raw-root",
         default=os.environ.get("CFB_RAW_ROOT", "../cfbfastR-cfb-raw"),
-        help=("recruiting datasets: cfbfastR-cfb-raw checkout holding cfb/recruits/json (env CFB_RAW_ROOT)"),
+        help=(
+            "recruiting datasets: cfbfastR-cfb-raw checkout holding cfb/recruits/json (env CFB_RAW_ROOT)"
+        ),
     )
     ap.add_argument(
         "--dry-run",
@@ -121,7 +146,9 @@ def main(argv: list[str] | None = None) -> int:
         if args.dataset != "summaries":
             ap.error("--through-week only applies to --dataset summaries")
         if args.publish:
-            ap.error("--through-week snapshots cannot be published; canonical tags hold season-final builds")
+            ap.error(
+                "--through-week snapshots cannot be published; canonical tags hold season-final builds"
+            )
     if args.dataset == "summaries":
         from cfb_data_build.summaries_build import build_summaries_season
 

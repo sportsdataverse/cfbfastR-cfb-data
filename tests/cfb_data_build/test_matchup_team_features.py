@@ -18,6 +18,7 @@ sample supports only the structural test.
 
 from __future__ import annotations
 
+from datetime import date
 from pathlib import Path
 
 import numpy as np
@@ -108,11 +109,11 @@ def test_full_season_features_match_r() -> None:
     games = pl.DataFrame(
         {
             "game_id": list(range(-1, -len(teams) - 1, -1)),
-            "start_date": [pl.date(2026, 2, 15)] * len(teams),
+            "start_date": [date(2026, 2, 15)] * len(teams),
             "home_team": teams,
             "away_team": ["SYNTH_FULL_SEASON"] * len(teams),
         }
-    ).with_columns(pl.col("start_date").cast(pl.Date))
+    )
     py = team_game_features(aug, games, teams, scoring).sort("team")
     oracle = oracle.sort("team")
     assert py.height == oracle.height == 136

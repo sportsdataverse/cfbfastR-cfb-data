@@ -1,0 +1,25 @@
+{
+  "model": "rush_expect",
+  "features": [
+    "pos_team_score",
+    "def_pos_team_score",
+    "score_diff",
+    "half",
+    "period",
+    "TimeSecsRem",
+    "down",
+    "distance",
+    "yards_to_goal",
+    "ep_before",
+    "wp_before",
+    "rz_play"
+  ],
+  "aliased": [
+    "score_diff"
+  ],
+  "train_seasons": "source's rush/pass corpus (1,304,773 plays)",
+  "n_obs": 1304773,
+  "parity": "port refit on the same rows reproduces every non-aliased coefficient within 1e-6 rel",
+  "fitted_by": "the source R pipeline (glm / random weight search), imported 2026-09-15 as the initial artifact",
+  "refit": "python -m cfb_model_build.cfb_matchup train-<model> --out-dir python/cfb_model_build/cfb_matchup/artifacts"
+}

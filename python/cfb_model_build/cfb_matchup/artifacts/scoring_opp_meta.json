@@ -1,0 +1,16 @@
+{
+  "model": "scoring_opp",
+  "features": [
+    "half_secs_rem",
+    "game_secs_rem",
+    "start_yards_to_goal",
+    "pos_team_timeouts",
+    "def_pos_team_timeouts"
+  ],
+  "aliased": [],
+  "train_seasons": "2014-2023 (source's drive frame; 262,065 drives after na.omit)",
+  "n_obs": 262065,
+  "parity": "port refit on the same rows reproduces every coefficient within 1e-6 rel (tests/cfb_matchup/test_glm_parity.py)",
+  "fitted_by": "the source R pipeline (glm / random weight search), imported 2026-09-15 as the initial artifact",
+  "refit": "python -m cfb_model_build.cfb_matchup train-<model> --out-dir python/cfb_model_build/cfb_matchup/artifacts"
+}

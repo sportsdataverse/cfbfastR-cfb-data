@@ -2197,9 +2197,13 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2022,Nick Saban,Alabama,SEC,13,11,2,true
 2022,Shawn Clark,App State,Sun Belt,12,6,6,true
 2022,Jedd Fisch,Arizona,Pac-12,12,5,7,true
+2022,Herm Edwards,Arizona State,Pac-12,3,1,2,false
+2022,Shaun Aguano,Arizona State,Pac-12,9,2,7,false
 2022,Sam Pittman,Arkansas,SEC,13,7,6,true
 2022,Butch Jones,Arkansas State,Sun Belt,12,3,9,true
 2022,Jeff Monken,Army,FBS Independents,12,6,6,true
+2022,Bryan Harsin,Auburn,SEC,8,3,5,false
+2022,Cadillac Williams,Auburn,SEC,4,2,2,false
 2022,Kalani Sitake,BYU,FBS Independents,13,8,5,true
 2022,Mike Neu,Ball State,Mid-American,12,5,7,true
 2022,Dave Aranda,Baylor,Big 12,13,6,7,true
@@ -2209,9 +2213,15 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2022,Maurice Linguist,Buffalo,Mid-American,13,7,6,true
 2022,Justin Wilcox,California,Pac-12,12,4,8,true
 2022,Jim McElwain,Central Michigan,Mid-American,12,4,8,true
+2022,Peter Rossomando,Charlotte,Conference USA,4,2,2,false
+2022,Will Healy,Charlotte,Conference USA,8,1,7,false
+2022,Kerry Coombs,Cincinnati,American Athletic,1,0,1,false
 2022,Luke Fickell,Cincinnati,American Athletic,12,9,3,true
 2022,Dabo Swinney,Clemson,ACC,14,11,3,true
+2022,Chad Staggs,Coastal Carolina,Sun Belt,1,0,1,false
 2022,Jamey Chadwell,Coastal Carolina,Sun Belt,12,9,3,true
+2022,Karl Dorrell,Colorado,Pac-12,5,0,5,false
+2022,Mike Sanford Jr.,Colorado,Pac-12,7,1,6,false
 2022,Jay Norvell,Colorado State,Mountain West,12,3,9,true
 2022,Mike Elko,Duke,ACC,13,9,4,true
 2022,Mike Houston,East Carolina,American Athletic,13,8,5,true
@@ -2224,6 +2234,8 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2022,Kirby Smart,Georgia,SEC,15,15,0,true
 2022,Clay Helton,Georgia Southern,Sun Belt,13,6,7,true
 2022,Shawn Elliott,Georgia State,Sun Belt,12,4,8,true
+2022,Brent Key,Georgia Tech,ACC,8,4,4,false
+2022,Geoff Collins,Georgia Tech,ACC,4,1,3,false
 2022,Timmy Chang,Hawai'i,Mountain West,13,3,10,true
 2022,Dana Holgorsen,Houston,American Athletic,13,8,5,true
 2022,Bret Bielema,Illinois,Big Ten,13,8,5,true
@@ -2237,8 +2249,10 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2022,Mark Stoops,Kentucky,SEC,13,7,6,true
 2022,Brian Kelly,LSU,SEC,14,10,4,true
 2022,Hugh Freeze,Liberty,FBS Independents,12,8,4,true
+2022,Josh Aldridge,Liberty,FBS Independents,1,0,1,false
 2022,Michael Desormeaux,Louisiana,Sun Belt,13,6,7,true
 2022,Sonny Cumbie,Louisiana Tech,Conference USA,12,3,9,true
+2022,Deion Branch,Louisville,ACC,1,1,0,false
 2022,Scott Satterfield,Louisville,ACC,12,7,5,true
 2022,Charles Huff,Marshall,Sun Belt,13,9,4,true
 2022,Mike Locksley,Maryland,Big Ten,13,8,5,true
@@ -2251,13 +2265,17 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2022,Rick Stockstill,Middle Tennessee,Conference USA,13,8,5,true
 2022,P.J. Fleck,Minnesota,Big Ten,13,9,4,true
 2022,Mike Leach,Mississippi State,SEC,12,8,4,true
+2022,Zach Arnett,Mississippi State,SEC,1,1,0,false
 2022,Eli Drinkwitz,Missouri,SEC,13,6,7,true
 2022,Dave Doeren,NC State,ACC,13,8,5,true
 2022,Ken Niumatalolo,Navy,American Athletic,12,4,8,true
+2022,Mickey Joseph,Nebraska,Big Ten,9,3,6,false
+2022,Scott Frost,Nebraska,Big Ten,3,1,2,false
 2022,Ken Wilson,Nevada,Mountain West,12,2,10,true
 2022,Danny Gonzales,New Mexico,Mountain West,12,2,10,true
 2022,Jerry Kill,New Mexico State,FBS Independents,13,7,6,true
 2022,Mack Brown,North Carolina,ACC,14,9,5,true
+2022,Phil Bennett,North Texas,Conference USA,1,0,1,false
 2022,Seth Littrell,North Texas,Conference USA,13,7,6,true
 2022,Thomas Hammock,Northern Illinois,Mid-American,12,3,9,true
 2022,Pat Fitzgerald,Northwestern,Big Ten,12,1,11,true
@@ -2272,6 +2290,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2022,Jonathan Smith,Oregon State,Pac-12,13,10,3,true
 2022,James Franklin,Penn State,Big Ten,13,11,2,true
 2022,Pat Narduzzi,Pittsburgh,ACC,13,9,4,true
+2022,Brian Brohm,Purdue,Big Ten,1,0,1,false
 2022,Jeff Brohm,Purdue,Big Ten,13,8,5,true
 2022,Mike Bloomgren,Rice,Conference USA,13,5,8,true
 2022,Greg Schiano,Rutgers,Big Ten,12,4,8,true
@@ -2280,6 +2299,8 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2022,Brent Brennan,San José State,Mountain West,12,7,5,true
 2022,Kane Wommack,South Alabama,Sun Belt,13,10,3,true
 2022,Shane Beamer,South Carolina,SEC,13,8,5,true
+2022,Daniel Da Prato,South Florida,American Athletic,3,0,3,false
+2022,Jeff Scott,South Florida,American Athletic,9,1,8,false
 2022,Will Hall,Southern Miss,Sun Belt,13,7,6,true
 2022,David Shaw,Stanford,Pac-12,12,3,9,true
 2022,Dino Babers,Syracuse,ACC,13,7,6,true
@@ -2314,6 +2335,9 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2022,Neal Brown,West Virginia,Big 12,12,5,7,true
 2022,Tyson Helton,Western Kentucky,Conference USA,14,9,5,true
 2022,Tim Lester,Western Michigan,Mid-American,12,5,7,true
+2022,Jim Leonhard,Wisconsin,Big Ten,7,4,3,false
+2022,Luke Fickell,Wisconsin,Big Ten,1,1,0,false
+2022,Paul Chryst,Wisconsin,Big Ten,5,2,3,false
 2022,Craig Bohl,Wyoming,Mountain West,13,7,6,true
 2023,Troy Calhoun,Air Force,Mountain West,13,9,4,true
 2023,Joe Moorhead,Akron,Mid-American,12,2,10,true

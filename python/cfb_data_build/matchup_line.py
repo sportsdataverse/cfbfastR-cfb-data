@@ -8,8 +8,8 @@ order (:data:`LINE_COLUMNS`).
 How each column group is filled -- the rules the delivered 2025 rows follow:
 
 * ``home_/away_<feature>`` (the 34 F features per side): the team's AS-OF
-  values for that game; a regular-season **week-1** row instead carries the
-  team's FULL prior-season values (no current-season plays exist yet);
+  values for that game, else -- a team's opener, week 1 or later -- its FULL
+  prior-season values (no current-season plays exist yet);
 * ``prev_home_/prev_away_<feature>``: the full prior-season values, every row;
 * ``*_sec_per_play_*`` (pace): the as-of-date ``pace_history`` value; week 1
   carries the prior season's full-season pace;
@@ -18,7 +18,7 @@ How each column group is filled -- the rules the delivered 2025 rows follow:
 * ``game_type``: ``regular`` / ``playoff`` (CFP by ``notes``) / ``bowl`` -- bowls
   are dropped;
 * every input's team names are mapped to the delivered display names FIRST
-  (:data:`TEAM_NAME_MAPPING`), so all joins share one spelling.
+  (``TEAM_NAME_MAPPING`` in ``matchup_features``), so all joins share one spelling.
 
 Side inputs (talent, returning production, coaches, QB, weather, venue / team
 metadata) are separate joins; a caller that has none gets those columns null.
@@ -29,18 +29,11 @@ from __future__ import annotations
 import polars as pl
 
 from cfb_data_build.matchup_elo import consensus_lines, is_playoff, season_elo
-from cfb_data_build.matchup_features import TEAM_FEATURE_COLUMNS, _SIDE_FEATURES
-
-#: CFBD name -> the name the delivered line (and its static master) uses
-TEAM_NAME_MAPPING = {
-    "UConn": "Connecticut",
-    "UTSA": "UT San Antonio",
-    "UL Monroe": "Louisiana Monroe",
-    "Southern Miss": "Southern Mississippi",
-    "Sam Houston": "Sam Houston State",
-    "Massachusetts": "UMass",
-    "Appalachian State": "App State",
-}
+from cfb_data_build.matchup_features import (
+    TEAM_FEATURE_COLUMNS,
+    _SIDE_FEATURES,
+    to_display_names,
+)
 
 FEATURE_COLS = tuple(f"{s}_{f}" for s in ("off", "def") for f in _SIDE_FEATURES)  # 34
 PACE_COLS = tuple(c for c in TEAM_FEATURE_COLUMNS if "sec_per_play" in c)  # 4
@@ -152,18 +145,6 @@ LINE_COLUMNS: tuple[str, ...] = (
 )
 
 
-def to_display_names(frame: pl.DataFrame, *cols: str) -> pl.DataFrame:
-    """Map CFBD spellings to the delivered names in every named column.
-
-    Applied to EVERY input before any join. The pipeline's own files carry a
-    mix of both spellings (its priors file has ``Connecticut`` but
-    ``Appalachian State``; its pace file the reverse; CFBD itself now says
-    ``App State``) -- exactly the name fault line its design spec warns about.
-    One convention on both sides of every join removes it.
-    """
-    return frame.with_columns([pl.col(c).replace(TEAM_NAME_MAPPING) for c in cols])
-
-
 def _prefixed(
     frame: pl.DataFrame, cols: tuple[str, ...], prefix: str, key: str
 ) -> pl.DataFrame:
@@ -175,7 +156,33 @@ def _prefixed(
     )
 
 
-def game_type(games: pl.DataFrame) -> pl.Expr:
+_UTF8 = {
+    "join_name", "head_coach", "qb_name", "weather_condition", "mascot", "abbreviation",
+    "alt_name1", "alt_name2", "alt_name3", "classification", "color", "alt_color", "logo",
+    "logo_2", "twitter", "venue_name", "city", "state", "zip", "country_code", "timezone",
+}  # fmt: skip
+_INT = {
+    "hc_tenure", "oc_cont", "dc_cont", "athlete_id", "returning_qb", "qb_starter_years",
+    "qb_games", "humidity", "snowfall", "wind_direction", "weather_condition_code",
+    "venue_id", "capacity", "year_constructed",
+}  # fmt: skip
+_BOOL = {"grass", "dome"}
+
+
+def _column_dtype(col: str) -> pl.DataType:
+    """Documented dtype of a side-input / weather / team-meta column (the delivered file's)."""
+    base = col.removeprefix("home_").removeprefix("away_")
+    if base in _UTF8:
+        return pl.Utf8
+    if base in _INT:
+        return pl.Int64
+    if base in _BOOL:
+        return pl.Boolean
+    return pl.Float64
+
+
+def game_type() -> pl.Expr:
+    """``regular`` / ``playoff`` (CFP by notes) / ``bowl`` over a CFBD games frame."""
     return (
         pl.when(
             pl.col("season_type").is_null() | (pl.col("season_type") != "postseason")
@@ -227,7 +234,7 @@ def build_matchup_line(
         start_date=pl.col("start_date").str.slice(0, 10).str.to_date(),
         home_mov=pl.col("home_points") - pl.col("away_points"),
         prev_season=pl.col("season") - 1,
-        game_type=game_type(filled),
+        game_type=game_type(),
         home_team_id=pl.col("home_id"),
         away_team_id=pl.col("away_id"),
     ).filter(
@@ -236,7 +243,6 @@ def build_matchup_line(
         & (pl.col("game_type") != "bowl")
     )
     week1 = (pl.col("week") == 1) & (pl.col("season_type") == "regular")
-
     out = base
     for side in ("home", "away"):
         key = f"{side}_team"
@@ -248,9 +254,19 @@ def build_matchup_line(
         out = out.join(asof, on=["game_id", key], how="left").join(
             prev, on=key, how="left"
         )
+        # regular-season week 1 takes the prior season's full-season values
+        # outright (the source swaps the whole block there, even where its
+        # same-day rule had produced a value); any later opener has no prior
+        # plays either and coalesces to the same fill instead of a null the
+        # source never produced
+        # an opener is a row with NO as-of block at all (no prior plays): the
+        # plays-per-game median is non-null the moment a single prior play
+        # exists, so it is the block's presence flag; a single null column in a
+        # present block (no scoring opportunity yet, say) stays null
+        opener = week1 | pl.col("_asof_off_plays_per_game").is_null()
         out = out.with_columns(
             [
-                pl.when(week1)
+                pl.when(opener)
                 .then(pl.col(f"prev_{side}_{c}"))
                 .otherwise(pl.col(f"_asof_{c}"))
                 .alias(f"{side}_{c}")
@@ -301,6 +317,9 @@ def build_matchup_line(
             how="left",
         )
 
+    # not-yet-joined groups carry their documented dtype, never a Null column
     missing = [c for c in LINE_COLUMNS if c not in out.columns]
-    out = out.with_columns([pl.lit(None).alias(c) for c in missing])
+    out = out.with_columns(
+        [pl.lit(None, dtype=_column_dtype(c)).alias(c) for c in missing]
+    )
     return out.select(list(LINE_COLUMNS)).sort(["season", "week", "game_id"])

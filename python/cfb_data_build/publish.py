@@ -86,7 +86,8 @@ RELEASE_NOTES: dict[str, str] = {
         "kept): home / away as-of features, the prior season's full-season "
         "`prev_*` block, pace, CFBD pregame ELO with opponent-ELO rolls, "
         "consensus betting lines and game meta -- 268 columns. Regular-season "
-        "week-1 features are the prior season's full-season values. Side inputs "
+        "week-1 (and any later opener's) features are the prior season's "
+        "full-season values. Side inputs "
         "(talent, coaches, returning production, QB, weather, venue) are null "
         "until their joins land."
     ),

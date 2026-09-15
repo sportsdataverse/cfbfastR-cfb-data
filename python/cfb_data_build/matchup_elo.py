@@ -88,33 +88,47 @@ def prior_final_elo(prev_games: pl.DataFrame) -> pl.DataFrame:
 
 def fbs_elo_10th(games: pl.DataFrame) -> pl.DataFrame:
     """Per season, the 10th percentile (R type-7) of pregame ELO over FBS-vs-FBS games."""
-    fbs = games.filter((pl.col("home_division") == "fbs") & (pl.col("away_division") == "fbs"))
+    fbs = games.filter(
+        (pl.col("home_division") == "fbs") & (pl.col("away_division") == "fbs")
+    )
     stacked = pl.concat(
         [
             fbs.select("season", elo="home_pregame_elo"),
             fbs.select("season", elo="away_pregame_elo"),
         ]
     ).drop_nulls("elo")
-    return stacked.group_by("season").agg(elo_10th=pl.col("elo").quantile(0.10, interpolation="linear"))
+    return stacked.group_by("season", maintain_order=True).agg(
+        elo_10th=pl.col("elo").quantile(0.10, interpolation="linear")
+    )
 
 
 def fill_pregame_elo(games: pl.DataFrame, prev_final: pl.DataFrame) -> pl.DataFrame:
     """Rules 1 and 2: carry-forward, then the FBS/FCS percentile substitution."""
     pct = fbs_elo_10th(games)
     global_10th = pct["elo_10th"].drop_nulls()
-    global_10th = float(global_10th.median()) if global_10th.len() else _DEFAULT_ELO_10TH
+    global_10th = (
+        float(global_10th.median()) if global_10th.len() else _DEFAULT_ELO_10TH
+    )
     out = games
     for side in ("home", "away"):
         out = (
             out.join(
-                prev_final.rename({"team": f"{side}_team", "prev_elo": f"_{side}_prev"}),
+                prev_final.rename(
+                    {"team": f"{side}_team", "prev_elo": f"_{side}_prev"}
+                ),
                 on=f"{side}_team",
                 how="left",
             )
-            .with_columns(pl.coalesce(f"{side}_pregame_elo", f"_{side}_prev").alias(f"{side}_pregame_elo"))
+            .with_columns(
+                pl.coalesce(f"{side}_pregame_elo", f"_{side}_prev").alias(
+                    f"{side}_pregame_elo"
+                )
+            )
             .drop(f"_{side}_prev")
         )
-    out = out.join(pct, on="season", how="left").with_columns(elo_10th=pl.col("elo_10th").fill_null(global_10th))
+    out = out.join(pct, on="season", how="left").with_columns(
+        elo_10th=pl.col("elo_10th").fill_null(global_10th)
+    )
     for side in ("home", "away"):
         elo, div = pl.col(f"{side}_pregame_elo"), pl.col(f"{side}_division")
         out = out.join(
@@ -151,7 +165,9 @@ def _expanding(values: pl.Series) -> tuple[list, list, list]:
 
 def opponent_elo_rolls(games_filled: pl.DataFrame) -> pl.DataFrame:
     """Rule 3 over one season (or several): (game_id, season, week, team, opp_elo_roll_*)."""
-    long = _long(games_filled, "pregame_elo").sort(["season", "team", "game_date", "week"], maintain_order=True)
+    long = _long(games_filled, "pregame_elo").sort(
+        ["season", "team", "game_date", "week"], maintain_order=True
+    )
     frames = []
     for _, grp in long.group_by(["season", "team"], maintain_order=True):
         s, a, m = _expanding(grp["opp_value"])
@@ -172,7 +188,9 @@ def opponent_elo_rolls(games_filled: pl.DataFrame) -> pl.DataFrame:
     return pl.concat(frames)
 
 
-def fill_week1_rolls(rolls: pl.DataFrame, prev_rolls: pl.DataFrame, prev_games_filled: pl.DataFrame) -> pl.DataFrame:
+def fill_week1_rolls(
+    rolls: pl.DataFrame, prev_rolls: pl.DataFrame, prev_games_filled: pl.DataFrame
+) -> pl.DataFrame:
     """Rule 4: week-1 rows take the prior season's final rolls, else their 10th percentile."""
     prev_final = (
         prev_rolls.sort(["team", "game_date", "week"], maintain_order=True)
@@ -185,14 +203,20 @@ def fill_week1_rolls(rolls: pl.DataFrame, prev_rolls: pl.DataFrame, prev_games_f
     )
     prev_fbs_teams = pl.concat(
         [
-            prev_games_filled.filter(pl.col("home_division") == "fbs").select(team="home_team"),
-            prev_games_filled.filter(pl.col("away_division") == "fbs").select(team="away_team"),
+            prev_games_filled.filter(pl.col("home_division") == "fbs").select(
+                team="home_team"
+            ),
+            prev_games_filled.filter(pl.col("away_division") == "fbs").select(
+                team="away_team"
+            ),
         ]
     ).unique()
     fbs_finals = prev_final.join(prev_fbs_teams, on="team", how="semi")
     prev_elo_10th = fbs_elo_10th(prev_games_filled)["elo_10th"]
     prev_elo_10th = (
-        float(prev_elo_10th[0]) if prev_elo_10th.len() and prev_elo_10th[0] is not None else _DEFAULT_ELO_10TH
+        float(prev_elo_10th[0])
+        if prev_elo_10th.len() and prev_elo_10th[0] is not None
+        else _DEFAULT_ELO_10TH
     )
 
     def q(col: str, fallback: float) -> float:
@@ -221,7 +245,9 @@ def fill_week1_rolls(rolls: pl.DataFrame, prev_rolls: pl.DataFrame, prev_games_f
 
 def is_playoff(notes: pl.Expr) -> pl.Expr:
     """CFBD ``notes`` naming a College Football Playoff game (bowls do not)."""
-    return notes.fill_null("").str.contains("(?i)college football playoff|national championship")
+    return notes.fill_null("").str.contains(
+        "(?i)college football playoff|national championship"
+    )
 
 
 def matchup_scope(games: pl.DataFrame) -> pl.DataFrame:
@@ -235,10 +261,14 @@ def matchup_scope(games: pl.DataFrame) -> pl.DataFrame:
     after every row the line keeps, so they cannot leak into a kept row of the
     same season. The line drops bowl ROWS separately (:func:`is_playoff`).
     """
-    return games.filter((pl.col("home_division") == "fbs") & (pl.col("away_division") == "fbs"))
+    return games.filter(
+        (pl.col("home_division") == "fbs") & (pl.col("away_division") == "fbs")
+    )
 
 
-def season_elo(games: pl.DataFrame, prev_games: pl.DataFrame) -> tuple[pl.DataFrame, pl.DataFrame]:
+def season_elo(
+    games: pl.DataFrame, prev_games: pl.DataFrame
+) -> tuple[pl.DataFrame, pl.DataFrame]:
     """All four rules for one season given the prior season's games.
 
     Returns ``(games_filled, rolls)``: the season's games (ALL of them) with
@@ -272,7 +302,12 @@ def consensus_lines(lines: pl.DataFrame) -> pl.DataFrame:
 
     def num(col: str) -> pl.Expr:
         s = pl.col(col).cast(pl.Utf8)
-        return pl.when(s.str.to_lowercase() == "pk").then(pl.lit("0")).otherwise(s).cast(pl.Float64, strict=False)
+        return (
+            pl.when(s.str.to_lowercase() == "pk")
+            .then(pl.lit("0"))
+            .otherwise(s)
+            .cast(pl.Float64, strict=False)
+        )
 
     return (
         lines.with_columns(

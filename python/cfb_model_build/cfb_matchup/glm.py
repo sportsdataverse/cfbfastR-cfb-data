@@ -46,6 +46,7 @@ class FitResult:
     n_obs: int
     log_loss: float
     accuracy: float
+    n_iter: int
 
 
 def fit_logit(
@@ -57,7 +58,8 @@ def fit_logit(
 ) -> FitResult:
     """Unpenalised logistic MLE on ``frame[features] -> frame[target]``."""
     active = [f for f in features if f not in aliased]
-    data = frame.select([target, *active]).drop_nulls()
+    # R's na.omit drops a row with NA in ANY formula term, aliased ones included
+    data = frame.select([target, *features]).drop_nulls()
     x = data.select(active).to_numpy().astype(np.float64)
     y = data[target].to_numpy().astype(np.int64)
     # C=inf is the unpenalised MLE (sklearn >= 1.8 spelling of penalty=None)
@@ -65,6 +67,11 @@ def fit_logit(
         C=np.inf, solver="newton-cholesky", tol=1e-12, max_iter=500
     )
     model.fit(x, y)
+    n_iter = int(model.n_iter_[0])
+    if n_iter >= model.max_iter:
+        raise RuntimeError(
+            f"{target}: Newton-Cholesky did not converge in {model.max_iter} iterations"
+        )
     p = np.clip(model.predict_proba(x)[:, 1], 1e-15, 1 - 1e-15)
     log_loss = float(-np.mean(y * np.log(p) + (1 - y) * np.log(1 - p)))
     coef = GlmCoefficients(
@@ -76,7 +83,7 @@ def fit_logit(
         link="logit",
     )
     return FitResult(
-        coef, int(len(y)), log_loss, float(np.mean((p >= 0.5) == (y == 1)))
+        coef, int(len(y)), log_loss, float(np.mean((p >= 0.5) == (y == 1))), n_iter
     )
 
 
@@ -132,7 +139,10 @@ def write_fit(
                 "n_obs": result.n_obs,
                 "train_log_loss": result.log_loss,
                 "train_accuracy": result.accuracy,
-                "solver": "sklearn LogisticRegression(penalty=None, solver='newton-cholesky', tol=1e-12)",
+                "n_iter": result.n_iter,
+                "fitted_by": f"cfb_matchup train-{stem.replace('_', '-')}",
+                "partition": "n/a -- full in-sample MLE",
+                "solver": "sklearn LogisticRegression(C=inf, solver='newton-cholesky', tol=1e-12) -- unpenalised MLE",
             },
             indent=2,
         ),

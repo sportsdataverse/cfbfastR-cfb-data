@@ -33,6 +33,49 @@ import polars as pl
 
 PLAY_KEYS = ("game_id", "id_play", "game_play_number")
 
+#: CFBD spelling -> the delivered display name. Applied to every team column at
+#: the pbp boundary (``augment_plays``) and to every other input before a join,
+#: so all joins share one spelling -- the source's own name fault line.
+TEAM_NAME_MAPPING = {
+    "UConn": "Connecticut",
+    "UTSA": "UT San Antonio",
+    "UL Monroe": "Louisiana Monroe",
+    "Southern Miss": "Southern Mississippi",
+    "Sam Houston": "Sam Houston State",
+    "Massachusetts": "UMass",
+    "Appalachian State": "App State",
+}
+TEAM_COLUMNS = (
+    "home",
+    "away",
+    "pos_team",
+    "def_pos_team",
+    "offense_play",
+    "defense_play",
+)
+
+
+def to_display_names(frame: pl.DataFrame, *cols: str) -> pl.DataFrame:
+    """Map CFBD spellings to the delivered names in every named column."""
+    return frame.with_columns([pl.col(c).replace(TEAM_NAME_MAPPING) for c in cols])
+
+
+def canonical_ids(frame: pl.DataFrame) -> pl.DataFrame:
+    """One id width for every dataset: ``game_id`` / ``season`` / ``week`` as Int64.
+
+    The pbp release ships them Int32 and CFBD Int64; a join between the two
+    silently widens, so the two sibling datasets would publish different
+    widths. Fix it once at the boundary.
+    """
+    return frame.with_columns(
+        [
+            pl.col(c).cast(pl.Int64)
+            for c in ("game_id", "season", "week")
+            if c in frame.columns
+        ]
+    )
+
+
 #: Rush-expectation glm terms, in formula order (``tools/run_pass.R``).
 RUSH_EXPECT_FEATURES = (
     "pos_team_score",
@@ -78,7 +121,9 @@ def dedupe_plays(pbp: pl.DataFrame) -> pl.DataFrame:
     The release parquet carries ~10k duplicate play rows per season; the
     pipeline keeps the first occurrence in file order.
     """
-    return pbp.unique(subset=list(PLAY_KEYS), keep="first", maintain_order=True)
+    return canonical_ids(
+        pbp.unique(subset=list(PLAY_KEYS), keep="first", maintain_order=True)
+    )
 
 
 # --------------------------------------------------------------------------- A
@@ -341,6 +386,9 @@ def build_drive_frame(
     return (
         grouped.with_columns(
             prev_drive_result=pl.col("drive_result").shift(1),
+            # R case_when(new_drive_pts >= 6 ~ 1, ind == 1 ~ 1, TRUE ~ 0): an NA
+            # condition falls through, so a null indicator labels 0 -- unlike the
+            # ifelse() flags above this one is NOT null-preserving, by the source
             scoring_opp=pl.when(pl.col("new_drive_pts") >= 6)
             .then(1)
             .when(pl.col("scoring_opp_ind_no_td") == 1)
@@ -410,7 +458,7 @@ def pace_history(pbp: pl.DataFrame) -> pl.DataFrame:
     ``offense_play``, defense rows on ``defense_play``; the two sides are
     outer-joined, so a team with plays on only one side still gets a row.
     """
-    paced = play_pace(pbp).with_columns(
+    paced = play_pace(canonical_ids(pbp)).with_columns(
         play_date=pl.col("start_date").str.slice(0, 10).str.to_date()
     )
     sides = []
@@ -511,12 +559,13 @@ def augment_plays(
 ) -> pl.DataFrame:
     """Dedupe, tag, weight and score a season's pbp into the frame unit F aggregates.
 
-    Adds ``off_wepa`` / ``def_wepa``, ``rp_prediction`` / ``rroe``, ``gsr`` and
-    ``play_date`` (the UTC calendar day of ``start_date``, which is what the
+    Maps every team column to the display spelling, then adds ``off_wepa`` /
+    ``def_wepa``, ``rp_prediction`` / ``rroe``, ``gsr`` and ``play_date`` (the UTC calendar day of ``start_date``, which is what the
     pipeline's ``as.Date()`` comparisons see); the 120 flag columns are dropped
     again -- nothing downstream reads them.
     """
     out = apply_wepa(tag_plays(dedupe_plays(pbp)), weights)
+    out = to_display_names(out, *[c for c in TEAM_COLUMNS if c in out.columns])
     out = out.drop([c for c in out.columns if c.endswith("_weight")])
     out = out.with_columns(rp_prediction=apply_logit(rush_expect))
     out = out.with_columns(
@@ -598,7 +647,7 @@ def team_game_features(
     teams: list[str],
     scoring_opp: GlmCoefficients,
     *,
-    first_game_same_day: bool = True,
+    first_game_same_day: bool = False,
 ) -> pl.DataFrame:
     """Per (team, game) as-of features: one row per game a listed team plays.
 
@@ -606,9 +655,9 @@ def team_game_features(
     dropped, as the pipeline does); ``games`` needs ``game_id``, ``start_date``
     (Date), ``home_team``, ``away_team``. Game i of a team's season sees plays
     dated strictly before it. Its FIRST game sees that same day's
-    regular-season plays when ``first_game_same_day`` is True -- the pipeline's
-    own behaviour, which reads the game being predicted; the published dataset
-    passes False and leaves the first game null.
+    regular-season plays when ``first_game_same_day`` is True -- the source's
+    own behaviour, which reads the game being predicted, kept ONLY for the
+    R-parity tests. The default (False) leaves the first game null.
     """
     plays = plays.filter(pl.col("ppa").is_not_null())
     rows: list[dict] = []

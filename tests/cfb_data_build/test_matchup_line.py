@@ -21,8 +21,8 @@ from pathlib import Path
 import numpy as np
 import polars as pl
 
+from cfb_data_build.matchup_features import TEAM_NAME_MAPPING
 from cfb_data_build.matchup_line import (
-    TEAM_NAME_MAPPING,
     FEATURE_COLS,
     LINE_COLUMNS,
     PACE_COLS,

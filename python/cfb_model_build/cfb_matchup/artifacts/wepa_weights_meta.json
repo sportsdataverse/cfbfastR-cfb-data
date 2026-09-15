@@ -3,6 +3,7 @@
   "n_weights": 120,
   "train": "random search over weight vectors scored by lm(home MOV ~ home/away off/def WEPA) adj-R2, IN-SAMPLE on the source's 2014-2023 games (500 candidates); selected 2024-06-02",
   "trainer": "not yet ported (wepa_weight_training.R); the weights are applied by cfb_data_build.matchup_features.apply_wepa",
-  "fitted_by": "the source R pipeline (glm / random weight search), imported 2026-09-15 as the initial artifact",
-  "refit": "python -m cfb_model_build.cfb_matchup train-<model> --out-dir python/cfb_model_build/cfb_matchup/artifacts"
+  "fitted_by": "the source pipeline's random weight search (500 candidates, in-sample adj-R2); selected 2024-06-02; imported 2026-09-15",
+  "refit": "TODO -- no trainer yet (port of wepa_weight_training.R)",
+  "follow_up": "ClaudeCowork/plans/cfb-matchup-python-port.md section 5 phase 5 (wepa_weights trainer port + out-of-sample score)"
 }

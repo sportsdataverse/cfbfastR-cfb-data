@@ -27,6 +27,7 @@ import pytest
 
 from cfb_data_build.matchup_features import (
     TEAM_FEATURE_COLUMNS,
+    TEAM_NAME_MAPPING,
     augment_plays,
     dedupe_plays,
     load_coefficients,
@@ -74,14 +75,14 @@ def test_sample_structure_and_first_game_rule() -> None:
     teams = sorted(set(games["home_team"]) | set(games["away_team"]))[:12]
     scoring = load_coefficients(FIX / "scoring_opp_coef.json")
 
-    faithful = team_game_features(aug, games, teams, scoring)
+    faithful = team_game_features(aug, games, teams, scoring, first_game_same_day=True)
     assert faithful.columns == ["game_id", "team", *TEAM_FEATURE_COLUMNS]
     assert faithful.height == sum(
         games.filter((pl.col("home_team") == t) | (pl.col("away_team") == t)).height
         for t in teams
     )
 
-    strict = team_game_features(aug, games, teams, scoring, first_game_same_day=False)
+    strict = team_game_features(aug, games, teams, scoring)
     first_rows = strict.group_by("team", maintain_order=True).first()
     assert first_rows.select(
         TEAM_FEATURE_COLUMNS
@@ -102,7 +103,7 @@ def test_full_season_features_match_r() -> None:
     aug = _augmented(pbp)
     oracle = pl.read_csv(
         FIX / "team_features_full_2025_r.csv", infer_schema_length=10000
-    )
+    ).with_columns(pl.col("team").replace(TEAM_NAME_MAPPING))
     teams = oracle["team"].to_list()
     scoring = load_coefficients(FIX / "scoring_opp_coef.json")
     # the pipeline's synthetic future game: every play of the season is "prior"
@@ -116,7 +117,7 @@ def test_full_season_features_match_r() -> None:
     )
     games = pl.concat([_games_from(aug), games], how="vertical_relaxed")
     py = (
-        team_game_features(aug, games, teams, scoring)
+        team_game_features(aug, games, teams, scoring, first_game_same_day=True)
         .filter(pl.col("game_id") < 0)
         .sort("team")
     )
@@ -134,11 +135,15 @@ def test_asof_features_match_r() -> None:
         FIX / "team_features_asof_2025.csv",
         infer_schema_length=10000,
         null_values=["NA", ""],
-    )
+    ).with_columns(pl.col("team").replace(TEAM_NAME_MAPPING))
     teams = sorted(oracle["team"].unique().to_list())
     games = _games_from(aug)
     py = team_game_features(
-        aug, games, teams, load_coefficients(FIX / "scoring_opp_coef.json")
+        aug,
+        games,
+        teams,
+        load_coefficients(FIX / "scoring_opp_coef.json"),
+        first_game_same_day=True,
     )
     keys = ["team", "game_id"]
     py, oracle = py.sort(keys), oracle.sort(keys)

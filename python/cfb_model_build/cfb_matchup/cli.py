@@ -1,7 +1,7 @@
 """CLI for model family 35 (``cfb_matchup``).
 
-    python -m cfb_model_build.cfb_matchup train-scoring-opp --seasons 2014-2024 --out-dir models/artifacts/cfb_matchup
-    python -m cfb_model_build.cfb_matchup train-rush-expect --seasons 2014-2024 --out-dir models/artifacts/cfb_matchup
+    python -m cfb_model_build.cfb_matchup train-scoring-opp --seasons 2014-2024 --out-dir python/.cache/matchup/candidate
+    python -m cfb_model_build.cfb_matchup train-rush-expect --seasons 2014-2024 --out-dir python/.cache/matchup/candidate
 
 Training rows come from the ``cfbfastR_cfb_pbp`` release (sdv-py
 ``load_cfb_pbp_r``), one season at a time, or from ``--frame`` (a parquet
@@ -73,13 +73,29 @@ def build_parser() -> argparse.ArgumentParser:
             default=None,
             help="pre-built training frame parquet (skips the release load)",
         )
-        sp.add_argument("--out-dir", type=Path, required=True)
+        sp.add_argument(
+            "--out-dir",
+            type=Path,
+            required=True,
+            help="where to write <stem>_coef.json + _meta.json (a candidate dir; the bundle needs --promote)",
+        )
+        sp.add_argument(
+            "--promote",
+            action="store_true",
+            help="allow --out-dir to be the bundled artifacts dir (only after the parity + level gates pass)",
+        )
     return p
 
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     seasons = _seasons(args.seasons)
+    bundle = Path(__file__).resolve().parent / "artifacts"
+    if args.out_dir.resolve() == bundle and not args.promote:
+        raise SystemExit(
+            "refusing to overwrite the bundled artifacts without --promote: fit into a "
+            "candidate dir, run tests/cfb_matchup (parity + level gates), then promote"
+        )
     if args.command == "train-scoring-opp":
         frame = (
             pl.read_parquet(args.frame)

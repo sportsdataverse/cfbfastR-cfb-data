@@ -19,7 +19,7 @@ drive number>`.
 | `wepa_weights.json` | 120 | the shipped WEPA weights (`off_*` 60 + `def_*` 60), by name | snapshot `models/final_wepa_weights_6_2_24.RDS` |
 | `scoring_opp_coef.json` | 6 | logistic glm coefficients + formula/family; rank 6/6 | snapshot `models/scoring_opp_mod.RDS` |
 | `rush_expect_coef.json` | 13 | logistic glm coefficients; rank 12/13 — `score_diff` aliased (null) and dropped by R's `predict` | snapshot `models/rp_mod_3.rds` |
-| `rp_features_sample.csv` | 5,000 × 15 | rush/pass plays with the 12 rush-expectation features + R's `rp` prediction (refit-parity oracle) | R capture, `set.seed(2025)` sample |
+| `rp_features_sample.csv` | 5,000 × 15 | rush/pass plays with the 12 rush-expectation features + R's `rp` prediction — the shipped applier is gated against it in `tests/cfb_matchup/test_glm_parity.py` (max diff 1e-15) | R capture, `set.seed(2025)` sample |
 | `team_features_full_2025.csv` | 136 × 36 | per FBS team, FULL-season 2025 features (38-col family; the pipeline's prior-season priors file) | snapshot `data/prev_season_epa_data_2025.csv` (June 2026 run) |
 | `team_features_asof_2025.csv` | 1,740 × 44 | per FBS team-game, the loop's as-of features + game meta — `capture_team_features.R`, the loop function verbatim over today's release | R capture 2026-09-15 |
 | `team_features_full_2025_r.csv` | 136 × 44 | the same loop with the pipeline's synthetic future game (whole season) | R capture 2026-09-15 |
@@ -42,3 +42,9 @@ Known oracle quirks (ported faithfully, documented in the module):
 - `early_down_rush_weight` has no rush condition (`down <= 2`).
 - `prev_drive_result` lags over the season-wide, key-sorted drive frame, so a game's first
   drive sees the previous game's last drive.
+
+Trainer parity frames (not committed; `python/.cache/matchup/`): `scoring_opp_training_frame.parquet`
+(262,089 rows) and `rush_expect_training_frame.parquet` (1,304,773 rows) are the `model$data`
+slots of the source's fitted objects, extracted by
+`ops/oneoff/20260915_matchup_oracle_capture/dump_training_frames.R`; their sha256 is recorded
+in `python/cfb_model_build/cfb_matchup/artifacts/*_meta.json`.

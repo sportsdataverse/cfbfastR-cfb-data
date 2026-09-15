@@ -19,10 +19,8 @@ pbp. Everything network-facing is isolated in the ``fetch_*`` names.
 
 from __future__ import annotations
 
-import json
 import os
 from datetime import date
-import urllib.request
 from pathlib import Path
 
 import polars as pl
@@ -34,7 +32,9 @@ from cfb_data_build.matchup_features import (
     load_coefficients,
     load_wepa_weights,
     pace_history,
+    play_pace,
     team_game_features,
+    to_display_names,
 )
 from cfb_data_build.matchup_line import PACE_COLS, build_matchup_line
 from cfb_data_build.schedules_unified import fetch_cfbd_games
@@ -136,27 +136,38 @@ def tidy_cfbd_lines(payload: list[dict]) -> pl.DataFrame:
 
 
 def fetch_cfbd_lines(season: int, *, api_key: str | None = None) -> list[dict]:
+    """CFBD ``/lines`` for a season, through the repo's pooled + retrying client.
+
+    A 200 whose body is not a list is an error, not an empty season: it would
+    otherwise publish a line with every spread null and no signal.
+    """
+    from sportsdataverse.dl_utils import download
+
     key = api_key or os.environ.get("CFBD_API_KEY")
     if not key:
         raise RuntimeError(
             "CFBD_API_KEY is not set -- cfb_matchup_line reads CFBD /lines"
         )
-    req = urllib.request.Request(
+    payload = download(
         f"{CFBD_LINES}?year={season}&seasonType=both",
         headers={"Authorization": f"Bearer {key}", "Accept": "application/json"},
-    )
-    with urllib.request.urlopen(req, timeout=120) as resp:  # noqa: S310 - fixed https host
-        payload = json.loads(resp.read())
-    return payload if isinstance(payload, list) else []
+    ).json()
+    if not isinstance(payload, list):
+        raise RuntimeError(
+            f"CFBD /lines {season}: unexpected body {type(payload).__name__}"
+        )
+    return payload
 
 
 def load_pbp(season: int) -> pl.DataFrame:
+    """The ``cfbfastR_cfb_pbp`` release for one season (sdv-py loader)."""
     from sportsdataverse.cfb import load_cfb_pbp_r
 
     return load_cfb_pbp_r([season])
 
 
 def augmented_season(pbp: pl.DataFrame) -> pl.DataFrame:
+    """``augment_plays`` with the bundled stage-35 artifacts."""
     return augment_plays(
         pbp,
         load_wepa_weights(ARTIFACTS / "wepa_weights.json"),
@@ -165,7 +176,8 @@ def augmented_season(pbp: pl.DataFrame) -> pl.DataFrame:
 
 
 def fbs_teams(games: pl.DataFrame) -> list[str]:
-    scope = matchup_scope(games)
+    """Every team in an FBS-vs-FBS game, in the display spelling the plays carry."""
+    scope = to_display_names(matchup_scope(games), "home_team", "away_team")
     return sorted(set(scope["home_team"]) | set(scope["away_team"]))
 
 
@@ -190,14 +202,12 @@ def full_season_features(plays: pl.DataFrame, teams: list[str]) -> pl.DataFrame:
     # first-game rule would otherwise see it as an opener with no prior plays
     games = pl.concat([played_games(plays), synth], how="vertical_relaxed")
     scoring = load_coefficients(ARTIFACTS / "scoring_opp_coef.json")
-    out = team_game_features(plays, games, teams, scoring)
+    out = team_game_features(plays, games, teams, scoring, first_game_same_day=False)
     return out.filter(pl.col("game_id") < 0).drop("game_id")
 
 
 def full_season_pace(pbp: pl.DataFrame) -> pl.DataFrame:
     """Per team, the season's pace over ALL its plays (the source's ``team_pace_full``)."""
-    from cfb_data_build.matchup_features import play_pace
-
     paced = play_pace(pbp)
     parts = []
     for side, col in (("off", "offense_play"), ("def", "defense_play")):
@@ -217,13 +227,22 @@ def full_season_pace(pbp: pl.DataFrame) -> pl.DataFrame:
 
 
 def build_matchup_features(season: int, *, base: str = "cfb") -> pl.DataFrame:
+    """Stage 41: one row per FBS team-game, features strictly prior to the game."""
     games = tidy_cfbd_games(fetch_cfbd_games(season))
     plays = augmented_season(load_pbp(season))
     scoring = load_coefficients(ARTIFACTS / "scoring_opp_coef.json")
+    teams = fbs_teams(games)
     feats = team_game_features(
-        plays, played_games(plays), fbs_teams(games), scoring, first_game_same_day=False
+        plays, played_games(plays), teams, scoring, first_game_same_day=False
     )
-    meta = games.select(
+    # a listed team with no rows means its spelling matched no play -- the
+    # silent-drop failure the display mapping exists to prevent
+    unmatched = sorted(set(teams) - set(feats["team"].unique().to_list()))
+    if unmatched:
+        raise RuntimeError(
+            f"{season}: FBS teams with no matchup rows (name mismatch?): {unmatched}"
+        )
+    meta = to_display_names(games, "home_team", "away_team").select(
         "game_id",
         "season",
         "week",
@@ -254,6 +273,7 @@ def build_matchup_features(season: int, *, base: str = "cfb") -> pl.DataFrame:
 
 
 def build_matchup_line_season(season: int, *, base: str = "cfb") -> pl.DataFrame:
+    """Stage 42: the 268-column line for one season (reads the prior season too)."""
     games = tidy_cfbd_games(fetch_cfbd_games(season))
     prev_games = tidy_cfbd_games(fetch_cfbd_games(season - 1))
     lines = tidy_cfbd_lines(fetch_cfbd_lines(season))

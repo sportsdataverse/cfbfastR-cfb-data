@@ -6,9 +6,12 @@ schedule provides one for the NFL, so attribution is per TEAM-SEASON:
 wins, losses, clean_attribution) names the head coach of each school-season;
 ``games`` is games coached (wins + losses, + ties where CFBD reports them) and
 :func:`load_coach_seasons` refuses a roster where it is smaller than the record.
-``clean_attribution`` is True when that coach led at least 80% of the
-school's games that season; a school-season split between two coaches is
-left unattributed rather than credited to either.
+``clean_attribution`` marks the coach who owns the school-season: a school's
+only coach owns it outright (CFBD reports ``games: 0`` while a season is in
+progress, so no share could be computed); with two or more coaches the one
+who led at least 80% of the school's counted games owns it, and a split
+season with no clear majority is left unattributed rather than credited to
+either.
 
 ``school`` is the CFBD school name, which equals the ESPN ``location`` the
 schedule master carries as ``home_location`` / ``away_location`` (all 137

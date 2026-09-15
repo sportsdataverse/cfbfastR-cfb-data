@@ -77,6 +77,23 @@ RELEASE_NOTES: dict[str, str] = {
         "The ridge is refit on everything up to week W, so this is NOT "
         "derivable by summing per-game rows.\n" + _WEEKLY_ASOF_WARNING
     ),
+    "cfb_matchup_features": (
+        "College Football per-team, per-GAME matchup features (EPA / success / "
+        "weighted EPA / scoring-opportunity rate over expected / rush rate over "
+        "expected / pace), computed from the team's plays dated STRICTLY BEFORE "
+        "the game. Keyed (season, game_id, team_id, team); a team's first game "
+        "of the season is null. As-of by construction: the row for game G never "
+        "contains G, so no `through_week` arithmetic is needed."
+    ),
+    "cfb_matchup_line": (
+        "College Football per-game matchup line (FBS vs FBS, bowls dropped, CFP "
+        "kept): home / away as-of features, the prior season's full-season "
+        "`prev_*` block, pace, CFBD pregame ELO with opponent-ELO rolls, "
+        "consensus betting lines and game meta -- 268 columns. Regular-season "
+        "week-1 (and any later opener's) features are the prior season's "
+        "full-season values. Side inputs (talent, coaches, returning "
+        "production, QB, weather, venue) are null until their joins land."
+    ),
 }
 
 

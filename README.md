@@ -210,6 +210,7 @@ Every numbered pipeline stage in `python/` (auto-listed; run subsets with the `s
 - `python/cfb_model_32_pregame_wp_creation.py`
 - `python/cfb_model_33_rb_eval_creation.py`
 - `python/cfb_model_34_higher_models_creation.py`
+- `python/cfb_model_35_matchup_creation.py`
 - `python/cfb_model_60_publish_creation.py`
 - `python/cfb_model_70_reports_creation.py`
 - `python/espn_cfb_01_pbp_creation.py`
@@ -248,6 +249,8 @@ Every numbered pipeline stage in `python/` (auto-listed; run subsets with the `s
 - `python/espn_cfb_38_adv_st_returners_creation.py`
 - `python/espn_cfb_39_adv_st_blocks_creation.py`
 - `python/espn_cfb_40_adv_st_team_creation.py`
+- `python/espn_cfb_41_matchup_features_creation.py`
+- `python/espn_cfb_42_matchup_line_creation.py`
 - `python/espn_cfb_50_usage_players_creation.py`
 - `python/espn_cfb_51_usage_position_groups_creation.py`
 - `python/espn_cfb_52_usage_tackles_creation.py`

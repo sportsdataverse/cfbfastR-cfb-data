@@ -1,0 +1,15 @@
+{
+  "model": "wepa_weights",
+  "n_weights": 120,
+  "train": "random search over weight vectors scored by lm(home MOV ~ home/away off/def WEPA) adj-R2, IN-SAMPLE on the source's 2014-2023 games (500 candidates); selected 2024-06-02",
+  "trainer": "python -m cfb_model_build.cfb_matchup train-wepa-weights (port of wepa_weight_training.R: random search scored by adj-R2 of home MOV on the four as-of WEPA means)",
+  "fitted_by": "the source pipeline's random weight search (500 candidates, in-sample adj-R2); selected 2024-06-02; imported 2026-09-15",
+  "refit": "python -m cfb_model_build.cfb_matchup train-wepa-weights --seasons 2014-2024 --holdout 2025 --n 500 --seed 4 --out-dir <candidate>; promote only if the held-out score beats the shipped one",
+  "selected_by": "max in-sample adj_r2 over the source's 500 candidates (row 302 of wepa_search_evals.csv)",
+  "adj_r2_in_sample_2014_2023": 0.250909,
+  "sd_err_in_sample_2014_2023": 17.99881,
+  "adj_r2_holdout_2025": 0.20357194368131848,
+  "sd_err_holdout_2025": 19.458418539718387,
+  "holdout_n_games": 1459,
+  "scorer_parity": "adj_r2 / sd_err within 1e-6 of the source's evaluate_weights on 2025 for six weight vectors (tests/cfb_matchup/test_wepa_search.py)"
+}

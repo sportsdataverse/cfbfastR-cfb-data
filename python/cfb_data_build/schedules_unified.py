@@ -237,13 +237,17 @@ _COALESCE = {
 }
 
 
-def _get(url: str, *, headers: dict[str, str] | None = None, timeout: int = 120) -> bytes:
+def _get(
+    url: str, *, headers: dict[str, str] | None = None, timeout: int = 120
+) -> bytes:
     req = urllib.request.Request(url, headers={**_UA, **(headers or {})})
     with urllib.request.urlopen(req, timeout=timeout) as resp:  # noqa: S310 - fixed https hosts
         return resp.read()
 
 
-def fetch_cfbd_games(season: int, *, api_key: str | None = None, url: str = CFBD_GAMES) -> list[dict]:
+def fetch_cfbd_games(
+    season: int, *, api_key: str | None = None, url: str = CFBD_GAMES
+) -> list[dict]:
     """Every CFBD game for a season, regular + postseason in one call."""
     key = api_key or os.environ.get("CFBD_API_KEY")
     if not key:
@@ -256,7 +260,14 @@ def fetch_cfbd_games(season: int, *, api_key: str | None = None, url: str = CFBD
         headers={"Authorization": f"Bearer {key}", "Accept": "application/json"},
     )
     payload = json.loads(raw)
-    return payload if isinstance(payload, list) else []
+    # a 200 whose body is not a list is CFBD's error object (auth, rate limit),
+    # never an empty season: returning [] here published an empty schedule and
+    # let the matchup stages report success on zero rows
+    if not isinstance(payload, list):
+        raise RuntimeError(
+            f"CFBD /games {season}: unexpected body {type(payload).__name__}: {str(payload)[:200]}"
+        )
+    return payload
 
 
 def _int(value: Any) -> int | None:
@@ -293,14 +304,20 @@ def _cfbd_row(game: dict) -> dict[str, Any]:
 
 def tidy_cfbd(games: list[dict]) -> pl.DataFrame:
     """Tidy the CFBD ``/games`` payload. Pure -- no network, no disk."""
-    cols = [c for c in SCHEMA if c in set(_CFBD_FIELDS.values()) | set(_PLAYOFF_FIELDS.values())]
+    cols = [
+        c
+        for c in SCHEMA
+        if c in set(_CFBD_FIELDS.values()) | set(_PLAYOFF_FIELDS.values())
+    ]
     schema = {c: SCHEMA[c] for c in cols}
     if not games:
         return pl.DataFrame(schema=schema)
     return pl.from_dicts([_cfbd_row(g) for g in games], schema=schema)
 
 
-def load_espn(season: int, *, base: str | Path = "cfb", release: str = ESPN_RELEASE) -> pl.DataFrame:
+def load_espn(
+    season: int, *, base: str | Path = "cfb", release: str = ESPN_RELEASE
+) -> pl.DataFrame:
     """The ESPN-native schedule for a season: local artifact first, release second.
 
     The daily driver builds ``schedules`` minutes before this stage, so the local
@@ -372,22 +389,33 @@ def unify(cfbd: pl.DataFrame, espn: pl.DataFrame, season: int) -> pl.DataFrame:
                 return pl.col(cand)
         return pl.lit(None)
 
-    df = df.with_columns(
-        [pl.coalesce(pl.col(dst), espn_col(src)).alias(dst) for dst, src in _COALESCE.items()]
-    ).with_columns(
-        season=pl.lit(season, dtype=pl.Int64),
-        season_type=pl.coalesce(pl.col("season_type"), espn_col("espn_season_type")),
-        status=espn_col("status"),
-        conference_competition=espn_col("conference_competition"),
-        home_abbreviation=espn_col("home_abbreviation"),
-        away_abbreviation=espn_col("away_abbreviation"),
-        completed=pl.coalesce(pl.col("completed"), espn_col("status") == "STATUS_FINAL"),
-    ).with_columns(
-        # Derived from the label, so the pair is 1:1 by construction; verified
-        # against ESPN's own integer on every joined row (they never disagree).
-        season_type_id=pl.col("season_type").replace_strict(
-            _SEASON_TYPE_IDS, default=None, return_dtype=pl.Int64
-        ),
+    df = (
+        df.with_columns(
+            [
+                pl.coalesce(pl.col(dst), espn_col(src)).alias(dst)
+                for dst, src in _COALESCE.items()
+            ]
+        )
+        .with_columns(
+            season=pl.lit(season, dtype=pl.Int64),
+            season_type=pl.coalesce(
+                pl.col("season_type"), espn_col("espn_season_type")
+            ),
+            status=espn_col("status"),
+            conference_competition=espn_col("conference_competition"),
+            home_abbreviation=espn_col("home_abbreviation"),
+            away_abbreviation=espn_col("away_abbreviation"),
+            completed=pl.coalesce(
+                pl.col("completed"), espn_col("status") == "STATUS_FINAL"
+            ),
+        )
+        .with_columns(
+            # Derived from the label, so the pair is 1:1 by construction; verified
+            # against ESPN's own integer on every joined row (they never disagree).
+            season_type_id=pl.col("season_type").replace_strict(
+                _SEASON_TYPE_IDS, default=None, return_dtype=pl.Int64
+            ),
+        )
     )
 
     # A winner ESPN did not state is recoverable from a completed game's points;
@@ -409,8 +437,10 @@ def unify(cfbd: pl.DataFrame, espn: pl.DataFrame, season: int) -> pl.DataFrame:
         away_winner=winner("away_points", "home_points", "away_winner"),
         # eq_missing, not `== "fbs"`: division is null for teams outside ESPN's
         # group-80/81 universe and a null must read FALSE, never null.
-        fbs_game=pl.col("home_division").eq_missing("fbs") & pl.col("away_division").eq_missing("fbs"),
-        fbs_participant=pl.col("home_division").eq_missing("fbs") | pl.col("away_division").eq_missing("fbs"),
+        fbs_game=pl.col("home_division").eq_missing("fbs")
+        & pl.col("away_division").eq_missing("fbs"),
+        fbs_participant=pl.col("home_division").eq_missing("fbs")
+        | pl.col("away_division").eq_missing("fbs"),
     )
 
     for col, dtype in SCHEMA.items():

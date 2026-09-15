@@ -1,0 +1,19 @@
+{
+  "formula": "scoring_opp ~ half_secs_rem + game_secs_rem + start_yards_to_goal +      pos_team_timeouts + def_pos_team_timeouts",
+  "family": "binomial",
+  "link": "logit",
+  "nobs": 262065,
+  "rank": 6,
+  "n_coef": 6,
+  "n_aliased": 0,
+  "xlevels": {},
+  "contrasts": {},
+  "coefficients": {
+    "(Intercept)": 0.117747970156011,
+    "half_secs_rem": 0.000140614532319443,
+    "game_secs_rem": -1.86539613998198e-05,
+    "start_yards_to_goal": -0.0161548678491726,
+    "pos_team_timeouts": 0.0765235548500484,
+    "def_pos_team_timeouts": 0.0627111943052528
+  }
+}

@@ -139,7 +139,16 @@ KNOWN_UNPAIRED.update(
     }
 )
 
-NON_DATASET_STAGES: set[str] = {"adv_box", "team_summaries", "fpi_weekly"}
+#   matchup_features derived (cli.DERIVED): the cfbfastR_cfb_pbp release + CFBD
+#   matchup_line     /games + /lines, not final.json; Python-only by design --
+#                    the R source is a private pipeline, not a numbered R stage
+NON_DATASET_STAGES: set[str] = {
+    "adv_box",
+    "team_summaries",
+    "fpi_weekly",
+    "matchup_features",
+    "matchup_line",
+}
 # --------------------------------------------------------------------------
 # End repo-specific data. Everything below is the shared engine.
 # --------------------------------------------------------------------------

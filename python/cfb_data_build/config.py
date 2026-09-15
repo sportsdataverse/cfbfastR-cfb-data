@@ -412,4 +412,11 @@ PKG_FUNCTION: dict[str, str] = {
     "espn_cfb_team_tendencies": "python/espn_cfb_61_team_tendencies_creation.py",
     "espn_cfb_coach_tendencies": "python/espn_cfb_62_coach_tendencies_creation.py",
     "espn_cfb_coach_careers": "python/espn_cfb_63_coach_careers_creation.py",
+    # derived stages (derived.SPECS) publish through the same sidecar path;
+    # three have sdv-py loaders, the matchup pair names its producer shim
+    "espn_cfb_adv_team_gamelog": "sportsdataverse.cfb.load_cfb_adv_team_gamelog()",
+    "cfb_ratings_weekly": "sportsdataverse.cfb.load_cfb_ratings_weekly()",
+    "cfb_team_summaries_weekly": "sportsdataverse.cfb.load_cfb_team_summaries_weekly()",
+    "cfb_matchup_features": "python/espn_cfb_41_matchup_features_creation.py",
+    "cfb_matchup_line": "python/espn_cfb_42_matchup_line_creation.py",
 }

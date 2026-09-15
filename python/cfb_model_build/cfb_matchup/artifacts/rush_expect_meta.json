@@ -1,0 +1,31 @@
+{
+  "model": "rush_expect",
+  "features": [
+    "pos_team_score",
+    "def_pos_team_score",
+    "score_diff",
+    "half",
+    "period",
+    "TimeSecsRem",
+    "down",
+    "distance",
+    "yards_to_goal",
+    "ep_before",
+    "wp_before",
+    "rz_play"
+  ],
+  "aliased": [
+    "score_diff"
+  ],
+  "train_seasons": "TODO -- the source did not record the seasons of its 1,304,773-play corpus",
+  "n_obs": 1304773,
+  "parity": "port refit on the same rows reproduces every non-aliased coefficient within 1e-6 rel",
+  "fitted_by": "the source pipeline's R glm(); imported 2026-09-15 as the initial artifact",
+  "refit": "python -m cfb_model_build.cfb_matchup train-rush-expect --out-dir <candidate>; promote only after tests/cfb_matchup passes",
+  "training_frame": "python/.cache/matchup/rush_expect_training_frame.parquet",
+  "training_frame_sha256": "a1ab2a241f7e74bf28561cd782349267715538c35f1ae3a8aed99894adb48ca6",
+  "training_frame_rows": 1304773,
+  "train_log_loss": 0.651212,
+  "max_rel_coef_delta_vs_r": 1.76e-11,
+  "partition": "n/a -- full in-sample MLE on the source's training rows (no holdout was used by the source)"
+}

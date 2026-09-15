@@ -86,12 +86,15 @@ def test_build_matchup_line_offline(offline: None) -> None:
     assert out["spread"].null_count() < out.height
 
 
-def test_features_guard_catches_a_schedule_spelling(
-    offline: None, monkeypatch: pytest.MonkeyPatch
+@pytest.mark.parametrize(
+    "builder", ["build_matchup_features", "build_matchup_line_season"]
+)
+def test_builders_guard_a_schedule_spelling(
+    offline: None, monkeypatch: pytest.MonkeyPatch, builder: str
 ) -> None:
-    """A schedule name the plays do not carry raises, naming the team.
+    """A schedule name the plays do not carry raises, naming the team -- in BOTH stages.
 
-    Mutation-proven: with the guard removed the build returns rows whose
+    Mutation-proven: with the guard removed a build returns rows whose
     features are null for that team instead of failing.
     """
     sample = pl.read_parquet(FIX / "pbp_input_2025_sample.parquet")
@@ -109,4 +112,24 @@ def test_features_guard_catches_a_schedule_spelling(
 
     monkeypatch.setattr(matchup_build, "fetch_cfbd_games", renamed)
     with pytest.raises(RuntimeError, match="spelling mismatch"):
-        matchup_build.build_matchup_features(2025)
+        getattr(matchup_build, builder)(2025)
+
+
+def test_fetch_cfbd_games_rejects_an_error_body(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A 200 with CFBD's error object is an error, not an empty season.
+
+    Both matchup stages (and cfb_schedules) read this fetcher; `[]` here let a
+    rate-limited run build zero rows and report success.
+    """
+    from cfb_data_build import schedules_unified
+
+    monkeypatch.setenv("CFBD_API_KEY", "test")
+    monkeypatch.setattr(
+        schedules_unified, "_get", lambda *a, **k: '{"message": "rate limited"}'
+    )
+    with pytest.raises(RuntimeError, match="unexpected body"):
+        schedules_unified.fetch_cfbd_games(2025)
+    monkeypatch.setattr(schedules_unified, "_get", lambda *a, **k: "[]")
+    assert schedules_unified.fetch_cfbd_games(2025) == []

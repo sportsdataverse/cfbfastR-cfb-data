@@ -252,35 +252,23 @@ def full_season_pace(pbp: pl.DataFrame) -> pl.DataFrame:
     )
 
 
-def build_matchup_features(season: int, *, base: str = "cfb") -> pl.DataFrame:
-    """Stage 41: one row per FBS team-game, features strictly prior to the game."""
-    games = tidy_cfbd_games(fetch_cfbd_games(season))
-    plays = augmented_season(load_pbp(season))
-    scoring = load_coefficients(ARTIFACTS / "scoring_opp_coef.json")
-    teams = fbs_teams(games)
-    feats = team_game_features(
-        plays, schedule_games(games), teams, scoring, first_game_same_day=False
-    )
+def assert_schedule_names(
+    plays: pl.DataFrame, games: pl.DataFrame, teams: list[str], season: int
+) -> None:
+    """Raise when an FBS side's schedule name is not what its game's plays carry.
+
+    Both season builders aggregate plays by the schedule's team name, so a
+    spelling the plays do not use would still produce rows -- with null
+    features (the source's failed joins). The check is per game that HAS
+    plays: a team with no plays yet (bye week, game not built) is not a
+    mismatch, so the stage survives an in-season run.
+    """
     meta = to_display_names(games, "home_team", "away_team").select(
-        "game_id",
-        "season",
-        "week",
-        "season_type",
-        "start_date",
-        "home_id",
-        "home_team",
-        "away_id",
-        "away_team",
+        "game_id", "home_team", "away_team"
     )
-    # spelling guard: in every game that HAS plays, the schedule's name for an
-    # FBS side must be one of the plays' two names -- a mismatch would still
-    # produce rows, just with null features (the source's failed joins). A team
-    # with no plays yet (bye week, game not built) is not a mismatch.
     named = plays.select("game_id", "home", "away").unique()
     assert meta.schema["game_id"] == named.schema["game_id"]
-    both = meta.select("game_id", "home_team", "away_team").join(
-        named, on="game_id", how="inner"
-    )
+    both = meta.join(named, on="game_id", how="inner")
     unmatched: set[str] = set()
     for side in ("home_team", "away_team"):
         off = both.filter(
@@ -294,6 +282,29 @@ def build_matchup_features(season: int, *, base: str = "cfb") -> pl.DataFrame:
             f"{season}: FBS teams whose games have plays under another name "
             f"(spelling mismatch): {sorted(unmatched)}"
         )
+
+
+def build_matchup_features(season: int, *, base: str = "cfb") -> pl.DataFrame:
+    """Stage 41: one row per FBS team-game, features strictly prior to the game."""
+    games = tidy_cfbd_games(fetch_cfbd_games(season))
+    plays = augmented_season(load_pbp(season))
+    scoring = load_coefficients(ARTIFACTS / "scoring_opp_coef.json")
+    teams = fbs_teams(games)
+    feats = team_game_features(
+        plays, schedule_games(games), teams, scoring, first_game_same_day=False
+    )
+    assert_schedule_names(plays, games, teams, season)
+    meta = to_display_names(games, "home_team", "away_team").select(
+        "game_id",
+        "season",
+        "week",
+        "season_type",
+        "start_date",
+        "home_id",
+        "home_team",
+        "away_id",
+        "away_team",
+    )
     out = feats.join(meta, on="game_id", how="left").with_columns(
         team_id=pl.when(pl.col("team") == pl.col("home_team"))
         .then(pl.col("home_id"))
@@ -322,6 +333,7 @@ def build_matchup_line_season(season: int, *, base: str = "cfb") -> pl.DataFrame
     plays = augmented_season(pbp)
     scoring = load_coefficients(ARTIFACTS / "scoring_opp_coef.json")
     teams = fbs_teams(games)
+    assert_schedule_names(plays, games, teams, season)
     feats = team_game_features(
         plays, schedule_games(games), teams, scoring, first_game_same_day=False
     )

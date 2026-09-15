@@ -110,7 +110,13 @@ def test_rush_expect_sample_fit_beats_intercept_only(tmp_path: Path) -> None:
     base = _intercept_only_log_loss(frame["rush"].to_numpy().astype(float))
     assert base - result.log_loss >= 0.03, (base, result.log_loss)  # observed 0.0449
     coef_path, meta_path = write_fit(
-        result, tmp_path, "rush_expect", formula="rush ~ ...", seasons=[2025]
+        result,
+        tmp_path / "bundle",
+        "rush_expect",
+        formula="rush ~ ...",
+        seasons=[2025],
+        frame=frame,
+        frame_dir=tmp_path / "cache",
     )
     back = load_coefficients(coef_path)
     assert back.features == list(RUSH_EXPECT_FEATURES) and back.aliased == [
@@ -118,6 +124,16 @@ def test_rush_expect_sample_fit_beats_intercept_only(tmp_path: Path) -> None:
     ]
     meta = json.loads(meta_path.read_text(encoding="utf-8"))
     assert meta["n_obs"] == result.n_obs and meta["n_iter"] == result.n_iter
+    # the training frame is persisted content-addressed in frame_dir (the CLI
+    # points it at the gitignored cache), never beside the bundle artifacts
+    import hashlib
+
+    frame_path = Path(meta["training_frame"])
+    assert frame_path.parent == tmp_path / "cache" and frame_path.exists()
+    assert not list((tmp_path / "bundle").glob("*.parquet"))
+    digest = hashlib.sha256(frame_path.read_bytes()).hexdigest()
+    assert meta["training_frame_sha256"] == digest and digest[:12] in frame_path.name
+    assert meta["training_frame_rows"] == frame.height
 
 
 def test_scoring_opp_sample_fit_beats_intercept_only() -> None:

@@ -128,24 +128,34 @@ def write_fit(
     seasons: list[int],
     frame: pl.DataFrame | None = None,
     source: str | None = None,
+    frame_dir: Path | None = None,
 ) -> tuple[Path, Path]:
     """Write ``<stem>_coef.json`` + ``<stem>_meta.json`` (+ the training frame).
 
-    ``frame`` is persisted beside the artifacts as ``<stem>_training_frame.parquet``
-    and its sha256 / row count recorded, so a promoted fit stays reproducible
-    and auditable -- the same provenance the bundled metas carry. ``source``
-    names where the rows came from (release seasons or a ``--frame`` path).
+    ``frame`` is persisted as ``<stem>_training_frame_<sha12>.parquet`` under
+    ``frame_dir`` (default: ``out_dir``) and its path / sha256 / row count
+    recorded, so a promoted fit stays reproducible and auditable. The name is
+    content-addressed so it never overwrites another frame in a shared cache,
+    and the CLI points ``frame_dir`` at the gitignored cache rather than the
+    bundle: a 1.3M-row parquet must not land in the tracked artifacts on
+    ``--promote``. ``source`` names where the rows came from (release seasons
+    or a ``--frame`` path).
     """
     import hashlib
 
     out_dir.mkdir(parents=True, exist_ok=True)
     provenance: dict[str, object] = {"training_frame_source": source}
     if frame is not None:
-        frame_path = out_dir / f"{stem}_training_frame.parquet"
-        frame.write_parquet(frame_path)
+        frame_dir = frame_dir or out_dir
+        frame_dir.mkdir(parents=True, exist_ok=True)
+        tmp = frame_dir / f"{stem}_training_frame.tmp.parquet"
+        frame.write_parquet(tmp)
+        digest = hashlib.sha256(tmp.read_bytes()).hexdigest()
+        frame_path = frame_dir / f"{stem}_training_frame_{digest[:12]}.parquet"
+        tmp.replace(frame_path)
         provenance.update(
             training_frame=str(frame_path),
-            training_frame_sha256=hashlib.sha256(frame_path.read_bytes()).hexdigest(),
+            training_frame_sha256=digest,
             training_frame_rows=frame.height,
         )
     coef_path = out_dir / f"{stem}_coef.json"

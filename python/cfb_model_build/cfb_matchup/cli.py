@@ -45,6 +45,8 @@ from cfb_model_build.cfb_matchup.glm import (
     write_fit,
 )
 
+#: training frames are persisted here (gitignored), never in the bundle dir
+CACHE = Path(__file__).resolve().parents[2] / ".cache" / "matchup"
 SCORING_OPP_FORMULA = "scoring_opp ~ " + " + ".join(SCORING_OPP_FEATURES)
 RUSH_EXPECT_FORMULA = "rush ~ " + " + ".join(RUSH_EXPECT_FEATURES)
 
@@ -179,8 +181,12 @@ def _status() -> int:
         )
     weights = load_wepa_weights(bundle / "wepa_weights.json")
     meta = json.loads((bundle / "wepa_weights_meta.json").read_text(encoding="utf-8"))
+    # the trainer writes the generic key; the imported bundle carries the
+    # season-named one
+    holdout = meta.get("adj_r2_holdout", meta.get("adj_r2_holdout_2025"))
     print(
-        f"wepa_weights: {len(weights)} weights, holdout_2025 adj_r2={meta.get('adj_r2_holdout_2025')}"
+        f"wepa_weights: {len(weights)} weights, "
+        f"holdout {meta.get('holdout_seasons', [2025])} adj_r2={holdout}"
     )
     return 0
 
@@ -266,6 +272,7 @@ def main(argv: list[str] | None = None) -> int:
             formula=SCORING_OPP_FORMULA,
             seasons=seasons,
             frame=frame,
+            frame_dir=CACHE,
             source=str(args.frame)
             if args.frame
             else f"cfbfastR_cfb_pbp {args.seasons}",
@@ -284,6 +291,7 @@ def main(argv: list[str] | None = None) -> int:
             formula=RUSH_EXPECT_FORMULA,
             seasons=seasons,
             frame=frame,
+            frame_dir=CACHE,
             source=str(args.frame)
             if args.frame
             else f"cfbfastR_cfb_pbp {args.seasons}",

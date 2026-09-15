@@ -50,11 +50,17 @@ def _lines_payload(season: int) -> list[dict]:
 def _side_frames(season: int) -> tuple[pl.DataFrame, pl.DataFrame]:
     from cfb_data_build.matchup_side import team_side_inputs
 
+    from cfb_data_build.matchup_reference import season_reference
+
+    teams = pl.read_parquet(FIX / f"cfbd_teams_{season}.parquet")
     side = team_side_inputs(
         season,
         talent=pl.read_parquet(FIX / f"cfbd_talent_{season}.parquet"),
-        teams=pl.read_parquet(FIX / f"cfbd_teams_{season}.parquet"),
+        teams=teams,
         coaches=pl.read_parquet(FIX / f"cfbd_coaches_thru_{season}.parquet"),
+        reference=season_reference(
+            season, teams=teams, schools=teams["team"].to_list()
+        ),
     )
     return side, pl.read_parquet(FIX / f"cfbd_weather_{season}.parquet")
 
@@ -99,10 +105,11 @@ def test_build_matchup_line_offline(offline: None) -> None:
     assert out.schema["temperature"] == pl.Float64
     assert out["temperature"].null_count() < out.height * 0.05
     assert out["home_talent"].null_count() < out.height * 0.05
-    assert (
-        out.schema["home_oc_cont"] == pl.Int64
-        and out["home_oc_cont"].null_count() == out.height
-    )
+    # the reference tables fill the remaining side inputs
+    assert out.schema["home_oc_cont"] == pl.Int64
+    assert out["home_oc_cont"].null_count() < out.height * 0.05
+    assert out["home_qb_name"].null_count() < out.height * 0.05
+    assert out["home_team_talent_weighted"].null_count() < out.height * 0.05
     assert out["spread"].null_count() < out.height
 
 

@@ -59,3 +59,12 @@ source's `evaluate_weights` run verbatim over the 2025 release for candidates 1,
 500 and the shipped weights — the exact-parity oracle for the Python scorer
 (`ops/oneoff/20260915_matchup_oracle_capture/capture_wepa_scores.R`, R 4.6.1, 2026-09-15;
 games and scores from `cfbd_games_elo_2025.parquet`).
+
+Side inputs (2026-09-15, `ops/oneoff/20260915_matchup_oracle_capture/capture_side_inputs.py 2025`,
+CFBD API, tidied by `cfb_data_build.matchup_side`): `cfbd_talent_2025.parquet` (134 rows,
+`/talent?year=2025`), `cfbd_weather_2025.parquet` (3,235 games, `/games/weather?year=2025&seasonType=both`,
+the 10 line columns), `cfbd_teams_2025.parquet` (679 schools, `/teams?year=2025`: identity block +
+home venue inline), `cfbd_coaches_thru_2025.parquet` (4,496 coach-school-seasons,
+`/coaches?minYear=1990&maxYear=2025`). Oracle for all four = the side / meta / weather columns of
+`matchup_line_2025.csv`; bars and the source-version columns that are NOT compared (colours, logo
+CDN, corrected venue rows) are recorded in `tests/cfb_data_build/test_matchup_side.py`.

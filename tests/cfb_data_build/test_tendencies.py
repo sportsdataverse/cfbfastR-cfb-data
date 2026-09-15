@@ -83,6 +83,10 @@ def test_coach_attribution_and_careers(plays, tmp_path):
     assert p["plays"] == home_t["plays"] and p["def_plays"] == home_t["def_plays"]
     assert abs(p["def_success_rate"] - home_t["def_success_rate"]) < 1e-12
     assert tend.coach_tendencies(plays, coaches.head(0)).height == 0
+    # a season with no games binds to a frame with NO columns; still no rows
+    bare = tend.attach_coaches(pl.DataFrame(), coaches)
+    assert bare.height == 0 and {"coach", "def_coach"} <= set(bare.columns)
+    assert tend.coach_tendencies(pl.DataFrame(), coaches).height == 0
     with pytest.raises(RuntimeError, match="cfb_data_build.coaches -s 2024"):
         tend.require_coaches(coaches.head(0), 2024)
     # careers: two written seasons of the same coach double the counts and keep the rates

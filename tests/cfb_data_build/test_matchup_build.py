@@ -47,6 +47,18 @@ def _lines_payload(season: int) -> list[dict]:
     return list(out.values())
 
 
+def _side_frames(season: int) -> tuple[pl.DataFrame, pl.DataFrame]:
+    from cfb_data_build.matchup_side import team_side_inputs
+
+    side = team_side_inputs(
+        season,
+        talent=pl.read_parquet(FIX / f"cfbd_talent_{season}.parquet"),
+        teams=pl.read_parquet(FIX / f"cfbd_teams_{season}.parquet"),
+        coaches=pl.read_parquet(FIX / f"cfbd_coaches_thru_{season}.parquet"),
+    )
+    return side, pl.read_parquet(FIX / f"cfbd_weather_{season}.parquet")
+
+
 @pytest.fixture
 def offline(monkeypatch: pytest.MonkeyPatch) -> None:
     sample = pl.read_parquet(FIX / "pbp_input_2025_sample.parquet")
@@ -57,6 +69,7 @@ def offline(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(
         matchup_build, "load_pbp", lambda season: pl.concat([sample, sample.head(50)])
     )
+    monkeypatch.setattr(matchup_build, "side_input_frames", _side_frames)
 
 
 def test_build_matchup_features_offline(offline: None) -> None:
@@ -79,10 +92,17 @@ def test_build_matchup_line_offline(offline: None) -> None:
         out.height == 773
     )  # the delivered 2025 line's row set (bowls dropped, CFP kept)
     assert out.schema["game_id"] == pl.Int64
-    # not-yet-joined groups carry their documented dtype, not Null
+    # side inputs + meta + weather are joined; the proprietary ones stay typed null
     assert out.schema["home_head_coach"] == pl.Utf8
-    assert out.schema["home_dome"] == pl.Boolean
+    assert out["home_head_coach"].null_count() < out.height * 0.05
+    assert out.schema["home_dome"] == pl.Boolean and out["home_dome"].null_count() == 0
     assert out.schema["temperature"] == pl.Float64
+    assert out["temperature"].null_count() < out.height * 0.05
+    assert out["home_talent"].null_count() < out.height * 0.05
+    assert (
+        out.schema["home_oc_cont"] == pl.Int64
+        and out["home_oc_cont"].null_count() == out.height
+    )
     assert out["spread"].null_count() < out.height
 
 

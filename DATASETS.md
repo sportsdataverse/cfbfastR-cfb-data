@@ -1689,14 +1689,14 @@ column order is `cfb_data_build.matchup_line.LINE_COLUMNS`:
 | Column group | Columns |
 |---|---|
 | game meta (22) | `game_id`, `season`, `week`, `season_type`, `start_date`, `venue_id`, `neutral_site`, `conference_game`, `notes`, `home_team_id`, `home_team`, `away_team_id`, `away_team`, `home_conference`, `away_conference`, `home_division`, `away_division`, `home_pregame_elo`, `away_pregame_elo`, `home_points`, `away_points`, `home_mov` |
-| side inputs (15 × home/away) | `join_name`, `team_talent_weighted`, `talent`, `off_rtprod`, `def_rtprod`, `ovr_rtprod`, `head_coach`, `hc_tenure`, `oc_cont`, `dc_cont`, `athlete_id`, `qb_name`, `returning_qb`, `qb_starter_years`, `qb_games` — null until the side-input joins land |
+| side inputs (15 × home/away) | `join_name`, `team_talent_weighted`, `talent`, `off_rtprod`, `def_rtprod`, `ovr_rtprod`, `head_coach`, `hc_tenure`, `oc_cont`, `dc_cont`, `athlete_id`, `qb_name`, `returning_qb`, `qb_starter_years`, `qb_games` — `join_name`, `talent` (CFBD `/talent`, the season's own composite; the service academies are 0), `head_coach` and `hc_tenure` (CFBD `/coaches`: the preseason incumbent; tenure counts the seasons the coach handled most of the school's games) are filled; the other eleven come from the source's proprietary inputs (a recruiting-site roster sum, an external returning-production table, coordinator continuity from a wiki scrape, a hand-projected starting QB) and stay null |
 | features (34 × home/away) | the `cfb_matchup_features` offense/defense block for that game; regular-season week 1 (and any later opener) carries the prior season's full-season values |
 | prior season (34 × prev_home/prev_away) | the prior season's full-season values |
 | pace (4 × home/away) | as-of-date pace, prior-season full-season pace when none |
 | lines | `spread_open`, `spread`, `over_under`, `over_under_open` — provider mean of CFBD `/lines` (`pk` → 0) |
-| weather (10) | `temperature` … `weather_condition` — null until the weather join lands |
+| weather (10) | `temperature` … `weather_condition` — CFBD `/games/weather`, verbatim, first row per game, joined by `game_id` (exact on the delivered 2025 line) |
 | `prev_season` | `season − 1` |
-| team / venue meta (25 × home/away) | `mascot` … `dome` — null until the team-info join lands |
+| team / venue meta (25 × home/away) | `mascot` … `dome` — CFBD `/teams` for the season (identity block + the school's home venue inline; current-season values, home-team venue even at neutral sites, as the source did) |
 | opponent ELO (3 × home/away) | `opp_elo_roll_avg`, `opp_elo_roll_median`, `opp_elo_roll_sum` — expanding over the team's prior FBS-vs-FBS opponents' pregame ELO by real date; week 1 from the prior season's final |
 | `game_type` | `regular` / `playoff` |
 

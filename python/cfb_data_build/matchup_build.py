@@ -39,6 +39,7 @@ from cfb_data_build.matchup_features import (
 )
 from cfb_data_build.matchup_line import PACE_COLS, build_matchup_line
 from cfb_data_build.schedules_unified import fetch_cfbd_games
+from cfb_data_build.matchup_side import side_input_frames
 
 ARTIFACTS = (
     Path(__file__).resolve().parents[1]
@@ -340,6 +341,7 @@ def build_matchup_line_season(season: int, *, base: str = "cfb") -> pl.DataFrame
     prev_pbp = load_pbp(season - 1)
     prev_plays = augmented_season(prev_pbp)
     prev_feats = full_season_features(prev_plays, fbs_teams(prev_games))
+    side, weather = side_input_frames(season)
     return build_matchup_line(
         games,
         prev_games,
@@ -348,4 +350,6 @@ def build_matchup_line_season(season: int, *, base: str = "cfb") -> pl.DataFrame
         pace_history(pbp),
         full_season_pace(prev_pbp),
         lines,
+        side_inputs=side,
+        weather=weather,
     )

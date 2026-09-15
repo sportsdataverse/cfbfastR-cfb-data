@@ -91,8 +91,10 @@ RELEASE_NOTES: dict[str, str] = {
         "`prev_*` block, pace, CFBD pregame ELO with opponent-ELO rolls, "
         "consensus betting lines and game meta -- 268 columns. Regular-season "
         "week-1 (and any later opener's) features are the prior season's "
-        "full-season values. Side inputs (talent, coaches, returning "
-        "production, QB, weather, venue) are null until their joins land."
+        "full-season values. Weather (CFBD /games/weather), team / venue meta "
+        "(/teams), talent (/talent) and the head coach with tenure (/coaches) "
+        "are filled; the source's proprietary side inputs (roster talent sum, "
+        "returning production, coordinator continuity, projected QB) are null."
     ),
 }
 

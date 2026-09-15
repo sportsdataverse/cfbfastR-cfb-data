@@ -128,6 +128,16 @@ KNOWN_UNPAIRED.update(
         )
     }
 )
+KNOWN_UNPAIRED.update(
+    {
+        key: (
+            "Python-only pending the R port of sportsdataverse.football.tendencies "
+            "(season tendencies over the season's plays; coach attribution from "
+            "data/cfb_coach_seasons.csv); tracked follow-up, not a decomposition."
+        )
+        for key in ("team_tendencies", "coach_tendencies", "coach_careers")
+    }
+)
 
 NON_DATASET_STAGES: set[str] = {"adv_box", "team_summaries", "fpi_weekly"}
 # --------------------------------------------------------------------------
@@ -166,7 +176,9 @@ def _stage_re() -> re.Pattern[str]:
     Pinning the league (rather than accepting any slug) is deliberate: a stray
     file from a sibling league would otherwise be silently adopted as a stage.
     """
-    return re.compile(rf"^(?:espn_)?{re.escape(_league())}_(?P<num>\d{{2}})_(?P<key>.+)_{re.escape(STAGE_SUFFIX)}$")
+    return re.compile(
+        rf"^(?:espn_)?{re.escape(_league())}_(?P<num>\d{{2}})_(?P<key>.+)_{re.escape(STAGE_SUFFIX)}$"
+    )
 
 
 def _stages(subdir: str, suffix: str) -> dict[str, str]:
@@ -214,7 +226,11 @@ def _registry_keys() -> list[str]:
     config = _config_path()
     tree = ast.parse(config.read_text(encoding="utf-8"))
     for node in tree.body:
-        tgs = [node.target] if isinstance(node, ast.AnnAssign) else getattr(node, "targets", [])
+        tgs = (
+            [node.target]
+            if isinstance(node, ast.AnnAssign)
+            else getattr(node, "targets", [])
+        )
         if any(isinstance(t, ast.Name) and t.id == "REGISTRY" for t in tgs):
             return [ast.literal_eval(k) for k in node.value.keys]
     raise AssertionError(f"no REGISTRY assignment found in {config}")
@@ -282,7 +298,9 @@ def test_non_dataset_exemptions_are_live():
     """An exemption for a shim that no longer exists is dead weight that would
     silently cover a future stage of the same name."""
     stale = sorted(NON_DATASET_STAGES - set(_py_stages()))
-    assert not stale, f"NON_DATASET_STAGES exempts {stale}, but no such shim exists. Remove the entry."
+    assert not stale, (
+        f"NON_DATASET_STAGES exempts {stale}, but no such shim exists. Remove the entry."
+    )
 
 
 def test_unpaired_datasets_are_declared():

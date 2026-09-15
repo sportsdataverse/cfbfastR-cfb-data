@@ -44,6 +44,10 @@ class DatasetSpec:
     usage_section: str | None = None
     #: sum the per-game usage rows into one season leaderboard
     aggregate: bool = False
+    #: a ``sportsdataverse.football.tendencies`` cut over the season's plays:
+    #: ``"team"`` (season x team), ``"coach"`` (season x team x head coach) or
+    #: ``"careers"`` (every written coach season summed per coach, one file)
+    tendencies: str | None = None
 
 
 REGISTRY: dict[str, DatasetSpec] = {
@@ -156,7 +160,10 @@ REGISTRY: dict[str, DatasetSpec] = {
     # --- usage / situational box (build-time, sportsdataverse.football.usage_box) --
     # per game (shims 30-35) and season leaderboards (40-45); R twin pending.
     "adv_player_usage": DatasetSpec(
-        "adv_player_usage", "adv_player_usage", "espn_cfb_adv_player_usage", usage_section="player_usage"
+        "adv_player_usage",
+        "adv_player_usage",
+        "espn_cfb_adv_player_usage",
+        usage_section="player_usage",
     ),
     "usage_players": DatasetSpec(
         "usage_players",
@@ -166,7 +173,10 @@ REGISTRY: dict[str, DatasetSpec] = {
         aggregate=True,
     ),
     "adv_position_group_usage": DatasetSpec(
-        "adv_position_group_usage", "adv_position_group_usage", "espn_cfb_adv_position_group_usage", usage_section="position_group_usage"
+        "adv_position_group_usage",
+        "adv_position_group_usage",
+        "espn_cfb_adv_position_group_usage",
+        usage_section="position_group_usage",
     ),
     "usage_position_groups": DatasetSpec(
         "usage_position_groups",
@@ -186,7 +196,10 @@ REGISTRY: dict[str, DatasetSpec] = {
         aggregate=True,
     ),
     "adv_position_group_tackles": DatasetSpec(
-        "adv_position_group_tackles", "adv_position_group_tackles", "espn_cfb_adv_position_group_tackles", usage_section="position_group_tackles"
+        "adv_position_group_tackles",
+        "adv_position_group_tackles",
+        "espn_cfb_adv_position_group_tackles",
+        usage_section="position_group_tackles",
     ),
     "usage_position_group_tackles": DatasetSpec(
         "usage_position_group_tackles",
@@ -196,7 +209,10 @@ REGISTRY: dict[str, DatasetSpec] = {
         aggregate=True,
     ),
     "adv_team_usage": DatasetSpec(
-        "adv_team_usage", "adv_team_usage", "espn_cfb_adv_team_usage", usage_section="team_usage"
+        "adv_team_usage",
+        "adv_team_usage",
+        "espn_cfb_adv_team_usage",
+        usage_section="team_usage",
     ),
     "usage_teams": DatasetSpec(
         "usage_teams",
@@ -206,7 +222,10 @@ REGISTRY: dict[str, DatasetSpec] = {
         aggregate=True,
     ),
     "adv_drive_scripting": DatasetSpec(
-        "adv_drive_scripting", "adv_drive_scripting", "espn_cfb_adv_drive_scripting", usage_section="drive_scripting"
+        "adv_drive_scripting",
+        "adv_drive_scripting",
+        "espn_cfb_adv_drive_scripting",
+        usage_section="drive_scripting",
     ),
     "usage_drive_scripting": DatasetSpec(
         "usage_drive_scripting",
@@ -216,7 +235,10 @@ REGISTRY: dict[str, DatasetSpec] = {
         aggregate=True,
     ),
     "adv_st_kickers": DatasetSpec(
-        "adv_st_kickers", "adv_st_kickers", "espn_cfb_adv_st_kickers", usage_section="st_kickers"
+        "adv_st_kickers",
+        "adv_st_kickers",
+        "espn_cfb_adv_st_kickers",
+        usage_section="st_kickers",
     ),
     "usage_st_kickers": DatasetSpec(
         "usage_st_kickers",
@@ -226,7 +248,10 @@ REGISTRY: dict[str, DatasetSpec] = {
         aggregate=True,
     ),
     "adv_st_punters": DatasetSpec(
-        "adv_st_punters", "adv_st_punters", "espn_cfb_adv_st_punters", usage_section="st_punters"
+        "adv_st_punters",
+        "adv_st_punters",
+        "espn_cfb_adv_st_punters",
+        usage_section="st_punters",
     ),
     "usage_st_punters": DatasetSpec(
         "usage_st_punters",
@@ -236,7 +261,10 @@ REGISTRY: dict[str, DatasetSpec] = {
         aggregate=True,
     ),
     "adv_st_returners": DatasetSpec(
-        "adv_st_returners", "adv_st_returners", "espn_cfb_adv_st_returners", usage_section="st_returners"
+        "adv_st_returners",
+        "adv_st_returners",
+        "espn_cfb_adv_st_returners",
+        usage_section="st_returners",
     ),
     "usage_st_returners": DatasetSpec(
         "usage_st_returners",
@@ -246,7 +274,10 @@ REGISTRY: dict[str, DatasetSpec] = {
         aggregate=True,
     ),
     "adv_st_blocks": DatasetSpec(
-        "adv_st_blocks", "adv_st_blocks", "espn_cfb_adv_st_blocks", usage_section="st_blocks"
+        "adv_st_blocks",
+        "adv_st_blocks",
+        "espn_cfb_adv_st_blocks",
+        usage_section="st_blocks",
     ),
     "usage_st_blocks": DatasetSpec(
         "usage_st_blocks",
@@ -264,6 +295,22 @@ REGISTRY: dict[str, DatasetSpec] = {
         "espn_cfb_usage_st_team",
         usage_section="st_team",
         aggregate=True,
+    ),
+    # --- team / coach tendencies (build-time, sportsdataverse.football.tendencies) --
+    "team_tendencies": DatasetSpec(
+        "team_tendencies",
+        "team_tendencies",
+        "espn_cfb_team_tendencies",
+        tendencies="team",
+    ),
+    "coach_tendencies": DatasetSpec(
+        "coach_tendencies",
+        "coach_tendencies",
+        "espn_cfb_coach_tendencies",
+        tendencies="coach",
+    ),
+    "coach_careers": DatasetSpec(
+        "coach_careers", "coach_careers", "espn_cfb_coach_careers", tendencies="careers"
     ),
 }
 
@@ -286,6 +333,11 @@ _USAGE_SECTIONS = (
 )
 USAGE_ADV_ORDER: list[str] = [f"adv_{k}" for _, k, _ in _USAGE_SECTIONS]
 USAGE_LEADERBOARD_ORDER: list[str] = [f"usage_{k}" for _, _, k in _USAGE_SECTIONS]
+
+# Team then coach seasons (shims 61-62), then careers (63), which reads the
+# written coach seasons. Coach attribution is per team-season from
+# ``data/cfb_coach_seasons.csv`` (cfb_data_build.coaches).
+TENDENCIES_ORDER: list[str] = ["team_tendencies", "coach_tendencies", "coach_careers"]
 
 # The team-summaries family builds from the RELEASED espn_cfb_pbp (not
 # final.json), so neither ``block`` nor ``reshaper`` is set — these specs only
@@ -356,4 +408,8 @@ PKG_FUNCTION: dict[str, str] = {
         f"espn_cfb_usage_{k}": f"python/espn_cfb_{50 + i}_usage_{k}_creation.py"
         for i, (_, _, k) in enumerate(_USAGE_SECTIONS)
     },
+    # tendencies: same convention (no loader yet), shims 61-63
+    "espn_cfb_team_tendencies": "python/espn_cfb_61_team_tendencies_creation.py",
+    "espn_cfb_coach_tendencies": "python/espn_cfb_62_coach_tendencies_creation.py",
+    "espn_cfb_coach_careers": "python/espn_cfb_63_coach_careers_creation.py",
 }

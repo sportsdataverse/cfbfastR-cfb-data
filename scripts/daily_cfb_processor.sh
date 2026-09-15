@@ -27,7 +27,7 @@ done
 END_YEAR=${END_YEAR:-$START_YEAR}
 
 PY_FIRST="pbp"
-PY_REST="play_participants team_box player_box drives game_rosters betting schedules linescores power_index injuries adv_team adv_passing adv_rushing adv_receiving adv_defensive adv_turnover adv_drives adv_situational adv_defensive_players adv_specialists adv_player_usage adv_position_group_usage adv_tackles adv_position_group_tackles adv_team_usage adv_drive_scripting usage_players usage_position_groups usage_tackles usage_position_group_tackles usage_teams usage_drive_scripting adv_st_kickers adv_st_punters adv_st_returners adv_st_blocks adv_st_team usage_st_kickers usage_st_punters usage_st_returners usage_st_blocks usage_st_team"
+PY_REST="play_participants team_box player_box drives game_rosters betting schedules linescores power_index injuries adv_team adv_passing adv_rushing adv_receiving adv_defensive adv_turnover adv_drives adv_situational adv_defensive_players adv_specialists adv_player_usage adv_position_group_usage adv_tackles adv_position_group_tackles adv_team_usage adv_drive_scripting usage_players usage_position_groups usage_tackles usage_position_group_tackles usage_teams usage_drive_scripting adv_st_kickers adv_st_punters adv_st_returners adv_st_blocks adv_st_team usage_st_kickers usage_st_punters usage_st_returners usage_st_blocks usage_st_team team_tendencies coach_tendencies coach_careers"
 # Derived datasets -- each reads an artifact an earlier step produced, so order
 # matters: gamelog <- adv_team.
 PY_DERIVED="gamelog"

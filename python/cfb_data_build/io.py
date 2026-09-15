@@ -60,15 +60,23 @@ def _append_manifest(
     return f
 
 
+def dataset_stem(stem: str, season: int | None) -> str:
+    """``{stem}_{season}``, or bare ``{stem}`` for a season-less dataset (coach careers)."""
+    return stem if season is None else f"{stem}_{season}"
+
+
 def write_dataset(
     df: pl.DataFrame,
     dataset: str,
-    season: int,
+    season: int | None,
     stem: str,
     *,
     base: str | Path = "cfb",
 ) -> dict[str, Path] | None:
     """Write parquet + rds + csv under ``base/{dataset}/`` and append the manifest.
+
+    ``season=None`` writes a season-less file (``{stem}.parquet``) and skips
+    the per-season manifest.
 
     Returns the written paths, or ``None`` for an empty frame (matches R's
     "0 rows, skipping write"). ``rds``/``csv`` are release artifacts (git-ignored);
@@ -77,22 +85,20 @@ def write_dataset(
     if df is None or df.height == 0:
         return None
     root = Path(base) / dataset
-    parquet_path = root / "parquet" / f"{stem}_{season}.parquet"
-    rds_path = root / "rds" / f"{stem}_{season}.rds"
-    csv_path = root / "csv" / f"{stem}_{season}.csv"
+    name = dataset_stem(stem, season)
+    parquet_path = root / "parquet" / f"{name}.parquet"
+    rds_path = root / "rds" / f"{name}.rds"
+    csv_path = root / "csv" / f"{name}.csv"
     for sub in ("parquet", "rds", "csv"):
         (root / sub).mkdir(parents=True, exist_ok=True)
 
     df.write_parquet(parquet_path)
     write_rds(df, rds_path, cls=RDS_CLASS)
     df.write_csv(csv_path)
-    manifest_path = _append_manifest(dataset, season, df.height, base)
-    return {
-        "parquet": parquet_path,
-        "rds": rds_path,
-        "csv": csv_path,
-        "manifest": manifest_path,
-    }
+    out = {"parquet": parquet_path, "rds": rds_path, "csv": csv_path}
+    if season is not None:
+        out["manifest"] = _append_manifest(dataset, season, df.height, base)
+    return out
 
 
 def gzip_csv(paths: dict | None) -> None:

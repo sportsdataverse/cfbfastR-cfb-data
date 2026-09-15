@@ -122,12 +122,37 @@ def build_dataset_frame(
     ``summaries_input`` both consume -- publishing a default-tier pbp would
     break the summaries rebuild that reads it back.
     """
+    if spec.usage_section is not None:
+        return flat_block_frame(_usage_box(game).get(spec.usage_section), game)
     if spec.reshaper is not None:
         fn = reshapers.RESHAPERS[spec.reshaper]
         return fn(game, output=output) if spec.reshaper == "pbp" else fn(game)
     if spec.block is not None:
         return flat_block_frame(_resolve_block(game, spec.block), game)
     raise ValueError(f"{spec.dataset}: spec has neither block nor reshaper")
+
+
+# Usage box per game, memoised for the PROCESS so the twelve usage datasets of
+# a season compute it once per final (the daily driver builds one dataset per
+# invocation, so this mostly pays off inside a single multi-dataset build).
+_USAGE_CACHE: dict[int, dict[str, list[dict[str, Any]]]] = {}
+
+
+def _usage_box(game: dict[str, Any]) -> dict[str, list[dict[str, Any]]]:
+    key = int(game["id"])
+    if key not in _USAGE_CACHE:
+        from sportsdataverse.football.usage_box import create_usage_box
+
+        plays = game.get("plays") or []
+        parts = game.get("play_participants") or []
+        if len(_USAGE_CACHE) > 2000:
+            _USAGE_CACHE.clear()
+        _USAGE_CACHE[key] = create_usage_box(
+            pl.from_dicts(plays, infer_schema_length=None) if plays else pl.DataFrame(),
+            pl.from_dicts(parts, infer_schema_length=None) if parts else None,
+            league="cfb",
+        )
+    return _USAGE_CACHE[key]
 
 
 # Released game-ids per season, cached for the PROCESS. The fan-out runs 10
@@ -224,6 +249,10 @@ def build_season(
         except Exception as exc:  # noqa: BLE001 — one bad game cannot abort the season
             print(f"{spec.dataset} {gid}: {exc}")
     df = bind_games(frames)
+    if spec.aggregate and df.height:
+        from sportsdataverse.football.usage_box import aggregate_usage_box
+
+        df = aggregate_usage_box(spec.usage_section, [df])  # type: ignore[arg-type]
     df = _resolve_team_names(df, season, schedule)
     print(f"{spec.dataset} {season}: {df.height} rows from {len(ids)} games")
     write_dataset(df, spec.dataset, season, spec.stem, base=base)

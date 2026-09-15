@@ -38,6 +38,12 @@ class DatasetSpec:
     tag: str
     block: tuple[str, ...] | None = None
     reshaper: str | None = None
+    #: a ``sportsdataverse.football.usage_box`` section computed at BUILD time
+    #: from the final's ``plays`` + ``play_participants`` (never read from
+    #: final.json, so the installed sdv-py's definitions always win)
+    usage_section: str | None = None
+    #: sum the per-game usage rows into one season leaderboard
+    aggregate: bool = False
 
 
 REGISTRY: dict[str, DatasetSpec] = {
@@ -147,7 +153,139 @@ REGISTRY: dict[str, DatasetSpec] = {
     "rosters": DatasetSpec(
         "rosters", "rosters", "espn_cfb_rosters", reshaper="rosters"
     ),
+    # --- usage / situational box (build-time, sportsdataverse.football.usage_box) --
+    # per game (shims 30-35) and season leaderboards (40-45); R twin pending.
+    "adv_player_usage": DatasetSpec(
+        "adv_player_usage", "adv_player_usage", "espn_cfb_adv_player_usage", usage_section="player_usage"
+    ),
+    "usage_players": DatasetSpec(
+        "usage_players",
+        "usage_players",
+        "espn_cfb_usage_players",
+        usage_section="player_usage",
+        aggregate=True,
+    ),
+    "adv_position_group_usage": DatasetSpec(
+        "adv_position_group_usage", "adv_position_group_usage", "espn_cfb_adv_position_group_usage", usage_section="position_group_usage"
+    ),
+    "usage_position_groups": DatasetSpec(
+        "usage_position_groups",
+        "usage_position_groups",
+        "espn_cfb_usage_position_groups",
+        usage_section="position_group_usage",
+        aggregate=True,
+    ),
+    "adv_tackles": DatasetSpec(
+        "adv_tackles", "adv_tackles", "espn_cfb_adv_tackles", usage_section="tackles"
+    ),
+    "usage_tackles": DatasetSpec(
+        "usage_tackles",
+        "usage_tackles",
+        "espn_cfb_usage_tackles",
+        usage_section="tackles",
+        aggregate=True,
+    ),
+    "adv_position_group_tackles": DatasetSpec(
+        "adv_position_group_tackles", "adv_position_group_tackles", "espn_cfb_adv_position_group_tackles", usage_section="position_group_tackles"
+    ),
+    "usage_position_group_tackles": DatasetSpec(
+        "usage_position_group_tackles",
+        "usage_position_group_tackles",
+        "espn_cfb_usage_position_group_tackles",
+        usage_section="position_group_tackles",
+        aggregate=True,
+    ),
+    "adv_team_usage": DatasetSpec(
+        "adv_team_usage", "adv_team_usage", "espn_cfb_adv_team_usage", usage_section="team_usage"
+    ),
+    "usage_teams": DatasetSpec(
+        "usage_teams",
+        "usage_teams",
+        "espn_cfb_usage_teams",
+        usage_section="team_usage",
+        aggregate=True,
+    ),
+    "adv_drive_scripting": DatasetSpec(
+        "adv_drive_scripting", "adv_drive_scripting", "espn_cfb_adv_drive_scripting", usage_section="drive_scripting"
+    ),
+    "usage_drive_scripting": DatasetSpec(
+        "usage_drive_scripting",
+        "usage_drive_scripting",
+        "espn_cfb_usage_drive_scripting",
+        usage_section="drive_scripting",
+        aggregate=True,
+    ),
+    "adv_st_kickers": DatasetSpec(
+        "adv_st_kickers", "adv_st_kickers", "espn_cfb_adv_st_kickers", usage_section="st_kickers"
+    ),
+    "usage_st_kickers": DatasetSpec(
+        "usage_st_kickers",
+        "usage_st_kickers",
+        "espn_cfb_usage_st_kickers",
+        usage_section="st_kickers",
+        aggregate=True,
+    ),
+    "adv_st_punters": DatasetSpec(
+        "adv_st_punters", "adv_st_punters", "espn_cfb_adv_st_punters", usage_section="st_punters"
+    ),
+    "usage_st_punters": DatasetSpec(
+        "usage_st_punters",
+        "usage_st_punters",
+        "espn_cfb_usage_st_punters",
+        usage_section="st_punters",
+        aggregate=True,
+    ),
+    "adv_st_returners": DatasetSpec(
+        "adv_st_returners", "adv_st_returners", "espn_cfb_adv_st_returners", usage_section="st_returners"
+    ),
+    "usage_st_returners": DatasetSpec(
+        "usage_st_returners",
+        "usage_st_returners",
+        "espn_cfb_usage_st_returners",
+        usage_section="st_returners",
+        aggregate=True,
+    ),
+    "adv_st_blocks": DatasetSpec(
+        "adv_st_blocks", "adv_st_blocks", "espn_cfb_adv_st_blocks", usage_section="st_blocks"
+    ),
+    "usage_st_blocks": DatasetSpec(
+        "usage_st_blocks",
+        "usage_st_blocks",
+        "espn_cfb_usage_st_blocks",
+        usage_section="st_blocks",
+        aggregate=True,
+    ),
+    "adv_st_team": DatasetSpec(
+        "adv_st_team", "adv_st_team", "espn_cfb_adv_st_team", usage_section="st_team"
+    ),
+    "usage_st_team": DatasetSpec(
+        "usage_st_team",
+        "usage_st_team",
+        "espn_cfb_usage_st_team",
+        usage_section="st_team",
+        aggregate=True,
+    ),
 }
+
+# --- usage / situational box (sportsdataverse.football.usage_box) -----------
+# Eleven per-game sections (shims 30-40) and their season leaderboards (50-60).
+# Computed at build time from each final's plays + participants; the R chain
+# has no twin yet (KNOWN_UNPAIRED in tests/test_r_python_parity.py).
+_USAGE_SECTIONS = (
+    ("player_usage", "player_usage", "players"),
+    ("position_group_usage", "position_group_usage", "position_groups"),
+    ("tackles", "tackles", "tackles"),
+    ("position_group_tackles", "position_group_tackles", "position_group_tackles"),
+    ("team_usage", "team_usage", "teams"),
+    ("drive_scripting", "drive_scripting", "drive_scripting"),
+    ("st_kickers", "st_kickers", "st_kickers"),
+    ("st_punters", "st_punters", "st_punters"),
+    ("st_returners", "st_returners", "st_returners"),
+    ("st_blocks", "st_blocks", "st_blocks"),
+    ("st_team", "st_team", "st_team"),
+)
+USAGE_ADV_ORDER: list[str] = [f"adv_{k}" for _, k, _ in _USAGE_SECTIONS]
+USAGE_LEADERBOARD_ORDER: list[str] = [f"usage_{k}" for _, _, k in _USAGE_SECTIONS]
 
 # The team-summaries family builds from the RELEASED espn_cfb_pbp (not
 # final.json), so neither ``block`` nor ``reshaper`` is set — these specs only
@@ -208,4 +346,14 @@ PKG_FUNCTION: dict[str, str] = {
     "espn_cfb_power_index": "sportsdataverse.cfb.load_cfb_power_index()",
     "espn_cfb_rosters": "cfbfastR::load_cfb_rosters()",
     "espn_cfb_team_box": "sportsdataverse.cfb.load_cfb_team_box()",
+    # usage box + leaderboards: no sdv-py loader yet (tracked follow-up), so
+    # each tag names its producer stage, as espn_cfb_injuries does.
+    **{
+        f"espn_cfb_adv_{k}": f"python/espn_cfb_{30 + i}_adv_{k}_creation.py"
+        for i, (_, k, _) in enumerate(_USAGE_SECTIONS)
+    },
+    **{
+        f"espn_cfb_usage_{k}": f"python/espn_cfb_{50 + i}_usage_{k}_creation.py"
+        for i, (_, _, k) in enumerate(_USAGE_SECTIONS)
+    },
 }

@@ -15,15 +15,20 @@ from pathlib import Path
 from typing import Any
 
 import polars as pl
-
-from cfb_data_build import reshapers
-from cfb_data_build.config import REGISTRY, DatasetSpec
-from cfb_data_build.coaches import team_coaches
-from cfb_data_build.io import write_dataset
-from cfb_data_build.tendencies import coach_careers, coach_tendencies, team_tendencies
-from cfb_data_build.reshape import bind_games, flat_block_frame
 from cfb_data_ingest.fetch import fetch_final
 from cfb_data_ingest.schedule import SCHEDULE_URL, season_game_ids
+
+from cfb_data_build import reshapers
+from cfb_data_build.coaches import team_coaches
+from cfb_data_build.config import REGISTRY, DatasetSpec
+from cfb_data_build.io import write_dataset
+from cfb_data_build.reshape import bind_games, flat_block_frame
+from cfb_data_build.tendencies import (
+    coach_careers,
+    coach_tendencies,
+    require_coaches,
+    team_tendencies,
+)
 
 # ESPN's advBoxScore blocks put a team ID in `pos_team` / `def_pos_team` -- a
 # name-shaped column. We surface the ID as `<col>_id` and fill `<col>` with the
@@ -265,8 +270,9 @@ def build_season(
     if spec.tendencies == "team":
         df = team_tendencies(df)
     elif spec.tendencies == "coach":
-        coaches = team_coaches(
-            season, schedule if schedule is not None else SCHEDULE_URL
+        coaches = require_coaches(
+            team_coaches(season, schedule if schedule is not None else SCHEDULE_URL),
+            season,
         )
         print(f"  coaches: {coaches.height} attributed team-seasons for {season}")
         df = coach_tendencies(df, coaches)

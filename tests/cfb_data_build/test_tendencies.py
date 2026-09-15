@@ -75,9 +75,16 @@ def test_coach_attribution_and_careers(plays, tmp_path):
         home_c["plays"] == home_t["plays"]
         and abs(home_c["pass_rate"] - home_t["pass_rate"]) < 1e-12
     )
-    # an unattributed side drops its plays rather than landing on a null coach
+    # only the home side attributed: its row still equals the full team-season
+    # (every snap it ran and every snap it faced); the other side forms no row
     partial = tend.coach_tendencies(plays, coaches.head(1))
-    assert partial.height == 0
+    assert partial["coach"].to_list() == ["Coach Home"]
+    p = partial.row(0, named=True)
+    assert p["plays"] == home_t["plays"] and p["def_plays"] == home_t["def_plays"]
+    assert abs(p["def_success_rate"] - home_t["def_success_rate"]) < 1e-12
+    assert tend.coach_tendencies(plays, coaches.head(0)).height == 0
+    with pytest.raises(RuntimeError, match="cfb_data_build.coaches -s 2024"):
+        tend.require_coaches(coaches.head(0), 2024)
     # careers: two written seasons of the same coach double the counts and keep the rates
     write_dataset(c, "coach_tendencies", 2024, "coach_tendencies", base=tmp_path)
     write_dataset(
@@ -194,3 +201,26 @@ def test_cfbd_rows_and_refresh(tmp_path):
     assert out.filter(pl.col("season") == 2026).height == 3
     assert coaches_mod.load_coach_seasons(csv).schema == coaches_mod.COACH_SCHEMA
     assert coaches_mod.load_coach_seasons(tmp_path / "missing.csv").height == 0
+    # an empty answer for a season keeps its existing rows instead of erasing them
+    again = coaches_mod.refresh_coach_seasons(
+        [2026], path=csv, api_key="k", fetch=lambda s, api_key=None: []
+    )
+    assert again.filter(pl.col("season") == 2026).height == 3
+
+
+def test_cfbd_error_envelope_is_an_error_not_an_empty_season(monkeypatch):
+    class _Resp:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            return False
+
+        def read(self):
+            return b'{"error": "rate limited"}'
+
+    monkeypatch.setattr(
+        coaches_mod.urllib.request, "urlopen", lambda req, timeout=120: _Resp()
+    )
+    with pytest.raises(TypeError, match="unexpected payload shape"):
+        coaches_mod.fetch_cfbd_coaches(2026, api_key="k")

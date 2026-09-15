@@ -120,6 +120,14 @@ for i in $(seq "${START_YEAR}" "${END_YEAR}"); do
     }
 
     run_py "$PY_FIRST" --publish
+    # Head-coach roster for the coach_tendencies stage: the vendored CSV only
+    # knows the seasons it was refreshed for, so refresh this one from CFBD.
+    # Without a key the coach stage fails loudly below (no silent skip).
+    if [ -n "${CFBD_API_KEY:-}" ]; then
+      (cd python && "$PY" -m cfb_data_build.coaches -s "$i" -e "$i") || echo "::warning ::coach roster refresh failed for season $i"
+    else
+      echo "::warning ::CFBD_API_KEY unset: coach roster not refreshed for season $i"
+    fi
     for ds in $PY_REST; do run_py "$ds" --no-fetch --publish; done
     for ds in $PY_DERIVED; do run_py "$ds" --no-fetch --publish; done
     for ds in $PY_UNIFIED_SCHEDULES; do run_py "$ds" --publish; done
@@ -152,7 +160,7 @@ for i in $(seq "${START_YEAR}" "${END_YEAR}"); do
     fi
 
     echo "RSCRIPT_RC=$SEASON_RC" > "/tmp/_rc_${i}"
-    sdv_commit_push "CFB Data Updated (Start: $i End: $i)" cfb || PUSH_RC=1
+    sdv_commit_push "CFB Data Updated (Start: $i End: $i)" cfb data/cfb_coach_seasons.csv || PUSH_RC=1
   } 2>&1 | tee "$TMPLOG"
 
   RSCRIPT_RC=$(sed 's/RSCRIPT_RC=//' "/tmp/_rc_${i}" 2>/dev/null); rm -f "/tmp/_rc_${i}"

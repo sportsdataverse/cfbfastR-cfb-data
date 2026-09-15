@@ -43,8 +43,11 @@ def counted_plays(plays: pl.DataFrame) -> pl.DataFrame:
 def attach_coaches(plays: pl.DataFrame, coaches: pl.DataFrame) -> pl.DataFrame:
     """``coach`` / ``def_coach`` on every play from ``(season, team_id, coach)`` rows.
 
-    Plays whose offense or defense has no attributed coach that season are
-    dropped: an unattributed snap must not land on a null coach row.
+    A play is kept when EITHER side is attributed: an attributed offense keeps
+    every snap it ran (also against an unattributed FCS opponent), and an
+    attributed defense keeps every snap it faced, so a coach row equals the
+    team-season it was cut from. The other side's null key forms no row
+    (:func:`coach_tendencies` drops it). Plays with neither side attributed go.
     """
     if plays.height == 0 or coaches.height == 0:
         return plays.head(0).with_columns(
@@ -69,7 +72,17 @@ def attach_coaches(plays: pl.DataFrame, coaches: pl.DataFrame) -> pl.DataFrame:
         on=["season", "def_pos_team"],
         how="left",
     )
-    return df.filter(pl.col("coach").is_not_null() & pl.col("def_coach").is_not_null())
+    return df.filter(pl.col("coach").is_not_null() | pl.col("def_coach").is_not_null())
+
+
+def require_coaches(coaches: pl.DataFrame, season: int) -> pl.DataFrame:
+    """Refuse to cut a coach season from an empty roster instead of silently writing nothing."""
+    if coaches.height == 0:
+        raise RuntimeError(
+            f"coach_tendencies {season}: no attributed coach-seasons in data/cfb_coach_seasons.csv; "
+            f"refresh it with `python -m cfb_data_build.coaches -s {season} -e {season}` (needs CFBD_API_KEY)"
+        )
+    return coaches
 
 
 def team_tendencies(plays: pl.DataFrame) -> pl.DataFrame:
@@ -92,6 +105,9 @@ def coach_tendencies(plays: pl.DataFrame, coaches: pl.DataFrame) -> pl.DataFrame
     out = tendencies(
         df, league=LEAGUE, group_cols=COACH_GROUP, def_group_cols=COACH_DEF_GROUP
     )
+    out = out.filter(
+        pl.col("coach").is_not_null()
+    )  # the unattributed side's snaps form no row
     return out.with_columns(role=pl.lit("HC")).select(
         "season",
         "pos_team",

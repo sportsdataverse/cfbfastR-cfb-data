@@ -107,7 +107,7 @@ def team_coaches(
     roster = load_coach_seasons() if roster is None else roster
     rows = roster.filter(
         (pl.col("season") == int(season)) & (pl.col("clean_attribution") == True)
-    )  # noqa: E712
+    )
     if rows.height == 0:
         return pl.DataFrame(schema=TEAM_COACH_SCHEMA)
     ids = school_team_ids(schedule, season)
@@ -193,9 +193,14 @@ def fetch_cfbd_coaches(
         f"{url}?year={int(season)}",
         headers={**_UA, "Authorization": f"Bearer {key}", "Accept": "application/json"},
     )
-    with urllib.request.urlopen(req, timeout=120) as resp:  # noqa: S310 - fixed https host
+    with urllib.request.urlopen(req, timeout=120) as resp:
         payload = json.loads(resp.read())
-    return payload if isinstance(payload, list) else []
+    if not isinstance(payload, list):
+        # an error envelope with HTTP 200 must not read as "no coaches this season"
+        raise TypeError(
+            f"CFBD /coaches?year={season}: unexpected payload shape {type(payload).__name__}"
+        )
+    return payload
 
 
 def refresh_coach_seasons(
@@ -212,7 +217,13 @@ def refresh_coach_seasons(
     """
     current = load_coach_seasons(path)
     fresh = [coach_rows_from_cfbd(fetch(s, api_key=api_key), s) for s in seasons]
-    kept = current.filter(~pl.col("season").is_in([int(s) for s in seasons]))
+    # a season CFBD returns nothing for keeps its vendored rows: an empty answer
+    # (not yet published, transient gap) must never erase attribution
+    replaced = [int(s) for s, f in zip(seasons, fresh) if f.height]
+    for s, f in zip(seasons, fresh):
+        if not f.height:
+            print(f"coaches {s}: CFBD returned no coach-seasons; existing rows kept")
+    kept = current.filter(~pl.col("season").is_in(replaced))
     out = pl.concat(
         [kept, *[f for f in fresh if f.height]], how="vertical_relaxed"
     ).sort(["season", "school", "coach"])

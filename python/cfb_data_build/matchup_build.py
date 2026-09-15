@@ -186,8 +186,12 @@ def full_season_features(plays: pl.DataFrame, teams: list[str]) -> pl.DataFrame:
             "away_team": ["SYNTH_FULL_SEASON"] * len(teams),
         }
     )
+    # the synthetic game must come AFTER the team's real games: the loop's
+    # first-game rule would otherwise see it as an opener with no prior plays
+    games = pl.concat([played_games(plays), synth], how="vertical_relaxed")
     scoring = load_coefficients(ARTIFACTS / "scoring_opp_coef.json")
-    return team_game_features(plays, synth, teams, scoring).drop("game_id")
+    out = team_game_features(plays, games, teams, scoring)
+    return out.filter(pl.col("game_id") < 0).drop("game_id")
 
 
 def full_season_pace(pbp: pl.DataFrame) -> pl.DataFrame:

@@ -114,7 +114,12 @@ def test_full_season_features_match_r() -> None:
             "away_team": ["SYNTH_FULL_SEASON"] * len(teams),
         }
     )
-    py = team_game_features(aug, games, teams, scoring).sort("team")
+    games = pl.concat([_games_from(aug), games], how="vertical_relaxed")
+    py = (
+        team_game_features(aug, games, teams, scoring)
+        .filter(pl.col("game_id") < 0)
+        .sort("team")
+    )
     oracle = oracle.sort("team")
     assert py.height == oracle.height == 136
     assert py["team"].to_list() == oracle["team"].to_list()

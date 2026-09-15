@@ -132,14 +132,19 @@ def team_coaches(
 def coach_rows_from_cfbd(payload: list[dict[str, Any]], season: int) -> pl.DataFrame:
     """Flatten a CFBD ``/coaches?year=`` payload into roster rows for ``season``.
 
-    ``clean_attribution`` is derived from the share of the school's games the
-    coach led (CFBD lists an interim coach as a second entry for the school).
+    CFBD ships camelCase (``firstName``, ``lastName``) today and snake_case in
+    older captures; both are read. ``conference`` comes from the season entry.
+    ``clean_attribution``: a school's only coach of the season owns it (CFBD
+    reports ``games: 0`` while a season is in progress, so a games share would
+    never clear the bar); with two or more coaches the one who led at least
+    80% of the school's counted games owns it, and nobody does until the games
+    are counted.
     """
     recs: list[dict[str, Any]] = []
     for coach in payload or []:
-        name = " ".join(
-            str(coach.get(k) or "").strip() for k in ("first_name", "last_name")
-        ).strip()
+        first = coach.get("firstName", coach.get("first_name")) or ""
+        last = coach.get("lastName", coach.get("last_name")) or ""
+        name = f"{str(first).strip()} {str(last).strip()}".strip()
         for s in coach.get("seasons") or []:
             if int(s.get("year") or 0) != int(season) or not name:
                 continue
@@ -148,7 +153,7 @@ def coach_rows_from_cfbd(payload: list[dict[str, Any]], season: int) -> pl.DataF
                     "season": int(season),
                     "coach": name,
                     "school": str(s.get("school") or ""),
-                    "conference": None,
+                    "conference": s.get("conference"),
                     "games": int(s.get("games") or 0),
                     "wins": int(s.get("wins") or 0),
                     "losses": int(s.get("losses") or 0),
@@ -157,14 +162,16 @@ def coach_rows_from_cfbd(payload: list[dict[str, Any]], season: int) -> pl.DataF
     if not recs:
         return pl.DataFrame(schema=COACH_SCHEMA)
     df = pl.DataFrame(recs)
+    n_coaches = pl.len().over("school")
     total = pl.col("games").sum().over("school")
+    share = pl.col("games") / pl.when(total > 0).then(total).otherwise(1)
+    clean = (
+        pl.when(n_coaches == 1)
+        .then(True)
+        .otherwise((total > 0) & (share >= CLEAN_ATTRIBUTION_SHARE))
+    )
     return (
-        df.with_columns(
-            clean_attribution=(
-                pl.col("games") / pl.when(total > 0).then(total).otherwise(1)
-            )
-            >= CLEAN_ATTRIBUTION_SHARE
-        )
+        df.with_columns(clean_attribution=clean)
         .select(list(COACH_SCHEMA))
         .cast(COACH_SCHEMA)  # type: ignore[arg-type]
         .sort(["school", "coach"])

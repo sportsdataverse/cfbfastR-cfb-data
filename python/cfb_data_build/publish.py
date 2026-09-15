@@ -14,16 +14,19 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Callable
 
+from cfb_model_build.cfb_model_publish.artifacts import _gh_release_exists, _gh_runner
 from sportsdataverse.release import upload_release_sidecars
 
 from cfb_data_build.config import PKG_FUNCTION, DatasetSpec
-from cfb_model_build.cfb_model_publish.artifacts import _gh_release_exists, _gh_runner
+from cfb_data_build.io import dataset_stem
 
 # Mirror R PUBLISH_REPOS (``R/_data_utils.R:5``).
 PUBLISH_REPOS: list[str] = ["sportsdataverse/sportsdataverse-data"]
 
 
-def _dataset_files(spec: DatasetSpec, season: int, base: str | Path) -> list[Path]:
+def _dataset_files(
+    spec: DatasetSpec, season: int | None, base: str | Path
+) -> list[Path]:
     """The on-disk release files for one dataset+season (parquet + rds + csv).
 
     All three released formats ship to the tag — the release is the distribution
@@ -33,11 +36,12 @@ def _dataset_files(spec: DatasetSpec, season: int, base: str | Path) -> list[Pat
     already publish — while every other dataset keeps shipping plain ``.csv``.
     """
     root = Path(base) / spec.dataset
+    name = dataset_stem(spec.stem, season)
     candidates = [
-        root / "parquet" / f"{spec.stem}_{season}.parquet",
-        root / "rds" / f"{spec.stem}_{season}.rds",
-        root / "csv" / f"{spec.stem}_{season}.csv",
-        root / "csv" / f"{spec.stem}_{season}.csv.gz",
+        root / "parquet" / f"{name}.parquet",
+        root / "rds" / f"{name}.rds",
+        root / "csv" / f"{name}.csv",
+        root / "csv" / f"{name}.csv.gz",
     ]
     return [f for f in candidates if f.exists()]
 
@@ -87,9 +91,8 @@ RELEASE_NOTES: dict[str, str] = {
         "`prev_*` block, pace, CFBD pregame ELO with opponent-ELO rolls, "
         "consensus betting lines and game meta -- 268 columns. Regular-season "
         "week-1 (and any later opener's) features are the prior season's "
-        "full-season values. Side inputs "
-        "(talent, coaches, returning production, QB, weather, venue) are null "
-        "until their joins land."
+        "full-season values. Side inputs (talent, coaches, returning "
+        "production, QB, weather, venue) are null until their joins land."
     ),
 }
 
@@ -116,7 +119,7 @@ def _stamp(tag: str, run: Callable[[list[str]], object], repo: str) -> None:
 
 def publish_dataset(
     spec: DatasetSpec,
-    season: int,
+    season: int | None,
     *,
     base: str | Path = "cfb",
     repos: list[str] | None = None,

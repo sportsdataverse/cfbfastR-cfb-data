@@ -262,3 +262,6 @@ Every numbered pipeline stage in `python/` (auto-listed; run subsets with the `s
 - `python/espn_cfb_58_usage_st_returners_creation.py`
 - `python/espn_cfb_59_usage_st_blocks_creation.py`
 - `python/espn_cfb_60_usage_st_team_creation.py`
+- `python/espn_cfb_61_team_tendencies_creation.py`
+- `python/espn_cfb_62_coach_tendencies_creation.py`
+- `python/espn_cfb_63_coach_careers_creation.py`

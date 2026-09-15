@@ -128,6 +128,16 @@ KNOWN_UNPAIRED.update(
         )
     }
 )
+KNOWN_UNPAIRED.update(
+    {
+        key: (
+            "Python-only pending the R port of sportsdataverse.football.tendencies "
+            "(season tendencies over the season's plays; coach attribution from "
+            "data/cfb_coach_seasons.csv); tracked follow-up, not a decomposition."
+        )
+        for key in ("team_tendencies", "coach_tendencies", "coach_careers")
+    }
+)
 
 #   matchup_features derived (cli.DERIVED): the cfbfastR_cfb_pbp release + CFBD
 #   matchup_line     /games + /lines, not final.json; Python-only by design --

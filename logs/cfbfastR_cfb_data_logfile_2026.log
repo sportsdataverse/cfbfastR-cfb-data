@@ -1,5 +1,5 @@
 From https://github.com/sportsdataverse/cfbfastR-cfb-data
-   0aa99421..62324842  main                   -> origin/main
+   62324842..0f806f91  main                   -> origin/main
  * [new branch]        AE/update-air-yards-model -> origin/AE/update-air-yards-model
  * [new branch]        chore/readme-repository-layout -> origin/chore/readme-repository-layout
  * [new branch]        docs/automation-status -> origin/docs/automation-status
@@ -41,7 +41,7 @@ pbp 2026: 20118 rows from 948 games
 2026: 138 coach-seasons, 138 cleanly attributed
 play_participants 2026: 18877 rows from 948 games
 team_box 2026: 370 rows from 948 games
-player_box 2026: 12380 rows from 948 games
+player_box 2026: 12377 rows from 948 games
 drives 401866408: can only concatenate list (not "dict") to list
 drives 401858201: can only concatenate list (not "dict") to list
 drives 401864570: can only concatenate list (not "dict") to list
@@ -163,9 +163,9 @@ adv_drives 2026: 355 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
 adv_situational 2026: 355 rows from 948 games
   def_pos_team: 100.0% of rows resolved to a team name
-adv_defensive_players 2026: 1371 rows from 948 games
+adv_defensive_players 2026: 1359 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
-adv_specialists 2026: 1143 rows from 948 games
+adv_specialists 2026: 1602 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
 adv_player_usage 2026: 3585 rows from 948 games
 adv_position_group_usage 2026: 0 rows from 948 games
@@ -187,21 +187,21 @@ usage_teams 2026: 216 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
 usage_drive_scripting 2026: 409 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
-adv_st_kickers 2026: 793 rows from 948 games
+adv_st_kickers 2026: 762 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
 adv_st_punters 2026: 334 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
-adv_st_returners 2026: 10 rows from 948 games
+adv_st_returners 2026: 396 rows from 948 games
   def_pos_team: 100.0% of rows resolved to a team name
 adv_st_blocks 2026: 19 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
-adv_st_team 2026: 355 rows from 948 games
+adv_st_team 2026: 356 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
-usage_st_kickers 2026: 591 rows from 948 games
+usage_st_kickers 2026: 562 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
 usage_st_punters 2026: 239 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
-usage_st_returners 2026: 10 rows from 948 games
+usage_st_returners 2026: 324 rows from 948 games
   def_pos_team: 100.0% of rows resolved to a team name
 usage_st_blocks 2026: 19 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name

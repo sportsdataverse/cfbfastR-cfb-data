@@ -43,6 +43,8 @@ rather than dropping them silently.
 from __future__ import annotations
 
 import re
+import unicodedata
+import warnings
 from pathlib import Path
 
 import polars as pl
@@ -89,15 +91,22 @@ MASCOT_ALIASES: dict[str, str] = {
 }
 
 
-def _key(expr: pl.Expr) -> pl.Expr:
-    """Contracting match key: lowercase, letters and digits only."""
-    return expr.str.to_lowercase().str.replace_all(r"[^a-z0-9]", "")
+def _contract(name: str) -> str:
+    """Contracting match key: transliterate, lowercase, letters and digits only.
+
+    The accent must be transliterated rather than stripped -- the coordinator
+    table spells one school both "San José State" and "San Jose State", and
+    dropping the accented letter entirely would make those two different keys.
+    """
+    folded = unicodedata.normalize("NFKD", name or "")
+    ascii_only = "".join(c for c in folded if not unicodedata.combining(c))
+    return re.sub(r"[^a-z0-9]", "", ascii_only.lower())
 
 
 def _candidates(name: str, *, aliases: dict[str, str] | None = None) -> list[str]:
     """The contracted key plus the systematic shorthands these lists use."""
     table = TEAM_ALIASES if aliases is None else aliases
-    k = re.sub(r"[^a-z0-9]", "", (name or "").lower())
+    k = _contract(name)
     out = [k, table.get(k, k)]
     if k.endswith("st"):
         out += [k[:-2] + "state", k[:-2]]
@@ -132,9 +141,10 @@ def match_team_names(
             missing.append(name)
         else:
             mapped.append({column: name, "_school": lookup[cands[rank]], "_rank": rank})
-    # two spellings of one school can both resolve (a table that carries both
-    # "Connecticut" and "UConn"); keep the one that matched on its own key
-    # rather than through an alias, so the join can never fan the line out
+    # two spellings of one school can both resolve (a table carrying both
+    # "Connecticut" and "UConn"). Keep the one that matched on its own key --
+    # but only when the rows agree; differing rows are a defect in the source
+    # table and must not be resolved by sort order
     if mapped:
         best = (
             pl.DataFrame(mapped)
@@ -142,9 +152,17 @@ def match_team_names(
             .unique(subset=["_school"], keep="first", maintain_order=True)
             .drop("_rank")
         )
+        dropped = set(x[column] for x in mapped) - set(best[column].to_list())
+        for name in sorted(dropped):
+            school = next(x["_school"] for x in mapped if x[column] == name)
+            kept = best.filter(pl.col("_school") == school)[column].item()
+            rows = frame.filter(pl.col(column).is_in([name, kept])).drop(column)
+            if rows.unique().height > 1:
+                raise ValueError(
+                    f"{column}: {name!r} and {kept!r} both resolve to {school!r} "
+                    f"with different values -- fix the reference table"
+                )
         mapped = best.to_dicts()
-    if not mapped:
-        return frame.head(0).with_columns(pl.lit(None, pl.Utf8).alias("team")), missing
     out = (
         frame.join(pl.DataFrame(mapped), on=column, how="inner")
         .drop(column)
@@ -183,16 +201,19 @@ def coach_continuity(coordinators: pl.DataFrame) -> pl.DataFrame:
     lagged = parts.with_columns(
         [
             pl.col(c).shift(1).over("school_mascot").alias(f"lag_{c}")
-            for c in ("oc1", "oc2", "dc1", "dc2")
+            for c in ("oc1", "oc2", "dc1", "dc2", "season")
         ]
     )
+    # a school that skipped a season (or joined late) must not have this
+    # season's staff compared with one from two years ago
+    consecutive = pl.col("lag_season") == pl.col("season") - 1
     flags = []
     for abbr in ("oc", "dc"):
         hit = pl.lit(False)  # noqa: FBT003 - polars literal, not a flag argument
         for a in (f"{abbr}1", f"{abbr}2"):
             for b in (f"lag_{abbr}1", f"lag_{abbr}2"):
                 hit = hit | (pl.col(a) == pl.col(b)).fill_null(False)  # noqa: FBT003
-        flags.append(hit.cast(pl.Int64).alias(f"{abbr}_cont"))
+        flags.append((hit & consecutive).cast(pl.Int64).alias(f"{abbr}_cont"))
     first = coordinators["season"].min()
     return (
         lagged.with_columns(flags)
@@ -234,7 +255,7 @@ def starters_from_pbp(pbp: pl.DataFrame) -> pl.DataFrame:
 
 
 def qb_game_counts(pbp: pl.DataFrame) -> pl.DataFrame:
-    """Per (season, athlete): distinct games the passer threw in."""
+    """Per (season, athlete): distinct games in which the athlete threw a pass."""
     return (
         pbp.filter((pl.col("pass") == 1) & pl.col("passer_player_id").is_not_null())
         .select(
@@ -254,9 +275,9 @@ def qb_starters(starters: pl.DataFrame, appearances: pl.DataFrame) -> pl.DataFra
     * ``returning_qb`` -- the same athlete started for the same team last season
     * ``qb_starter_years`` -- how many earlier seasons this athlete was a
       starter anywhere (0 for a first-time starter)
-    * ``qb_games`` -- games ENTERING the season in which the athlete threw an
-      incompletion. The delivered line carries one value per team for the whole
-      season, so this is a career-to-date count, not an as-of-date one.
+    * ``qb_games`` -- games ENTERING the season in which the athlete threw a
+      pass. The delivered line carries one value per team for the whole season,
+      so this is a career-to-date count, not an as-of-date one.
     """
     s = starters.sort(["athlete_id", "season"])
     prior_years = (
@@ -346,14 +367,21 @@ def season_reference(
     """The eleven non-CFBD columns for one season, keyed by CFBD ``team``.
 
     ``teams`` is :func:`~cfb_data_build.matchup_side.tidy_cfbd_teams` output
-    (it carries ``join_name``, which resolves the coordinators table's
-    mascot-form school). Every column is present even when a table has no rows
-    for the season, so the line's schema never depends on the data.
+    (it carries ``join_name``, which resolves the mascot-form keys). Every
+    column is present even when a table has no rows for the season, so the
+    line's schema never depends on the data.
+
+    A spelling that resolves to no CFBD school is reported through
+    ``warnings.warn`` naming the source and season: a table that predates a new
+    FBS member legitimately has no row for it, but silent name drift would
+    otherwise look identical to that.
     """
+    unresolved: dict[str, list[str]] = {}
+
     out = pl.DataFrame({"team": schools}, schema={"team": pl.Utf8})
 
     cont = load_coach_continuity().filter(pl.col("season") == season)
-    cont, _unmatched_mascots = match_team_names(
+    cont, unresolved["coach continuity"] = match_team_names(
         cont,
         teams["join_name"].to_list(),
         column="school_mascot",
@@ -367,7 +395,7 @@ def season_reference(
     _one_row_per_team(cont, "coach continuity", season)
     out = out.join(cont, on="team", how="left")
 
-    rp, _ = match_team_names(
+    rp, unresolved["returning production"] = match_team_names(
         load_returning_production().filter(pl.col("season") == season), schools
     )
     rp = rp.with_columns(
@@ -376,14 +404,14 @@ def season_reference(
     _one_row_per_team(rp, "returning production", season)
     out = out.join(rp, on="team", how="left")
 
-    tl, _ = match_team_names(
+    tl, unresolved["roster talent"] = match_team_names(
         load_roster_talent().filter(pl.col("season") == season), schools
     )
     _one_row_per_team(tl, "roster talent", season)
     out = out.join(tl.select("team", "team_talent_weighted"), on="team", how="left")
 
     # the pbp release keys teams by the mascot form, as the coordinators table does
-    qb, _ = match_team_names(
+    qb, unresolved["QB starters"] = match_team_names(
         load_qb_starters().filter(pl.col("season") == season),
         teams["join_name"].to_list(),
         aliases=MASCOT_ALIASES,
@@ -406,6 +434,13 @@ def season_reference(
         on="team",
         how="left",
     )
+    reports = {k: v for k, v in unresolved.items() if v}
+    if reports:
+        warnings.warn(
+            f"matchup reference {season}: spellings that matched no CFBD school "
+            + "; ".join(f"{k}: {v}" for k, v in sorted(reports.items())),
+            stacklevel=2,
+        )
     return out
 
 
@@ -457,6 +492,12 @@ def main(argv: list[str] | None = None) -> int:
     r.add_argument("--end-season", type=int, required=True)
     r.add_argument("--start-season", type=int, default=PBP_FIRST_SEASON)
     r.add_argument(
+        "--allow-partial-qb",
+        action="store_true",
+        help="rebuild the QB table from a later start (drops the earlier backfill "
+        "and undercounts career games -- for testing only)",
+    )
+    r.add_argument(
         "--only",
         choices=("continuity", "qb"),
         help="rebuild just one table (qb needs the pbp release)",
@@ -474,6 +515,16 @@ def main(argv: list[str] | None = None) -> int:
             f"{cont['season'].min()}-{cont['season'].max()}"
         )
     if args.only != "continuity":
+        # the QB table's career columns are cumulative, so a rebuild that starts
+        # late does not just lose rows -- it silently undercounts every season
+        # it does write
+        if args.start_season > PBP_FIRST_SEASON and not args.allow_partial_qb:
+            raise SystemExit(
+                f"refusing to rebuild the QB table from {args.start_season}: it "
+                f"replaces the file, so the {PBP_FIRST_SEASON}-{args.start_season - 1} "
+                f"backfill would be lost and career counts would be low. Use "
+                f"--start-season {PBP_FIRST_SEASON} (or --allow-partial-qb)."
+            )
         seasons = list(range(args.start_season, args.end_season + 1))
         qb = build_qb_table(seasons)
         qb.write_csv(QB_CSV)

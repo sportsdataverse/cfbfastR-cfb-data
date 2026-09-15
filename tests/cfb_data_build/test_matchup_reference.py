@@ -11,12 +11,12 @@ column                  observed      why it is not 1.000
 ======================= ============= =====================================
 team_talent_weighted    1.000 / 1.000 -
 off_rtprod              0.994 / 0.992 a team the table predates is null
-def_rtprod              0.987 / 0.984 (one: a new FBS member)
-ovr_rtprod              0.948 / 0.951 recomputed as the rounded mean of the
+def_rtprod              0.994 / 0.992 (one: a new FBS member)
+ovr_rtprod              0.955 / 0.959 recomputed as the rounded mean of the
                                       two sides, as the source recomputes
                                       it; the gap is rounding on halves
-oc_cont / dc_cont       0.882 / 0.895 derived from a newer coordinator
-                                      vintage than the 2025 line used
+oc_cont                 0.889 / 0.890 derived from a newer coordinator
+dc_cont                 0.894 / 0.903 vintage than the 2025 line used
 returning_qb            0.840 / 0.827 see the QB note
 qb_name                 0.673 / 0.651 "
 athlete_id              0.693 / 0.673 "
@@ -211,3 +211,81 @@ def test_unmatched_team_names_are_reported_not_dropped_silently() -> None:
     out, missing = match_team_names(frame, ["Mississippi", "Alabama"])
     assert out["team"].to_list() == ["Mississippi"]
     assert missing == ["Not A School"]
+
+
+def test_accented_and_plain_spellings_are_one_key() -> None:
+    """The coordinator table spells one school both ways; both must resolve."""
+    from cfb_data_build.matchup_reference import _contract
+
+    assert _contract("San José State Spartans") == _contract("San Jose State Spartans")
+    out, missing = match_team_names(
+        pl.DataFrame({"team": ["San Jose State"], "v": [1]}), ["San José State"]
+    )
+    assert out["team"].to_list() == ["San José State"] and missing == []
+
+
+def test_continuity_requires_the_immediately_prior_season() -> None:
+    """A gap year must not let a two-year-old staff count as continuity."""
+    src = pl.DataFrame(
+        {
+            "season": [2018, 2020],  # no 2019 row for this school
+            "school_mascot": ["A Aces"] * 2,
+            "offensive_coordinators": ["Same Name", "Same Name"],
+            "defensive_coordinators": ["Same D", "Same D"],
+        }
+    )
+    out = coach_continuity(src)
+    assert out["season"].to_list() == [2020]
+    assert out["oc_cont"].to_list() == [0] and out["dc_cont"].to_list() == [0]
+
+
+def test_conflicting_spellings_for_one_school_raise() -> None:
+    """Two source names resolving to one school must not be settled by sort order."""
+    clash = pl.DataFrame({"team": ["Connecticut", "UConn"], "off_rtprod": [0.5, 0.9]})
+    with pytest.raises(ValueError, match="different values"):
+        match_team_names(clash, ["UConn"])
+    agree = pl.DataFrame({"team": ["Connecticut", "UConn"], "off_rtprod": [0.5, 0.5]})
+    out, _ = match_team_names(agree, ["UConn"])
+    assert out.height == 1
+
+
+def test_every_imported_table_is_unique_on_its_key() -> None:
+    """A duplicated team-season would raise mid-build; catch it at rest instead."""
+    from cfb_data_build.matchup_reference import (
+        load_coordinators,
+        load_returning_production,
+        load_roster_talent,
+    )
+
+    for frame, keys in (
+        (load_returning_production(), ["season", "team"]),
+        (load_roster_talent(), ["season", "team"]),
+        (load_coordinators(), ["season", "school_mascot"]),
+        (load_qb_starters(), ["season", "team"]),
+    ):
+        assert frame.unique(subset=keys).height == frame.height
+
+
+def test_a_partial_qb_refresh_is_refused() -> None:
+    """Rebuilding from a later start would drop the backfill and undercount careers."""
+    from cfb_data_build.matchup_reference import main
+
+    with pytest.raises(SystemExit, match="refusing to rebuild"):
+        main(
+            [
+                "refresh",
+                "--start-season",
+                "2014",
+                "--end-season",
+                "2025",
+                "--only",
+                "qb",
+            ]
+        )
+
+
+def test_unresolved_spellings_are_reported() -> None:
+    """A name that matches no school must surface, not just left-join to null."""
+    teams = pl.read_parquet(FIX / "cfbd_teams_2025.parquet")
+    with pytest.warns(UserWarning, match="matched no CFBD school"):
+        season_reference(2025, teams=teams, schools=["Alabama"])

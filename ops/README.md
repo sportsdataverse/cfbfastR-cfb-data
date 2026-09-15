@@ -16,11 +16,15 @@ does not publish. Two are rebuilt from their sources, two are imported values.
 ```sh
 # derived -- rerun whenever the coordinator table or a new season lands
 PYTHONPATH=python uv run python -m cfb_data_build.matchup_reference refresh \
-    --start-season 2014 --end-season <season>
+    --start-season 2004 --end-season <season>
 ```
 
 * `cfb_matchup_coach_continuity.csv` — derived from `cfb_matchup_coordinators.csv`
   (2014+, one season per source season after the first).
+The QB rebuild always starts at 2004: it replaces the file, and its career
+columns are cumulative, so a later start would drop the backfill AND undercount
+every season it wrote. The command refuses a later start.
+
 * `cfb_matchup_qb_starters.csv` — derived from the ESPN pbp release (2004+):
   the passer with the most attempts. It is the REALIZED starter, so the table
   is only complete once a season has been played, and the columns it feeds are

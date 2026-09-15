@@ -50,3 +50,12 @@ Trainer parity frames (not committed; `python/.cache/matchup/`): `scoring_opp_tr
 slots of the source's fitted objects, extracted by
 `ops/oneoff/20260915_matchup_oracle_capture/dump_training_frames.R`; their sha256 is recorded
 in `python/cfb_model_build/cfb_matchup/artifacts/*_meta.json`.
+
+WEPA weight search: `wepa_search_evals.csv` (500 × 122) is the source's evaluated candidate
+table — its 500 random weight vectors with the in-sample `r2` / `sd_err` each scored on the
+source's 2014–2023 corpus (June 2024; NOT reproducible from the current release, informational
+only; the shipped weights are row 302, the argmax). `wepa_scores_2025.csv` (6 rows) is the
+source's `evaluate_weights` run verbatim over the 2025 release for candidates 1, 2, 3, 250,
+500 and the shipped weights — the exact-parity oracle for the Python scorer
+(`ops/oneoff/20260915_matchup_oracle_capture/capture_wepa_scores.R`, R 4.6.1, 2026-09-15;
+games and scores from `cfbd_games_elo_2025.parquet`).

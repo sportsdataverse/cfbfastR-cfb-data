@@ -60,8 +60,9 @@ def fit_logit(
     data = frame.select([target, *active]).drop_nulls()
     x = data.select(active).to_numpy().astype(np.float64)
     y = data[target].to_numpy().astype(np.int64)
+    # C=inf is the unpenalised MLE (sklearn >= 1.8 spelling of penalty=None)
     model = LogisticRegression(
-        penalty=None, solver="newton-cholesky", tol=1e-12, max_iter=500
+        C=np.inf, solver="newton-cholesky", tol=1e-12, max_iter=500
     )
     model.fit(x, y)
     p = np.clip(model.predict_proba(x)[:, 1], 1e-15, 1 - 1e-15)

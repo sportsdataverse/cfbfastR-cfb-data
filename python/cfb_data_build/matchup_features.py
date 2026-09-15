@@ -397,3 +397,250 @@ def play_pace(plays: pl.DataFrame) -> pl.DataFrame:
         .then(None)
         .otherwise(pl.max_horizontal(prev_gsr - pl.col("gsr"), pl.lit(0.0)))
     )
+
+
+def pace_history(pbp: pl.DataFrame) -> pl.DataFrame:
+    """As-of-date pace per (season, team, game): the pipeline's ``pace_hist`` table.
+
+    The historical variant of the loop's pace (``tools/backfill_pace.R``): over
+    ALL plays of the season (no ``ppa`` filter, every team that appears as
+    offense or defense), a team's row for game G aggregates ``sec_since_prev``
+    over its games dated strictly before G -- mean from running sums, median
+    over the prior plays -- and its first game is null. Offense rows key on
+    ``offense_play``, defense rows on ``defense_play``; the two sides are
+    outer-joined, so a team with plays on only one side still gets a row.
+    """
+    paced = play_pace(pbp).with_columns(
+        play_date=pl.col("start_date").str.slice(0, 10).str.to_date()
+    )
+    sides = []
+    for side, team_col in (("off", "offense_play"), ("def", "defense_play")):
+        rows: list[dict] = []
+        by_team = paced.select(
+            "season",
+            pl.col(team_col).alias("team"),
+            "game_id",
+            "play_date",
+            "sec_since_prev",
+        )
+        for (season, team), grp in by_team.group_by(
+            ["season", "team"], maintain_order=True
+        ):
+            games = (
+                grp.group_by(["game_id", "play_date"], maintain_order=True)
+                .agg(
+                    s=pl.col("sec_since_prev").sum(),
+                    n=pl.col("sec_since_prev").is_not_null().sum(),
+                )
+                .sort("play_date", maintain_order=True)
+                .with_columns(
+                    cum_s=pl.col("s").cum_sum().shift(1, fill_value=0.0),
+                    cum_n=pl.col("n").cum_sum().shift(1, fill_value=0),
+                )
+            )
+            secs = grp.select("play_date", "sec_since_prev").drop_nulls(
+                "sec_since_prev"
+            )
+            for game_id, date, cum_s, cum_n in games.select(
+                "game_id", "play_date", "cum_s", "cum_n"
+            ).iter_rows():
+                prior = secs.filter(pl.col("play_date") < date)["sec_since_prev"]
+                rows.append(
+                    {
+                        "season": season,
+                        "team": team,
+                        "game_id": game_id,
+                        f"{side}_sec_per_play_mean": (cum_s / cum_n)
+                        if cum_n > 0
+                        else None,
+                        f"{side}_sec_per_play_median": prior.median()
+                        if prior.len()
+                        else None,
+                    }
+                )
+        sides.append(
+            pl.DataFrame(
+                rows,
+                schema={
+                    "season": pbp.schema["season"],
+                    "team": pl.Utf8,
+                    "game_id": pbp.schema["game_id"],
+                    f"{side}_sec_per_play_mean": pl.Float64,
+                    f"{side}_sec_per_play_median": pl.Float64,
+                },
+            )
+        )
+    off, deff = sides
+    return off.join(deff, on=["season", "team", "game_id"], how="full", coalesce=True)
+
+
+# --------------------------------------------------------------------------- F
+#: The per-team feature family, in the pipeline's column order (offense block,
+#: defense block, then the four pace columns).
+_SIDE_FEATURES = (
+    "plays_per_game",
+    "3d_per_game",
+    "epa",
+    "pass_epa",
+    "rush_epa",
+    "rroe",
+    "1st_down_rush_rate",
+    "scoring_opp_rate_oe",
+    "pts_per_scoring_opp",
+    "starting_fp",
+    "wepa",
+    "success_rate",
+    "early_success_rate",
+    "late_success_rate",
+    "pass_success_rate",
+    "rush_success_rate",
+    "3rd_down_pct",
+)
+TEAM_FEATURE_COLUMNS: tuple[str, ...] = (
+    *(f"off_{f}" for f in _SIDE_FEATURES),
+    *(f"def_{f}" for f in _SIDE_FEATURES),
+    "off_sec_per_play_mean",
+    "off_sec_per_play_median",
+    "def_sec_per_play_mean",
+    "def_sec_per_play_median",
+)
+
+
+def augment_plays(
+    pbp: pl.DataFrame, weights: dict[str, float], rush_expect: GlmCoefficients
+) -> pl.DataFrame:
+    """Dedupe, tag, weight and score a season's pbp into the frame unit F aggregates.
+
+    Adds ``off_wepa`` / ``def_wepa``, ``rp_prediction`` / ``rroe``, ``gsr`` and
+    ``play_date`` (the UTC calendar day of ``start_date``, which is what the
+    pipeline's ``as.Date()`` comparisons see); the 120 flag columns are dropped
+    again -- nothing downstream reads them.
+    """
+    out = apply_wepa(tag_plays(dedupe_plays(pbp)), weights)
+    out = out.drop([c for c in out.columns if c.endswith("_weight")])
+    out = out.with_columns(rp_prediction=apply_logit(rush_expect))
+    out = out.with_columns(
+        rroe=pl.col("rush").cast(pl.Float64) - pl.col("rp_prediction"),
+        play_date=pl.col("start_date").str.slice(0, 10).str.to_date(),
+    )
+    return game_seconds_remaining(out)
+
+
+def _mean(frame: pl.DataFrame, col: str) -> float | None:
+    return frame[col].cast(pl.Float64).mean() if frame.height else None
+
+
+def _median(frame: pl.DataFrame, col: str) -> float | None:
+    return frame[col].cast(pl.Float64).median() if frame.height else None
+
+
+def _plays_per_game_median(frame: pl.DataFrame) -> float | None:
+    if not frame.height:
+        return None
+    return frame.group_by("game_id").len()["len"].cast(pl.Float64).median()
+
+
+def _side_features(
+    plays: pl.DataFrame, drives: pl.DataFrame, team: str, side: str
+) -> dict[str, float | None]:
+    """One side's 17 features over a team's plays (unit F, one loop body)."""
+    play_col, drive_col = (
+        ("offense_play", "pos_team")
+        if side == "off"
+        else ("defense_play", "def_pos_team")
+    )
+    mine = plays.filter(pl.col(play_col) == team)
+    my_drives = drives.filter(pl.col(drive_col) == team)
+    down = pl.col("down")
+    return {
+        f"{side}_plays_per_game": _plays_per_game_median(mine),
+        f"{side}_3d_per_game": _plays_per_game_median(mine.filter(down == 3)),
+        f"{side}_epa": _mean(mine, "ppa"),
+        f"{side}_pass_epa": _mean(mine.filter(pl.col("pass") == 1), "ppa"),
+        f"{side}_rush_epa": _mean(mine.filter(pl.col("rush") == 1), "ppa"),
+        f"{side}_rroe": _mean(mine, "rroe"),
+        f"{side}_1st_down_rush_rate": _mean(mine.filter(down == 1), "rush"),
+        f"{side}_scoring_opp_rate_oe": _mean(my_drives, "scoring_opp_oe"),
+        f"{side}_pts_per_scoring_opp": _mean(
+            my_drives.filter(pl.col("scoring_opp") == 1), "new_drive_pts"
+        ),
+        f"{side}_starting_fp": _mean(
+            my_drives.filter(pl.col("prev_drive_result") == "PUNT"),
+            "start_yards_to_goal",
+        ),
+        f"{side}_wepa": _mean(mine, f"{side}_wepa"),
+        f"{side}_success_rate": _mean(mine, "success"),
+        f"{side}_early_success_rate": _mean(mine.filter(down <= 2), "success"),
+        f"{side}_late_success_rate": _mean(mine.filter(down == 3), "success"),
+        f"{side}_pass_success_rate": _mean(mine.filter(pl.col("pass") == 1), "success"),
+        f"{side}_rush_success_rate": _mean(mine.filter(pl.col("rush") == 1), "success"),
+        # the share of downs 1-3 that were third downs -- a share, not a
+        # conversion rate; the name is the pipeline's
+        f"{side}_3rd_down_pct": _mean(
+            mine.filter(down <= 3).with_columns(_third=(down == 3).cast(pl.Float64)),
+            "_third",
+        ),
+    }
+
+
+def _pace(plays: pl.DataFrame, team: str, side: str) -> dict[str, float | None]:
+    play_col = "offense_play" if side == "off" else "defense_play"
+    paced = play_pace(plays.filter(pl.col(play_col) == team))
+    return {
+        f"{side}_sec_per_play_mean": _mean(paced, "sec_since_prev"),
+        f"{side}_sec_per_play_median": _median(paced, "sec_since_prev"),
+    }
+
+
+def team_game_features(
+    plays: pl.DataFrame,
+    games: pl.DataFrame,
+    teams: list[str],
+    scoring_opp: GlmCoefficients,
+    *,
+    first_game_same_day: bool = True,
+) -> pl.DataFrame:
+    """Per (team, game) as-of features: one row per game a listed team plays.
+
+    ``plays`` is the ``augment_plays`` frame (plays with a null ``ppa`` are
+    dropped, as the pipeline does); ``games`` needs ``game_id``, ``start_date``
+    (Date), ``home_team``, ``away_team``. Game i of a team's season sees plays
+    dated strictly before it. Its FIRST game sees that same day's
+    regular-season plays when ``first_game_same_day`` is True -- the pipeline's
+    own behaviour, which reads the game being predicted; the published dataset
+    passes False and leaves the first game null.
+    """
+    plays = plays.filter(pl.col("ppa").is_not_null())
+    rows: list[dict] = []
+    for team in teams:
+        team_games = games.filter(
+            (pl.col("home_team") == team) | (pl.col("away_team") == team)
+        ).sort("start_date", maintain_order=True)
+        team_plays = plays.filter((pl.col("home") == team) | (pl.col("away") == team))
+        for i, (game_id, game_date) in enumerate(
+            team_games.select("game_id", "start_date").iter_rows()
+        ):
+            if i == 0:
+                subset = (
+                    team_plays.filter(
+                        (pl.col("play_date") == game_date)
+                        & (pl.col("season_type") == "regular")
+                    )
+                    if first_game_same_day
+                    else team_plays.clear()
+                )
+            else:
+                subset = team_plays.filter(pl.col("play_date") < game_date)
+            row: dict = {"game_id": game_id, "team": team}
+            if subset.height == 0:
+                row.update({c: None for c in TEAM_FEATURE_COLUMNS})
+            else:
+                drives = build_drive_frame(subset, scoring_opp)
+                row.update(_side_features(subset, drives, team, "off"))
+                row.update(_side_features(subset, drives, team, "def"))
+                row.update(_pace(subset, team, "off"))
+                row.update(_pace(subset, team, "def"))
+            rows.append(row)
+    schema = {"game_id": games.schema["game_id"], "team": pl.Utf8}
+    schema.update({c: pl.Float64 for c in TEAM_FEATURE_COLUMNS})
+    return pl.DataFrame(rows, schema=schema)

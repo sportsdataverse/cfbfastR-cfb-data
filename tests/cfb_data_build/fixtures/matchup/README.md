@@ -19,7 +19,11 @@ drive number>`.
 | `scoring_opp_coef.json` | 6 | logistic glm coefficients + formula/family; rank 6/6 | snapshot `models/scoring_opp_mod.RDS` |
 | `rush_expect_coef.json` | 13 | logistic glm coefficients; rank 12/13 — `score_diff` aliased (null) and dropped by R's `predict` | snapshot `models/rp_mod_3.rds` |
 | `rp_features_sample.csv` | 5,000 × 15 | rush/pass plays with the 12 rush-expectation features + R's `rp` prediction (refit-parity oracle) | R capture, `set.seed(2025)` sample |
-| `team_features_full_2025.csv` | 136 × 36 | per FBS team, FULL-season 2025 features (38-col family; the pipeline's prior-season priors file) | snapshot `data/prev_season_epa_data_2025.csv` |
+| `team_features_full_2025.csv` | 136 × 36 | per FBS team, FULL-season 2025 features (38-col family; the pipeline's prior-season priors file) | snapshot `data/prev_season_epa_data_2025.csv` (June 2026 run) |
+| `team_features_asof_2025.csv` | 1,740 × 44 | per FBS team-game, the loop's as-of features + game meta — `capture_team_features.R`, the loop function verbatim over today's release | R capture 2026-09-15 |
+| `team_features_full_2025_r.csv` | 136 × 44 | the same loop with the pipeline's synthetic future game (whole season) | R capture 2026-09-15 |
+| `cfbd_games_elo_2024.parquet`, `cfbd_games_elo_2025.parquet` | 3,801 / 3,831 × 23 | CFBD `/games` rows with pregame / postgame ELO, divisions, points, notes | CFBD API 2026-09-15 |
+| `cfbd_lines_2025.parquet` | 3,345 × 6 | CFBD `/lines` rows, one per (game, provider) | CFBD API 2026-09-15 |
 | `pace_hist_2025.csv` | 3,314 × 7 | per (season, team, game_id) as-of-date pace (off/def sec-per-play mean + median) | snapshot `data/pace_hist_2014_2025.csv`, season 2025 slice |
 | `matchup_line_2025.csv` | 773 × 268 | the delivered matchup line, season 2025 (bowls excluded, CFP kept) | snapshot `output/cfb_data_2026_week_1.csv`, season 2025 slice |
 

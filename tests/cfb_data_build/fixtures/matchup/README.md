@@ -1,7 +1,7 @@
 # Matchup-feature oracle fixtures (2025 season)
 
 Golden output of the R matchup pipeline, captured **2026-09-15** under R 4.6.1 +
-cfbfastR 2.0.0 by `dev/cfb_matchup/capture_oracle.R` (the R units run verbatim over
+cfbfastR 2.0.0 by `ops/oneoff/20260915_matchup_oracle_capture/capture_oracle.R` (the R units run verbatim over
 `cfbfastR::load_cfb_pbp(2025)` after `distinct(game_id, id_play, game_play_number)` →
 283,172 plays, 1,657 games). The Python port must reproduce these; nothing here is
 synthetic.
@@ -27,8 +27,8 @@ Full-season files (too large to commit) live in `python/.cache/matchup/` and dri
 `integration`-marked tests: `cfbfastR_cfb_pbp_2025.parquet` (293,200 rows before dedupe),
 `play_flags_wepa_2025.csv.gz` (283,172 rows), `drives_2025.csv.gz` (36,151 rows).
 
-Regenerate: `Rscript dev/cfb_matchup/capture_oracle.R <snapshot_dir> <out_dir>` then the
-sampling step in `dev/cfb_matchup/make_fixtures.py`. Re-run the oracle live before
+Regenerate: `Rscript ops/oneoff/20260915_matchup_oracle_capture/capture_oracle.R <snapshot_dir> <out_dir>` then the
+sampling step in `ops/oneoff/20260915_matchup_oracle_capture/make_fixtures.py`. Re-run the oracle live before
 treating any delta as a port regression — the release parquet is republished in-season.
 
 Known oracle quirks (ported faithfully, documented in the module):

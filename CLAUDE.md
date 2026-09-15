@@ -39,6 +39,7 @@ The native model suite moved here from `-raw` (2026-06-17). Run from `python/`:
 | `rb_eval` | `python -m cfb_model_build.rb_eval` | `gam` (pygam) |
 | `pregame_wp` | `python -m cfb_model_build.pregame_wp` | `pregame-wp` (scipy/sklearn) |
 | `cpoe` | `python -m cfb_model_build.cpoe` | — |
+| `cfb_matchup` (scoring_opp + rush_expect glms, WEPA weights; feeds dataset stages 41/42) | `python -m cfb_model_build.cfb_matchup` | — |
 
 Cross-repo dependency: `.github/workflows/cfb_model_pipeline.yml` runs `cfbfastR-cfb-raw`'s
 QBR scraper (sparse checkout at `_raw`) for the ESPN-QBR reference. The step tries

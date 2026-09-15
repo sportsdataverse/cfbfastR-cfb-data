@@ -45,6 +45,10 @@ PY_ROSTERS="cfb_rosters"
 # Weekly long-format snapshots read the summaries/ratings output, so they run
 # last of all.
 PY_WEEKLY="ratings_weekly team_summaries_weekly"
+# The matchup datasets (stages 41/42) read the cfbfastR_cfb_pbp release the R
+# chain published above plus CFBD /games + /lines (needs CFBD_API_KEY); the line
+# also reads the PRIOR season's release for its prev_* block. No final.json.
+PY_MATCHUP="matchup_features matchup_line"
 # Roster continuity. `recruits`/`team_talent` read the 247 raw store in
 # cfbfastR-cfb-raw; `returning_production` reads the ESPN player box and needs
 # no store. `recruiting_proj` consumes talent + returning, so it runs after
@@ -132,6 +136,7 @@ for i in $(seq "${START_YEAR}" "${END_YEAR}"); do
     run_py summaries --publish
 
     for ds in $PY_WEEKLY; do run_py "$ds" --no-fetch --publish; done
+    for ds in $PY_MATCHUP; do run_py "$ds" --publish; done
 
     # Recruiting last: it depends on nothing above, and a 247 outage must not
     # cost the game datasets. Per-dataset failures are already non-fatal here.

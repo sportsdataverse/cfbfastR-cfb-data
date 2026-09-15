@@ -1,7 +1,8 @@
 # Matchup-feature oracle fixtures (2025 season)
 
 Golden output of the R matchup pipeline, captured **2026-09-15** under R 4.6.1 +
-cfbfastR 2.0.0 by `ops/oneoff/20260915_matchup_oracle_capture/capture_oracle.R` (the R units run verbatim over
+cfbfastR 2.0.0 (the GitHub dev build 3.0.0.9000, installed the same day, loads the identical
+frame: 293,200 rows / 283,172 after the distinct) by `ops/oneoff/20260915_matchup_oracle_capture/capture_oracle.R` (the R units run verbatim over
 `cfbfastR::load_cfb_pbp(2025)` after `distinct(game_id, id_play, game_play_number)` →
 283,172 plays, 1,657 games). The Python port must reproduce these; nothing here is
 synthetic.

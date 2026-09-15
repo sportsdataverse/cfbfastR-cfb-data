@@ -188,6 +188,36 @@ def test_cfbd_rows_and_refresh(tmp_path):
         False,
         False,
     ]
+
+    # the live shape: camelCase names, conference on the season entry, games not yet counted
+    def live_entry(first, last, school):
+        season = {
+            "school": school,
+            "conference": "C",
+            "year": 2026,
+            "games": 0,
+            "wins": 0,
+            "losses": 0,
+        }
+        return {"firstName": first, "lastName": last, "seasons": [season]}
+
+    live = [
+        live_entry("Sole", "Coach", "Gamma"),
+        live_entry("Shared", "One", "Delta"),
+        live_entry("Shared", "Two", "Delta"),
+    ]
+    lrows = coaches_mod.coach_rows_from_cfbd(live, 2026)
+    assert (
+        lrows.filter(pl.col("school") == "Gamma").row(0, named=True)[
+            "clean_attribution"
+        ]
+        is True
+    )
+    assert lrows.filter(pl.col("school") == "Gamma")["conference"].to_list() == ["C"]
+    assert lrows.filter(pl.col("school") == "Delta")["clean_attribution"].to_list() == [
+        False,
+        False,
+    ]
     csv = tmp_path / "roster.csv"
     pl.DataFrame(
         {

@@ -1,4 +1,5 @@
 From https://github.com/sportsdataverse/cfbfastR-cfb-data
+   0aa99421..62324842  main                   -> origin/main
  * [new branch]        AE/update-air-yards-model -> origin/AE/update-air-yards-model
  * [new branch]        chore/readme-repository-layout -> origin/chore/readme-repository-layout
  * [new branch]        docs/automation-status -> origin/docs/automation-status
@@ -321,13 +322,11 @@ cfb_rosters 2026: 13814 rows from 948/948 games | position 100.0% | division 100
 
 === team_summaries_weekly: 0 failures ===
   cfb_matchup_features 2026: 1649 rows, 45 cols
-https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/cfb_matchup_features
 
 === matchup_features: 0 failures ===
 /home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/matchup_features.py:507: UserWarning: Comparisons with None always result in null. Consider using `.is_null()` or `.is_not_null()`.
   prior = secs.filter(pl.col("play_date") < date)["sec_since_prev"]
   cfb_matchup_line 2026: 761 rows, 268 cols
-https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/cfb_matchup_line
 
 === matchup_line: 0 failures ===
 ::warning::no 247 recruits store at /home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-raw/cfb/recruits/json; skipping recruiting datasets

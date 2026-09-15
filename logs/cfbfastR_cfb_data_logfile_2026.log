@@ -1,4 +1,5 @@
 From https://github.com/sportsdataverse/cfbfastR-cfb-data
+   d6297b3e..4e819d59  main                   -> origin/main
  * [new branch]        AE/update-air-yards-model -> origin/AE/update-air-yards-model
  * [new branch]        chore/readme-repository-layout -> origin/chore/readme-repository-layout
  * [new branch]        docs/automation-status -> origin/docs/automation-status
@@ -167,65 +168,46 @@ adv_situational 2026: 355 rows from 948 games
 adv_defensive_players 2026: 1371 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
 adv_specialists 2026: 1143 rows from 948 games
-https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_adv_player_usage
   pos_team: 100.0% of rows resolved to a team name
 adv_player_usage 2026: 3585 rows from 948 games
 adv_position_group_usage 2026: 0 rows from 948 games
-https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_adv_tackles
   def_pos_team: 100.0% of rows resolved to a team name
 adv_tackles 2026: 7835 rows from 948 games
 adv_position_group_tackles 2026: 0 rows from 948 games
-https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_adv_team_usage
   pos_team: 100.0% of rows resolved to a team name
 adv_team_usage 2026: 355 rows from 948 games
-https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_adv_drive_scripting
   pos_team: 100.0% of rows resolved to a team name
 adv_drive_scripting 2026: 639 rows from 948 games
-https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_usage_players
   pos_team: 100.0% of rows resolved to a team name
 usage_players 2026: 2672 rows from 948 games
 usage_position_groups 2026: 0 rows from 948 games
-https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_usage_tackles
   def_pos_team: 100.0% of rows resolved to a team name
 usage_tackles 2026: 7003 rows from 948 games
 usage_position_group_tackles 2026: 0 rows from 948 games
-https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_usage_teams
   pos_team: 100.0% of rows resolved to a team name
 usage_teams 2026: 216 rows from 948 games
-https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_usage_drive_scripting
   pos_team: 100.0% of rows resolved to a team name
 usage_drive_scripting 2026: 409 rows from 948 games
-https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_adv_st_kickers
   pos_team: 100.0% of rows resolved to a team name
 adv_st_kickers 2026: 793 rows from 948 games
-https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_adv_st_punters
   pos_team: 100.0% of rows resolved to a team name
 adv_st_punters 2026: 334 rows from 948 games
-https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_adv_st_returners
   pos_team: 100.0% of rows resolved to a team name
 adv_st_returners 2026: 10 rows from 948 games
-https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_adv_st_blocks
   def_pos_team: 100.0% of rows resolved to a team name
 adv_st_blocks 2026: 19 rows from 948 games
-https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_adv_st_team
   pos_team: 100.0% of rows resolved to a team name
 adv_st_team 2026: 355 rows from 948 games
-https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_usage_st_kickers
   pos_team: 100.0% of rows resolved to a team name
 usage_st_kickers 2026: 591 rows from 948 games
-https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_usage_st_punters
   pos_team: 100.0% of rows resolved to a team name
 usage_st_punters 2026: 239 rows from 948 games
-https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_usage_st_returners
   pos_team: 100.0% of rows resolved to a team name
 usage_st_returners 2026: 10 rows from 948 games
-https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_usage_st_blocks
   def_pos_team: 100.0% of rows resolved to a team name
 usage_st_blocks 2026: 19 rows from 948 games
-https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_usage_st_team
   pos_team: 100.0% of rows resolved to a team name
 usage_st_team 2026: 215 rows from 948 games
-https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_team_tendencies
   pos_team: 100.0% of rows resolved to a team name
 team_tendencies 2026: 216 rows from 948 games
 Traceback (most recent call last):
@@ -359,4 +341,5 @@ cfb_rosters 2026: 13814 rows from 948/948 games | position 100.0% | division 100
   cfb_returning_production 2026: 236 rows
 
 === returning_production: 0 failures ===
-pushed: CFB Data Updated (Start: 2026 End: 2026) (attempt 1)
+push rejected (attempt 1); syncing with origin
+pushed: CFB Data Updated (Start: 2026 End: 2026) (attempt 2)

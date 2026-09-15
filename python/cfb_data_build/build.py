@@ -15,13 +15,20 @@ from pathlib import Path
 from typing import Any
 
 import polars as pl
+from cfb_data_ingest.fetch import fetch_final
+from cfb_data_ingest.schedule import SCHEDULE_URL, season_game_ids
 
 from cfb_data_build import reshapers
+from cfb_data_build.coaches import team_coaches
 from cfb_data_build.config import REGISTRY, DatasetSpec
 from cfb_data_build.io import write_dataset
 from cfb_data_build.reshape import bind_games, flat_block_frame
-from cfb_data_ingest.fetch import fetch_final
-from cfb_data_ingest.schedule import SCHEDULE_URL, season_game_ids
+from cfb_data_build.tendencies import (
+    coach_careers,
+    coach_tendencies,
+    require_coaches,
+    team_tendencies,
+)
 
 # ESPN's advBoxScore blocks put a team ID in `pos_team` / `def_pos_team` -- a
 # name-shaped column. We surface the ID as `<col>_id` and fill `<col>` with the
@@ -124,6 +131,13 @@ def build_dataset_frame(
     """
     if spec.usage_section is not None:
         return flat_block_frame(_usage_box(game).get(spec.usage_section), game)
+    if spec.tendencies in ("team", "coach"):
+        # the season's full-tier plays; the tendencies cut happens after bind
+        return reshapers.RESHAPERS["pbp"](game, output="full")
+    if spec.tendencies == "careers":
+        raise ValueError(
+            "coach_careers is cut from the written coach seasons; use build_careers"
+        )
     if spec.reshaper is not None:
         fn = reshapers.RESHAPERS[spec.reshaper]
         return fn(game, output=output) if spec.reshaper == "pbp" else fn(game)
@@ -253,6 +267,15 @@ def build_season(
         from sportsdataverse.football.usage_box import aggregate_usage_box
 
         df = aggregate_usage_box(spec.usage_section, [df])  # type: ignore[arg-type]
+    if spec.tendencies == "team":
+        df = team_tendencies(df)
+    elif spec.tendencies == "coach":
+        coaches = require_coaches(
+            team_coaches(season, schedule if schedule is not None else SCHEDULE_URL),
+            season,
+        )
+        print(f"  coaches: {coaches.height} attributed team-seasons for {season}")
+        df = coach_tendencies(df, coaches)
     df = _resolve_team_names(df, season, schedule)
     print(f"{spec.dataset} {season}: {df.height} rows from {len(ids)} games")
     write_dataset(df, spec.dataset, season, spec.stem, base=base)
@@ -260,6 +283,26 @@ def build_season(
         from cfb_data_build.publish import publish_dataset
 
         publish_dataset(spec, season, base=base)
+    return df
+
+
+def build_careers(*, base: str | Path = "cfb", publish: bool = False) -> pl.DataFrame:
+    """``coach_careers`` from every ``coach_tendencies`` season parquet under ``base``.
+
+    Season-less (one file), so it is built once per run, after the coach
+    seasons; a partial tree yields partial careers and says so.
+    """
+    spec = REGISTRY["coach_careers"]
+    src = REGISTRY["coach_tendencies"]
+    files = sorted((Path(base) / src.dataset / "parquet").glob(f"{src.stem}_*.parquet"))
+    seasons = [f.stem.rsplit("_", 1)[-1] for f in files]
+    df = coach_careers(files)
+    print(f"coach_careers: {df.height} coaches from {len(files)} season(s) {seasons}")
+    write_dataset(df, spec.dataset, None, spec.stem, base=base)
+    if publish and df.height > 0:
+        from cfb_data_build.publish import publish_dataset
+
+        publish_dataset(spec, None, base=base)
     return df
 
 
@@ -314,6 +357,11 @@ def build_dataset(
     if dataset == "rosters":
         for season in range(start_year, end_year + 1):
             build_rosters_season(season, base=base, publish=publish)
+        return
+    if (
+        dataset == "coach_careers"
+    ):  # one season-less file over every written coach season
+        build_careers(base=base, publish=publish)
         return
     spec = REGISTRY[dataset]
     for season in range(start_year, end_year + 1):

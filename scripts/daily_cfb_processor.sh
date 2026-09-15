@@ -122,12 +122,11 @@ for i in $(seq "${START_YEAR}" "${END_YEAR}"); do
     run_py "$PY_FIRST" --publish
     # Head-coach roster for the coach_tendencies stage: the vendored CSV only
     # knows the seasons it was refreshed for, so refresh this one from CFBD.
-    # Without a key the coach stage fails loudly below (no silent skip).
-    if [ -n "${CFBD_API_KEY:-}" ]; then
-      (cd python && "$PY" -m cfb_data_build.coaches -s "$i" -e "$i") || echo "::warning ::coach roster refresh failed for season $i"
-    else
-      echo "::warning ::CFBD_API_KEY unset: coach roster not refreshed for season $i"
-    fi
+    # The module resolves CFBD_API_KEY itself (env, then ~/.Renviron), so the
+    # refresh runs unconditionally and a failure marks the season red.
+    (cd python && "$PY" -m cfb_data_build.coaches -s "$i" -e "$i") || {
+      rc=$?; echo "::warning ::coach roster refresh for season $i exited with code $rc"; SEASON_RC=$rc
+    }
     for ds in $PY_REST; do run_py "$ds" --no-fetch --publish; done
     for ds in $PY_DERIVED; do run_py "$ds" --no-fetch --publish; done
     for ds in $PY_UNIFIED_SCHEDULES; do run_py "$ds" --publish; done

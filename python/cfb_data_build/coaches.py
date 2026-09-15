@@ -3,7 +3,9 @@
 No per-game coach source exists for college football the way the nflverse
 schedule provides one for the NFL, so attribution is per TEAM-SEASON:
 ``data/cfb_coach_seasons.csv`` (season, coach, school, conference, games,
-wins, losses, clean_attribution) names the head coach of each school-season.
+wins, losses, clean_attribution) names the head coach of each school-season;
+``games`` is games coached (wins + losses, + ties where CFBD reports them) and
+:func:`load_coach_seasons` refuses a roster where it is smaller than the record.
 ``clean_attribution`` is True when that coach led at least 80% of the
 school's games that season; a school-season split between two coaches is
 left unattributed rather than credited to either.
@@ -77,7 +79,14 @@ def load_coach_seasons(path: str | Path = COACH_SEASONS_CSV) -> pl.DataFrame:
             .is_in(["true", "1"])
             .alias("clean_attribution")
         )
-    return df.select(list(COACH_SCHEMA)).cast(COACH_SCHEMA)  # type: ignore[arg-type]
+    df = df.select(list(COACH_SCHEMA)).cast(COACH_SCHEMA)  # type: ignore[arg-type]
+    short = df.filter(pl.col("games") < pl.col("wins") + pl.col("losses"))
+    if short.height:
+        raise ValueError(
+            f"{p}: {short.height} coach-season(s) declare fewer games than wins + losses "
+            f"(e.g. {short.row(0, named=True)}); games must be games coached"
+        )
+    return df
 
 
 def school_team_ids(schedule: str | Path, season: int) -> pl.DataFrame:

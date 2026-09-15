@@ -121,6 +121,12 @@ def test_coach_attribution_and_careers(plays, tmp_path):
 def test_vendored_roster_and_school_ids(tmp_path):
     roster = coaches_mod.load_coach_seasons()
     assert roster.height > 2500 and roster.schema == coaches_mod.COACH_SCHEMA
+    # games is games coached: never smaller than the record
+    assert (roster["games"] >= roster["wins"] + roster["losses"]).all()
+    bad = tmp_path / "bad.csv"
+    roster.head(2).with_columns(games=pl.lit(1)).write_csv(bad)
+    with pytest.raises(ValueError, match="fewer games than wins"):
+        coaches_mod.load_coach_seasons(bad)
     assert roster.filter(pl.col("season") == 2024).height > 100
     # school -> id through a schedule master shaped like the real one
     sched = pl.DataFrame(

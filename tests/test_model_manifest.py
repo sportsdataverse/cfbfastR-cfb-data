@@ -74,7 +74,7 @@ def test_every_model_points_at_a_declared_stage():
 
 
 def test_fitted_stages_route_through_the_fingerprint_runtime():
-    for num in ("30", "31", "32", "33", "34"):
+    for num in ("30", "31", "32", "33", "34", "35"):
         src = (REPO / _doc()["stages"][num]["file"]).read_text(encoding="utf-8")
         assert "_model_stage" in src, (
             f"stage {num} bypasses the fingerprint/ledger runtime"

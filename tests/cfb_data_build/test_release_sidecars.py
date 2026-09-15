@@ -22,7 +22,9 @@ SIDECAR_NAMES = [
 def test_stamp_uploads_the_four_sidecars_with_clobber():
     calls: list[list[str]] = []
 
-    publish._stamp("espn_cfb_adv_defensive", calls.append, "sportsdataverse/sportsdataverse-data")
+    publish._stamp(
+        "espn_cfb_adv_defensive", calls.append, "sportsdataverse/sportsdataverse-data"
+    )
 
     assert [Path(c[3]).name for c in calls] == SIDECAR_NAMES
     assert all(c[:3] == ["release", "upload", "espn_cfb_adv_defensive"] for c in calls)
@@ -40,7 +42,9 @@ def test_stamp_names_the_loader_for_the_tag():
         path = Path(argv[3])
         seen[path.name] = path.read_text()
 
-    publish._stamp("espn_cfb_adv_defensive", _runner, "sportsdataverse/sportsdataverse-data")
+    publish._stamp(
+        "espn_cfb_adv_defensive", _runner, "sportsdataverse/sportsdataverse-data"
+    )
 
     expected = PKG_FUNCTION["espn_cfb_adv_defensive"]
     assert seen["package_function.txt"].strip() == expected
@@ -54,7 +58,13 @@ def test_every_registry_tag_has_a_package_function():
     Both registries publish through the same publish_dataset(), so a tag missing
     from either one would ship a timestamp with no package_function beside it.
     """
-    published = {s.tag for s in REGISTRY.values()} | {s.tag for s in SUMMARIES_REGISTRY.values()}
+    from cfb_data_build.derived import SPECS as DERIVED_SPECS
+
+    published = (
+        {s.tag for s in REGISTRY.values()}
+        | {s.tag for s in SUMMARIES_REGISTRY.values()}
+        | {s.tag for s in DERIVED_SPECS.values()}
+    )
     missing = sorted(published - set(PKG_FUNCTION))
     assert missing == [], f"tags with no PKG_FUNCTION entry: {missing}"
 

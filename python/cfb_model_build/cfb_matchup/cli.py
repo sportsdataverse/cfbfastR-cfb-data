@@ -68,6 +68,10 @@ def _drive_frame_for_training(pbp: pl.DataFrame) -> pl.DataFrame:
 
     ``build_drive_frame`` also scores drives with a coefficient table; for
     training we only need the snapshot + label, so score with a zero table.
+    Population: every drive of the release, as the source's trainer
+    (``tools/scoring_opp_rate.R``) builds it -- it applies no ``ppa`` filter;
+    the per-team APPLY path filters null ``ppa`` because it aggregates EPA,
+    which the fit does not read.
     """
     from cfb_data_build.matchup_features import GlmCoefficients
 
@@ -108,7 +112,11 @@ def _tagged_for_scoring(seasons: list[int]) -> pl.DataFrame:
 
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="cfb_matchup", description=__doc__)
-    sub = p.add_subparsers(dest="command", required=True)
+    # the generic stage driver (scripts/cfb_models.sh) runs every shim with no
+    # arguments; that must not exit 2 here, so the default is a read-only
+    # "status" of the bundle -- training stays an explicit subcommand
+    sub = p.add_subparsers(dest="command", required=False)
+    sub.add_parser("status", help="verify + print the bundled artifacts (default)")
     for name in ("train-scoring-opp", "train-rush-expect"):
         sp = sub.add_parser(name)
         sp.add_argument(
@@ -154,6 +162,27 @@ def build_parser() -> argparse.ArgumentParser:
         "--weights", type=Path, required=True, help="a wepa_weights.json to score"
     )
     return p
+
+
+def _status() -> int:
+    """Load every bundled artifact through its applier and print the meta (exit 0)."""
+    import json
+
+    from cfb_data_build.matchup_features import load_coefficients, load_wepa_weights
+
+    bundle = Path(__file__).resolve().parent / "artifacts"
+    for stem in ("scoring_opp", "rush_expect"):
+        coef = load_coefficients(bundle / f"{stem}_coef.json")
+        meta = json.loads((bundle / f"{stem}_meta.json").read_text(encoding="utf-8"))
+        print(
+            f"{stem}: {len(coef.coefficients)} active terms, aliased={coef.aliased}, n_obs={meta.get('n_obs')}"
+        )
+    weights = load_wepa_weights(bundle / "wepa_weights.json")
+    meta = json.loads((bundle / "wepa_weights_meta.json").read_text(encoding="utf-8"))
+    print(
+        f"wepa_weights: {len(weights)} weights, holdout_2025 adj_r2={meta.get('adj_r2_holdout_2025')}"
+    )
+    return 0
 
 
 def _run_wepa(args, seasons: list[int]) -> int:
@@ -211,6 +240,8 @@ def _run_wepa(args, seasons: list[int]) -> int:
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+    if args.command in (None, "status"):
+        return _status()
     seasons = _seasons(args.seasons)
     bundle = Path(__file__).resolve().parent / "artifacts"
     out_dir = getattr(args, "out_dir", None)
@@ -234,6 +265,10 @@ def main(argv: list[str] | None = None) -> int:
             "scoring_opp",
             formula=SCORING_OPP_FORMULA,
             seasons=seasons,
+            frame=frame,
+            source=str(args.frame)
+            if args.frame
+            else f"cfbfastR_cfb_pbp {args.seasons}",
         )
     else:
         frame = (
@@ -248,6 +283,10 @@ def main(argv: list[str] | None = None) -> int:
             "rush_expect",
             formula=RUSH_EXPECT_FORMULA,
             seasons=seasons,
+            frame=frame,
+            source=str(args.frame)
+            if args.frame
+            else f"cfbfastR_cfb_pbp {args.seasons}",
         )
     print(
         f"{args.command}: n={result.n_obs:,} log_loss={result.log_loss:.4f} "

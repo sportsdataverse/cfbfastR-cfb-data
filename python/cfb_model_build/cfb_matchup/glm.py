@@ -120,9 +120,34 @@ def coefficients_json(coef: GlmCoefficients, *, formula: str) -> dict:
 
 
 def write_fit(
-    result: FitResult, out_dir: Path, stem: str, *, formula: str, seasons: list[int]
+    result: FitResult,
+    out_dir: Path,
+    stem: str,
+    *,
+    formula: str,
+    seasons: list[int],
+    frame: pl.DataFrame | None = None,
+    source: str | None = None,
 ) -> tuple[Path, Path]:
+    """Write ``<stem>_coef.json`` + ``<stem>_meta.json`` (+ the training frame).
+
+    ``frame`` is persisted beside the artifacts as ``<stem>_training_frame.parquet``
+    and its sha256 / row count recorded, so a promoted fit stays reproducible
+    and auditable -- the same provenance the bundled metas carry. ``source``
+    names where the rows came from (release seasons or a ``--frame`` path).
+    """
+    import hashlib
+
     out_dir.mkdir(parents=True, exist_ok=True)
+    provenance: dict[str, object] = {"training_frame_source": source}
+    if frame is not None:
+        frame_path = out_dir / f"{stem}_training_frame.parquet"
+        frame.write_parquet(frame_path)
+        provenance.update(
+            training_frame=str(frame_path),
+            training_frame_sha256=hashlib.sha256(frame_path.read_bytes()).hexdigest(),
+            training_frame_rows=frame.height,
+        )
     coef_path = out_dir / f"{stem}_coef.json"
     meta_path = out_dir / f"{stem}_meta.json"
     coef_path.write_text(
@@ -141,6 +166,7 @@ def write_fit(
                 "train_accuracy": result.accuracy,
                 "n_iter": result.n_iter,
                 "fitted_by": f"cfb_matchup train-{stem.replace('_', '-')}",
+                **provenance,
                 "partition": "n/a -- full in-sample MLE",
                 "solver": "sklearn LogisticRegression(C=inf, solver='newton-cholesky', tol=1e-12) -- unpenalised MLE",
             },

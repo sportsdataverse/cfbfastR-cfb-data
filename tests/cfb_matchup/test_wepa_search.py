@@ -34,6 +34,7 @@ from cfb_model_build.cfb_matchup.wepa import (
     random_candidates,
     score_frame,
     score_weights,
+    search,
     tag_for_search,
     team_game_wepa,
     weights_of,
@@ -77,6 +78,25 @@ def test_random_candidates_are_reproducible_and_bounded() -> None:
     assert a.equals(b) and a.columns == ["candidate", *WEIGHT_NAMES]
     vals = a.select(WEIGHT_NAMES).to_numpy()
     assert vals.min() >= -1.0 and vals.max() <= 1.0
+
+
+def test_search_scores_every_random_candidate() -> None:
+    """Every random candidate comes back scored, with the candidates' key dtype.
+
+    ``random_candidates`` numbers rows with ``with_row_index`` (UInt32); the
+    scorer's rows are built from Python ints (Int64). polars 1.41 coerces the
+    two to a supertype so the raw join already scored every row; the explicit
+    cast in ``search`` pins that across versions (the repo's join-key rule),
+    and this test pins the contract the cast serves.
+    """
+    pbp = dedupe_plays(pl.read_parquet(FIX / "pbp_input_2025_sample.parquet"))
+    games = _games(2025).filter(
+        pl.col("game_id").is_in(pbp["game_id"].unique().to_list())
+    )
+    cands = random_candidates(3, seed=7)
+    out = search(_tagged(pbp), games, cands)
+    assert out.height == 3 and out.schema["candidate"] == cands.schema["candidate"]
+    assert out["adj_r2"].null_count() == 0 and out["n_games"].min() > 0
 
 
 def test_team_game_wepa_is_as_of_on_the_sample() -> None:

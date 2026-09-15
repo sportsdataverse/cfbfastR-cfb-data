@@ -160,7 +160,12 @@ def weights_of(row: dict) -> dict[str, float]:
 def random_candidates(
     n: int, *, seed: int, low: float = -1.0, high: float = 1.0
 ) -> pl.DataFrame:
-    """Uniform candidates in ``[low, high]`` per weight (round 1 of the source's search)."""
+    """Uniform candidates in ``[low, high]`` per weight (round 1 of the source's search).
+
+    ``seed`` makes THIS draw reproducible; it does not reproduce the source's
+    ``runif`` sequence (numpy and R generators differ), so a rerun explores a
+    different sample of the same space.
+    """
     rng = np.random.default_rng(seed)
     mat = rng.uniform(low, high, size=(n, len(WEIGHT_NAMES)))
     return pl.DataFrame(mat, schema=list(WEIGHT_NAMES)).with_row_index("candidate")
@@ -193,7 +198,10 @@ def search(
             h = score_weights(holdout[0], holdout[1], w)
             rec["holdout_adj_r2"] = h.adj_r2
         rows.append(rec)
-    return candidates.join(pl.DataFrame(rows), on="candidate", how="left")
+    results = pl.DataFrame(rows).with_columns(
+        pl.col("candidate").cast(candidates.schema["candidate"])
+    )
+    return candidates.join(results, on="candidate", how="left")
 
 
 def tag_for_search(pbp: pl.DataFrame) -> pl.DataFrame:

@@ -84,3 +84,29 @@ def test_build_matchup_line_offline(offline: None) -> None:
     assert out.schema["home_dome"] == pl.Boolean
     assert out.schema["temperature"] == pl.Float64
     assert out["spread"].null_count() < out.height
+
+
+def test_features_guard_catches_a_schedule_spelling(
+    offline: None, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A schedule name the plays do not carry raises, naming the team.
+
+    Mutation-proven: with the guard removed the build returns rows whose
+    features are null for that team instead of failing.
+    """
+    sample = pl.read_parquet(FIX / "pbp_input_2025_sample.parquet")
+    victim_game = int(sample["game_id"][0])
+    games = pl.read_parquet(FIX / "cfbd_games_elo_2025.parquet")
+    victim = games.filter(pl.col("game_id") == victim_game)["home_team"][0]
+
+    def renamed(season: int) -> list[dict]:
+        payload = _games_payload(season)
+        for row in payload:
+            for k in ("homeTeam", "awayTeam"):
+                if row.get(k) == victim:
+                    row[k] = victim + " Univ."
+        return payload
+
+    monkeypatch.setattr(matchup_build, "fetch_cfbd_games", renamed)
+    with pytest.raises(RuntimeError, match="spelling mismatch"):
+        matchup_build.build_matchup_features(2025)

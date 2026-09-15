@@ -109,16 +109,20 @@ def tidy_cfbd_games(payload: list[dict]) -> pl.DataFrame:
     )
 
 
+def _text(value) -> str | None:
+    return None if value is None else str(value)
+
+
 def tidy_cfbd_lines(payload: list[dict]) -> pl.DataFrame:
     """CFBD ``/lines`` objects -> one row per (game, provider) (pure)."""
     rows = [
         {
             "game_id": g["id"],
             "provider": ln.get("provider"),
-            "spread": ln.get("spread"),
-            "spread_open": ln.get("spreadOpen"),
-            "over_under": ln.get("overUnder"),
-            "over_under_open": ln.get("overUnderOpen"),
+            "spread": _text(ln.get("spread")),
+            "spread_open": _text(ln.get("spreadOpen")),
+            "over_under": _text(ln.get("overUnder")),
+            "over_under_open": _text(ln.get("overUnderOpen")),
         }
         for g in payload
         for ln in (g.get("lines") or [])
@@ -128,10 +132,11 @@ def tidy_cfbd_lines(payload: list[dict]) -> pl.DataFrame:
         schema={
             "game_id": pl.Int64,
             "provider": pl.Utf8,
-            "spread": pl.Float64,
-            "spread_open": pl.Float64,
-            "over_under": pl.Float64,
-            "over_under_open": pl.Float64,
+            # kept as text: CFBD spells a pick'em "pk"; consensus_lines converts
+            "spread": pl.Utf8,
+            "spread_open": pl.Utf8,
+            "over_under": pl.Utf8,
+            "over_under_open": pl.Utf8,
         },
     )
 
@@ -256,13 +261,6 @@ def build_matchup_features(season: int, *, base: str = "cfb") -> pl.DataFrame:
     feats = team_game_features(
         plays, schedule_games(games), teams, scoring, first_game_same_day=False
     )
-    # a listed team with no rows means its spelling matched no play -- the
-    # silent-drop failure the display mapping exists to prevent
-    unmatched = sorted(set(teams) - set(feats["team"].unique().to_list()))
-    if unmatched:
-        raise RuntimeError(
-            f"{season}: FBS teams with no matchup rows (name mismatch?): {unmatched}"
-        )
     meta = to_display_names(games, "home_team", "away_team").select(
         "game_id",
         "season",
@@ -274,6 +272,28 @@ def build_matchup_features(season: int, *, base: str = "cfb") -> pl.DataFrame:
         "away_id",
         "away_team",
     )
+    # spelling guard: in every game that HAS plays, the schedule's name for an
+    # FBS side must be one of the plays' two names -- a mismatch would still
+    # produce rows, just with null features (the source's failed joins). A team
+    # with no plays yet (bye week, game not built) is not a mismatch.
+    named = plays.select("game_id", "home", "away").unique()
+    assert meta.schema["game_id"] == named.schema["game_id"]
+    both = meta.select("game_id", "home_team", "away_team").join(
+        named, on="game_id", how="inner"
+    )
+    unmatched: set[str] = set()
+    for side in ("home_team", "away_team"):
+        off = both.filter(
+            pl.col(side).is_in(teams)
+            & (pl.col(side) != pl.col("home"))
+            & (pl.col(side) != pl.col("away"))
+        )
+        unmatched |= set(off[side].to_list())
+    if unmatched:
+        raise RuntimeError(
+            f"{season}: FBS teams whose games have plays under another name "
+            f"(spelling mismatch): {sorted(unmatched)}"
+        )
     out = feats.join(meta, on="game_id", how="left").with_columns(
         team_id=pl.when(pl.col("team") == pl.col("home_team"))
         .then(pl.col("home_id"))

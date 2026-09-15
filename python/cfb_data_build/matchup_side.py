@@ -7,17 +7,22 @@ part and leaves the rest null with its documented dtype:
 * ``talent`` -- CFBD ``/talent`` for the season (the season's own composite; the
   endpoint publishes the current season late, so a preseason build carries
   nulls exactly as the source seeded them).
-* ``head_coach`` / ``hc_tenure`` -- CFBD ``/coaches``: the head coach with the
-  most games for the school that season, tenure = ``season - first season`` of
-  the coach's consecutive run at that school (the source counted from a
-  scraped "first season", the same quantity).
+* ``head_coach`` / ``hc_tenure`` -- CFBD ``/coaches``: the PRESEASON incumbent
+  (the source scraped its coaching list before the season, so a mid-season
+  interim never replaces the incumbent even when the interim coached more
+  games); ``hc_tenure`` = ``season`` minus the first season of the coach's
+  consecutive run at that school, counting a season only when the coach
+  handled the majority of the school's games (the "first season" a coaching
+  list reports), 0 in the first season.
 * the 25 team-meta columns -- CFBD ``/teams`` (identity block + the school's
   home venue inline), current-season values, home-team venue even at neutral
   sites, as the source did.
 * the 10 weather columns -- CFBD ``/games/weather``, verbatim, first row per
   game, joined by ``game_id`` only.
 
-Not derivable from CFBD and therefore null: ``team_talent_weighted`` (a
+That fills 68 of the line's 90 side / meta / weather columns (4 side inputs
+x 2 sides, 25 meta x 2, 10 weather). The other 22 (11 per side) are not
+derivable from CFBD and stay null: ``team_talent_weighted`` (a
 rank-decayed roster sum from a recruiting site), ``off/def/ovr_rtprod`` (an
 external returning-production table whose numbers are not CFBD's
 ``percentPPA``), ``oc_cont`` / ``dc_cont`` (coordinator continuity from a
@@ -80,15 +85,23 @@ def fetch_cfbd_coaches(season: int, *, min_year: int = 1990) -> list[dict]:
 
 def _typed(frame: pl.DataFrame, cols: tuple[str, ...]) -> pl.DataFrame:
     """Cast the named columns to their documented line dtype; refuse a lossy int cast."""
+    # numeric text (CFBD ships elevation as a string) becomes Float64 FIRST, so
+    # the lossy-cast check below sees the parsed value; a non-numeric string
+    # raises here rather than silently becoming null
+    present = [c for c in cols if c in frame.columns]
+    frame = frame.with_columns(
+        [
+            pl.col(c).cast(pl.Float64, strict=True)
+            for c in present
+            if frame.schema[c] == pl.Utf8 and _column_dtype(c) in (pl.Float64, pl.Int64)
+        ]
+    )
     exprs = []
     for c in cols:
         target = _column_dtype(c)
         if c not in frame.columns:
             exprs.append(pl.lit(None, dtype=target).alias(c))
             continue
-        col = pl.col(c)
-        if frame.schema[c] == pl.Utf8 and target in (pl.Float64, pl.Int64):
-            col = col.cast(pl.Float64, strict=False)
         if target == pl.Int64 and frame.schema[c] in (pl.Float64, pl.Float32):
             bad = frame.filter(
                 pl.col(c).is_not_null() & (pl.col(c) != pl.col(c).round(0))
@@ -98,7 +111,7 @@ def _typed(frame: pl.DataFrame, cols: tuple[str, ...]) -> pl.DataFrame:
                     f"{c}: non-integer values but documented Int64: "
                     f"{bad[c].head(3).to_list()}"
                 )
-        exprs.append(col.cast(target).alias(c))
+        exprs.append(pl.col(c).cast(target).alias(c))
     return frame.with_columns(exprs)
 
 
@@ -194,6 +207,14 @@ def tidy_cfbd_teams(payload: list[dict]) -> pl.DataFrame:
                 "logo": logos[0],
                 "logo_2": logos[1],
                 **{out: loc.get(src) for src, out in _META_LOC.items()},
+            }
+        )
+    if not rows:
+        return pl.DataFrame(
+            schema={
+                "team": pl.Utf8,
+                "join_name": pl.Utf8,
+                **{c: _column_dtype(c) for c in TEAM_META_COLS},
             }
         )
     frame = pl.DataFrame(rows, schema_overrides={"team": pl.Utf8, "join_name": pl.Utf8})

@@ -82,7 +82,9 @@ def _match(a: pl.Series, b: pl.Series, *, atol: float = 1e-6) -> float:
     """Share of rows equal (nulls equal to nulls)."""
     if a.dtype.is_numeric() and b.dtype.is_numeric():
         x, y = a.cast(pl.Float64).to_numpy(), b.cast(pl.Float64).to_numpy()
-        ok = np.isclose(x, y, atol=atol, equal_nan=True) | (np.isnan(x) & np.isnan(y))
+        ok = np.isclose(x, y, rtol=0, atol=atol, equal_nan=True) | (
+            np.isnan(x) & np.isnan(y)
+        )
     else:
         ok = (
             (a.cast(pl.Utf8) == b.cast(pl.Utf8))
@@ -186,6 +188,22 @@ def test_weather_tidy_keeps_the_first_row_per_game_and_the_documented_dtypes() -
 def test_typed_refuses_a_lossy_integer_cast() -> None:
     with pytest.raises(ValueError, match="snowfall"):
         _typed(pl.DataFrame({"snowfall": [0.0, 0.4]}), ("snowfall",))
+    # numeric TEXT is parsed first, so the same value cannot slip past as a string
+    with pytest.raises(ValueError, match="snowfall"):
+        _typed(pl.DataFrame({"snowfall": ["0", "0.4"]}), ("snowfall",))
+    with pytest.raises(pl.exceptions.InvalidOperationError):
+        _typed(pl.DataFrame({"elevation": ["328.05", "n/a"]}), ("elevation",))
+    assert _typed(pl.DataFrame({"elevation": ["328.05", None]}), ("elevation",))[
+        "elevation"
+    ].to_list() == [328.05, None]
+
+
+def test_teams_tidy_handles_an_empty_payload() -> None:
+    from cfb_data_build.matchup_side import tidy_cfbd_teams
+
+    empty = tidy_cfbd_teams([])
+    assert empty.height == 0 and empty.columns == ["team", "join_name", *TEAM_META_COLS]
+    assert empty.schema["dome"] == pl.Boolean
 
 
 def test_cfbd_error_body_raises(monkeypatch: pytest.MonkeyPatch) -> None:

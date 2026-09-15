@@ -159,10 +159,13 @@ for i in $(seq "${START_YEAR}" "${END_YEAR}"); do
     fi
 
     echo "RSCRIPT_RC=$SEASON_RC" > "/tmp/_rc_${i}"
-    sdv_commit_push "CFB Data Updated (Start: $i End: $i)" cfb data/cfb_coach_seasons.csv || PUSH_RC=1
+    # the tee pipeline runs this block in a subshell, so a push failure is
+    # carried out through a sentinel like the season rc above
+    sdv_commit_push "CFB Data Updated (Start: $i End: $i)" cfb data/cfb_coach_seasons.csv || echo "PUSH_FAILED=1" > "/tmp/_push_${i}"
   } 2>&1 | tee "$TMPLOG"
 
   RSCRIPT_RC=$(sed 's/RSCRIPT_RC=//' "/tmp/_rc_${i}" 2>/dev/null); rm -f "/tmp/_rc_${i}"
+  if [ -f "/tmp/_push_${i}" ]; then PUSH_RC=1; rm -f "/tmp/_push_${i}"; fi
   cp "$TMPLOG" "$LOGFILE"
   sdv_commit_push "CFB Data log update (Start: $i End: $i)" "$LOGFILE" || PUSH_RC=1
   rm -f "$TMPLOG"

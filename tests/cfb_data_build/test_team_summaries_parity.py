@@ -25,7 +25,12 @@ pytestmark = pytest.mark.integration
 FIX = Path(__file__).parent / "fixtures"
 CACHE = Path(__file__).parents[2] / "python" / ".cache" / "team_summaries"
 
-# ridge-adjusted EPA columns -- correlation bar, not exact (glmnet vs sklearn)
+# ridge-adjusted EPA columns. Historically a 0.9 correlation bar vs R (glmnet vs
+# sklearn); since the R fit was found to be a no-op (see DIVERGENT_FROM_R) every
+# member is also listed as divergent, so the R comparison skips them and the
+# producer's own gate (corr(adj, raw) < 0.95 in team_summaries.py) is what
+# guards the adjustment. Kept so the intent is visible if an R oracle with a
+# real fit is ever captured.
 CORR_COLS = {
     "adj_off_epa",
     "adj_def_epa",
@@ -200,8 +205,9 @@ def test_team_summaries_parity(
     if ds == "passing":
         # #31 keeps sack- and interception-only passers the oracle never had
         only_py = got.join(oracle.select(keys), on=keys, how="anti")
-        assert only_py.height > 0 and (only_py["att"] == 0).all(), (
-            "rows absent from the oracle must be the att == 0 passers #31 keeps"
+        # the 2023 fixture has exactly 12 such passers; fewer means #31 regressed
+        assert only_py.height == 12 and (only_py["att"] == 0).all(), (
+            "rows absent from the oracle must be the 12 att == 0 passers #31 keeps"
         )
         got = got.join(oracle.select(keys), on=keys, how="semi")
     extra = PYTHON_ONLY.get(ds, set())
@@ -211,6 +217,9 @@ def test_team_summaries_parity(
     drop = DIVERGENT_FROM_R.get(ds, set())
     corr = {c for c in corr if c not in drop}
     if drop:
+        # a divergent column must still be EMITTED -- only its values differ
+        gone = sorted(drop - set(got.columns))
+        assert not gone, f"{ds}: divergent columns no longer produced: {gone}"
         got = got.drop([c for c in drop if c in got.columns])
         oracle = oracle.drop([c for c in drop if c in oracle.columns])
     assert_frame_parity(

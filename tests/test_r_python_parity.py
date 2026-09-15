@@ -90,6 +90,45 @@ KNOWN_UNPAIRED: dict[str, str] = {
 #   team_summaries   assembled from the 5-table summaries family
 #   fpi_weekly       fetched from the core-v2 powerindex API, not final.json
 #                    (cfb_data_build.fpi, dispatched via cli.FPI)
+# The usage / situational box (sportsdataverse.football.usage_box: player and
+# position-group usage, tackle share, team situational efficiencies, drive
+# scripting; shims 30-35 per game, 40-45 season leaderboards) is Python-only
+# for now: the metrics live in sdv-py's shared football layer and the R twin
+# stages are a tracked follow-up (port usage_box to R, then pair them here).
+KNOWN_UNPAIRED.update(
+    {
+        key: (
+            "Python-only pending the R port of sportsdataverse.football.usage_box "
+            "(the section is computed at build time from final.json's plays + "
+            "play_participants); tracked follow-up, not a decomposition."
+        )
+        for key in (
+            "adv_player_usage",
+            "adv_position_group_usage",
+            "adv_tackles",
+            "adv_position_group_tackles",
+            "adv_team_usage",
+            "adv_drive_scripting",
+            "usage_players",
+            "usage_position_groups",
+            "usage_tackles",
+            "usage_position_group_tackles",
+            "usage_teams",
+            "usage_drive_scripting",
+            "adv_st_kickers",
+            "adv_st_punters",
+            "adv_st_returners",
+            "adv_st_blocks",
+            "adv_st_team",
+            "usage_st_kickers",
+            "usage_st_punters",
+            "usage_st_returners",
+            "usage_st_blocks",
+            "usage_st_team",
+        )
+    }
+)
+
 NON_DATASET_STAGES: set[str] = {"adv_box", "team_summaries", "fpi_weekly"}
 # --------------------------------------------------------------------------
 # End repo-specific data. Everything below is the shared engine.

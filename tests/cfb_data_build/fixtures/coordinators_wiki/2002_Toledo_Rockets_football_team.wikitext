@@ -1,0 +1,275 @@
+<!-- title: 2002 Toledo Rockets football team | revid: 1339602672 -->
+{{short description|American college football season}}
+{{Use American English|date=February 2026}}
+{{Use mdy dates|date=August 2023}}
+{{Infobox NCAA team season
+|sport       =football  
+|year        =2002  
+|team        =Toledo Rockets
+| image       =Toledo Rockets wordmark.svg
+| image_size  = 175  
+|conference  =Mid-American Conference  
+|division    =West Division  
+|short_conf  =MAC  
+|CoachRank   =  
+|APRank      =  
+|record      =9&ndash;5  
+|conf_record =7&ndash;1  
+|head_coach  =[[Tom Amstutz]]  
+|hc_year     =2nd  
+|off_coach   = [[Rob Spence (American football)|Rob Spence]] 
+|oc_year     = 2nd
+|def_coach   = [[Lou West]]
+|dc_year     = 2nd
+|off_scheme  =   
+|def_scheme  =  
+|stadium     =[[Glass Bowl]]  
+|champion    =MAC West Division co-champion  
+|conf_champ  =[[2002 MAC Championship Game|MAC Championship Game]] vs. [[2002 Marshall Thundering Herd football team|Marshall]]  
+|conf_champ_result=L 45&ndash;49  
+|bowl        =[[2002 Motor City Bowl|Motor City Bowl]]  
+|bowl_result = L 25&ndash;51 vs. [[2002 Boston College Eagles football team|Boston College]]
+}}
+{{2002 Mid-American Conference football standings}}
+The '''2002 Toledo Rockets football team''' represented the [[University of Toledo]] during the [[2002 NCAA Division I-A football season]]. They competed as a member of the [[Mid-American Conference]] (MAC) in the West Division. The Rockets were led by head coach [[Tom Amstutz]].
+
+==Schedule==
+{{CFB schedule
+| rankyear = 2002
+| poll = AP
+| timezone = Eastern
+
+|{{CFB schedule entry
+| date = August 29
+| time = 7:00&nbsp;pm
+| w/l = w
+| nonconf = y
+| rank = 
+| opponent = [[2002 Cal Poly Mustangs football team|Cal Poly]]
+| site_stadium = [[Glass Bowl]]
+| site_cityst = [[Toledo, Ohio]]
+| tv = 
+| score = 44–16
+| attend = 23,074
+}}
+|{{CFB schedule entry
+| date = September 7
+| time = 6:00&nbsp;pm
+| w/l = w
+| away = y
+| rank = 
+| opponent = [[2002 Eastern Michigan Eagles football team|Eastern Michigan]]
+| site_stadium = [[Rynearson Stadium]]
+| site_cityst = [[Ypsilanti, Michigan]]
+| tv = 
+| score = 65–13
+| attend = 16,843
+}}
+|{{CFB schedule entry
+| date = September 14
+| time = 2:30&nbsp;pm
+| w/l = l
+| nonconf = y
+| away = y
+| rank = 
+| opponent = [[2002 Minnesota Golden Gophers football team|Minnesota]]
+| site_stadium = [[Hubert H. Humphrey Metrodome]]
+| site_cityst = [[Minneapolis]]
+| tv = 
+| score = 21–31
+| attend = 36,640
+}}
+|{{CFB schedule entry
+| date = September 21
+| time = 7:00&nbsp;pm
+| w/l = w
+| nonconf = y
+| rank = 
+| opponent = [[2002 UNLV Rebels football team|UNLV]]
+| site_stadium = Glass Bowl
+| site_cityst = Toledo, Ohio
+| tv = 
+| score = 38–21
+| attend = 26,050
+}}
+|{{CFB schedule entry
+| date = September 28
+| time = 1:30&nbsp;pm
+| w/l = l
+| nonconf = y
+| away = y
+| rank = 
+| opponent = [[2002 Pittsburgh Panthers football team|Pittsburgh]]
+| site_stadium = [[Heinz Field]]
+| site_cityst = [[Pittsburgh]]
+| tv = 
+| score = 19–37
+| attend = 39,713
+}}
+|{{CFB schedule entry
+| date = October 12
+| time = 7:00&nbsp;pm
+| w/l = w
+| homecoming = y
+| rank = 
+| opponent = [[2002 Ball State Cardinals football team|Ball State]]
+| site_stadium = Glass Bowl
+| site_cityst = Toledo, Ohio
+| tv = 
+| score = 27–24
+| attend = 25,926
+}}
+|{{CFB schedule entry
+| date = October 19
+| time = 6:00&nbsp;pm
+| w/l = w
+| away = y
+| rank = 
+| opponent = [[2002 UCF Golden Knights football team|Central Florida]]
+| site_stadium = [[Citrus Bowl]]
+| site_cityst = [[Orlando, Florida]]
+| tv = [[WTO5|TV5]]
+| score = 27–24
+| attend = 18,815
+}}
+|{{CFB schedule entry
+| date = October 26
+| time = 7:00&nbsp;pm
+| w/l = l
+| rank = 
+| opponent = [[2002 Miami RedHawks football team|Miami (OH)]]
+| site_stadium = Glass Bowl
+| site_cityst = Toledo, Ohio
+| tv = 
+| score = 13–27
+| attend = 24,466
+}}
+|{{CFB schedule entry
+| date = November 9
+| time = 7:00&nbsp;pm
+| w/l = w
+| rank = 
+| opponent = [[2002 Central Michigan Chippewas football team|Central Michigan]]
+| site_stadium = Glass Bowl
+| site_cityst = Toledo, Ohio
+| tv = 
+| score = 44–17
+| attend = 18,944
+}}
+|{{CFB schedule entry
+| date = November 16
+| time = 3:30&nbsp;pm
+| w/l = w
+| away = y
+| rank = 
+| opponent = [[2002 Western Michigan Broncos football team|Western Michigan]]
+| site_stadium = [[Waldo Stadium]]
+| site_cityst = [[Kalamazoo, Michigan]]
+| tv = [[Fox Sports Ohio|FSN]]
+| score = 42–21
+| attend = 9,844
+}}
+|{{CFB schedule entry
+| date = November 23
+| time = 12:00&nbsp;pm
+| w/l = w
+| away = y
+| rank = 
+| opponent = [[2002 Northern Illinois Huskies football team|Northern Illinois]]
+| site_stadium = [[Huskie Stadium]]
+| site_cityst = [[DeKalb, Illinois]]
+| tv = FSN
+| score = 33–30
+| attend = 20,154
+}}
+|{{CFB schedule entry
+| date = November 30
+| time = 7:00&nbsp;pm
+| w/l = w
+| rank = 
+| opponent = [[2002 Bowling Green Falcons football team|Bowling Green]]
+| gamename = [[Battle of I-75 Trophy|Battle of I-75]]
+| site_stadium = Glass Bowl
+| site_cityst = Toledo, Ohio
+| tv = 
+| score = 42–24
+| attend = 25,331
+}}
+|{{CFB schedule entry
+| date = December 7
+| time = 2:30&nbsp;pm
+| w/l = l
+| away = y
+| rank = 
+| opponent = [[2002 Marshall Thundering Herd football team|Marshall]]
+| gamename = [[2002 MAC Championship Game|MAC Championship]]
+| site_stadium = [[Marshall University Stadium]]
+| site_cityst = [[Huntington, West Virginia]]
+| tv = [[ESPN2]]
+| score = 45–49
+| attend = 24,582
+}}
+|{{CFB schedule entry
+| date = December 26
+| time = 5:00&nbsp;pm
+| w/l = l
+| nonconf = y
+| neutral = y
+| rank = 
+| opponent = [[2002 Boston College Eagles football team|Boston College]]
+| gamename = [[2002 Motor City Bowl|Motor City Bowl]]
+| site_stadium = [[Ford Field]]
+| site_cityst = [[Detroit]]
+| tv = [[ESPN]]
+| score = 25–51
+| attend = 51,872
+}}
+}}
+
+==Roster==
+
+{{American football roster/Header
+| year = 	2002
+| team = Toledo Rockets
+| teamcolors = f
+| offensive_players=
+{{American football roster/Player|num=2|class=Sr|first=Carl|last=Ford|dab=Carl Ford (American football)|pos=WR|link=y}}
+{{American football roster/Player|num=7|class=Fr|first=Bruce|last=Gradkowski|pos=QB|link=y}}
+{{American football roster/Player|num=10|class=Sr|first=Brian|last=Jones|dab=Brian Jones (quarterback)|pos=QB|link=y}}
+{{American football roster/Player|num=14|class=So|first=Lance|last=Moore|pos=WR|link=y}}
+{{American football roster/Player|num=68|class=So|first=Nick|last=Kaczur|pos=G|link=y}}
+{{American football roster/Player|num=78|class=So|first=Mike|last=Sacco|pos=OL}}
+{{American football roster/Player|num=79|class=Sr|first=Noah|last=Swartz|pos=OL}}
+| defensive_players=
+{{American football roster/Player|num=11|class=So|first=Patrick|last=Body|pos=SS|link=y}}
+{{American football roster/Player|num=12|class=Jr|first=Brandon|last=Hefflin|pos=CB}}
+{{American football roster/Player|num=25|class=Sr|first=James|last=Stanley|dab=James Stanley (American football)|pos=CB|link=y}}
+| special_teams_players=
+
+}}
+{{American football roster/Footer|roster_url=https://web.archive.org/web/20021021103048/http://utrockets.ocsn.com:80/sports/m-footbl/mtt/tol-m-footbl-mtt.html
+| head_coach = *[[Tom Amstutz]]
+| asst_coach = * [[Joe Gilbert (American football)|Joe Gilbert]] o-line coach
+| accessdate= 2002-10-21
+}}
+
+==After the season==
+===NFL draft===
+The following Rocket was selected in the [[2003 NFL draft]] following the season.<ref>{{Cite web|url=https://www.pro-football-reference.com/years/2003/draft.htm|title=2003 NFL Draft Listing|website=Pro-Football-Reference.com|access-date=September 30, 2023}}</ref>
+
+{| class="wikitable" style="text-align:center"
+{{CollegePrimaryHeader|team=Toledo Rockets|border=2|Round|Pick|Player|Position|NFL club}}
+|-
+|7||256||[[Carl Ford (American football)|Carl Ford]]||[[Wide receiver]]||[[Green Bay Packers]]
+|}
+
+==References==
+{{Reflist}}
+
+{{Toledo Rockets football navbox}}
+
+[[Category:2002 Mid-American Conference football season|Toledo]]
+[[Category:Toledo Rockets football seasons]]
+[[Category:2002 in sports in Ohio|Toledo Rockets football]]
+
+{{collegefootball-2002-season-stub}}

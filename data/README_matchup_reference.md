@@ -18,3 +18,32 @@ resolved by sort order:
 
 `match_team_names` now raises when two spellings of one school carry different
 values, so a future import cannot reintroduce this silently.
+
+## `cfb_matchup_coordinators_wikipedia.csv` — provenance
+
+Head coach and offensive / defensive coordinators for every FBS school-season
+from 2002, read from each season's English Wikipedia article (the
+`Infobox NCAA team season` / `Infobox college sports team season` infobox)
+through the MediaWiki API. The school-season universe is CFBD `/coaches`.
+
+Every row records `source_title` and `source_revid`, the exact article
+revision it was read from. `python -m cfb_data_build.coordinators_wiki pinned`
+re-reads those revisions and reproduces this file byte for byte (verified
+2026-09-16), so later edits to the articles cannot change it silently.
+
+Measured against the imported coordinator table on the seasons both cover
+(2013-2016): head coach 0.994, offensive coordinators 0.940 and defensive
+0.926 any-overlap. Several disagreements were errors in the imported table,
+not in Wikipedia: "Rich Skorsky" (Skrosky), "John Regan" (Reagan), "Kirk
+Ciarocca" (Ciarrocca), USC 2013 recorded as "Vacant" (Clay Helton), South
+Carolina 2013 missing its co-coordinator.
+
+The names are facts; the articles they came from are credited per row above,
+under Wikipedia's CC BY-SA licence.
+
+## `cfb_coach_seasons.csv` — 2003 added
+
+2003 was appended with `python -m cfb_data_build.coaches -s 2003 -e 2003`
+(CFBD `/coaches`); every existing season is unchanged. Six 2003 rows are not
+cleanly attributed because the school changed head coach mid-season (Army,
+Duke, Nebraska, UCF).

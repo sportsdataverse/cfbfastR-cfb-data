@@ -25,8 +25,13 @@ production                             NOT CFBD's ``/player/returning`` -- that
 cfb_matchup_roster_talent    2015-     IMPORTED. Rank-decayed roster talent sum
                                        from a recruiting service, distinct from
                                        CFBD ``/talent``'s composite.
-cfb_matchup_coach_continuity 2014-     DERIVED from the coordinators table by
-                                       :func:`coach_continuity`.
+cfb_matchup_coordinators_    2002-     From Wikipedia team-season articles,
+wikipedia                              every row pinned to its revision id
+                                       (:mod:`cfb_data_build.coordinators_wiki`).
+cfb_matchup_coach_continuity 2003-     DERIVED by :func:`build_coach_continuity`:
+                                       each flag compares two consecutive
+                                       seasons from ONE source -- the imported
+                                       table where it has both, else Wikipedia.
 cfb_matchup_qb_starters      2004-     DERIVED from the ESPN play-by-play
                                        release: the passer with the most
                                        attempts (:func:`starters_from_pbp`).
@@ -117,6 +122,30 @@ def _candidates(name: str, *, aliases: dict[str, str] | None = None) -> list[str
     return list(dict.fromkeys(out))
 
 
+def resolve_names(
+    names: list[str], schools: list[str], *, aliases: dict[str, str] | None = None
+) -> tuple[dict[str, tuple[str, int]], list[str]]:
+    """Each name -> (the school it resolves to, how early it matched); plus misses.
+
+    The rank is the candidate position that matched: 0 means the name's own
+    key, larger means it only matched through a shorthand or alias.
+    """
+    lookup: dict[str, str] = {}
+    for school in schools:
+        for c in _candidates(school, aliases=aliases):
+            lookup.setdefault(c, school)
+    resolved: dict[str, tuple[str, int]] = {}
+    missing: list[str] = []
+    for name in sorted(set(names)):
+        cands = _candidates(name, aliases=aliases)
+        rank = next((i for i, c in enumerate(cands) if c in lookup), None)
+        if rank is None:
+            missing.append(name)
+        else:
+            resolved[name] = (lookup[cands[rank]], rank)
+    return resolved, missing
+
+
 def match_team_names(
     frame: pl.DataFrame,
     schools: list[str],
@@ -124,23 +153,18 @@ def match_team_names(
     column: str = "team",
     aliases: dict[str, str] | None = None,
 ) -> tuple[pl.DataFrame, list[str]]:
-    """Re-key ``frame`` onto CFBD ``schools``; returns (matched, unmatched names).
+    """Re-key ONE SEASON of ``frame`` onto CFBD ``schools``; (matched, unmatched names).
 
     Unmatched rows are DROPPED and returned so the caller can assert a match
-    rate instead of silently losing a school.
+    rate instead of silently losing a school. Two spellings resolving to one
+    school must carry identical rows, which only makes sense within a season
+    -- across seasons use :func:`canonicalize_schools`.
     """
-    lookup: dict[str, str] = {}
-    for school in schools:
-        for c in _candidates(school, aliases=aliases):
-            lookup.setdefault(c, school)
-    mapped, missing = [], []
-    for name in frame[column].unique().sort().to_list():
-        cands = _candidates(name, aliases=aliases)
-        rank = next((i for i, c in enumerate(cands) if c in lookup), None)
-        if rank is None:
-            missing.append(name)
-        else:
-            mapped.append({column: name, "_school": lookup[cands[rank]], "_rank": rank})
+    resolved, missing = resolve_names(frame[column].to_list(), schools, aliases=aliases)
+    mapped = [
+        {column: name, "_school": school, "_rank": rank}
+        for name, (school, rank) in resolved.items()
+    ]
     # two spellings of one school can both resolve (a table carrying both
     # "Connecticut" and "UConn"). Keep the one that matched on its own key --
     # but only when the rows agree; differing rows are a defect in the source
@@ -413,7 +437,71 @@ def _read(path: Path, what: str) -> pl.DataFrame:
 
 
 def load_coordinators() -> pl.DataFrame:
+    """The IMPORTED coordinator table (2013+), in its own school spellings."""
     return _read(COORDINATORS_CSV, "coordinators")
+
+
+def load_wikipedia_coordinators() -> pl.DataFrame:
+    """The revision-pinned Wikipedia coordinator table (2002+), CFBD school keys."""
+    from cfb_data_build.coordinators_wiki import load_table
+
+    return load_table()
+
+
+def canonicalize_schools(frame: pl.DataFrame, schools: list[str]) -> pl.DataFrame:
+    """Rewrite ``school_mascot`` onto ``schools`` spellings, across any seasons.
+
+    Unlike :func:`match_team_names` there is no same-school conflict check:
+    one table legitimately spells a school two ways in different seasons
+    ("San José State" / "San Jose State"). A name that resolves to nothing
+    keeps its own spelling rather than being dropped.
+    """
+    resolved, _ = resolve_names(
+        frame["school_mascot"].to_list(), schools, aliases=MASCOT_ALIASES
+    )
+    mapping = {name: school for name, (school, _rank) in resolved.items()}
+    return frame.with_columns(
+        # replace() without a default leaves an unmapped name as it is
+        pl.col("school_mascot").replace(mapping)
+    )
+
+
+def build_coach_continuity(
+    imported: pl.DataFrame, wikipedia: pl.DataFrame
+) -> pl.DataFrame:
+    """Continuity for every derivable season, each value from ONE source.
+
+    A continuity flag compares a season's coordinators with the previous
+    season's, so both names must come from the same source: the imported table
+    and Wikipedia disagree on spellings (the imported one carries typos such as
+    "Skorsky" for Skrosky), and comparing across them would flag a coaching
+    change where there was none. Each source's flags are computed on its own
+    consecutive pairs; the imported ones win wherever both exist (they are the
+    vintage the delivered line was built from), and Wikipedia fills the
+    seasons the imported table cannot reach.
+    """
+    wiki = wikipedia.select(
+        "season", "school_mascot", "offensive_coordinators", "defensive_coordinators"
+    )
+    imp = canonicalize_schools(
+        imported.select(
+            "season",
+            "school_mascot",
+            "offensive_coordinators",
+            "defensive_coordinators",
+        ),
+        wiki["school_mascot"].unique().to_list(),
+    )
+    from_imported = coach_continuity(imp).with_columns(source=pl.lit("imported"))
+    from_wiki = coach_continuity(wiki).with_columns(source=pl.lit("wikipedia"))
+    fill = from_wiki.join(
+        from_imported.select("season", "school_mascot"),
+        on=["season", "school_mascot"],
+        how="anti",
+    )
+    return pl.concat([from_imported, fill], how="vertical").sort(
+        ["season", "school_mascot"]
+    )
 
 
 def load_returning_production() -> pl.DataFrame:
@@ -590,7 +678,9 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.only != "qb":
-        cont = coach_continuity(load_coordinators())
+        cont = build_coach_continuity(
+            load_coordinators(), load_wikipedia_coordinators()
+        )
         cont.write_csv(CONTINUITY_CSV)
         print(
             f"{CONTINUITY_CSV.name}: {cont.height} rows, "

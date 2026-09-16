@@ -135,10 +135,14 @@ def test_only_a_new_fbs_member_is_unfilled(
 
 
 def test_continuity_is_backfilled_to_the_first_derivable_season() -> None:
-    """The source shipped one season; the derivation covers every season but the first."""
+    """The source shipped one season; the derivation now reaches 2003.
+
+    2003-2013 come from the Wikipedia coordinator table and 2014 on from the
+    imported one (see test_coordinators_wiki.py for the same-source rule).
+    """
     cont = load_coach_continuity()
-    assert cont["season"].min() == 2014 and cont["season"].max() >= 2026
-    assert cont["season"].n_unique() >= 13
+    assert cont["season"].min() == 2003 and cont["season"].max() >= 2026
+    assert cont["season"].n_unique() >= 24
     assert set(cont["oc_cont"].unique()) <= {0, 1}
     assert cont.unique(subset=["season", "school_mascot"]).height == cont.height
 

@@ -1,1708 +1,3025 @@
-season,school_mascot,oc_cont,dc_cont
-2014,Air Force Falcons,1,1
-2014,Akron Zips,1,1
-2014,Alabama Crimson Tide,0,1
-2014,Appalachian State Mountaineers,0,0
-2014,Arizona State Sun Devils,1,0
-2014,Arizona Wildcats,1,1
-2014,Arkansas Razorbacks,1,0
-2014,Arkansas State Red Wolves,0,0
-2014,Army Black Knights,0,0
-2014,Auburn Tigers,1,1
-2014,BYU Cougars,1,0
-2014,Ball State Cardinals,0,0
-2014,Baylor Bears,1,1
-2014,Boise State Broncos,0,0
-2014,Boston College Eagles,1,1
-2014,Bowling Green Falcons,0,0
-2014,Buffalo Bulls,1,1
-2014,California Golden Bears,1,0
-2014,Central Michigan Chippewas,0,1
-2014,Cincinnati Bearcats,1,0
-2014,Clemson Tigers,1,1
-2014,Colorado Buffaloes,1,1
-2014,Colorado State Rams,1,1
-2014,Duke Blue Devils,0,1
-2014,East Carolina Pirates,1,1
-2014,Eastern Michigan Eagles,0,0
-2014,Florida Atlantic Owls,1,0
-2014,Florida Gators,0,1
-2014,Florida International Golden Panthers,0,1
-2014,Florida State Seminoles,0,0
-2014,Fresno State Bulldogs,1,1
-2014,Georgia Bulldogs,1,0
-2014,Georgia Southern Eagles,0,0
-2014,Georgia State Panthers,1,1
-2014,Georgia Tech Yellow Jackets,1,1
-2014,Hawai'i Rainbow Warriors,1,0
-2014,Houston Cougars,1,1
-2014,Idaho Vandals,1,1
-2014,Illinois Fighting Illini,1,1
-2014,Indiana Hoosiers,0,0
-2014,Iowa Hawkeyes,1,1
-2014,Iowa State Cyclones,0,1
-2014,Kansas Jayhawks,0,0
-2014,Kansas State Wildcats,1,1
-2014,Kent State Golden Flashes,1,1
-2014,Kentucky Wildcats,1,1
-2014,LSU Tigers,1,1
-2014,Louisiana Monroe Warhawks,1,1
-2014,Louisiana Ragin' Cajuns,1,1
-2014,Louisiana Tech Bulldogs,1,0
-2014,Louisville Cardinals,0,0
-2014,Marshall Thundering Herd,1,1
-2014,Maryland Terrapins,1,1
-2014,Memphis Tigers,1,1
-2014,Miami (OH) RedHawks,0,0
-2014,Miami Hurricanes,1,1
-2014,Michigan State Spartans,1,1
-2014,Michigan Wolverines,0,1
-2014,Middle Tennessee Blue Raiders,1,1
-2014,Minnesota Golden Gophers,1,1
-2014,Mississippi State Bulldogs,0,1
-2014,Missouri Tigers,1,1
-2014,NC State Wolfpack,1,1
-2014,Navy Midshipmen,1,1
-2014,Nebraska Cornhuskers,1,1
-2014,Nevada Wolf Pack,1,0
-2014,New Mexico Lobos,1,0
-2014,New Mexico State Aggies,1,0
-2014,North Carolina Tar Heels,0,1
-2014,North Texas Mean Green,1,1
-2014,Northern Illinois Huskies,1,1
-2014,Northwestern Wildcats,1,1
-2014,Notre Dame Fighting Irish,0,0
-2014,Ohio Bobcats,1,1
-2014,Ohio State Buckeyes,1,0
-2014,Oklahoma Sooners,1,1
-2014,Oklahoma State Cowboys,1,0
-2014,Old Dominion Monarchs,0,0
-2014,Ole Miss Rebels,1,1
-2014,Oregon Ducks,1,0
-2014,Oregon State Beavers,0,1
-2014,Penn State Nittany Lions,0,0
-2014,Pittsburgh Panthers,1,1
-2014,Purdue Boilermakers,1,1
-2014,Rice Owls,0,1
-2014,Rutgers Scarlet Knights,0,0
-2014,SMU Mustangs,1,1
-2014,San Diego State Aztecs,1,1
-2014,San José State Spartans,1,0
-2014,South Alabama Jaguars,1,0
-2014,South Carolina Gamecocks,1,1
-2014,South Florida Bulls,0,1
-2014,Southern Mississippi Golden Eagles,0,1
-2014,Stanford Cardinal,1,0
-2014,Syracuse Orange,1,1
-2014,TCU Horned Frogs,0,1
-2014,Temple Owls,1,1
-2014,Tennessee Volunteers,1,1
-2014,Texas A&M Aggies,1,1
-2014,Texas Longhorns,0,0
-2014,Texas State Bobcats,1,1
-2014,Texas Tech Red Raiders,1,1
-2014,Toledo Rockets,1,0
-2014,Troy Trojans,1,1
-2014,Tulane Green Wave,1,1
-2014,Tulsa Golden Hurricane,0,1
-2014,UAB Blazers,0,0
-2014,UCF Knights,1,0
-2014,UCLA Bruins,1,0
-2014,UConn Huskies,0,0
-2014,UMass Minutemen,0,0
-2014,UNLV Rebels,1,1
-2014,USC Trojans,0,0
-2014,UTEP Miners,1,1
-2014,UTSA Roadrunners,1,1
-2014,Utah State Aggies,1,1
-2014,Utah Utes,0,1
-2014,Vanderbilt Commodores,0,0
-2014,Virginia Cavaliers,1,1
-2014,Virginia Tech Hokies,1,1
-2014,Wake Forest Demon Deacons,0,0
-2014,Washington Huskies,0,0
-2014,Washington State Cougars,1,1
-2014,West Virginia Mountaineers,1,0
-2014,Western Kentucky Hilltoppers,0,1
-2014,Western Michigan Broncos,1,1
-2014,Wisconsin Badgers,1,1
-2014,Wyoming Cowboys,0,0
-2015,Air Force Falcons,1,1
-2015,Akron Zips,1,1
-2015,Alabama Crimson Tide,1,1
-2015,Appalachian State Mountaineers,1,1
-2015,Arizona State Sun Devils,1,1
-2015,Arizona Wildcats,1,1
-2015,Arkansas Razorbacks,0,1
-2015,Arkansas State Red Wolves,1,1
-2015,Army Black Knights,1,1
-2015,Auburn Tigers,1,0
-2015,BYU Cougars,1,0
-2015,Ball State Cardinals,1,1
-2015,Baylor Bears,0,1
-2015,Boise State Broncos,0,1
-2015,Boston College Eagles,0,1
-2015,Bowling Green Falcons,0,0
-2015,Buffalo Bulls,0,0
-2015,California Golden Bears,1,1
-2015,Central Michigan Chippewas,1,0
-2015,Cincinnati Bearcats,1,1
-2015,Clemson Tigers,0,1
-2015,Colorado Buffaloes,1,0
-2015,Colorado State Rams,0,0
-2015,Duke Blue Devils,1,1
-2015,East Carolina Pirates,0,1
-2015,Eastern Michigan Eagles,1,1
-2015,Florida Atlantic Owls,1,1
-2015,Florida Gators,0,0
-2015,Florida International Golden Panthers,1,0
-2015,Florida State Seminoles,1,1
-2015,Fresno State Bulldogs,1,1
-2015,Georgia Bulldogs,0,1
-2015,Georgia Southern Eagles,1,1
-2015,Georgia State Panthers,1,1
-2015,Georgia Tech Yellow Jackets,1,1
-2015,Hawai'i Rainbow Warriors,0,0
-2015,Houston Cougars,0,0
-2015,Idaho Vandals,1,0
-2015,Illinois Fighting Illini,1,1
-2015,Indiana Hoosiers,1,1
-2015,Iowa Hawkeyes,1,1
-2015,Iowa State Cyclones,1,1
-2015,Kansas Jayhawks,0,1
-2015,Kansas State Wildcats,1,1
-2015,Kent State Golden Flashes,0,1
-2015,Kentucky Wildcats,0,1
-2015,LSU Tigers,1,0
-2015,Louisiana Monroe Warhawks,1,0
-2015,Louisiana Ragin' Cajuns,1,1
-2015,Louisiana Tech Bulldogs,1,0
-2015,Louisville Cardinals,1,1
-2015,Marshall Thundering Herd,1,1
-2015,Maryland Terrapins,1,0
-2015,Memphis Tigers,1,0
-2015,Miami (OH) RedHawks,1,1
-2015,Miami Hurricanes,1,1
-2015,Michigan State Spartans,1,0
-2015,Michigan Wolverines,0,0
-2015,Middle Tennessee Blue Raiders,1,1
-2015,Minnesota Golden Gophers,1,1
-2015,Mississippi State Bulldogs,1,0
-2015,Missouri Tigers,1,0
-2015,NC State Wolfpack,1,1
-2015,Navy Midshipmen,1,1
-2015,Nebraska Cornhuskers,0,0
-2015,Nevada Wolf Pack,1,0
-2015,New Mexico Lobos,1,1
-2015,New Mexico State Aggies,0,0
-2015,North Carolina Tar Heels,1,0
-2015,North Texas Mean Green,1,0
-2015,Northern Illinois Huskies,1,1
-2015,Northwestern Wildcats,1,1
-2015,Notre Dame Fighting Irish,0,1
-2015,Ohio Bobcats,1,1
-2015,Ohio State Buckeyes,1,1
-2015,Oklahoma Sooners,0,1
-2015,Oklahoma State Cowboys,1,1
-2015,Old Dominion Monarchs,1,1
-2015,Ole Miss Rebels,1,1
-2015,Oregon Ducks,1,1
-2015,Oregon State Beavers,0,0
-2015,Penn State Nittany Lions,1,1
-2015,Pittsburgh Panthers,0,0
-2015,Purdue Boilermakers,1,1
-2015,Rice Owls,1,0
-2015,Rutgers Scarlet Knights,0,1
-2015,SMU Mustangs,0,0
-2015,San Diego State Aztecs,0,1
-2015,San José State Spartans,0,1
-2015,South Alabama Jaguars,0,1
-2015,South Carolina Gamecocks,1,1
-2015,South Florida Bulls,0,0
-2015,Southern Mississippi Golden Eagles,1,1
-2015,Stanford Cardinal,1,1
-2015,Syracuse Orange,0,1
-2015,TCU Horned Frogs,1,0
-2015,Temple Owls,1,1
-2015,Tennessee Volunteers,0,1
-2015,Texas A&M Aggies,1,0
-2015,Texas Longhorns,1,1
-2015,Texas State Bobcats,1,0
-2015,Texas Tech Red Raiders,1,1
-2015,Toledo Rockets,1,1
-2015,Troy Trojans,1,0
-2015,Tulane Green Wave,1,1
-2015,Tulsa Golden Hurricane,0,0
-2015,UAB Blazers,0,1
-2015,UCF Knights,0,0
-2015,UCLA Bruins,1,0
-2015,UConn Huskies,0,1
-2015,UMass Minutemen,0,1
-2015,UNLV Rebels,0,0
-2015,USC Trojans,1,1
-2015,UTEP Miners,1,1
-2015,UTSA Roadrunners,1,1
-2015,Utah State Aggies,1,0
-2015,Utah Utes,0,0
-2015,Vanderbilt Commodores,0,0
-2015,Virginia Cavaliers,1,1
-2015,Virginia Tech Hokies,1,1
-2015,Wake Forest Demon Deacons,1,1
-2015,Washington Huskies,1,1
-2015,Washington State Cougars,0,0
-2015,West Virginia Mountaineers,0,1
-2015,Western Kentucky Hilltoppers,1,1
-2015,Western Michigan Broncos,1,1
-2015,Wisconsin Badgers,0,1
-2015,Wyoming Cowboys,1,1
-2016,Air Force Falcons,0,1
-2016,Akron Zips,1,1
-2016,Alabama Crimson Tide,1,0
-2016,Appalachian State Mountaineers,1,1
-2016,Arizona State Sun Devils,0,1
-2016,Arizona Wildcats,1,0
-2016,Arkansas Razorbacks,1,1
-2016,Arkansas State Red Wolves,0,1
-2016,Army Black Knights,1,1
-2016,Auburn Tigers,1,0
-2016,BYU Cougars,0,0
-2016,Ball State Cardinals,1,0
-2016,Baylor Bears,1,1
-2016,Boise State Broncos,0,0
-2016,Boston College Eagles,0,0
-2016,Bowling Green Falcons,0,0
-2016,Buffalo Bulls,1,1
-2016,California Golden Bears,0,1
-2016,Central Michigan Chippewas,1,1
-2016,Charlotte 49ers,0,0
-2016,Cincinnati Bearcats,0,1
-2016,Clemson Tigers,1,1
-2016,Colorado Buffaloes,1,1
-2016,Colorado State Rams,1,0
-2016,Duke Blue Devils,0,1
-2016,East Carolina Pirates,0,0
-2016,Eastern Michigan Eagles,1,0
-2016,Florida Atlantic Owls,0,1
-2016,Florida Gators,1,1
-2016,Florida International Golden Panthers,1,1
-2016,Florida State Seminoles,1,1
-2016,Fresno State Bulldogs,0,0
-2016,Georgia Bulldogs,0,0
-2016,Georgia Southern Eagles,0,0
-2016,Georgia State Panthers,1,1
-2016,Georgia Tech Yellow Jackets,1,1
-2016,Hawai'i Rainbow Warriors,0,0
-2016,Houston Cougars,1,1
-2016,Idaho Vandals,1,1
-2016,Illinois Fighting Illini,0,0
-2016,Indiana Hoosiers,1,0
-2016,Iowa Hawkeyes,1,1
-2016,Iowa State Cyclones,0,0
-2016,Kansas Jayhawks,1,1
-2016,Kansas State Wildcats,1,1
-2016,Kent State Golden Flashes,1,0
-2016,Kentucky Wildcats,0,1
-2016,LSU Tigers,1,0
-2016,Louisiana Monroe Warhawks,0,0
-2016,Louisiana Ragin' Cajuns,0,1
-2016,Louisiana Tech Bulldogs,0,1
-2016,Louisville Cardinals,0,1
-2016,Marshall Thundering Herd,1,1
-2016,Maryland Terrapins,0,0
-2016,Memphis Tigers,0,0
-2016,Miami (OH) RedHawks,1,1
-2016,Miami Hurricanes,0,0
-2016,Michigan State Spartans,1,1
-2016,Michigan Wolverines,1,0
-2016,Middle Tennessee Blue Raiders,0,1
-2016,Minnesota Golden Gophers,0,0
-2016,Mississippi State Bulldogs,1,0
-2016,Missouri Tigers,0,0
-2016,NC State Wolfpack,0,1
-2016,Navy Midshipmen,1,0
-2016,Nebraska Cornhuskers,1,1
-2016,Nevada Wolf Pack,0,1
-2016,New Mexico Lobos,1,1
-2016,New Mexico State Aggies,1,0
-2016,North Carolina Tar Heels,0,1
-2016,North Texas Mean Green,0,0
-2016,Northern Illinois Huskies,0,0
-2016,Northwestern Wildcats,1,1
-2016,Notre Dame Fighting Irish,1,1
-2016,Ohio Bobcats,1,1
-2016,Ohio State Buckeyes,1,1
-2016,Oklahoma Sooners,1,1
-2016,Oklahoma State Cowboys,1,1
-2016,Old Dominion Monarchs,1,1
-2016,Ole Miss Rebels,1,1
-2016,Oregon Ducks,0,0
-2016,Oregon State Beavers,0,0
-2016,Penn State Nittany Lions,0,1
-2016,Pittsburgh Panthers,0,1
-2016,Purdue Boilermakers,0,0
-2016,Rice Owls,1,1
-2016,Rutgers Scarlet Knights,0,0
-2016,SMU Mustangs,1,1
-2016,San Diego State Aztecs,1,1
-2016,San José State Spartans,1,0
-2016,South Alabama Jaguars,1,0
-2016,South Carolina Gamecocks,0,0
-2016,South Florida Bulls,1,0
-2016,Southern Mississippi Golden Eagles,0,0
-2016,Stanford Cardinal,1,1
-2016,Syracuse Orange,0,0
-2016,TCU Horned Frogs,1,0
-2016,Temple Owls,0,1
-2016,Tennessee Volunteers,1,0
-2016,Texas A&M Aggies,0,1
-2016,Texas Longhorns,0,1
-2016,Texas State Bobcats,0,0
-2016,Texas Tech Red Raiders,1,1
-2016,Toledo Rockets,0,0
-2016,Troy Trojans,1,1
-2016,Tulane Green Wave,0,0
-2016,Tulsa Golden Hurricane,0,1
-2016,UCF Knights,0,0
-2016,UCLA Bruins,0,1
-2016,UConn Huskies,1,1
-2016,UMass Minutemen,1,1
-2016,UNLV Rebels,1,1
-2016,USC Trojans,0,0
-2016,UTEP Miners,0,0
-2016,UTSA Roadrunners,0,0
-2016,Utah State Aggies,1,0
-2016,Utah Utes,1,0
-2016,Vanderbilt Commodores,1,1
-2016,Virginia Cavaliers,0,0
-2016,Virginia Tech Hokies,0,1
-2016,Wake Forest Demon Deacons,1,1
-2016,Washington Huskies,1,1
-2016,Washington State Cougars,1,1
-2016,West Virginia Mountaineers,0,1
-2016,Western Kentucky Hilltoppers,0,1
-2016,Western Michigan Broncos,1,1
-2016,Wisconsin Badgers,1,0
-2016,Wyoming Cowboys,1,1
-2017,Air Force Falcons,1,1
-2017,Akron Zips,1,1
-2017,Alabama Crimson Tide,0,1
-2017,Appalachian State Mountaineers,1,1
-2017,Arizona State Sun Devils,0,0
-2017,Arizona Wildcats,1,1
-2017,Arkansas Razorbacks,1,0
-2017,Arkansas State Red Wolves,1,1
-2017,Army Black Knights,1,1
-2017,Auburn Tigers,0,1
-2017,BYU Cougars,1,1
-2017,Ball State Cardinals,1,0
-2017,Baylor Bears,0,0
-2017,Boise State Broncos,1,1
-2017,Boston College Eagles,1,1
-2017,Bowling Green Falcons,1,1
-2017,Buffalo Bulls,1,1
-2017,California Golden Bears,0,0
-2017,Central Michigan Chippewas,0,1
-2017,Charlotte 49ers,1,1
-2017,Cincinnati Bearcats,0,0
-2017,Clemson Tigers,1,1
-2017,Coastal Carolina Chanticleers,0,0
-2017,Colorado Buffaloes,1,0
-2017,Colorado State Rams,1,1
-2017,Duke Blue Devils,1,1
-2017,East Carolina Pirates,1,1
-2017,Eastern Michigan Eagles,0,1
-2017,Florida Atlantic Owls,0,0
-2017,Florida Gators,1,1
-2017,Florida International Golden Panthers,0,0
-2017,Florida State Seminoles,1,1
-2017,Fresno State Bulldogs,0,0
-2017,Georgia Bulldogs,1,1
-2017,Georgia Southern Eagles,0,1
-2017,Georgia State Panthers,0,0
-2017,Georgia Tech Yellow Jackets,1,1
-2017,Hawai'i Rainbow Warriors,0,0
-2017,Houston Cougars,0,0
-2017,Idaho Vandals,1,1
-2017,Illinois Fighting Illini,1,1
-2017,Indiana Hoosiers,0,1
-2017,Iowa Hawkeyes,0,1
-2017,Iowa State Cyclones,1,1
-2017,Kansas Jayhawks,0,1
-2017,Kansas State Wildcats,1,1
-2017,Kent State Golden Flashes,1,1
-2017,Kentucky Wildcats,1,0
-2017,LSU Tigers,0,1
-2017,Louisiana Monroe Warhawks,1,1
-2017,Louisiana Ragin' Cajuns,0,1
-2017,Louisiana Tech Bulldogs,1,1
-2017,Louisville Cardinals,1,0
-2017,Marshall Thundering Herd,1,1
-2017,Maryland Terrapins,1,0
-2017,Memphis Tigers,0,1
-2017,Miami (OH) RedHawks,1,1
-2017,Miami Hurricanes,1,1
-2017,Michigan State Spartans,1,1
-2017,Michigan Wolverines,1,1
-2017,Middle Tennessee Blue Raiders,1,0
-2017,Minnesota Golden Gophers,0,0
-2017,Mississippi State Bulldogs,1,0
-2017,Missouri Tigers,1,1
-2017,NC State Wolfpack,1,1
-2017,Navy Midshipmen,1,1
-2017,Nebraska Cornhuskers,1,0
-2017,Nevada Wolf Pack,0,0
-2017,New Mexico Lobos,1,1
-2017,New Mexico State Aggies,0,1
-2017,North Carolina Tar Heels,1,0
-2017,North Texas Mean Green,1,0
-2017,Northern Illinois Huskies,1,1
-2017,Northwestern Wildcats,1,1
-2017,Notre Dame Fighting Irish,0,0
-2017,Ohio Bobcats,1,1
-2017,Ohio State Buckeyes,0,1
-2017,Oklahoma Sooners,0,1
-2017,Oklahoma State Cowboys,1,1
-2017,Old Dominion Monarchs,1,1
-2017,Ole Miss Rebels,0,0
-2017,Oregon Ducks,0,0
-2017,Oregon State Beavers,1,1
-2017,Penn State Nittany Lions,1,1
-2017,Pittsburgh Panthers,0,1
-2017,Purdue Boilermakers,0,0
-2017,Rice Owls,1,0
-2017,Rutgers Scarlet Knights,0,1
-2017,SMU Mustangs,1,1
-2017,San Diego State Aztecs,1,1
-2017,San José State Spartans,0,0
-2017,South Alabama Jaguars,1,1
-2017,South Carolina Gamecocks,1,1
-2017,South Florida Bulls,0,0
-2017,Southern Mississippi Golden Eagles,1,1
-2017,Stanford Cardinal,1,1
-2017,Syracuse Orange,1,1
-2017,TCU Horned Frogs,1,1
-2017,Temple Owls,0,0
-2017,Tennessee Volunteers,0,1
-2017,Texas A&M Aggies,1,1
-2017,Texas Longhorns,0,0
-2017,Texas State Bobcats,0,1
-2017,Texas Tech Red Raiders,1,1
-2017,Toledo Rockets,1,1
-2017,Troy Trojans,1,1
-2017,Tulane Green Wave,1,1
-2017,Tulsa Golden Hurricane,1,1
-2017,UAB Blazers,0,0
-2017,UCF Knights,1,1
-2017,UCLA Bruins,0,1
-2017,UConn Huskies,0,0
-2017,UMass Minutemen,1,0
-2017,UNLV Rebels,1,1
-2017,USC Trojans,1,1
-2017,UTEP Miners,1,1
-2017,UTSA Roadrunners,1,1
-2017,Utah State Aggies,0,1
-2017,Utah Utes,1,1
-2017,Vanderbilt Commodores,1,1
-2017,Virginia Cavaliers,1,1
-2017,Virginia Tech Hokies,1,1
-2017,Wake Forest Demon Deacons,1,0
-2017,Washington Huskies,1,1
-2017,Washington State Cougars,1,1
-2017,West Virginia Mountaineers,0,1
-2017,Western Kentucky Hilltoppers,0,0
-2017,Western Michigan Broncos,0,0
-2017,Wisconsin Badgers,1,0
-2017,Wyoming Cowboys,1,0
-2018,Air Force Falcons,1,0
-2018,Akron Zips,1,0
-2018,Alabama Crimson Tide,1,0
-2018,Appalachian State Mountaineers,1,0
-2018,Arizona State Sun Devils,0,0
-2018,Arizona Wildcats,0,1
-2018,Arkansas Razorbacks,0,0
-2018,Arkansas State Red Wolves,1,1
-2018,Army Black Knights,1,1
-2018,Auburn Tigers,1,1
-2018,BYU Cougars,0,1
-2018,Ball State Cardinals,1,1
-2018,Baylor Bears,1,1
-2018,Boise State Broncos,1,1
-2018,Boston College Eagles,1,1
-2018,Bowling Green Falcons,1,1
-2018,Buffalo Bulls,1,1
-2018,California Golden Bears,1,1
-2018,Central Michigan Chippewas,0,1
-2018,Charlotte 49ers,0,0
-2018,Cincinnati Bearcats,1,1
-2018,Clemson Tigers,1,1
-2018,Coastal Carolina Chanticleers,1,0
-2018,Colorado Buffaloes,1,1
-2018,Colorado State Rams,0,0
-2018,Duke Blue Devils,1,1
-2018,East Carolina Pirates,1,0
-2018,Eastern Michigan Eagles,1,1
-2018,Florida Atlantic Owls,0,0
-2018,Florida Gators,0,0
-2018,Florida International Golden Panthers,1,1
-2018,Florida State Seminoles,0,0
-2018,Fresno State Bulldogs,1,0
-2018,Georgia Bulldogs,1,1
-2018,Georgia Southern Eagles,0,0
-2018,Georgia State Panthers,1,1
-2018,Georgia Tech Yellow Jackets,1,0
-2018,Hawai'i Rainbow Warriors,1,0
-2018,Houston Cougars,0,1
-2018,Illinois Fighting Illini,0,1
-2018,Indiana Hoosiers,1,1
-2018,Iowa Hawkeyes,1,1
-2018,Iowa State Cyclones,0,1
-2018,Kansas Jayhawks,1,1
-2018,Kansas State Wildcats,0,0
-2018,Kent State Golden Flashes,0,0
-2018,Kentucky Wildcats,1,1
-2018,LSU Tigers,0,1
-2018,Liberty Flames,0,0
-2018,Louisiana Monroe Warhawks,1,1
-2018,Louisiana Ragin' Cajuns,0,0
-2018,Louisiana Tech Bulldogs,1,1
-2018,Louisville Cardinals,1,0
-2018,Marshall Thundering Herd,0,0
-2018,Maryland Terrapins,0,1
-2018,Memphis Tigers,0,1
-2018,Miami (OH) RedHawks,1,0
-2018,Miami Hurricanes,1,1
-2018,Michigan State Spartans,1,1
-2018,Michigan Wolverines,0,1
-2018,Middle Tennessee Blue Raiders,1,1
-2018,Minnesota Golden Gophers,1,1
-2018,Mississippi State Bulldogs,0,0
-2018,Missouri Tigers,0,0
-2018,NC State Wolfpack,1,1
-2018,Navy Midshipmen,1,1
-2018,Nebraska Cornhuskers,0,0
-2018,Nevada Wolf Pack,1,1
-2018,New Mexico Lobos,0,1
-2018,New Mexico State Aggies,1,1
-2018,North Carolina Tar Heels,1,1
-2018,North Texas Mean Green,1,1
-2018,Northern Illinois Huskies,1,0
-2018,Northwestern Wildcats,1,1
-2018,Notre Dame Fighting Irish,1,0
-2018,Ohio Bobcats,1,1
-2018,Ohio State Buckeyes,1,1
-2018,Oklahoma Sooners,0,1
-2018,Oklahoma State Cowboys,1,0
-2018,Old Dominion Monarchs,1,1
-2018,Ole Miss Rebels,1,1
-2018,Oregon Ducks,1,1
-2018,Oregon State Beavers,0,0
-2018,Penn State Nittany Lions,0,1
-2018,Pittsburgh Panthers,1,0
-2018,Purdue Boilermakers,1,1
-2018,Rice Owls,0,0
-2018,Rutgers Scarlet Knights,0,1
-2018,SMU Mustangs,0,0
-2018,San Diego State Aztecs,1,0
-2018,San José State Spartans,0,1
-2018,South Alabama Jaguars,0,0
-2018,South Carolina Gamecocks,1,1
-2018,South Florida Bulls,1,1
-2018,Southern Mississippi Golden Eagles,1,0
-2018,Stanford Cardinal,0,1
-2018,Syracuse Orange,1,1
-2018,TCU Horned Frogs,1,1
-2018,Temple Owls,1,0
-2018,Tennessee Volunteers,0,0
-2018,Texas A&M Aggies,0,0
-2018,Texas Longhorns,1,1
-2018,Texas State Bobcats,1,0
-2018,Texas Tech Red Raiders,0,1
-2018,Toledo Rockets,1,1
-2018,Troy Trojans,1,1
-2018,Tulane Green Wave,1,1
-2018,Tulsa Golden Hurricane,1,1
-2018,UAB Blazers,0,1
-2018,UCF Knights,0,0
-2018,UCLA Bruins,0,0
-2018,UConn Huskies,0,1
-2018,UMass Minutemen,1,1
-2018,UNLV Rebels,1,0
-2018,USC Trojans,1,1
-2018,UTEP Miners,0,0
-2018,UTSA Roadrunners,0,0
-2018,Utah State Aggies,1,1
-2018,Utah Utes,1,1
-2018,Vanderbilt Commodores,1,0
-2018,Virginia Cavaliers,1,1
-2018,Virginia Tech Hokies,1,1
-2018,Wake Forest Demon Deacons,1,1
-2018,Washington Huskies,0,1
-2018,Washington State Cougars,1,0
-2018,West Virginia Mountaineers,1,1
-2018,Western Kentucky Hilltoppers,1,1
-2018,Western Michigan Broncos,1,1
-2018,Wisconsin Badgers,1,1
-2018,Wyoming Cowboys,1,1
-2019,Air Force Falcons,1,0
-2019,Akron Zips,0,0
-2019,Alabama Crimson Tide,0,1
-2019,Appalachian State Mountaineers,0,0
-2019,Arizona State Sun Devils,1,1
-2019,Arizona Wildcats,1,1
-2019,Arkansas Razorbacks,1,1
-2019,Arkansas State Red Wolves,0,0
-2019,Army Black Knights,1,0
-2019,Auburn Tigers,0,1
-2019,BYU Cougars,1,1
-2019,Ball State Cardinals,1,1
-2019,Baylor Bears,1,1
-2019,Boise State Broncos,1,0
-2019,Boston College Eagles,0,0
-2019,Bowling Green Falcons,0,0
-2019,Buffalo Bulls,1,1
-2019,California Golden Bears,1,1
-2019,Central Michigan Chippewas,0,0
-2019,Charlotte 49ers,0,0
-2019,Cincinnati Bearcats,1,1
-2019,Clemson Tigers,1,1
-2019,Coastal Carolina Chanticleers,0,1
-2019,Colorado Buffaloes,0,0
-2019,Colorado State Rams,1,1
-2019,Duke Blue Devils,1,1
-2019,East Carolina Pirates,0,0
-2019,Eastern Michigan Eagles,1,1
-2019,Florida Atlantic Owls,1,0
-2019,Florida Gators,1,1
-2019,Florida International Golden Panthers,1,0
-2019,Florida State Seminoles,0,1
-2019,Fresno State Bulldogs,0,1
-2019,Georgia Bulldogs,1,0
-2019,Georgia Southern Eagles,1,1
-2019,Georgia State Panthers,0,1
-2019,Georgia Tech Yellow Jackets,0,0
-2019,Hawai'i Rainbow Warriors,1,1
-2019,Houston Cougars,0,0
-2019,Illinois Fighting Illini,1,0
-2019,Indiana Hoosiers,0,0
-2019,Iowa Hawkeyes,1,1
-2019,Iowa State Cyclones,0,1
-2019,Kansas Jayhawks,0,0
-2019,Kansas State Wildcats,0,0
-2019,Kent State Golden Flashes,1,1
-2019,Kentucky Wildcats,1,0
-2019,LSU Tigers,1,1
-2019,Liberty Flames,0,0
-2019,Louisiana Monroe Warhawks,1,1
-2019,Louisiana Ragin' Cajuns,1,1
-2019,Louisiana Tech Bulldogs,1,0
-2019,Louisville Cardinals,0,0
-2019,Marshall Thundering Herd,1,0
-2019,Maryland Terrapins,0,0
-2019,Memphis Tigers,0,0
-2019,Miami (OH) RedHawks,1,1
-2019,Miami Hurricanes,0,0
-2019,Michigan State Spartans,0,1
-2019,Michigan Wolverines,0,1
-2019,Middle Tennessee Blue Raiders,1,1
-2019,Minnesota Golden Gophers,1,0
-2019,Mississippi State Bulldogs,0,1
-2019,Missouri Tigers,1,1
-2019,NC State Wolfpack,0,1
-2019,Navy Midshipmen,1,0
-2019,Nebraska Cornhuskers,1,1
-2019,Nevada Wolf Pack,1,1
-2019,New Mexico Lobos,0,0
-2019,New Mexico State Aggies,0,1
-2019,North Carolina Tar Heels,0,0
-2019,North Texas Mean Green,0,1
-2019,Northern Illinois Huskies,0,0
-2019,Northwestern Wildcats,1,1
-2019,Notre Dame Fighting Irish,1,1
-2019,Ohio Bobcats,1,0
-2019,Ohio State Buckeyes,1,0
-2019,Oklahoma Sooners,1,0
-2019,Oklahoma State Cowboys,0,1
-2019,Old Dominion Monarchs,1,0
-2019,Ole Miss Rebels,0,0
-2019,Oregon Ducks,1,0
-2019,Oregon State Beavers,1,1
-2019,Penn State Nittany Lions,1,1
-2019,Pittsburgh Panthers,0,1
-2019,Purdue Boilermakers,1,1
-2019,Rice Owls,1,1
-2019,Rutgers Scarlet Knights,1,1
-2019,SMU Mustangs,1,1
-2019,San Diego State Aztecs,1,1
-2019,San José State Spartans,1,1
-2019,South Alabama Jaguars,1,1
-2019,South Carolina Gamecocks,1,1
-2019,South Florida Bulls,0,1
-2019,Southern Mississippi Golden Eagles,0,1
-2019,Stanford Cardinal,1,1
-2019,Syracuse Orange,1,1
-2019,TCU Horned Frogs,1,1
-2019,Temple Owls,0,0
-2019,Tennessee Volunteers,0,0
-2019,Texas A&M Aggies,1,1
-2019,Texas Longhorns,1,1
-2019,Texas State Bobcats,0,0
-2019,Texas Tech Red Raiders,0,0
-2019,Toledo Rockets,1,1
-2019,Troy Trojans,0,0
-2019,Tulane Green Wave,0,1
-2019,Tulsa Golden Hurricane,1,0
-2019,UAB Blazers,1,1
-2019,UCF Knights,1,1
-2019,UCLA Bruins,0,1
-2019,UConn Huskies,0,0
-2019,UMass Minutemen,0,0
-2019,UNLV Rebels,0,1
-2019,USC Trojans,0,1
-2019,UTEP Miners,1,1
-2019,UTSA Roadrunners,0,1
-2019,Utah State Aggies,0,0
-2019,Utah Utes,0,1
-2019,Vanderbilt Commodores,0,1
-2019,Virginia Cavaliers,1,1
-2019,Virginia Tech Hokies,1,1
-2019,Wake Forest Demon Deacons,1,0
-2019,Washington Huskies,1,1
-2019,Washington State Cougars,1,1
-2019,West Virginia Mountaineers,0,0
-2019,Western Kentucky Hilltoppers,0,1
-2019,Western Michigan Broncos,1,1
-2019,Wisconsin Badgers,1,1
-2019,Wyoming Cowboys,1,0
-2020,Air Force Falcons,1,1
-2020,Akron Zips,1,1
-2020,Alabama Crimson Tide,1,1
-2020,Appalachian State Mountaineers,0,0
-2020,Arizona State Sun Devils,0,0
-2020,Arizona Wildcats,1,0
-2020,Arkansas Razorbacks,0,0
-2020,Arkansas State Red Wolves,1,1
-2020,Army Black Knights,1,0
-2020,Auburn Tigers,0,1
-2020,BYU Cougars,1,1
-2020,Ball State Cardinals,0,1
-2020,Baylor Bears,0,0
-2020,Boise State Broncos,1,1
-2020,Boston College Eagles,0,0
-2020,Bowling Green Falcons,1,1
-2020,Buffalo Bulls,1,1
-2020,California Golden Bears,0,1
-2020,Central Michigan Chippewas,1,1
-2020,Charlotte 49ers,0,1
-2020,Cincinnati Bearcats,1,1
-2020,Clemson Tigers,1,1
-2020,Coastal Carolina Chanticleers,1,0
-2020,Colorado Buffaloes,0,1
-2020,Colorado State Rams,0,0
-2020,Duke Blue Devils,1,1
-2020,East Carolina Pirates,1,0
-2020,Eastern Michigan Eagles,0,1
-2020,Florida Atlantic Owls,0,0
-2020,Florida Gators,1,1
-2020,Florida International Golden Panthers,1,1
-2020,Florida State Seminoles,0,0
-2020,Fresno State Bulldogs,1,0
-2020,Georgia Bulldogs,0,1
-2020,Georgia Southern Eagles,1,1
-2020,Georgia State Panthers,1,1
-2020,Georgia Tech Yellow Jackets,1,1
-2020,Hawai'i Rainbow Warriors,0,0
-2020,Houston Cougars,0,1
-2020,Illinois Fighting Illini,1,1
-2020,Indiana Hoosiers,0,1
-2020,Iowa Hawkeyes,1,1
-2020,Iowa State Cyclones,1,1
-2020,Kansas Jayhawks,0,1
-2020,Kansas State Wildcats,1,0
-2020,Kent State Golden Flashes,1,1
-2020,Kentucky Wildcats,1,1
-2020,LSU Tigers,1,0
-2020,Liberty Flames,1,1
-2020,Louisiana Monroe Warhawks,0,1
-2020,Louisiana Ragin' Cajuns,1,0
-2020,Louisiana Tech Bulldogs,0,0
-2020,Louisville Cardinals,1,1
-2020,Marshall Thundering Herd,1,1
-2020,Maryland Terrapins,1,1
-2020,Memphis Tigers,1,0
-2020,Miami (OH) RedHawks,1,1
-2020,Miami Hurricanes,0,1
-2020,Michigan State Spartans,0,0
-2020,Michigan Wolverines,1,1
-2020,Middle Tennessee Blue Raiders,1,1
-2020,Minnesota Golden Gophers,0,1
-2020,Mississippi State Bulldogs,0,0
-2020,Missouri Tigers,0,1
-2020,NC State Wolfpack,1,1
-2020,Navy Midshipmen,1,1
-2020,Nebraska Cornhuskers,0,1
-2020,Nevada Wolf Pack,1,0
-2020,New Mexico Lobos,0,0
-2020,New Mexico State Aggies,1,1
-2020,North Carolina Tar Heels,1,1
-2020,North Texas Mean Green,1,0
-2020,Northern Illinois Huskies,1,1
-2020,Northwestern Wildcats,0,1
-2020,Notre Dame Fighting Irish,0,1
-2020,Ohio Bobcats,1,1
-2020,Ohio State Buckeyes,1,1
-2020,Oklahoma Sooners,1,1
-2020,Oklahoma State Cowboys,0,1
-2020,Old Dominion Monarchs,0,0
-2020,Ole Miss Rebels,0,0
-2020,Oregon Ducks,0,1
-2020,Oregon State Beavers,1,1
-2020,Penn State Nittany Lions,0,1
-2020,Pittsburgh Panthers,1,1
-2020,Purdue Boilermakers,1,1
-2020,Rice Owls,1,1
-2020,Rutgers Scarlet Knights,0,0
-2020,SMU Mustangs,0,1
-2020,San Diego State Aztecs,0,0
-2020,San José State Spartans,1,1
-2020,South Alabama Jaguars,1,1
-2020,South Carolina Gamecocks,0,1
-2020,South Florida Bulls,0,0
-2020,Southern Mississippi Golden Eagles,0,0
-2020,Stanford Cardinal,1,1
-2020,Syracuse Orange,0,0
-2020,TCU Horned Frogs,1,1
-2020,Temple Owls,1,1
-2020,Tennessee Volunteers,1,1
-2020,Texas A&M Aggies,1,1
-2020,Texas Longhorns,0,0
-2020,Texas State Bobcats,0,1
-2020,Texas Tech Red Raiders,1,1
-2020,Toledo Rockets,0,0
-2020,Troy Trojans,1,1
-2020,Tulane Green Wave,1,1
-2020,Tulsa Golden Hurricane,1,1
-2020,UAB Blazers,1,1
-2020,UCF Knights,0,1
-2020,UCLA Bruins,1,1
-2020,UConn Huskies,1,1
-2020,UMass Minutemen,0,1
-2020,UNLV Rebels,0,0
-2020,USC Trojans,1,0
-2020,UTEP Miners,1,1
-2020,UTSA Roadrunners,0,0
-2020,Utah State Aggies,0,0
-2020,Utah Utes,1,1
-2020,Vanderbilt Commodores,0,0
-2020,Virginia Cavaliers,1,1
-2020,Virginia Tech Hokies,1,0
-2020,Wake Forest Demon Deacons,1,1
-2020,Washington Huskies,0,1
-2020,Washington State Cougars,0,0
-2020,West Virginia Mountaineers,0,0
-2020,Western Kentucky Hilltoppers,1,1
-2020,Western Michigan Broncos,1,1
-2020,Wisconsin Badgers,1,1
-2020,Wyoming Cowboys,1,0
-2021,Air Force Falcons,1,1
-2021,Akron Zips,1,1
-2021,Alabama Crimson Tide,0,1
-2021,Appalachian State Mountaineers,0,1
-2021,Arizona State Sun Devils,1,1
-2021,Arizona Wildcats,0,0
-2021,Arkansas Razorbacks,1,1
-2021,Arkansas State Red Wolves,1,0
-2021,Army Black Knights,1,1
-2021,Auburn Tigers,0,0
-2021,BYU Cougars,0,1
-2021,Ball State Cardinals,1,1
-2021,Baylor Bears,0,1
-2021,Boise State Broncos,0,1
-2021,Boston College Eagles,1,1
-2021,Bowling Green Falcons,1,0
-2021,Buffalo Bulls,0,0
-2021,California Golden Bears,1,1
-2021,Central Michigan Chippewas,0,1
-2021,Charlotte 49ers,1,1
-2021,Cincinnati Bearcats,1,0
-2021,Clemson Tigers,1,1
-2021,Coastal Carolina Chanticleers,1,1
-2021,Colorado Buffaloes,1,0
-2021,Colorado State Rams,0,1
-2021,Duke Blue Devils,0,1
-2021,East Carolina Pirates,1,1
-2021,Eastern Michigan Eagles,1,1
-2021,Florida Atlantic Owls,0,0
-2021,Florida Gators,0,1
-2021,Florida International Golden Panthers,0,0
-2021,Florida State Seminoles,1,1
-2021,Fresno State Bulldogs,1,1
-2021,Georgia Bulldogs,1,1
-2021,Georgia Southern Eagles,0,1
-2021,Georgia State Panthers,1,0
-2021,Georgia Tech Yellow Jackets,1,1
-2021,Hawai'i Rainbow Warriors,0,1
-2021,Houston Cougars,1,1
-2021,Illinois Fighting Illini,0,0
-2021,Indiana Hoosiers,1,0
-2021,Iowa Hawkeyes,1,1
-2021,Iowa State Cyclones,1,1
-2021,Kansas Jayhawks,0,0
-2021,Kansas State Wildcats,1,1
-2021,Kent State Golden Flashes,1,1
-2021,Kentucky Wildcats,0,1
-2021,LSU Tigers,0,0
-2021,Liberty Flames,1,1
-2021,Louisiana Monroe Warhawks,0,0
-2021,Louisiana Ragin' Cajuns,0,1
-2021,Louisiana Tech Bulldogs,1,1
-2021,Louisville Cardinals,0,1
-2021,Marshall Thundering Herd,1,0
-2021,Maryland Terrapins,0,0
-2021,Memphis Tigers,1,1
-2021,Miami (OH) RedHawks,1,1
-2021,Miami Hurricanes,1,0
-2021,Michigan State Spartans,1,1
-2021,Michigan Wolverines,1,0
-2021,Middle Tennessee Blue Raiders,0,1
-2021,Minnesota Golden Gophers,1,1
-2021,Mississippi State Bulldogs,1,1
-2021,Missouri Tigers,1,0
-2021,NC State Wolfpack,1,1
-2021,Navy Midshipmen,1,1
-2021,Nebraska Cornhuskers,1,1
-2021,Nevada Wolf Pack,1,1
-2021,New Mexico Lobos,1,1
-2021,New Mexico State Aggies,1,1
-2021,North Carolina Tar Heels,1,1
-2021,North Texas Mean Green,1,0
-2021,Northern Illinois Huskies,1,1
-2021,Northwestern Wildcats,1,0
-2021,Notre Dame Fighting Irish,1,0
-2021,Ohio Bobcats,0,1
-2021,Ohio State Buckeyes,1,1
-2021,Oklahoma Sooners,1,1
-2021,Oklahoma State Cowboys,1,1
-2021,Old Dominion Monarchs,1,1
-2021,Ole Miss Rebels,1,1
-2021,Oregon Ducks,1,0
-2021,Oregon State Beavers,1,1
-2021,Penn State Nittany Lions,0,1
-2021,Pittsburgh Panthers,1,1
-2021,Purdue Boilermakers,1,0
-2021,Rice Owls,0,1
-2021,Rutgers Scarlet Knights,1,1
-2021,SMU Mustangs,1,0
-2021,San Diego State Aztecs,1,1
-2021,San Jose State Spartans,0,0
-2021,South Alabama Jaguars,0,0
-2021,South Carolina Gamecocks,0,0
-2021,South Florida Bulls,1,1
-2021,Southern Mississippi Golden Eagles,0,0
-2021,Stanford Cardinal,1,1
-2021,Syracuse Orange,1,1
-2021,TCU Horned Frogs,0,1
-2021,Temple Owls,1,1
-2021,Tennessee Volunteers,0,0
-2021,Texas A&M Aggies,1,1
-2021,Texas Longhorns,0,0
-2021,Texas State Bobcats,1,1
-2021,Texas Tech Red Raiders,0,1
-2021,Toledo Rockets,1,1
-2021,Troy Trojans,0,1
-2021,Tulane Green Wave,0,0
-2021,Tulsa Golden Hurricane,1,1
-2021,UAB Blazers,1,1
-2021,UCF Knights,0,0
-2021,UCLA Bruins,1,1
-2021,UConn Huskies,1,1
-2021,UMass Minutemen,0,1
-2021,UNLV Rebels,1,1
-2021,USC Trojans,1,1
-2021,UTEP Miners,0,0
-2021,UTSA Roadrunners,1,0
-2021,Utah State Aggies,0,0
-2021,Utah Utes,1,1
-2021,Vanderbilt Commodores,0,0
-2021,Virginia Cavaliers,1,1
-2021,Virginia Tech Hokies,1,1
-2021,Wake Forest Demon Deacons,1,1
-2021,Washington Huskies,1,1
-2021,Washington State Cougars,1,1
-2021,West Virginia Mountaineers,1,0
-2021,Western Kentucky Hilltoppers,0,1
-2021,Western Michigan Broncos,0,1
-2021,Wisconsin Badgers,1,1
-2021,Wyoming Cowboys,0,1
-2022,Air Force Falcons,1,0
-2022,Akron Zips,0,0
-2022,Alabama Crimson Tide,1,1
-2022,Appalachian State Mountaineers,0,1
-2022,Arizona State Sun Devils,0,0
-2022,Arizona Wildcats,1,0
-2022,Arkansas Razorbacks,1,1
-2022,Arkansas State Red Wolves,1,1
-2022,Army Black Knights,1,1
-2022,Auburn Tigers,0,0
-2022,BYU Cougars,1,1
-2022,Ball State Cardinals,1,1
-2022,Baylor Bears,1,1
-2022,Boise State Broncos,1,1
-2022,Boston College Eagles,0,1
-2022,Bowling Green Falcons,0,1
-2022,Buffalo Bulls,1,0
-2022,California Golden Bears,1,1
-2022,Central Michigan Chippewas,0,1
-2022,Charlotte 49ers,1,0
-2022,Cincinnati Bearcats,0,1
-2022,Clemson Tigers,0,0
-2022,Coastal Carolina Chanticleers,1,1
-2022,Colorado Buffaloes,0,1
-2022,Colorado State Rams,0,0
-2022,Duke Blue Devils,0,0
-2022,East Carolina Pirates,1,1
-2022,Eastern Michigan Eagles,1,1
-2022,Florida Atlantic Owls,0,0
-2022,Florida Gators,0,0
-2022,Florida International Golden Panthers,0,0
-2022,Florida State Seminoles,0,1
-2022,Fresno State Bulldogs,0,0
-2022,Georgia Bulldogs,1,1
-2022,Georgia Southern Eagles,0,0
-2022,Georgia State Panthers,0,1
-2022,Georgia Tech Yellow Jackets,0,1
-2022,Hawai'i Rainbow Warriors,0,1
-2022,Houston Cougars,1,1
-2022,Illinois Fighting Illini,0,1
-2022,Indiana Hoosiers,0,0
-2022,Iowa Hawkeyes,1,1
-2022,Iowa State Cyclones,1,1
-2022,James Madison Dukes,0,0
-2022,Kansas Jayhawks,1,1
-2022,Kansas State Wildcats,0,1
-2022,Kent State Golden Flashes,1,0
-2022,Kentucky Wildcats,0,1
-2022,LSU Tigers,0,0
-2022,Liberty Flames,1,0
-2022,Louisiana Monroe Warhawks,0,0
-2022,Louisiana Ragin' Cajuns,1,0
-2022,Louisiana Tech Bulldogs,0,0
-2022,Louisville Cardinals,0,1
-2022,Marshall Thundering Herd,0,1
-2022,Maryland Terrapins,1,1
-2022,Memphis Tigers,0,0
-2022,Miami (OH) RedHawks,1,0
-2022,Miami Hurricanes,0,0
-2022,Michigan State Spartans,1,1
-2022,Michigan Wolverines,1,0
-2022,Middle Tennessee Blue Raiders,0,1
-2022,Minnesota Golden Gophers,1,1
-2022,Mississippi State Bulldogs,1,1
-2022,Missouri Tigers,1,0
-2022,NC State Wolfpack,1,1
-2022,Navy Midshipmen,0,1
-2022,Nebraska Cornhuskers,0,1
-2022,Nevada Wolf Pack,0,0
-2022,New Mexico Lobos,1,1
-2022,New Mexico State Aggies,0,0
-2022,North Carolina Tar Heels,1,0
-2022,North Texas Mean Green,1,1
-2022,Northern Illinois Huskies,1,1
-2022,Northwestern Wildcats,1,1
-2022,Notre Dame Fighting Irish,1,0
-2022,Ohio Bobcats,1,0
-2022,Ohio State Buckeyes,1,0
-2022,Oklahoma Sooners,0,0
-2022,Oklahoma State Cowboys,1,0
-2022,Old Dominion Monarchs,0,1
-2022,Ole Miss Rebels,0,1
-2022,Oregon Ducks,0,0
-2022,Oregon State Beavers,1,0
-2022,Penn State Nittany Lions,1,1
-2022,Pittsburgh Panthers,0,1
-2022,Purdue Boilermakers,1,1
-2022,Rice Owls,1,1
-2022,Rutgers Scarlet Knights,1,0
-2022,SMU Mustangs,0,0
-2022,San Diego State Aztecs,1,1
-2022,San Jose State Spartans,1,1
-2022,South Alabama Jaguars,1,1
-2022,South Carolina Gamecocks,1,1
-2022,South Florida Bulls,0,0
-2022,Southern Mississippi Golden Eagles,0,1
-2022,Stanford Cardinal,1,1
-2022,Syracuse Orange,0,1
-2022,TCU Horned Frogs,0,0
-2022,Temple Owls,0,0
-2022,Tennessee Volunteers,1,1
-2022,Texas A&M Aggies,1,0
-2022,Texas Longhorns,1,1
-2022,Texas State Bobcats,0,1
-2022,Texas Tech Red Raiders,0,0
-2022,Toledo Rockets,1,1
-2022,Troy Trojans,0,0
-2022,Tulane Green Wave,0,1
-2022,Tulsa Golden Hurricane,1,0
-2022,UAB Blazers,1,1
-2022,UCF Knights,0,1
-2022,UCLA Bruins,0,0
-2022,UConn Huskies,0,1
-2022,UMass Minutemen,0,0
-2022,UNLV Rebels,0,0
-2022,USC Trojans,0,0
-2022,UTEP Miners,1,1
-2022,UTSA Roadrunners,0,1
-2022,Utah State Aggies,1,1
-2022,Utah Utes,1,1
-2022,Vanderbilt Commodores,0,0
-2022,Virginia Cavaliers,0,0
-2022,Virginia Tech Hokies,0,0
-2022,Wake Forest Demon Deacons,1,0
-2022,Washington Huskies,0,0
-2022,Washington State Cougars,0,0
-2022,West Virginia Mountaineers,0,1
-2022,Western Kentucky Hilltoppers,0,0
-2022,Western Michigan Broncos,1,1
-2022,Wisconsin Badgers,0,1
-2022,Wyoming Cowboys,1,1
-2023,Air Force Falcons,1,1
-2023,Akron Zips,0,1
-2023,Alabama Crimson Tide,0,0
-2023,Appalachian State Mountaineers,0,0
-2023,Arizona State Sun Devils,0,0
-2023,Arizona Wildcats,1,1
-2023,Arkansas Razorbacks,0,0
-2023,Arkansas State Red Wolves,0,1
-2023,Army Black Knights,0,1
-2023,Auburn Tigers,0,0
-2023,BYU Cougars,1,0
-2023,Ball State Cardinals,1,1
-2023,Baylor Bears,1,0
-2023,Boise State Broncos,0,1
-2023,Boston College Eagles,0,0
-2023,Bowling Green Falcons,1,0
-2023,Buffalo Bulls,0,0
-2023,California Golden Bears,0,1
-2023,Central Michigan Chippewas,1,1
-2023,Charlotte 49ers,0,0
-2023,Cincinnati Bearcats,0,0
-2023,Clemson Tigers,0,1
-2023,Coastal Carolina Chanticleers,0,0
-2023,Colorado Buffaloes,0,0
-2023,Colorado State Rams,1,1
-2023,Duke Blue Devils,1,0
-2023,East Carolina Pirates,1,1
-2023,Eastern Michigan Eagles,1,0
-2023,Florida Atlantic Owls,0,0
-2023,Florida Gators,1,1
-2023,Florida International Golden Panthers,1,1
-2023,Florida State Seminoles,1,1
-2023,Fresno State Bulldogs,0,1
-2023,Georgia Bulldogs,0,1
-2023,Georgia Southern Eagles,1,0
-2023,Georgia State Panthers,1,0
-2023,Georgia Tech Yellow Jackets,0,1
-2023,Hawai'i Rainbow Warriors,1,1
-2023,Houston Cougars,0,1
-2023,Illinois Fighting Illini,1,0
-2023,Indiana Hoosiers,1,1
-2023,Iowa Hawkeyes,1,1
-2023,Iowa State Cyclones,0,1
-2023,Jacksonville State Gamecocks,0,0
-2023,James Madison Dukes,1,1
-2023,Kansas Jayhawks,1,1
-2023,Kansas State Wildcats,1,1
-2023,Kennesaw State Owls,0,0
-2023,Kent State Golden Flashes,0,0
-2023,Kentucky Wildcats,0,1
-2023,LSU Tigers,1,1
-2023,Liberty Flames,0,1
-2023,Louisiana Monroe Warhawks,1,1
-2023,Louisiana Ragin' Cajuns,1,1
-2023,Louisiana Tech Bulldogs,1,1
-2023,Louisville Cardinals,0,0
-2023,Marshall Thundering Herd,1,0
-2023,Maryland Terrapins,0,1
-2023,Memphis Tigers,1,1
-2023,Miami (OH) RedHawks,0,1
-2023,Miami Hurricanes,0,0
-2023,Michigan State Spartans,1,1
-2023,Michigan Wolverines,1,1
-2023,Middle Tennessee Blue Raiders,1,1
-2023,Minnesota Golden Gophers,1,1
-2023,Mississippi State Bulldogs,0,0
-2023,Missouri Tigers,0,1
-2023,NC State Wolfpack,0,1
-2023,Navy Midshipmen,0,0
-2023,Nebraska Cornhuskers,0,0
-2023,Nevada Wolf Pack,1,1
-2023,New Mexico Lobos,0,0
-2023,New Mexico State Aggies,1,1
-2023,North Carolina Tar Heels,0,1
-2023,North Texas Mean Green,0,0
-2023,Northern Illinois Huskies,1,1
-2023,Northwestern Wildcats,1,0
-2023,Notre Dame Fighting Irish,0,1
-2023,Ohio Bobcats,1,1
-2023,Ohio State Buckeyes,0,1
-2023,Oklahoma Sooners,1,1
-2023,Oklahoma State Cowboys,1,0
-2023,Old Dominion Monarchs,0,1
-2023,Ole Miss Rebels,1,0
-2023,Oregon Ducks,1,1
-2023,Oregon State Beavers,1,1
-2023,Penn State Nittany Lions,1,1
-2023,Pittsburgh Panthers,1,1
-2023,Purdue Boilermakers,0,0
-2023,Rice Owls,1,1
-2023,Rutgers Scarlet Knights,0,1
-2023,SMU Mustangs,1,1
-2023,Sam Houston State,0,0
-2023,San Diego State Aztecs,0,1
-2023,San Jose State Spartans,1,1
-2023,South Alabama Jaguars,1,1
-2023,South Carolina Gamecocks,0,1
-2023,South Florida Bulls,0,0
-2023,Southern Mississippi Golden Eagles,1,0
-2023,Stanford Cardinal,0,0
-2023,Syracuse Orange,0,0
-2023,TCU Horned Frogs,1,0
-2023,Temple Owls,1,0
-2023,Tennessee Volunteers,0,1
-2023,Texas A&M Aggies,0,1
-2023,Texas Longhorns,1,1
-2023,Texas State Bobcats,0,0
-2023,Texas Tech Red Raiders,1,1
-2023,Toledo Rockets,1,1
-2023,Troy Trojans,1,0
-2023,Tulane Green Wave,0,0
-2023,Tulsa Golden Hurricane,0,0
-2023,UAB Blazers,0,0
-2023,UCF Knights,0,1
-2023,UCLA Bruins,1,0
-2023,UConn Huskies,1,1
-2023,UMass Minutemen,1,1
-2023,UNLV Rebels,0,0
-2023,USC Trojans,1,1
-2023,UTEP Miners,0,1
-2023,UTSA Roadrunners,0,1
-2023,Utah State Aggies,0,0
-2023,Utah Utes,1,1
-2023,Vanderbilt Commodores,1,1
-2023,Virginia Cavaliers,1,1
-2023,Virginia Tech Hokies,1,1
-2023,Wake Forest Demon Deacons,1,1
-2023,Washington Huskies,1,1
-2023,Washington State Cougars,0,0
-2023,West Virginia Mountaineers,0,1
-2023,Western Kentucky Hilltoppers,0,1
-2023,Western Michigan Broncos,0,1
-2023,Wisconsin Badgers,0,0
-2023,Wyoming Cowboys,1,1
-2024,Air Force Falcons,1,1
-2024,Akron Zips,0,1
-2024,Alabama Crimson Tide,0,0
-2024,Appalachian State Mountaineers,1,1
-2024,Arizona State Sun Devils,0,1
-2024,Arizona Wildcats,0,0
-2024,Arkansas Razorbacks,0,1
-2024,Arkansas State Red Wolves,0,1
-2024,Army Black Knights,0,1
-2024,Auburn Tigers,0,0
-2024,BYU Cougars,1,1
-2024,Ball State Cardinals,1,0
-2024,Baylor Bears,0,1
-2024,Boise State Broncos,0,0
-2024,Boston College Eagles,0,0
-2024,Bowling Green Falcons,1,1
-2024,Buffalo Bulls,0,0
-2024,California Golden Bears,0,1
-2024,Central Michigan Chippewas,0,1
-2024,Charlotte 49ers,1,1
-2024,Cincinnati Bearcats,1,1
-2024,Clemson Tigers,1,1
-2024,Coastal Carolina Chanticleers,1,1
-2024,Colorado Buffaloes,0,0
-2024,Colorado State Rams,1,1
-2024,Duke Blue Devils,0,0
-2024,East Carolina Pirates,0,1
-2024,Eastern Michigan Eagles,0,1
-2024,Florida Atlantic Owls,1,1
-2024,Florida Gators,1,1
-2024,Florida International Golden Panthers,1,1
-2024,Florida State Seminoles,1,1
-2024,Fresno State Bulldogs,1,1
-2024,Georgia Bulldogs,1,1
-2024,Georgia Southern Eagles,0,1
-2024,Georgia State Panthers,0,0
-2024,Georgia Tech Yellow Jackets,1,0
-2024,Hawai'i Rainbow Warriors,0,0
-2024,Houston Cougars,0,0
-2024,Illinois Fighting Illini,1,1
-2024,Indiana Hoosiers,0,0
-2024,Iowa Hawkeyes,0,1
-2024,Iowa State Cyclones,0,1
-2024,Jacksonville State Gamecocks,1,0
-2024,James Madison Dukes,0,0
-2024,Kansas Jayhawks,0,1
-2024,Kansas State Wildcats,0,1
-2024,Kennesaw State Owls,0,0
-2024,Kent State Golden Flashes,0,1
-2024,Kentucky Wildcats,0,1
-2024,LSU Tigers,0,0
-2024,Liberty Flames,1,1
-2024,Louisiana Monroe Warhawks,0,0
-2024,Louisiana Ragin' Cajuns,1,0
-2024,Louisiana Tech Bulldogs,1,0
-2024,Louisville Cardinals,1,1
-2024,Marshall Thundering Herd,0,1
-2024,Maryland Terrapins,1,1
-2024,Memphis Tigers,1,0
-2024,Miami (OH) RedHawks,1,1
-2024,Miami Hurricanes,1,1
-2024,Michigan State Spartans,0,0
-2024,Michigan Wolverines,0,0
-2024,Middle Tennessee Blue Raiders,0,0
-2024,Minnesota Golden Gophers,1,0
-2024,Mississippi State Bulldogs,0,0
-2024,Missouri Tigers,1,0
-2024,NC State Wolfpack,1,1
-2024,Navy Midshipmen,0,1
-2024,Nebraska Cornhuskers,1,1
-2024,Nevada Wolf Pack,0,0
-2024,New Mexico Lobos,0,0
-2024,New Mexico State Aggies,0,0
-2024,North Carolina Tar Heels,1,1
-2024,North Texas Mean Green,1,1
-2024,Northern Illinois Huskies,0,1
-2024,Northwestern Wildcats,0,0
-2024,Notre Dame Fighting Irish,0,1
-2024,Ohio Bobcats,0,0
-2024,Ohio State Buckeyes,1,1
-2024,Oklahoma Sooners,0,1
-2024,Oklahoma State Cowboys,1,1
-2024,Old Dominion Monarchs,1,1
-2024,Ole Miss Rebels,1,1
-2024,Oregon Ducks,1,1
-2024,Oregon State Beavers,0,0
-2024,Penn State Nittany Lions,0,0
-2024,Pittsburgh Panthers,0,1
-2024,Purdue Boilermakers,1,1
-2024,Rice Owls,1,1
-2024,Rutgers Scarlet Knights,1,1
-2024,SMU Mustangs,1,1
-2024,Sam Houston State,0,0
-2024,San Diego State Aztecs,0,0
-2024,San Jose State Spartans,0,1
-2024,South Alabama Jaguars,0,0
-2024,South Carolina Gamecocks,1,1
-2024,South Florida Bulls,1,1
-2024,Southern Mississippi Golden Eagles,0,0
-2024,Stanford Cardinal,1,1
-2024,Syracuse Orange,0,0
-2024,TCU Horned Frogs,1,0
-2024,Temple Owls,1,1
-2024,Tennessee Volunteers,1,1
-2024,Texas A&M Aggies,0,0
-2024,Texas Longhorns,1,1
-2024,Texas State Bobcats,1,0
-2024,Texas Tech Red Raiders,1,1
-2024,Toledo Rockets,1,1
-2024,Troy Trojans,0,0
-2024,Tulane Green Wave,0,0
-2024,Tulsa Golden Hurricane,1,1
-2024,UAB Blazers,1,1
-2024,UCF Knights,0,1
-2024,UCLA Bruins,0,0
-2024,UConn Huskies,0,0
-2024,UMass Minutemen,0,1
-2024,UNLV Rebels,1,1
-2024,USC Trojans,1,0
-2024,UTEP Miners,0,0
-2024,UTSA Roadrunners,1,1
-2024,Utah State Aggies,1,0
-2024,Utah Utes,1,1
-2024,Vanderbilt Commodores,0,0
-2024,Virginia Cavaliers,1,1
-2024,Virginia Tech Hokies,1,1
-2024,Wake Forest Demon Deacons,1,1
-2024,Washington Huskies,0,0
-2024,Washington State Cougars,1,1
-2024,West Virginia Mountaineers,1,1
-2024,Western Kentucky Hilltoppers,0,1
-2024,Western Michigan Broncos,0,0
-2024,Wisconsin Badgers,1,1
-2024,Wyoming Cowboys,0,0
-2025,Air Force Falcons,1,1
-2025,Akron Zips,0,1
-2025,Alabama Crimson Tide,1,1
-2025,Appalachian State Mountaineers,0,0
-2025,Arizona State Sun Devils,1,1
-2025,Arizona Wildcats,0,0
-2025,Arkansas Razorbacks,1,1
-2025,Arkansas State Red Wolves,1,0
-2025,Army Black Knights,1,1
-2025,Auburn Tigers,1,1
-2025,BYU Cougars,1,1
-2025,Ball State Cardinals,0,1
-2025,Baylor Bears,1,1
-2025,Boise State Broncos,1,1
-2025,Boston College Eagles,1,1
-2025,Bowling Green Falcons,0,0
-2025,Buffalo Bulls,1,1
-2025,California Golden Bears,0,0
-2025,Central Michigan Chippewas,0,0
-2025,Charlotte 49ers,0,0
-2025,Cincinnati Bearcats,1,1
-2025,Clemson Tigers,1,1
-2025,Coastal Carolina Chanticleers,0,0
-2025,Colorado Buffaloes,1,1
-2025,Colorado State Rams,1,0
-2025,Delaware Fightin' Blue Hens,0,0
-2025,Duke Blue Devils,1,1
-2025,East Carolina Pirates,1,0
-2025,Eastern Michigan Eagles,1,1
-2025,Florida Atlantic Owls,0,0
-2025,Florida Gators,0,1
-2025,Florida International Golden Panthers,0,1
-2025,Florida State Seminoles,0,0
-2025,Fresno State Bulldogs,0,0
-2025,Georgia Bulldogs,1,1
-2025,Georgia Southern Eagles,1,1
-2025,Georgia State Panthers,0,0
-2025,Georgia Tech Yellow Jackets,1,0
-2025,Hawai'i Rainbow Warriors,0,1
-2025,Houston Cougars,0,0
-2025,Illinois Fighting Illini,1,1
-2025,Indiana Hoosiers,1,1
-2025,Iowa Hawkeyes,1,1
-2025,Iowa State Cyclones,1,1
-2025,Jacksonville State Gamecocks,0,0
-2025,James Madison Dukes,1,0
-2025,Kansas Jayhawks,1,1
-2025,Kansas State Wildcats,1,1
-2025,Kennesaw State Owls,0,0
-2025,Kent State Golden Flashes,0,0
-2025,Kentucky Wildcats,1,1
-2025,LSU Tigers,1,1
-2025,Liberty Flames,1,1
-2025,Louisiana Monroe Warhawks,1,1
-2025,Louisiana Ragin' Cajuns,1,1
-2025,Louisiana Tech Bulldogs,0,0
-2025,Louisville Cardinals,1,1
-2025,Marshall Thundering Herd,0,0
-2025,Maryland Terrapins,0,1
-2025,Memphis Tigers,1,1
-2025,Miami (OH) RedHawks,1,1
-2025,Miami Hurricanes,1,0
-2025,Michigan State Spartans,1,1
-2025,Michigan Wolverines,0,1
-2025,Middle Tennessee Blue Raiders,1,1
-2025,Minnesota Golden Gophers,1,0
-2025,Mississippi State Bulldogs,1,1
-2025,Missouri State Bears,0,0
-2025,Missouri Tigers,1,1
-2025,NC State Wolfpack,0,0
-2025,Navy Midshipmen,1,1
-2025,Nebraska Cornhuskers,0,0
-2025,Nevada Wolf Pack,0,1
-2025,New Mexico Lobos,0,0
-2025,New Mexico State Aggies,0,1
-2025,North Carolina Tar Heels,0,0
-2025,North Texas Mean Green,1,0
-2025,Northern Illinois Huskies,0,0
-2025,Northwestern Wildcats,1,1
-2025,Notre Dame Fighting Irish,1,0
-2025,Ohio Bobcats,0,1
-2025,Ohio State Buckeyes,1,0
-2025,Oklahoma Sooners,0,1
-2025,Oklahoma State Cowboys,0,0
-2025,Old Dominion Monarchs,1,1
-2025,Ole Miss Rebels,1,1
-2025,Oregon Ducks,1,1
-2025,Oregon State Beavers,1,0
-2025,Penn State Nittany Lions,1,0
-2025,Pittsburgh Panthers,1,1
-2025,Purdue Boilermakers,0,0
-2025,Rice Owls,0,0
-2025,Rutgers Scarlet Knights,1,0
-2025,SMU Mustangs,1,1
-2025,Sam Houston Bearkats,0,0
-2025,San Diego State Aztecs,1,0
-2025,San Jose State Spartans,1,1
-2025,South Alabama Jaguars,0,1
-2025,South Carolina Gamecocks,0,1
-2025,South Florida Bulls,1,1
-2025,Southern Mississippi Golden Eagles,0,0
-2025,Stanford Cardinal,0,1
-2025,Syracuse Orange,1,1
-2025,TCU Horned Frogs,1,1
-2025,Temple Owls,0,0
-2025,Tennessee Volunteers,1,1
-2025,Texas A&M Aggies,1,1
-2025,Texas Longhorns,1,1
-2025,Texas State Bobcats,0,1
-2025,Texas Tech Red Raiders,0,0
-2025,Toledo Rockets,1,1
-2025,Troy Trojans,1,1
-2025,Tulane Green Wave,1,1
-2025,Tulsa Golden Hurricane,0,0
-2025,UAB Blazers,1,0
-2025,UCF Knights,0,0
-2025,UCLA Bruins,0,1
-2025,UConn Huskies,1,1
-2025,UMass Minutemen,0,0
-2025,UNLV Rebels,0,0
-2025,USC Trojans,0,1
-2025,UTEP Miners,1,1
-2025,UTSA Roadrunners,1,1
-2025,Utah State Aggies,0,0
-2025,Utah Utes,0,1
-2025,Vanderbilt Commodores,1,0
-2025,Virginia Cavaliers,1,1
-2025,Virginia Tech Hokies,0,0
-2025,Wake Forest Demon Deacons,0,0
-2025,Washington Huskies,0,0
-2025,Washington State Cougars,0,0
-2025,West Virginia Mountaineers,0,0
-2025,Western Kentucky Hilltoppers,0,0
-2025,Western Michigan Broncos,1,0
-2025,Wisconsin Badgers,0,1
-2025,Wyoming Cowboys,1,1
-2026,Air Force Falcons,1,0
-2026,Akron Zips,1,1
-2026,Alabama Crimson Tide,1,1
-2026,Appalachian State Mountaineers,0,1
-2026,Arizona State Sun Devils,1,1
-2026,Arizona Wildcats,1,1
-2026,Arkansas Razorbacks,0,0
-2026,Arkansas State Red Wolves,0,1
-2026,Army Black Knights,1,0
-2026,Auburn Tigers,0,1
-2026,BYU Cougars,1,0
-2026,Ball State Cardinals,1,1
-2026,Baylor Bears,1,0
-2026,Boise State Broncos,1,1
-2026,Boston College Eagles,0,0
-2026,Bowling Green Falcons,0,0
-2026,Buffalo Bulls,0,0
-2026,California Golden Bears,0,0
-2026,Central Michigan Chippewas,1,1
-2026,Charlotte 49ers,1,1
-2026,Cincinnati Bearcats,0,0
-2026,Clemson Tigers,0,1
-2026,Coastal Carolina Chanticleers,0,0
-2026,Colorado Buffaloes,0,0
-2026,Colorado State Rams,0,1
-2026,Delaware Fightin' Blue Hens,1,1
-2026,Duke Blue Devils,1,1
-2026,East Carolina Pirates,0,0
-2026,Eastern Michigan Eagles,1,0
-2026,Florida Atlantic Owls,0,1
-2026,Florida Gators,0,0
-2026,Florida International Golden Panthers,1,1
-2026,Florida State Seminoles,0,1
-2026,Fresno State Bulldogs,1,1
-2026,Georgia Bulldogs,1,1
-2026,Georgia Southern Eagles,1,0
-2026,Georgia State Panthers,1,0
-2026,Georgia Tech Yellow Jackets,0,0
-2026,Hawai'i Rainbow Warriors,1,1
-2026,Houston Cougars,1,1
-2026,Illinois Fighting Illini,1,0
-2026,Indiana Hoosiers,1,1
-2026,Iowa Hawkeyes,1,1
-2026,Iowa State Cyclones,0,0
-2026,Jacksonville State Gamecocks,0,1
-2026,James Madison Dukes,0,0
-2026,Kansas Jayhawks,1,1
-2026,Kansas State Wildcats,0,0
-2026,Kennesaw State Owls,1,1
-2026,Kent State Golden Flashes,1,1
-2026,Kentucky Wildcats,0,0
-2026,LSU Tigers,0,1
-2026,Liberty Flames,1,1
-2026,Louisiana Monroe Warhawks,0,0
-2026,Louisiana Ragin' Cajuns,1,1
-2026,Louisiana Tech Bulldogs,0,1
-2026,Louisville Cardinals,1,0
-2026,Marshall Thundering Herd,1,0
-2026,Maryland Terrapins,0,1
-2026,Memphis Tigers,0,0
-2026,Miami (OH) RedHawks,0,1
-2026,Miami Hurricanes,1,1
-2026,Michigan State Spartans,0,1
-2026,Michigan Wolverines,0,0
-2026,Middle Tennessee Blue Raiders,0,1
-2026,Minnesota Golden Gophers,1,1
-2026,Mississippi State Bulldogs,1,0
-2026,Missouri State Bears,0,0
-2026,Missouri Tigers,0,1
-2026,NC State Wolfpack,1,1
-2026,Navy Midshipmen,1,0
-2026,Nebraska Cornhuskers,1,0
-2026,Nevada Wolf Pack,0,1
-2026,New Mexico Lobos,1,1
-2026,New Mexico State Aggies,1,1
-2026,North Carolina Tar Heels,0,1
-2026,North Dakota State Bison,0,0
-2026,North Texas Mean Green,0,0
-2026,Northern Illinois Huskies,0,0
-2026,Northwestern Wildcats,0,1
-2026,Notre Dame Fighting Irish,1,1
-2026,Ohio Bobcats,0,0
-2026,Ohio State Buckeyes,1,1
-2026,Oklahoma Sooners,1,1
-2026,Oklahoma State Cowboys,0,0
-2026,Old Dominion Monarchs,0,1
-2026,Ole Miss Rebels,0,1
-2026,Oregon Ducks,0,1
-2026,Oregon State Beavers,0,0
-2026,Penn State Nittany Lions,0,0
-2026,Pittsburgh Panthers,1,0
-2026,Purdue Boilermakers,1,0
-2026,Rice Owls,1,1
-2026,Rutgers Scarlet Knights,1,0
-2026,SMU Mustangs,0,0
-2026,Sacramento State Hornets,0,0
-2026,Sam Houston Bearkats,1,1
-2026,San Diego State Aztecs,1,0
-2026,San Jose State Spartans,1,0
-2026,South Alabama Jaguars,0,1
-2026,South Carolina Gamecocks,0,1
-2026,South Florida Bulls,0,0
-2026,Southern Mississippi Golden Eagles,0,0
-2026,Stanford Cardinal,0,0
-2026,Syracuse Orange,1,0
-2026,TCU Horned Frogs,1,1
-2026,Temple Owls,1,1
-2026,Tennessee Volunteers,1,0
-2026,Texas A&M Aggies,1,0
-2026,Texas Longhorns,1,1
-2026,Texas State Bobcats,1,0
-2026,Texas Tech Red Raiders,1,1
-2026,Toledo Rockets,0,0
-2026,Troy Trojans,0,1
-2026,Tulane Green Wave,0,1
-2026,Tulsa Golden Hurricane,1,1
-2026,UAB Blazers,1,0
-2026,UCF Knights,1,1
-2026,UCLA Bruins,0,0
-2026,UConn Huskies,0,0
-2026,UMass Minutemen,0,1
-2026,UNLV Rebels,1,1
-2026,USC Trojans,1,0
-2026,UTEP Miners,0,1
-2026,UTSA Roadrunners,0,1
-2026,Utah State Aggies,0,1
-2026,Utah Utes,0,0
-2026,Vanderbilt Commodores,1,1
-2026,Virginia Cavaliers,0,1
-2026,Virginia Tech Hokies,0,0
-2026,Wake Forest Demon Deacons,1,1
-2026,Washington Huskies,0,1
-2026,Washington State Cougars,0,0
-2026,West Virginia Mountaineers,1,1
-2026,Western Kentucky Hilltoppers,0,1
-2026,Western Michigan Broncos,1,0
-2026,Wisconsin Badgers,1,1
-2026,Wyoming Cowboys,0,1
+season,school_mascot,oc_cont,dc_cont,source
+2003,Air Force Falcons,0,1,wikipedia
+2003,Akron Zips,1,1,wikipedia
+2003,Alabama Crimson Tide,0,0,wikipedia
+2003,Arizona State Sun Devils,0,1,wikipedia
+2003,Arizona Wildcats,0,0,wikipedia
+2003,Arkansas Razorbacks,0,1,wikipedia
+2003,Arkansas State Red Wolves,1,1,wikipedia
+2003,Army Black Knights,1,1,wikipedia
+2003,Auburn Tigers,0,1,wikipedia
+2003,BYU Cougars,0,0,wikipedia
+2003,Ball State Cardinals,0,0,wikipedia
+2003,Baylor Bears,0,0,wikipedia
+2003,Boise State Broncos,1,1,wikipedia
+2003,Boston College Eagles,1,1,wikipedia
+2003,Bowling Green Falcons,0,1,wikipedia
+2003,Buffalo Bulls,0,0,wikipedia
+2003,California Golden Bears,1,1,wikipedia
+2003,Central Michigan Chippewas,0,0,wikipedia
+2003,Cincinnati Bearcats,1,0,wikipedia
+2003,Clemson Tigers,1,1,wikipedia
+2003,Colorado Buffaloes,1,1,wikipedia
+2003,Colorado State Rams,1,0,wikipedia
+2003,Duke Blue Devils,0,1,wikipedia
+2003,East Carolina Pirates,0,0,wikipedia
+2003,Eastern Michigan Eagles,0,0,wikipedia
+2003,Florida Gators,1,0,wikipedia
+2003,Florida State Seminoles,1,1,wikipedia
+2003,Fresno State Bulldogs,1,1,wikipedia
+2003,Georgia Bulldogs,1,1,wikipedia
+2003,Georgia Tech Yellow Jackets,0,1,wikipedia
+2003,Hawai'i Rainbow Warriors,0,0,wikipedia
+2003,Houston Cougars,0,0,wikipedia
+2003,Illinois Fighting Illini,0,1,wikipedia
+2003,Indiana Hoosiers,1,1,wikipedia
+2003,Iowa Hawkeyes,1,1,wikipedia
+2003,Iowa State Cyclones,1,1,wikipedia
+2003,Kansas Jayhawks,1,1,wikipedia
+2003,Kansas State Wildcats,0,1,wikipedia
+2003,Kent State Golden Flashes,0,0,wikipedia
+2003,Kentucky Wildcats,0,0,wikipedia
+2003,LSU Tigers,1,1,wikipedia
+2003,Louisiana Ragin' Cajuns,1,1,wikipedia
+2003,Louisiana Tech Bulldogs,1,1,wikipedia
+2003,Louisville Cardinals,0,0,wikipedia
+2003,Marshall Thundering Herd,1,1,wikipedia
+2003,Maryland Terrapins,1,1,wikipedia
+2003,Memphis Tigers,1,0,wikipedia
+2003,Miami (OH) RedHawks,1,0,wikipedia
+2003,Miami Hurricanes,1,1,wikipedia
+2003,Michigan State Spartans,0,0,wikipedia
+2003,Michigan Wolverines,1,1,wikipedia
+2003,Middle Tennessee Blue Raiders,1,1,wikipedia
+2003,Minnesota Golden Gophers,1,0,wikipedia
+2003,Mississippi State Bulldogs,0,0,wikipedia
+2003,Missouri Tigers,1,1,wikipedia
+2003,NC State Wolfpack,0,1,wikipedia
+2003,Navy Midshipmen,0,1,wikipedia
+2003,Nebraska Cornhuskers,0,0,wikipedia
+2003,Nevada Wolf Pack,1,1,wikipedia
+2003,New Mexico Lobos,1,0,wikipedia
+2003,New Mexico State Aggies,0,0,wikipedia
+2003,North Carolina Tar Heels,1,1,wikipedia
+2003,North Texas Mean Green,1,0,wikipedia
+2003,Northern Illinois Huskies,0,0,wikipedia
+2003,Northwestern Wildcats,1,1,wikipedia
+2003,Notre Dame Fighting Irish,1,1,wikipedia
+2003,Ohio Bobcats,1,1,wikipedia
+2003,Ohio State Buckeyes,1,1,wikipedia
+2003,Oklahoma Sooners,1,1,wikipedia
+2003,Oklahoma State Cowboys,1,1,wikipedia
+2003,Ole Miss Rebels,1,1,wikipedia
+2003,Oregon Ducks,1,1,wikipedia
+2003,Oregon State Beavers,0,0,wikipedia
+2003,Penn State Nittany Lions,1,1,wikipedia
+2003,Pittsburgh Panthers,1,1,wikipedia
+2003,Purdue Boilermakers,1,1,wikipedia
+2003,Rice Owls,1,1,wikipedia
+2003,Rutgers Scarlet Knights,0,1,wikipedia
+2003,SMU Mustangs,1,1,wikipedia
+2003,San Diego State Aztecs,0,1,wikipedia
+2003,San José State Spartans,0,0,wikipedia
+2003,South Carolina Gamecocks,1,0,wikipedia
+2003,South Florida Bulls,1,1,wikipedia
+2003,Southern Miss Golden Eagles,0,1,wikipedia
+2003,Stanford Cardinal,0,0,wikipedia
+2003,Syracuse Orange,1,1,wikipedia
+2003,TCU Horned Frogs,1,1,wikipedia
+2003,Temple Owls,1,1,wikipedia
+2003,Tennessee Volunteers,1,1,wikipedia
+2003,Texas A&M Aggies,0,0,wikipedia
+2003,Texas Longhorns,1,1,wikipedia
+2003,Texas Tech Red Raiders,0,0,wikipedia
+2003,Toledo Rockets,1,1,wikipedia
+2003,Troy Trojans,0,0,wikipedia
+2003,Tulane Green Wave,1,1,wikipedia
+2003,Tulsa Golden Hurricane,0,0,wikipedia
+2003,UAB Blazers,1,0,wikipedia
+2003,UCF Knights,1,1,wikipedia
+2003,UCLA Bruins,0,0,wikipedia
+2003,UConn Huskies,1,1,wikipedia
+2003,UL Monroe Warhawks,1,0,wikipedia
+2003,UNLV Rebels,1,1,wikipedia
+2003,USC Trojans,1,0,wikipedia
+2003,UTEP Miners,1,1,wikipedia
+2003,Utah State Aggies,1,0,wikipedia
+2003,Utah Utes,0,1,wikipedia
+2003,Vanderbilt Commodores,1,1,wikipedia
+2003,Virginia Cavaliers,0,1,wikipedia
+2003,Virginia Tech Hokies,1,1,wikipedia
+2003,Wake Forest Demon Deacons,0,1,wikipedia
+2003,Washington Huskies,0,1,wikipedia
+2003,Washington State Cougars,1,0,wikipedia
+2003,West Virginia Mountaineers,0,1,wikipedia
+2003,Western Michigan Broncos,1,0,wikipedia
+2003,Wisconsin Badgers,1,1,wikipedia
+2003,Wyoming Cowboys,0,0,wikipedia
+2004,Air Force Falcons,0,1,wikipedia
+2004,Akron Zips,0,0,wikipedia
+2004,Alabama Crimson Tide,1,1,wikipedia
+2004,Arizona State Sun Devils,0,1,wikipedia
+2004,Arizona Wildcats,0,0,wikipedia
+2004,Arkansas Razorbacks,1,1,wikipedia
+2004,Arkansas State Red Wolves,1,1,wikipedia
+2004,Army Black Knights,0,0,wikipedia
+2004,Auburn Tigers,0,1,wikipedia
+2004,BYU Cougars,1,1,wikipedia
+2004,Ball State Cardinals,0,0,wikipedia
+2004,Baylor Bears,1,0,wikipedia
+2004,Boise State Broncos,1,1,wikipedia
+2004,Boston College Eagles,1,1,wikipedia
+2004,Bowling Green Falcons,1,1,wikipedia
+2004,Buffalo Bulls,0,0,wikipedia
+2004,California Golden Bears,1,1,wikipedia
+2004,Central Michigan Chippewas,0,0,wikipedia
+2004,Cincinnati Bearcats,0,0,wikipedia
+2004,Clemson Tigers,0,1,wikipedia
+2004,Colorado Buffaloes,1,0,wikipedia
+2004,Colorado State Rams,1,1,wikipedia
+2004,Duke Blue Devils,0,0,wikipedia
+2004,East Carolina Pirates,0,1,wikipedia
+2004,Eastern Michigan Eagles,0,0,wikipedia
+2004,Florida Atlantic Owls,0,0,wikipedia
+2004,Florida Gators,0,1,wikipedia
+2004,Florida International Panthers,0,0,wikipedia
+2004,Florida State Seminoles,1,1,wikipedia
+2004,Fresno State Bulldogs,1,1,wikipedia
+2004,Georgia Bulldogs,1,1,wikipedia
+2004,Georgia Tech Yellow Jackets,1,1,wikipedia
+2004,Hawai'i Rainbow Warriors,0,1,wikipedia
+2004,Houston Cougars,0,1,wikipedia
+2004,Idaho Vandals,0,0,wikipedia
+2004,Illinois Fighting Illini,0,0,wikipedia
+2004,Indiana Hoosiers,0,0,wikipedia
+2004,Iowa Hawkeyes,1,1,wikipedia
+2004,Iowa State Cyclones,0,1,wikipedia
+2004,Kansas Jayhawks,1,1,wikipedia
+2004,Kansas State Wildcats,1,1,wikipedia
+2004,Kent State Golden Flashes,0,0,wikipedia
+2004,Kentucky Wildcats,1,1,wikipedia
+2004,LSU Tigers,1,1,wikipedia
+2004,Louisiana Ragin' Cajuns,1,1,wikipedia
+2004,Louisiana Tech Bulldogs,1,0,wikipedia
+2004,Louisville Cardinals,1,0,wikipedia
+2004,Marshall Thundering Herd,1,1,wikipedia
+2004,Maryland Terrapins,1,1,wikipedia
+2004,Memphis Tigers,1,1,wikipedia
+2004,Miami (OH) RedHawks,1,0,wikipedia
+2004,Miami Hurricanes,0,1,wikipedia
+2004,Michigan State Spartans,1,1,wikipedia
+2004,Michigan Wolverines,1,1,wikipedia
+2004,Middle Tennessee Blue Raiders,1,0,wikipedia
+2004,Minnesota Golden Gophers,1,1,wikipedia
+2004,Mississippi State Bulldogs,0,0,wikipedia
+2004,Missouri Tigers,1,1,wikipedia
+2004,NC State Wolfpack,1,0,wikipedia
+2004,Navy Midshipmen,0,1,wikipedia
+2004,Nebraska Cornhuskers,0,0,wikipedia
+2004,Nevada Wolf Pack,0,0,wikipedia
+2004,New Mexico Lobos,1,1,wikipedia
+2004,New Mexico State Aggies,1,1,wikipedia
+2004,North Carolina Tar Heels,1,0,wikipedia
+2004,North Texas Mean Green,1,1,wikipedia
+2004,Northern Illinois Huskies,0,0,wikipedia
+2004,Northwestern Wildcats,1,1,wikipedia
+2004,Notre Dame Fighting Irish,1,1,wikipedia
+2004,Ohio Bobcats,0,1,wikipedia
+2004,Ohio State Buckeyes,1,0,wikipedia
+2004,Oklahoma Sooners,1,1,wikipedia
+2004,Oklahoma State Cowboys,1,1,wikipedia
+2004,Ole Miss Rebels,1,1,wikipedia
+2004,Oregon Ducks,1,1,wikipedia
+2004,Oregon State Beavers,1,1,wikipedia
+2004,Penn State Nittany Lions,0,1,wikipedia
+2004,Pittsburgh Panthers,0,1,wikipedia
+2004,Purdue Boilermakers,1,1,wikipedia
+2004,Rice Owls,1,1,wikipedia
+2004,Rutgers Scarlet Knights,1,1,wikipedia
+2004,SMU Mustangs,0,1,wikipedia
+2004,San Diego State Aztecs,0,1,wikipedia
+2004,San José State Spartans,1,0,wikipedia
+2004,South Carolina Gamecocks,1,0,wikipedia
+2004,South Florida Bulls,1,1,wikipedia
+2004,Southern Miss Golden Eagles,1,1,wikipedia
+2004,Stanford Cardinal,1,1,wikipedia
+2004,Syracuse Orange,1,0,wikipedia
+2004,TCU Horned Frogs,1,0,wikipedia
+2004,Temple Owls,0,1,wikipedia
+2004,Tennessee Volunteers,1,1,wikipedia
+2004,Texas A&M Aggies,1,1,wikipedia
+2004,Texas Longhorns,1,0,wikipedia
+2004,Texas Tech Red Raiders,0,1,wikipedia
+2004,Toledo Rockets,1,1,wikipedia
+2004,Troy Trojans,1,1,wikipedia
+2004,Tulane Green Wave,1,1,wikipedia
+2004,Tulsa Golden Hurricane,1,1,wikipedia
+2004,UAB Blazers,1,1,wikipedia
+2004,UCF Knights,0,0,wikipedia
+2004,UCLA Bruins,0,1,wikipedia
+2004,UConn Huskies,1,1,wikipedia
+2004,UL Monroe Warhawks,0,1,wikipedia
+2004,UNLV Rebels,0,1,wikipedia
+2004,USC Trojans,1,0,wikipedia
+2004,UTEP Miners,0,0,wikipedia
+2004,Utah State Aggies,1,1,wikipedia
+2004,Utah Utes,1,1,wikipedia
+2004,Vanderbilt Commodores,1,1,wikipedia
+2004,Virginia Cavaliers,1,1,wikipedia
+2004,Virginia Tech Hokies,1,1,wikipedia
+2004,Wake Forest Demon Deacons,1,1,wikipedia
+2004,Washington Huskies,1,1,wikipedia
+2004,Washington State Cougars,1,1,wikipedia
+2004,West Virginia Mountaineers,0,1,wikipedia
+2004,Western Michigan Broncos,1,0,wikipedia
+2004,Wisconsin Badgers,1,0,wikipedia
+2004,Wyoming Cowboys,1,1,wikipedia
+2005,Air Force Falcons,0,1,wikipedia
+2005,Akron Zips,1,1,wikipedia
+2005,Alabama Crimson Tide,1,1,wikipedia
+2005,Arizona State Sun Devils,0,0,wikipedia
+2005,Arizona Wildcats,1,1,wikipedia
+2005,Arkansas Razorbacks,1,0,wikipedia
+2005,Arkansas State Red Wolves,1,1,wikipedia
+2005,Army Black Knights,1,1,wikipedia
+2005,Auburn Tigers,1,0,wikipedia
+2005,BYU Cougars,0,0,wikipedia
+2005,Ball State Cardinals,0,0,wikipedia
+2005,Baylor Bears,1,1,wikipedia
+2005,Boise State Broncos,1,1,wikipedia
+2005,Boston College Eagles,1,1,wikipedia
+2005,Bowling Green Falcons,1,0,wikipedia
+2005,Buffalo Bulls,0,0,wikipedia
+2005,California Golden Bears,1,1,wikipedia
+2005,Central Michigan Chippewas,1,0,wikipedia
+2005,Cincinnati Bearcats,1,1,wikipedia
+2005,Clemson Tigers,0,0,wikipedia
+2005,Colorado Buffaloes,1,1,wikipedia
+2005,Colorado State Rams,1,1,wikipedia
+2005,Duke Blue Devils,0,1,wikipedia
+2005,East Carolina Pirates,0,0,wikipedia
+2005,Eastern Michigan Eagles,1,0,wikipedia
+2005,Florida Atlantic Owls,0,1,wikipedia
+2005,Florida Gators,0,1,wikipedia
+2005,Florida International Panthers,1,1,wikipedia
+2005,Florida State Seminoles,1,1,wikipedia
+2005,Fresno State Bulldogs,1,1,wikipedia
+2005,Georgia Bulldogs,1,0,wikipedia
+2005,Georgia Tech Yellow Jackets,1,1,wikipedia
+2005,Hawai'i Rainbow Warriors,0,0,wikipedia
+2005,Houston Cougars,0,1,wikipedia
+2005,Idaho Vandals,1,0,wikipedia
+2005,Illinois Fighting Illini,0,1,wikipedia
+2005,Indiana Hoosiers,0,0,wikipedia
+2005,Iowa Hawkeyes,1,1,wikipedia
+2005,Iowa State Cyclones,1,1,wikipedia
+2005,Kansas Jayhawks,1,1,wikipedia
+2005,Kansas State Wildcats,1,1,wikipedia
+2005,Kent State Golden Flashes,0,1,wikipedia
+2005,Kentucky Wildcats,0,1,wikipedia
+2005,LSU Tigers,1,0,wikipedia
+2005,Louisiana Ragin' Cajuns,1,1,wikipedia
+2005,Louisiana Tech Bulldogs,1,0,wikipedia
+2005,Louisville Cardinals,1,1,wikipedia
+2005,Marshall Thundering Herd,1,0,wikipedia
+2005,Maryland Terrapins,0,0,wikipedia
+2005,Memphis Tigers,1,1,wikipedia
+2005,Miami (OH) RedHawks,0,0,wikipedia
+2005,Miami Hurricanes,1,1,wikipedia
+2005,Michigan State Spartans,1,1,wikipedia
+2005,Michigan Wolverines,1,1,wikipedia
+2005,Middle Tennessee Blue Raiders,1,0,wikipedia
+2005,Minnesota Golden Gophers,1,0,wikipedia
+2005,Mississippi State Bulldogs,1,1,wikipedia
+2005,Missouri Tigers,1,1,wikipedia
+2005,NC State Wolfpack,0,0,wikipedia
+2005,Navy Midshipmen,0,1,wikipedia
+2005,Nebraska Cornhuskers,1,1,wikipedia
+2005,Nevada Wolf Pack,1,1,wikipedia
+2005,New Mexico Lobos,1,1,wikipedia
+2005,New Mexico State Aggies,0,0,wikipedia
+2005,North Carolina Tar Heels,1,1,wikipedia
+2005,North Texas Mean Green,1,1,wikipedia
+2005,Northern Illinois Huskies,1,1,wikipedia
+2005,Northwestern Wildcats,1,1,wikipedia
+2005,Notre Dame Fighting Irish,0,0,wikipedia
+2005,Ohio Bobcats,0,0,wikipedia
+2005,Ohio State Buckeyes,1,0,wikipedia
+2005,Oklahoma Sooners,1,1,wikipedia
+2005,Oklahoma State Cowboys,0,0,wikipedia
+2005,Ole Miss Rebels,0,0,wikipedia
+2005,Oregon Ducks,0,1,wikipedia
+2005,Oregon State Beavers,0,1,wikipedia
+2005,Penn State Nittany Lions,1,1,wikipedia
+2005,Pittsburgh Panthers,0,1,wikipedia
+2005,Purdue Boilermakers,1,1,wikipedia
+2005,Rice Owls,1,1,wikipedia
+2005,Rutgers Scarlet Knights,1,0,wikipedia
+2005,SMU Mustangs,1,1,wikipedia
+2005,San Diego State Aztecs,0,1,wikipedia
+2005,San José State Spartans,0,0,wikipedia
+2005,South Carolina Gamecocks,0,0,wikipedia
+2005,South Florida Bulls,0,1,wikipedia
+2005,Southern Miss Golden Eagles,0,0,wikipedia
+2005,Stanford Cardinal,0,0,wikipedia
+2005,Syracuse Orange,0,0,wikipedia
+2005,TCU Horned Frogs,1,1,wikipedia
+2005,Temple Owls,1,1,wikipedia
+2005,Tennessee Volunteers,1,1,wikipedia
+2005,Texas A&M Aggies,1,1,wikipedia
+2005,Texas Longhorns,1,0,wikipedia
+2005,Texas Tech Red Raiders,0,1,wikipedia
+2005,Toledo Rockets,0,0,wikipedia
+2005,Troy Trojans,1,0,wikipedia
+2005,Tulane Green Wave,1,1,wikipedia
+2005,Tulsa Golden Hurricane,1,1,wikipedia
+2005,UAB Blazers,1,1,wikipedia
+2005,UCF Knights,1,1,wikipedia
+2005,UCLA Bruins,1,1,wikipedia
+2005,UConn Huskies,1,0,wikipedia
+2005,UL Monroe Warhawks,1,0,wikipedia
+2005,UNLV Rebels,0,0,wikipedia
+2005,USC Trojans,0,0,wikipedia
+2005,UTEP Miners,1,1,wikipedia
+2005,Utah State Aggies,0,0,wikipedia
+2005,Utah Utes,0,0,wikipedia
+2005,Vanderbilt Commodores,1,1,wikipedia
+2005,Virginia Cavaliers,1,1,wikipedia
+2005,Virginia Tech Hokies,1,1,wikipedia
+2005,Wake Forest Demon Deacons,1,1,wikipedia
+2005,Washington Huskies,0,0,wikipedia
+2005,Washington State Cougars,1,1,wikipedia
+2005,West Virginia Mountaineers,1,1,wikipedia
+2005,Western Michigan Broncos,0,0,wikipedia
+2005,Wisconsin Badgers,1,1,wikipedia
+2005,Wyoming Cowboys,1,1,wikipedia
+2006,Air Force Falcons,0,1,wikipedia
+2006,Akron Zips,0,1,wikipedia
+2006,Alabama Crimson Tide,1,1,wikipedia
+2006,Arizona State Sun Devils,0,1,wikipedia
+2006,Arizona Wildcats,1,1,wikipedia
+2006,Arkansas Razorbacks,0,1,wikipedia
+2006,Arkansas State Red Wolves,1,1,wikipedia
+2006,Army Black Knights,1,1,wikipedia
+2006,Auburn Tigers,1,0,wikipedia
+2006,BYU Cougars,1,0,wikipedia
+2006,Ball State Cardinals,0,0,wikipedia
+2006,Baylor Bears,0,1,wikipedia
+2006,Boise State Broncos,0,0,wikipedia
+2006,Boston College Eagles,1,1,wikipedia
+2006,Bowling Green Falcons,1,1,wikipedia
+2006,Buffalo Bulls,0,0,wikipedia
+2006,California Golden Bears,0,1,wikipedia
+2006,Central Michigan Chippewas,1,0,wikipedia
+2006,Cincinnati Bearcats,1,1,wikipedia
+2006,Clemson Tigers,1,1,wikipedia
+2006,Colorado Buffaloes,0,0,wikipedia
+2006,Colorado State Rams,1,1,wikipedia
+2006,Duke Blue Devils,1,1,wikipedia
+2006,East Carolina Pirates,1,1,wikipedia
+2006,Eastern Michigan Eagles,1,0,wikipedia
+2006,Florida Atlantic Owls,1,1,wikipedia
+2006,Florida Gators,1,1,wikipedia
+2006,Florida International Panthers,1,0,wikipedia
+2006,Florida State Seminoles,1,1,wikipedia
+2006,Fresno State Bulldogs,0,1,wikipedia
+2006,Georgia Bulldogs,1,1,wikipedia
+2006,Georgia Tech Yellow Jackets,1,1,wikipedia
+2006,Hawai'i Rainbow Warriors,0,1,wikipedia
+2006,Houston Cougars,0,0,wikipedia
+2006,Idaho Vandals,0,0,wikipedia
+2006,Illinois Fighting Illini,1,0,wikipedia
+2006,Indiana Hoosiers,1,1,wikipedia
+2006,Iowa Hawkeyes,1,1,wikipedia
+2006,Iowa State Cyclones,1,1,wikipedia
+2006,Kansas Jayhawks,1,1,wikipedia
+2006,Kansas State Wildcats,0,0,wikipedia
+2006,Kent State Golden Flashes,0,1,wikipedia
+2006,Kentucky Wildcats,1,1,wikipedia
+2006,LSU Tigers,1,1,wikipedia
+2006,Louisiana Ragin' Cajuns,1,1,wikipedia
+2006,Louisiana Tech Bulldogs,1,0,wikipedia
+2006,Louisville Cardinals,1,1,wikipedia
+2006,Marshall Thundering Herd,0,0,wikipedia
+2006,Maryland Terrapins,0,0,wikipedia
+2006,Memphis Tigers,1,1,wikipedia
+2006,Miami (OH) RedHawks,0,1,wikipedia
+2006,Miami Hurricanes,0,1,wikipedia
+2006,Michigan State Spartans,1,1,wikipedia
+2006,Michigan Wolverines,0,0,wikipedia
+2006,Middle Tennessee Blue Raiders,0,0,wikipedia
+2006,Minnesota Golden Gophers,1,1,wikipedia
+2006,Mississippi State Bulldogs,1,1,wikipedia
+2006,Missouri Tigers,1,1,wikipedia
+2006,NC State Wolfpack,1,1,wikipedia
+2006,Navy Midshipmen,0,1,wikipedia
+2006,Nebraska Cornhuskers,1,1,wikipedia
+2006,Nevada Wolf Pack,1,1,wikipedia
+2006,New Mexico Lobos,0,1,wikipedia
+2006,New Mexico State Aggies,1,1,wikipedia
+2006,North Carolina Tar Heels,0,1,wikipedia
+2006,North Texas Mean Green,1,0,wikipedia
+2006,Northern Illinois Huskies,1,1,wikipedia
+2006,Northwestern Wildcats,0,1,wikipedia
+2006,Notre Dame Fighting Irish,1,1,wikipedia
+2006,Ohio Bobcats,1,1,wikipedia
+2006,Ohio State Buckeyes,1,1,wikipedia
+2006,Oklahoma Sooners,1,1,wikipedia
+2006,Oklahoma State Cowboys,1,1,wikipedia
+2006,Ole Miss Rebels,0,0,wikipedia
+2006,Oregon Ducks,1,1,wikipedia
+2006,Oregon State Beavers,1,1,wikipedia
+2006,Penn State Nittany Lions,1,1,wikipedia
+2006,Pittsburgh Panthers,1,1,wikipedia
+2006,Purdue Boilermakers,0,1,wikipedia
+2006,Rice Owls,0,0,wikipedia
+2006,Rutgers Scarlet Knights,1,0,wikipedia
+2006,SMU Mustangs,1,1,wikipedia
+2006,San Diego State Aztecs,0,0,wikipedia
+2006,San José State Spartans,0,1,wikipedia
+2006,South Carolina Gamecocks,0,1,wikipedia
+2006,South Florida Bulls,1,1,wikipedia
+2006,Southern Miss Golden Eagles,1,1,wikipedia
+2006,Stanford Cardinal,0,0,wikipedia
+2006,Syracuse Orange,0,0,wikipedia
+2006,TCU Horned Frogs,1,1,wikipedia
+2006,Temple Owls,0,0,wikipedia
+2006,Tennessee Volunteers,0,1,wikipedia
+2006,Texas A&M Aggies,1,0,wikipedia
+2006,Texas Longhorns,1,1,wikipedia
+2006,Texas Tech Red Raiders,1,1,wikipedia
+2006,Toledo Rockets,1,1,wikipedia
+2006,Troy Trojans,0,0,wikipedia
+2006,Tulane Green Wave,1,1,wikipedia
+2006,Tulsa Golden Hurricane,1,0,wikipedia
+2006,UAB Blazers,1,0,wikipedia
+2006,UCF Knights,1,1,wikipedia
+2006,UCLA Bruins,0,0,wikipedia
+2006,UConn Huskies,0,1,wikipedia
+2006,UL Monroe Warhawks,0,1,wikipedia
+2006,UNLV Rebels,1,1,wikipedia
+2006,USC Trojans,1,0,wikipedia
+2006,UTEP Miners,1,1,wikipedia
+2006,Utah State Aggies,1,1,wikipedia
+2006,Utah Utes,1,1,wikipedia
+2006,Vanderbilt Commodores,1,1,wikipedia
+2006,Virginia Cavaliers,0,0,wikipedia
+2006,Virginia Tech Hokies,1,1,wikipedia
+2006,Wake Forest Demon Deacons,1,1,wikipedia
+2006,Washington Huskies,1,1,wikipedia
+2006,Washington State Cougars,1,1,wikipedia
+2006,West Virginia Mountaineers,1,1,wikipedia
+2006,Western Michigan Broncos,1,0,wikipedia
+2006,Wisconsin Badgers,1,0,wikipedia
+2006,Wyoming Cowboys,1,1,wikipedia
+2007,Air Force Falcons,0,0,wikipedia
+2007,Akron Zips,1,1,wikipedia
+2007,Alabama Crimson Tide,0,0,wikipedia
+2007,Arizona State Sun Devils,0,0,wikipedia
+2007,Arizona Wildcats,0,1,wikipedia
+2007,Arkansas Razorbacks,0,1,wikipedia
+2007,Arkansas State Red Wolves,1,1,wikipedia
+2007,Army Black Knights,0,1,wikipedia
+2007,Auburn Tigers,1,1,wikipedia
+2007,BYU Cougars,1,0,wikipedia
+2007,Ball State Cardinals,0,1,wikipedia
+2007,Baylor Bears,1,0,wikipedia
+2007,Boise State Broncos,1,1,wikipedia
+2007,Boston College Eagles,0,1,wikipedia
+2007,Bowling Green Falcons,0,0,wikipedia
+2007,Buffalo Bulls,1,0,wikipedia
+2007,California Golden Bears,0,1,wikipedia
+2007,Central Michigan Chippewas,0,0,wikipedia
+2007,Cincinnati Bearcats,0,0,wikipedia
+2007,Clemson Tigers,1,1,wikipedia
+2007,Colorado Buffaloes,1,1,wikipedia
+2007,Colorado State Rams,1,1,wikipedia
+2007,Duke Blue Devils,0,1,wikipedia
+2007,East Carolina Pirates,1,1,wikipedia
+2007,Eastern Michigan Eagles,0,0,wikipedia
+2007,Florida Atlantic Owls,1,1,wikipedia
+2007,Florida Gators,1,1,wikipedia
+2007,Florida International Panthers,0,0,wikipedia
+2007,Florida State Seminoles,0,1,wikipedia
+2007,Fresno State Bulldogs,0,1,wikipedia
+2007,Georgia Bulldogs,0,1,wikipedia
+2007,Georgia Tech Yellow Jackets,0,1,wikipedia
+2007,Hawai'i Rainbow Warriors,0,0,wikipedia
+2007,Houston Cougars,0,1,wikipedia
+2007,Illinois Fighting Illini,1,0,wikipedia
+2007,Indiana Hoosiers,0,1,wikipedia
+2007,Iowa Hawkeyes,1,1,wikipedia
+2007,Iowa State Cyclones,0,0,wikipedia
+2007,Kansas Jayhawks,0,1,wikipedia
+2007,Kansas State Wildcats,1,0,wikipedia
+2007,Kent State Golden Flashes,0,1,wikipedia
+2007,Kentucky Wildcats,1,0,wikipedia
+2007,LSU Tigers,0,1,wikipedia
+2007,Louisiana Ragin' Cajuns,0,0,wikipedia
+2007,Louisiana Tech Bulldogs,0,0,wikipedia
+2007,Louisville Cardinals,0,1,wikipedia
+2007,Marshall Thundering Herd,0,0,wikipedia
+2007,Maryland Terrapins,0,1,wikipedia
+2007,Memphis Tigers,0,0,wikipedia
+2007,Miami (OH) RedHawks,0,0,wikipedia
+2007,Miami Hurricanes,0,0,wikipedia
+2007,Michigan State Spartans,0,0,wikipedia
+2007,Michigan Wolverines,1,1,wikipedia
+2007,Middle Tennessee Blue Raiders,1,1,wikipedia
+2007,Minnesota Golden Gophers,0,0,wikipedia
+2007,Mississippi State Bulldogs,1,1,wikipedia
+2007,Missouri Tigers,1,1,wikipedia
+2007,NC State Wolfpack,0,0,wikipedia
+2007,Navy Midshipmen,0,1,wikipedia
+2007,Nebraska Cornhuskers,0,1,wikipedia
+2007,Nevada Wolf Pack,1,0,wikipedia
+2007,New Mexico Lobos,0,1,wikipedia
+2007,New Mexico State Aggies,1,1,wikipedia
+2007,North Carolina Tar Heels,0,0,wikipedia
+2007,North Texas Mean Green,0,0,wikipedia
+2007,Northern Illinois Huskies,0,1,wikipedia
+2007,Northwestern Wildcats,1,1,wikipedia
+2007,Notre Dame Fighting Irish,1,0,wikipedia
+2007,Ohio Bobcats,1,1,wikipedia
+2007,Ohio State Buckeyes,1,1,wikipedia
+2007,Oklahoma Sooners,1,1,wikipedia
+2007,Oklahoma State Cowboys,1,0,wikipedia
+2007,Ole Miss Rebels,1,0,wikipedia
+2007,Oregon Ducks,0,1,wikipedia
+2007,Oregon State Beavers,1,1,wikipedia
+2007,Penn State Nittany Lions,1,1,wikipedia
+2007,Pittsburgh Panthers,1,1,wikipedia
+2007,Purdue Boilermakers,1,1,wikipedia
+2007,Rice Owls,0,0,wikipedia
+2007,Rutgers Scarlet Knights,1,0,wikipedia
+2007,SMU Mustangs,1,1,wikipedia
+2007,San Diego State Aztecs,1,1,wikipedia
+2007,San José State Spartans,0,1,wikipedia
+2007,South Carolina Gamecocks,0,1,wikipedia
+2007,South Florida Bulls,0,1,wikipedia
+2007,Southern Miss Golden Eagles,1,1,wikipedia
+2007,Stanford Cardinal,0,0,wikipedia
+2007,Syracuse Orange,1,0,wikipedia
+2007,TCU Horned Frogs,1,1,wikipedia
+2007,Temple Owls,1,1,wikipedia
+2007,Tennessee Volunteers,1,1,wikipedia
+2007,Texas A&M Aggies,1,1,wikipedia
+2007,Texas Longhorns,1,1,wikipedia
+2007,Texas Tech Red Raiders,1,1,wikipedia
+2007,Toledo Rockets,1,1,wikipedia
+2007,Troy Trojans,1,1,wikipedia
+2007,Tulane Green Wave,0,0,wikipedia
+2007,Tulsa Golden Hurricane,0,1,wikipedia
+2007,UAB Blazers,0,0,wikipedia
+2007,UCF Knights,1,0,wikipedia
+2007,UCLA Bruins,0,1,wikipedia
+2007,UConn Huskies,1,1,wikipedia
+2007,UL Monroe Warhawks,0,1,wikipedia
+2007,UNLV Rebels,0,1,wikipedia
+2007,USC Trojans,0,1,wikipedia
+2007,UTEP Miners,1,1,wikipedia
+2007,Utah State Aggies,0,1,wikipedia
+2007,Utah Utes,1,1,wikipedia
+2007,Vanderbilt Commodores,1,1,wikipedia
+2007,Virginia Cavaliers,1,1,wikipedia
+2007,Virginia Tech Hokies,1,1,wikipedia
+2007,Wake Forest Demon Deacons,1,1,wikipedia
+2007,Washington Huskies,1,1,wikipedia
+2007,Washington State Cougars,1,0,wikipedia
+2007,West Virginia Mountaineers,1,1,wikipedia
+2007,Western Kentucky Hilltoppers,0,0,wikipedia
+2007,Western Michigan Broncos,0,0,wikipedia
+2007,Wisconsin Badgers,1,1,wikipedia
+2007,Wyoming Cowboys,1,1,wikipedia
+2008,Air Force Falcons,1,1,wikipedia
+2008,Akron Zips,1,1,wikipedia
+2008,Alabama Crimson Tide,0,0,wikipedia
+2008,Arizona State Sun Devils,1,1,wikipedia
+2008,Arizona Wildcats,1,1,wikipedia
+2008,Arkansas Razorbacks,0,0,wikipedia
+2008,Arkansas State Red Wolves,1,1,wikipedia
+2008,Army Black Knights,1,1,wikipedia
+2008,Auburn Tigers,1,0,wikipedia
+2008,BYU Cougars,1,0,wikipedia
+2008,Ball State Cardinals,1,1,wikipedia
+2008,Baylor Bears,0,0,wikipedia
+2008,Boise State Broncos,1,1,wikipedia
+2008,Boston College Eagles,1,1,wikipedia
+2008,Bowling Green Falcons,0,1,wikipedia
+2008,Buffalo Bulls,0,0,wikipedia
+2008,California Golden Bears,0,1,wikipedia
+2008,Central Michigan Chippewas,1,1,wikipedia
+2008,Cincinnati Bearcats,1,1,wikipedia
+2008,Clemson Tigers,1,1,wikipedia
+2008,Colorado Buffaloes,1,1,wikipedia
+2008,Colorado State Rams,0,0,wikipedia
+2008,Duke Blue Devils,0,0,wikipedia
+2008,East Carolina Pirates,1,1,wikipedia
+2008,Eastern Michigan Eagles,1,0,wikipedia
+2008,Florida Atlantic Owls,1,1,wikipedia
+2008,Florida Gators,1,1,wikipedia
+2008,Florida International Panthers,0,1,wikipedia
+2008,Florida State Seminoles,1,1,wikipedia
+2008,Fresno State Bulldogs,0,1,wikipedia
+2008,Georgia Bulldogs,1,1,wikipedia
+2008,Georgia Tech Yellow Jackets,0,0,wikipedia
+2008,Hawai'i Rainbow Warriors,0,0,wikipedia
+2008,Houston Cougars,0,0,wikipedia
+2008,Illinois Fighting Illini,1,1,wikipedia
+2008,Indiana Hoosiers,1,1,wikipedia
+2008,Iowa Hawkeyes,1,1,wikipedia
+2008,Iowa State Cyclones,1,1,wikipedia
+2008,Kansas Jayhawks,1,1,wikipedia
+2008,Kansas State Wildcats,0,1,wikipedia
+2008,Kent State Golden Flashes,0,1,wikipedia
+2008,Kentucky Wildcats,1,1,wikipedia
+2008,LSU Tigers,1,0,wikipedia
+2008,Louisiana Ragin' Cajuns,0,1,wikipedia
+2008,Louisiana Tech Bulldogs,1,1,wikipedia
+2008,Louisville Cardinals,0,0,wikipedia
+2008,Marshall Thundering Herd,0,0,wikipedia
+2008,Maryland Terrapins,0,1,wikipedia
+2008,Memphis Tigers,1,0,wikipedia
+2008,Miami (OH) RedHawks,0,0,wikipedia
+2008,Miami Hurricanes,1,0,wikipedia
+2008,Michigan State Spartans,1,1,wikipedia
+2008,Michigan Wolverines,0,0,wikipedia
+2008,Middle Tennessee Blue Raiders,1,1,wikipedia
+2008,Minnesota Golden Gophers,1,0,wikipedia
+2008,Mississippi State Bulldogs,1,0,wikipedia
+2008,Missouri Tigers,1,1,wikipedia
+2008,NC State Wolfpack,1,1,wikipedia
+2008,Navy Midshipmen,0,1,wikipedia
+2008,Nebraska Cornhuskers,1,0,wikipedia
+2008,Nevada Wolf Pack,1,0,wikipedia
+2008,New Mexico Lobos,1,0,wikipedia
+2008,New Mexico State Aggies,1,0,wikipedia
+2008,North Carolina Tar Heels,1,0,wikipedia
+2008,North Texas Mean Green,1,0,wikipedia
+2008,Northern Illinois Huskies,0,0,wikipedia
+2008,Northwestern Wildcats,0,0,wikipedia
+2008,Notre Dame Fighting Irish,1,1,wikipedia
+2008,Ohio Bobcats,1,1,wikipedia
+2008,Ohio State Buckeyes,1,1,wikipedia
+2008,Oklahoma Sooners,1,1,wikipedia
+2008,Oklahoma State Cowboys,0,1,wikipedia
+2008,Ole Miss Rebels,0,0,wikipedia
+2008,Oregon Ducks,1,1,wikipedia
+2008,Oregon State Beavers,1,1,wikipedia
+2008,Penn State Nittany Lions,1,1,wikipedia
+2008,Pittsburgh Panthers,1,0,wikipedia
+2008,Purdue Boilermakers,1,1,wikipedia
+2008,Rice Owls,1,1,wikipedia
+2008,Rutgers Scarlet Knights,1,0,wikipedia
+2008,SMU Mustangs,0,0,wikipedia
+2008,San Diego State Aztecs,1,1,wikipedia
+2008,San José State Spartans,1,0,wikipedia
+2008,South Carolina Gamecocks,0,0,wikipedia
+2008,South Florida Bulls,1,1,wikipedia
+2008,Southern Miss Golden Eagles,0,0,wikipedia
+2008,Stanford Cardinal,1,0,wikipedia
+2008,Syracuse Orange,0,0,wikipedia
+2008,TCU Horned Frogs,1,1,wikipedia
+2008,Temple Owls,0,1,wikipedia
+2008,Tennessee Volunteers,0,1,wikipedia
+2008,Texas A&M Aggies,0,0,wikipedia
+2008,Texas Longhorns,1,0,wikipedia
+2008,Texas Tech Red Raiders,0,1,wikipedia
+2008,Toledo Rockets,0,1,wikipedia
+2008,Troy Trojans,0,1,wikipedia
+2008,Tulane Green Wave,1,0,wikipedia
+2008,Tulsa Golden Hurricane,1,1,wikipedia
+2008,UAB Blazers,1,1,wikipedia
+2008,UCF Knights,1,0,wikipedia
+2008,UCLA Bruins,0,1,wikipedia
+2008,UConn Huskies,1,1,wikipedia
+2008,UL Monroe Warhawks,1,0,wikipedia
+2008,UNLV Rebels,1,0,wikipedia
+2008,USC Trojans,1,1,wikipedia
+2008,UTEP Miners,0,0,wikipedia
+2008,Utah State Aggies,1,1,wikipedia
+2008,Utah Utes,1,1,wikipedia
+2008,Vanderbilt Commodores,1,1,wikipedia
+2008,Virginia Cavaliers,1,0,wikipedia
+2008,Virginia Tech Hokies,1,1,wikipedia
+2008,Wake Forest Demon Deacons,1,0,wikipedia
+2008,Washington Huskies,1,0,wikipedia
+2008,Washington State Cougars,0,0,wikipedia
+2008,West Virginia Mountaineers,0,1,wikipedia
+2008,Western Kentucky Hilltoppers,1,0,wikipedia
+2008,Western Michigan Broncos,0,0,wikipedia
+2008,Wisconsin Badgers,1,0,wikipedia
+2008,Wyoming Cowboys,0,1,wikipedia
+2009,Air Force Falcons,1,1,wikipedia
+2009,Akron Zips,0,1,wikipedia
+2009,Alabama Crimson Tide,1,1,wikipedia
+2009,Arizona State Sun Devils,1,1,wikipedia
+2009,Arizona Wildcats,1,1,wikipedia
+2009,Arkansas Razorbacks,1,1,wikipedia
+2009,Arkansas State Red Wolves,1,1,wikipedia
+2009,Army Black Knights,0,0,wikipedia
+2009,Auburn Tigers,0,0,wikipedia
+2009,BYU Cougars,1,1,wikipedia
+2009,Ball State Cardinals,0,0,wikipedia
+2009,Baylor Bears,1,1,wikipedia
+2009,Boise State Broncos,1,1,wikipedia
+2009,Boston College Eagles,0,0,wikipedia
+2009,Bowling Green Falcons,0,0,wikipedia
+2009,Buffalo Bulls,0,0,wikipedia
+2009,California Golden Bears,0,1,wikipedia
+2009,Central Michigan Chippewas,1,1,wikipedia
+2009,Cincinnati Bearcats,1,0,wikipedia
+2009,Clemson Tigers,1,0,wikipedia
+2009,Colorado Buffaloes,0,1,wikipedia
+2009,Colorado State Rams,1,1,wikipedia
+2009,Duke Blue Devils,1,1,wikipedia
+2009,East Carolina Pirates,1,1,wikipedia
+2009,Eastern Michigan Eagles,0,0,wikipedia
+2009,Florida Atlantic Owls,0,1,wikipedia
+2009,Florida Gators,0,1,wikipedia
+2009,Florida International Panthers,1,1,wikipedia
+2009,Florida State Seminoles,1,1,wikipedia
+2009,Fresno State Bulldogs,0,0,wikipedia
+2009,Georgia Bulldogs,1,1,wikipedia
+2009,Georgia Tech Yellow Jackets,0,1,wikipedia
+2009,Hawai'i Rainbow Warriors,1,1,wikipedia
+2009,Houston Cougars,1,1,wikipedia
+2009,Illinois Fighting Illini,0,1,wikipedia
+2009,Indiana Hoosiers,1,1,wikipedia
+2009,Iowa Hawkeyes,1,1,wikipedia
+2009,Iowa State Cyclones,0,0,wikipedia
+2009,Kansas Jayhawks,1,1,wikipedia
+2009,Kansas State Wildcats,0,0,wikipedia
+2009,Kent State Golden Flashes,1,1,wikipedia
+2009,Kentucky Wildcats,1,1,wikipedia
+2009,LSU Tigers,1,0,wikipedia
+2009,Louisiana Ragin' Cajuns,1,1,wikipedia
+2009,Louisiana Tech Bulldogs,1,1,wikipedia
+2009,Louisville Cardinals,0,0,wikipedia
+2009,Marshall Thundering Herd,1,1,wikipedia
+2009,Maryland Terrapins,1,0,wikipedia
+2009,Memphis Tigers,1,0,wikipedia
+2009,Miami (OH) RedHawks,0,0,wikipedia
+2009,Miami Hurricanes,0,0,wikipedia
+2009,Michigan State Spartans,1,1,wikipedia
+2009,Michigan Wolverines,1,0,wikipedia
+2009,Middle Tennessee Blue Raiders,0,1,wikipedia
+2009,Minnesota Golden Gophers,0,0,wikipedia
+2009,Mississippi State Bulldogs,0,0,wikipedia
+2009,Missouri Tigers,0,0,wikipedia
+2009,NC State Wolfpack,1,1,wikipedia
+2009,Navy Midshipmen,1,1,wikipedia
+2009,Nebraska Cornhuskers,1,1,wikipedia
+2009,Nevada Wolf Pack,1,1,wikipedia
+2009,New Mexico Lobos,0,0,wikipedia
+2009,New Mexico State Aggies,0,0,wikipedia
+2009,North Carolina Tar Heels,1,1,wikipedia
+2009,North Texas Mean Green,1,1,wikipedia
+2009,Northern Illinois Huskies,1,1,wikipedia
+2009,Northwestern Wildcats,1,1,wikipedia
+2009,Notre Dame Fighting Irish,0,1,wikipedia
+2009,Ohio Bobcats,1,1,wikipedia
+2009,Ohio State Buckeyes,1,1,wikipedia
+2009,Oklahoma Sooners,1,1,wikipedia
+2009,Oklahoma State Cowboys,1,0,wikipedia
+2009,Ole Miss Rebels,1,1,wikipedia
+2009,Oregon Ducks,0,1,wikipedia
+2009,Oregon State Beavers,1,1,wikipedia
+2009,Penn State Nittany Lions,1,1,wikipedia
+2009,Pittsburgh Panthers,0,1,wikipedia
+2009,Purdue Boilermakers,0,0,wikipedia
+2009,Rice Owls,0,1,wikipedia
+2009,Rutgers Scarlet Knights,0,0,wikipedia
+2009,SMU Mustangs,1,1,wikipedia
+2009,San Diego State Aztecs,0,0,wikipedia
+2009,San José State Spartans,1,1,wikipedia
+2009,South Carolina Gamecocks,0,1,wikipedia
+2009,South Florida Bulls,0,0,wikipedia
+2009,Southern Miss Golden Eagles,1,1,wikipedia
+2009,Stanford Cardinal,1,1,wikipedia
+2009,Syracuse Orange,0,0,wikipedia
+2009,TCU Horned Frogs,0,1,wikipedia
+2009,Temple Owls,1,1,wikipedia
+2009,Tennessee Volunteers,0,0,wikipedia
+2009,Texas A&M Aggies,1,1,wikipedia
+2009,Texas Longhorns,1,1,wikipedia
+2009,Texas Tech Red Raiders,0,1,wikipedia
+2009,Toledo Rockets,0,0,wikipedia
+2009,Troy Trojans,1,1,wikipedia
+2009,Tulane Green Wave,1,0,wikipedia
+2009,Tulsa Golden Hurricane,1,1,wikipedia
+2009,UAB Blazers,1,1,wikipedia
+2009,UCF Knights,0,1,wikipedia
+2009,UCLA Bruins,1,0,wikipedia
+2009,UConn Huskies,0,1,wikipedia
+2009,UL Monroe Warhawks,0,0,wikipedia
+2009,UNLV Rebels,1,1,wikipedia
+2009,USC Trojans,0,0,wikipedia
+2009,UTEP Miners,1,1,wikipedia
+2009,Utah State Aggies,0,0,wikipedia
+2009,Utah Utes,0,0,wikipedia
+2009,Vanderbilt Commodores,1,0,wikipedia
+2009,Virginia Cavaliers,0,0,wikipedia
+2009,Virginia Tech Hokies,1,1,wikipedia
+2009,Wake Forest Demon Deacons,1,1,wikipedia
+2009,Washington Huskies,0,0,wikipedia
+2009,Washington State Cougars,1,1,wikipedia
+2009,West Virginia Mountaineers,1,1,wikipedia
+2009,Western Kentucky Hilltoppers,0,0,wikipedia
+2009,Western Michigan Broncos,0,1,wikipedia
+2009,Wisconsin Badgers,1,1,wikipedia
+2009,Wyoming Cowboys,0,0,wikipedia
+2010,Air Force Falcons,1,1,wikipedia
+2010,Akron Zips,0,0,wikipedia
+2010,Alabama Crimson Tide,1,1,wikipedia
+2010,Arizona State Sun Devils,0,1,wikipedia
+2010,Arizona Wildcats,0,0,wikipedia
+2010,Arkansas Razorbacks,0,1,wikipedia
+2010,Arkansas State Red Wolves,0,1,wikipedia
+2010,Army Black Knights,1,1,wikipedia
+2010,Auburn Tigers,1,1,wikipedia
+2010,BYU Cougars,1,1,wikipedia
+2010,Ball State Cardinals,1,0,wikipedia
+2010,Baylor Bears,1,1,wikipedia
+2010,Boise State Broncos,1,0,wikipedia
+2010,Boston College Eagles,1,1,wikipedia
+2010,Bowling Green Falcons,1,0,wikipedia
+2010,Buffalo Bulls,0,0,wikipedia
+2010,California Golden Bears,1,0,wikipedia
+2010,Central Michigan Chippewas,0,0,wikipedia
+2010,Cincinnati Bearcats,0,0,wikipedia
+2010,Clemson Tigers,1,1,wikipedia
+2010,Colorado Buffaloes,1,1,wikipedia
+2010,Colorado State Rams,0,1,wikipedia
+2010,Duke Blue Devils,1,0,wikipedia
+2010,East Carolina Pirates,0,0,wikipedia
+2010,Eastern Michigan Eagles,1,0,wikipedia
+2010,Florida Atlantic Owls,1,0,wikipedia
+2010,Florida Gators,1,0,wikipedia
+2010,Florida International Panthers,0,0,wikipedia
+2010,Florida State Seminoles,0,0,wikipedia
+2010,Fresno State Bulldogs,0,1,wikipedia
+2010,Georgia Bulldogs,1,0,wikipedia
+2010,Georgia Tech Yellow Jackets,0,0,wikipedia
+2010,Hawai'i Rainbow Warriors,0,0,wikipedia
+2010,Houston Cougars,0,0,wikipedia
+2010,Illinois Fighting Illini,0,0,wikipedia
+2010,Indiana Hoosiers,1,1,wikipedia
+2010,Iowa Hawkeyes,1,1,wikipedia
+2010,Iowa State Cyclones,1,1,wikipedia
+2010,Kansas Jayhawks,0,0,wikipedia
+2010,Kansas State Wildcats,1,1,wikipedia
+2010,Kent State Golden Flashes,0,1,wikipedia
+2010,Kentucky Wildcats,0,1,wikipedia
+2010,LSU Tigers,1,1,wikipedia
+2010,Louisiana Ragin' Cajuns,1,1,wikipedia
+2010,Louisiana Tech Bulldogs,0,1,wikipedia
+2010,Louisville Cardinals,0,0,wikipedia
+2010,Marshall Thundering Herd,0,0,wikipedia
+2010,Maryland Terrapins,1,1,wikipedia
+2010,Memphis Tigers,0,0,wikipedia
+2010,Miami (OH) RedHawks,0,1,wikipedia
+2010,Miami Hurricanes,1,1,wikipedia
+2010,Michigan State Spartans,1,1,wikipedia
+2010,Michigan Wolverines,1,1,wikipedia
+2010,Middle Tennessee Blue Raiders,0,0,wikipedia
+2010,Minnesota Golden Gophers,0,1,wikipedia
+2010,Mississippi State Bulldogs,1,0,wikipedia
+2010,Missouri Tigers,1,1,wikipedia
+2010,NC State Wolfpack,1,1,wikipedia
+2010,Navy Midshipmen,1,1,wikipedia
+2010,Nebraska Cornhuskers,1,1,wikipedia
+2010,Nevada Wolf Pack,0,0,wikipedia
+2010,New Mexico Lobos,1,1,wikipedia
+2010,New Mexico State Aggies,0,0,wikipedia
+2010,North Carolina Tar Heels,1,1,wikipedia
+2010,North Texas Mean Green,0,1,wikipedia
+2010,Northern Illinois Huskies,1,1,wikipedia
+2010,Northwestern Wildcats,1,1,wikipedia
+2010,Notre Dame Fighting Irish,0,0,wikipedia
+2010,Ohio Bobcats,1,1,wikipedia
+2010,Ohio State Buckeyes,1,1,wikipedia
+2010,Oklahoma Sooners,1,1,wikipedia
+2010,Oklahoma State Cowboys,0,1,wikipedia
+2010,Ole Miss Rebels,0,1,wikipedia
+2010,Oregon Ducks,1,1,wikipedia
+2010,Oregon State Beavers,1,1,wikipedia
+2010,Penn State Nittany Lions,1,1,wikipedia
+2010,Pittsburgh Panthers,1,1,wikipedia
+2010,Purdue Boilermakers,1,0,wikipedia
+2010,Rice Owls,0,1,wikipedia
+2010,Rutgers Scarlet Knights,1,1,wikipedia
+2010,SMU Mustangs,0,1,wikipedia
+2010,San Diego State Aztecs,1,1,wikipedia
+2010,San José State Spartans,0,0,wikipedia
+2010,South Carolina Gamecocks,0,1,wikipedia
+2010,South Florida Bulls,0,0,wikipedia
+2010,Southern Miss Golden Eagles,0,1,wikipedia
+2010,Stanford Cardinal,1,0,wikipedia
+2010,Syracuse Orange,0,1,wikipedia
+2010,TCU Horned Frogs,1,1,wikipedia
+2010,Temple Owls,1,1,wikipedia
+2010,Tennessee Volunteers,1,0,wikipedia
+2010,Texas A&M Aggies,0,0,wikipedia
+2010,Texas Longhorns,1,1,wikipedia
+2010,Texas Tech Red Raiders,0,0,wikipedia
+2010,Toledo Rockets,0,0,wikipedia
+2010,Troy Trojans,0,1,wikipedia
+2010,Tulane Green Wave,1,1,wikipedia
+2010,Tulsa Golden Hurricane,0,1,wikipedia
+2010,UAB Blazers,1,1,wikipedia
+2010,UCF Knights,1,1,wikipedia
+2010,UCLA Bruins,1,1,wikipedia
+2010,UConn Huskies,1,1,wikipedia
+2010,UL Monroe Warhawks,0,1,wikipedia
+2010,UNLV Rebels,0,0,wikipedia
+2010,USC Trojans,0,0,wikipedia
+2010,UTEP Miners,1,0,wikipedia
+2010,Utah State Aggies,1,1,wikipedia
+2010,Utah Utes,1,1,wikipedia
+2010,Vanderbilt Commodores,0,1,wikipedia
+2010,Virginia Cavaliers,0,0,wikipedia
+2010,Virginia Tech Hokies,1,1,wikipedia
+2010,Wake Forest Demon Deacons,1,1,wikipedia
+2010,Washington Huskies,1,1,wikipedia
+2010,Washington State Cougars,1,1,wikipedia
+2010,West Virginia Mountaineers,1,1,wikipedia
+2010,Western Kentucky Hilltoppers,0,0,wikipedia
+2010,Western Michigan Broncos,0,0,wikipedia
+2010,Wisconsin Badgers,1,1,wikipedia
+2010,Wyoming Cowboys,1,1,wikipedia
+2011,Air Force Falcons,1,1,wikipedia
+2011,Akron Zips,1,0,wikipedia
+2011,Alabama Crimson Tide,1,1,wikipedia
+2011,Arizona State Sun Devils,1,1,wikipedia
+2011,Arizona Wildcats,1,1,wikipedia
+2011,Arkansas Razorbacks,1,1,wikipedia
+2011,Arkansas State Red Wolves,0,0,wikipedia
+2011,Army Black Knights,1,1,wikipedia
+2011,Auburn Tigers,1,1,wikipedia
+2011,BYU Cougars,0,0,wikipedia
+2011,Ball State Cardinals,0,0,wikipedia
+2011,Baylor Bears,1,0,wikipedia
+2011,Boise State Broncos,0,1,wikipedia
+2011,Boston College Eagles,0,1,wikipedia
+2011,Bowling Green Falcons,1,1,wikipedia
+2011,Buffalo Bulls,0,1,wikipedia
+2011,California Golden Bears,0,1,wikipedia
+2011,Central Michigan Chippewas,1,1,wikipedia
+2011,Cincinnati Bearcats,1,1,wikipedia
+2011,Clemson Tigers,0,1,wikipedia
+2011,Colorado Buffaloes,0,0,wikipedia
+2011,Colorado State Rams,1,1,wikipedia
+2011,Duke Blue Devils,1,1,wikipedia
+2011,East Carolina Pirates,1,1,wikipedia
+2011,Eastern Michigan Eagles,1,1,wikipedia
+2011,Florida Atlantic Owls,1,1,wikipedia
+2011,Florida Gators,0,0,wikipedia
+2011,Florida International Panthers,1,0,wikipedia
+2011,Florida State Seminoles,1,1,wikipedia
+2011,Fresno State Bulldogs,0,1,wikipedia
+2011,Georgia Bulldogs,1,1,wikipedia
+2011,Georgia Tech Yellow Jackets,0,1,wikipedia
+2011,Hawai'i Rainbow Warriors,1,1,wikipedia
+2011,Houston Cougars,1,1,wikipedia
+2011,Illinois Fighting Illini,1,1,wikipedia
+2011,Indiana Hoosiers,0,0,wikipedia
+2011,Iowa Hawkeyes,1,1,wikipedia
+2011,Iowa State Cyclones,1,1,wikipedia
+2011,Kansas Jayhawks,1,0,wikipedia
+2011,Kansas State Wildcats,1,1,wikipedia
+2011,Kent State Golden Flashes,0,0,wikipedia
+2011,Kentucky Wildcats,1,0,wikipedia
+2011,LSU Tigers,0,1,wikipedia
+2011,Louisiana Ragin' Cajuns,0,0,wikipedia
+2011,Louisiana Tech Bulldogs,1,1,wikipedia
+2011,Louisville Cardinals,1,1,wikipedia
+2011,Marshall Thundering Herd,1,1,wikipedia
+2011,Maryland Terrapins,0,0,wikipedia
+2011,Memphis Tigers,1,1,wikipedia
+2011,Miami (OH) RedHawks,0,0,wikipedia
+2011,Miami Hurricanes,0,0,wikipedia
+2011,Michigan State Spartans,0,1,wikipedia
+2011,Michigan Wolverines,0,0,wikipedia
+2011,Middle Tennessee Blue Raiders,0,0,wikipedia
+2011,Minnesota Golden Gophers,0,0,wikipedia
+2011,Mississippi State Bulldogs,1,1,wikipedia
+2011,Missouri Tigers,1,1,wikipedia
+2011,NC State Wolfpack,1,1,wikipedia
+2011,Navy Midshipmen,1,1,wikipedia
+2011,Nebraska Cornhuskers,0,1,wikipedia
+2011,Nevada Wolf Pack,0,1,wikipedia
+2011,New Mexico Lobos,0,0,wikipedia
+2011,New Mexico State Aggies,0,0,wikipedia
+2011,North Carolina Tar Heels,1,0,wikipedia
+2011,North Texas Mean Green,1,0,wikipedia
+2011,Northern Illinois Huskies,0,0,wikipedia
+2011,Northwestern Wildcats,1,1,wikipedia
+2011,Notre Dame Fighting Irish,1,1,wikipedia
+2011,Ohio Bobcats,1,1,wikipedia
+2011,Ohio State Buckeyes,1,1,wikipedia
+2011,Oklahoma Sooners,1,1,wikipedia
+2011,Oklahoma State Cowboys,0,1,wikipedia
+2011,Ole Miss Rebels,0,1,wikipedia
+2011,Oregon Ducks,1,1,wikipedia
+2011,Oregon State Beavers,1,1,wikipedia
+2011,Penn State Nittany Lions,1,1,wikipedia
+2011,Pittsburgh Panthers,0,0,wikipedia
+2011,Purdue Boilermakers,1,1,wikipedia
+2011,Rice Owls,0,1,wikipedia
+2011,Rutgers Scarlet Knights,0,1,wikipedia
+2011,SMU Mustangs,0,1,wikipedia
+2011,San Diego State Aztecs,0,0,wikipedia
+2011,San José State Spartans,0,1,wikipedia
+2011,South Carolina Gamecocks,0,1,wikipedia
+2011,South Florida Bulls,1,1,wikipedia
+2011,Southern Miss Golden Eagles,1,0,wikipedia
+2011,Stanford Cardinal,0,0,wikipedia
+2011,Syracuse Orange,0,1,wikipedia
+2011,TCU Horned Frogs,1,1,wikipedia
+2011,Temple Owls,0,0,wikipedia
+2011,Tennessee Volunteers,1,1,wikipedia
+2011,Texas A&M Aggies,0,1,wikipedia
+2011,Texas Longhorns,0,0,wikipedia
+2011,Texas Tech Red Raiders,1,0,wikipedia
+2011,Toledo Rockets,0,0,wikipedia
+2011,Troy Trojans,1,1,wikipedia
+2011,Tulane Green Wave,0,1,wikipedia
+2011,Tulsa Golden Hurricane,0,0,wikipedia
+2011,UAB Blazers,1,0,wikipedia
+2011,UCF Knights,1,0,wikipedia
+2011,UCLA Bruins,0,0,wikipedia
+2011,UConn Huskies,0,0,wikipedia
+2011,UL Monroe Warhawks,1,1,wikipedia
+2011,UNLV Rebels,1,1,wikipedia
+2011,USC Trojans,0,1,wikipedia
+2011,UTEP Miners,1,1,wikipedia
+2011,Utah State Aggies,1,0,wikipedia
+2011,Utah Utes,0,1,wikipedia
+2011,Vanderbilt Commodores,0,0,wikipedia
+2011,Virginia Cavaliers,1,1,wikipedia
+2011,Virginia Tech Hokies,1,1,wikipedia
+2011,Wake Forest Demon Deacons,1,0,wikipedia
+2011,Washington Huskies,1,1,wikipedia
+2011,Washington State Cougars,1,1,wikipedia
+2011,West Virginia Mountaineers,0,1,wikipedia
+2011,Western Kentucky Hilltoppers,0,0,wikipedia
+2011,Western Michigan Broncos,0,1,wikipedia
+2011,Wisconsin Badgers,1,0,wikipedia
+2011,Wyoming Cowboys,0,1,wikipedia
+2012,Air Force Falcons,1,1,wikipedia
+2012,Akron Zips,0,0,wikipedia
+2012,Alabama Crimson Tide,0,1,wikipedia
+2012,Arizona State Sun Devils,0,0,wikipedia
+2012,Arizona Wildcats,0,0,wikipedia
+2012,Arkansas Razorbacks,0,0,wikipedia
+2012,Arkansas State Red Wolves,0,0,wikipedia
+2012,Army Black Knights,1,1,wikipedia
+2012,Auburn Tigers,0,0,wikipedia
+2012,BYU Cougars,1,0,wikipedia
+2012,Ball State Cardinals,1,1,wikipedia
+2012,Baylor Bears,1,1,wikipedia
+2012,Boise State Broncos,0,1,wikipedia
+2012,Boston College Eagles,0,1,wikipedia
+2012,Bowling Green Falcons,1,1,wikipedia
+2012,Buffalo Bulls,1,0,wikipedia
+2012,California Golden Bears,1,1,wikipedia
+2012,Central Michigan Chippewas,1,1,wikipedia
+2012,Cincinnati Bearcats,1,1,wikipedia
+2012,Clemson Tigers,1,1,wikipedia
+2012,Colorado Buffaloes,1,1,wikipedia
+2012,Colorado State Rams,0,0,wikipedia
+2012,Duke Blue Devils,1,1,wikipedia
+2012,East Carolina Pirates,1,1,wikipedia
+2012,Eastern Michigan Eagles,1,1,wikipedia
+2012,Florida Atlantic Owls,0,0,wikipedia
+2012,Florida Gators,0,1,wikipedia
+2012,Florida International Panthers,0,1,wikipedia
+2012,Florida State Seminoles,1,1,wikipedia
+2012,Fresno State Bulldogs,0,0,wikipedia
+2012,Georgia Bulldogs,1,1,wikipedia
+2012,Georgia Tech Yellow Jackets,0,1,wikipedia
+2012,Hawai'i Rainbow Warriors,0,0,wikipedia
+2012,Houston Cougars,0,0,wikipedia
+2012,Illinois Fighting Illini,0,0,wikipedia
+2012,Indiana Hoosiers,1,1,wikipedia
+2012,Iowa Hawkeyes,0,0,wikipedia
+2012,Iowa State Cyclones,0,1,wikipedia
+2012,Kansas Jayhawks,0,0,wikipedia
+2012,Kansas State Wildcats,1,0,wikipedia
+2012,Kent State Golden Flashes,1,1,wikipedia
+2012,Kentucky Wildcats,1,1,wikipedia
+2012,LSU Tigers,1,1,wikipedia
+2012,Louisiana Ragin' Cajuns,1,1,wikipedia
+2012,Louisiana Tech Bulldogs,1,1,wikipedia
+2012,Louisville Cardinals,1,1,wikipedia
+2012,Marshall Thundering Herd,1,1,wikipedia
+2012,Maryland Terrapins,0,0,wikipedia
+2012,Massachusetts Minutemen,0,0,wikipedia
+2012,Memphis Tigers,0,0,wikipedia
+2012,Miami (OH) RedHawks,1,0,wikipedia
+2012,Miami Hurricanes,1,1,wikipedia
+2012,Michigan State Spartans,1,1,wikipedia
+2012,Michigan Wolverines,1,1,wikipedia
+2012,Middle Tennessee Blue Raiders,0,1,wikipedia
+2012,Minnesota Golden Gophers,1,1,wikipedia
+2012,Mississippi State Bulldogs,1,1,wikipedia
+2012,Missouri Tigers,1,1,wikipedia
+2012,NC State Wolfpack,1,1,wikipedia
+2012,Navy Midshipmen,1,1,wikipedia
+2012,Nebraska Cornhuskers,1,0,wikipedia
+2012,Nevada Wolf Pack,0,0,wikipedia
+2012,New Mexico Lobos,0,0,wikipedia
+2012,New Mexico State Aggies,0,0,wikipedia
+2012,North Carolina Tar Heels,0,0,wikipedia
+2012,North Texas Mean Green,1,0,wikipedia
+2012,Northern Illinois Huskies,0,1,wikipedia
+2012,Northwestern Wildcats,1,1,wikipedia
+2012,Notre Dame Fighting Irish,0,1,wikipedia
+2012,Ohio Bobcats,1,1,wikipedia
+2012,Ohio State Buckeyes,0,0,wikipedia
+2012,Oklahoma Sooners,1,0,wikipedia
+2012,Oklahoma State Cowboys,1,1,wikipedia
+2012,Ole Miss Rebels,0,0,wikipedia
+2012,Oregon Ducks,1,1,wikipedia
+2012,Oregon State Beavers,1,1,wikipedia
+2012,Penn State Nittany Lions,0,0,wikipedia
+2012,Pittsburgh Panthers,0,0,wikipedia
+2012,Purdue Boilermakers,1,0,wikipedia
+2012,Rice Owls,1,0,wikipedia
+2012,Rutgers Scarlet Knights,0,0,wikipedia
+2012,SMU Mustangs,0,1,wikipedia
+2012,San Diego State Aztecs,1,0,wikipedia
+2012,San José State Spartans,0,1,wikipedia
+2012,South Alabama Jaguars,0,0,wikipedia
+2012,South Carolina Gamecocks,0,0,wikipedia
+2012,South Florida Bulls,1,0,wikipedia
+2012,Southern Miss Golden Eagles,0,0,wikipedia
+2012,Stanford Cardinal,1,1,wikipedia
+2012,Syracuse Orange,1,1,wikipedia
+2012,TCU Horned Frogs,1,1,wikipedia
+2012,Temple Owls,0,1,wikipedia
+2012,Tennessee Volunteers,1,0,wikipedia
+2012,Texas A&M Aggies,0,0,wikipedia
+2012,Texas Longhorns,1,1,wikipedia
+2012,Texas State Bobcats,0,0,wikipedia
+2012,Texas Tech Red Raiders,1,0,wikipedia
+2012,Toledo Rockets,0,0,wikipedia
+2012,Troy Trojans,1,1,wikipedia
+2012,Tulane Green Wave,0,0,wikipedia
+2012,Tulsa Golden Hurricane,1,1,wikipedia
+2012,UAB Blazers,0,0,wikipedia
+2012,UCF Knights,1,0,wikipedia
+2012,UCLA Bruins,0,0,wikipedia
+2012,UConn Huskies,1,1,wikipedia
+2012,UL Monroe Warhawks,1,1,wikipedia
+2012,UNLV Rebels,0,0,wikipedia
+2012,USC Trojans,1,1,wikipedia
+2012,UTEP Miners,0,1,wikipedia
+2012,UTSA Roadrunners,0,0,wikipedia
+2012,Utah State Aggies,0,0,wikipedia
+2012,Utah Utes,0,1,wikipedia
+2012,Vanderbilt Commodores,1,1,wikipedia
+2012,Virginia Cavaliers,1,1,wikipedia
+2012,Virginia Tech Hokies,1,1,wikipedia
+2012,Wake Forest Demon Deacons,1,1,wikipedia
+2012,Washington Huskies,0,0,wikipedia
+2012,Washington State Cougars,0,0,wikipedia
+2012,West Virginia Mountaineers,0,0,wikipedia
+2012,Western Kentucky Hilltoppers,0,1,wikipedia
+2012,Western Michigan Broncos,0,0,wikipedia
+2012,Wisconsin Badgers,0,1,wikipedia
+2012,Wyoming Cowboys,1,0,wikipedia
+2013,Air Force Falcons,1,1,wikipedia
+2013,Akron Zips,0,1,wikipedia
+2013,Alabama Crimson Tide,1,1,wikipedia
+2013,Arizona State Sun Devils,1,1,wikipedia
+2013,Arizona Wildcats,1,1,wikipedia
+2013,Arkansas Razorbacks,0,0,wikipedia
+2013,Arkansas State Red Wolves,0,1,wikipedia
+2013,Army Black Knights,1,1,wikipedia
+2013,Auburn Tigers,0,0,wikipedia
+2013,BYU Cougars,0,0,wikipedia
+2013,Ball State Cardinals,1,1,wikipedia
+2013,Baylor Bears,1,1,wikipedia
+2013,Boise State Broncos,1,1,wikipedia
+2013,Boston College Eagles,0,0,wikipedia
+2013,Bowling Green Falcons,1,1,wikipedia
+2013,Buffalo Bulls,1,1,wikipedia
+2013,California Golden Bears,0,0,wikipedia
+2013,Central Michigan Chippewas,1,1,wikipedia
+2013,Cincinnati Bearcats,0,0,wikipedia
+2013,Clemson Tigers,1,1,wikipedia
+2013,Colorado Buffaloes,0,0,wikipedia
+2013,Colorado State Rams,1,1,wikipedia
+2013,Duke Blue Devils,1,1,wikipedia
+2013,East Carolina Pirates,1,0,wikipedia
+2013,Eastern Michigan Eagles,0,0,wikipedia
+2013,Florida Atlantic Owls,1,1,wikipedia
+2013,Florida Gators,1,0,wikipedia
+2013,Florida International Panthers,0,0,wikipedia
+2013,Florida State Seminoles,0,0,wikipedia
+2013,Fresno State Bulldogs,1,1,wikipedia
+2013,Georgia Bulldogs,1,1,wikipedia
+2013,Georgia State Panthers,0,0,wikipedia
+2013,Georgia Tech Yellow Jackets,0,0,wikipedia
+2013,Hawai'i Rainbow Warriors,0,1,wikipedia
+2013,Houston Cougars,0,0,wikipedia
+2013,Idaho Vandals,0,0,wikipedia
+2013,Illinois Fighting Illini,0,1,wikipedia
+2013,Indiana Hoosiers,1,1,wikipedia
+2013,Iowa Hawkeyes,1,1,wikipedia
+2013,Iowa State Cyclones,1,1,wikipedia
+2013,Kansas Jayhawks,0,1,wikipedia
+2013,Kansas State Wildcats,1,1,wikipedia
+2013,Kent State Golden Flashes,1,0,wikipedia
+2013,Kentucky Wildcats,0,0,wikipedia
+2013,LSU Tigers,0,1,wikipedia
+2013,Louisiana Ragin' Cajuns,1,0,wikipedia
+2013,Louisiana Tech Bulldogs,0,0,wikipedia
+2013,Louisville Cardinals,1,1,wikipedia
+2013,Marshall Thundering Herd,1,0,wikipedia
+2013,Maryland Terrapins,1,1,wikipedia
+2013,Massachusetts Minutemen,0,1,wikipedia
+2013,Memphis Tigers,1,1,wikipedia
+2013,Miami (OH) RedHawks,1,1,wikipedia
+2013,Miami Hurricanes,0,1,wikipedia
+2013,Michigan State Spartans,0,1,wikipedia
+2013,Michigan Wolverines,1,1,wikipedia
+2013,Middle Tennessee Blue Raiders,1,1,wikipedia
+2013,Minnesota Golden Gophers,1,1,wikipedia
+2013,Mississippi State Bulldogs,1,1,wikipedia
+2013,Missouri Tigers,0,1,wikipedia
+2013,NC State Wolfpack,0,0,wikipedia
+2013,Navy Midshipmen,1,1,wikipedia
+2013,Nebraska Cornhuskers,1,1,wikipedia
+2013,Nevada Wolf Pack,1,0,wikipedia
+2013,New Mexico Lobos,1,1,wikipedia
+2013,New Mexico State Aggies,0,1,wikipedia
+2013,North Carolina Tar Heels,1,1,wikipedia
+2013,North Texas Mean Green,1,1,wikipedia
+2013,Northern Illinois Huskies,0,1,wikipedia
+2013,Northwestern Wildcats,1,1,wikipedia
+2013,Notre Dame Fighting Irish,1,1,wikipedia
+2013,Ohio Bobcats,1,1,wikipedia
+2013,Ohio State Buckeyes,1,1,wikipedia
+2013,Oklahoma Sooners,1,1,wikipedia
+2013,Oklahoma State Cowboys,0,1,wikipedia
+2013,Ole Miss Rebels,1,1,wikipedia
+2013,Oregon Ducks,0,1,wikipedia
+2013,Oregon State Beavers,1,1,wikipedia
+2013,Penn State Nittany Lions,0,0,wikipedia
+2013,Pittsburgh Panthers,1,0,wikipedia
+2013,Purdue Boilermakers,0,0,wikipedia
+2013,Rice Owls,1,1,wikipedia
+2013,Rutgers Scarlet Knights,0,0,wikipedia
+2013,SMU Mustangs,1,1,wikipedia
+2013,San Diego State Aztecs,0,0,wikipedia
+2013,San José State Spartans,0,0,wikipedia
+2013,South Alabama Jaguars,1,0,wikipedia
+2013,South Carolina Gamecocks,1,1,wikipedia
+2013,South Florida Bulls,0,0,wikipedia
+2013,Southern Miss Golden Eagles,0,0,wikipedia
+2013,Stanford Cardinal,0,1,wikipedia
+2013,Syracuse Orange,0,0,wikipedia
+2013,TCU Horned Frogs,1,1,wikipedia
+2013,Temple Owls,0,0,wikipedia
+2013,Tennessee Volunteers,0,0,wikipedia
+2013,Texas A&M Aggies,0,1,wikipedia
+2013,Texas Longhorns,1,0,wikipedia
+2013,Texas State Bobcats,1,1,wikipedia
+2013,Texas Tech Red Raiders,0,0,wikipedia
+2013,Toledo Rockets,0,1,wikipedia
+2013,Troy Trojans,1,0,wikipedia
+2013,Tulane Green Wave,1,1,wikipedia
+2013,Tulsa Golden Hurricane,1,1,wikipedia
+2013,UAB Blazers,0,1,wikipedia
+2013,UCF Knights,1,1,wikipedia
+2013,UCLA Bruins,1,1,wikipedia
+2013,UConn Huskies,0,0,wikipedia
+2013,UL Monroe Warhawks,1,1,wikipedia
+2013,UNLV Rebels,0,0,wikipedia
+2013,USC Trojans,0,0,wikipedia
+2013,UTEP Miners,0,0,wikipedia
+2013,UTSA Roadrunners,1,1,wikipedia
+2013,Utah State Aggies,0,0,wikipedia
+2013,Utah Utes,1,1,wikipedia
+2013,Vanderbilt Commodores,1,1,wikipedia
+2013,Virginia Cavaliers,0,0,wikipedia
+2013,Virginia Tech Hokies,0,1,wikipedia
+2013,Wake Forest Demon Deacons,1,1,wikipedia
+2013,Washington Huskies,1,1,wikipedia
+2013,Washington State Cougars,0,1,wikipedia
+2013,West Virginia Mountaineers,1,1,wikipedia
+2013,Western Kentucky Hilltoppers,0,0,wikipedia
+2013,Western Michigan Broncos,0,0,wikipedia
+2013,Wisconsin Badgers,0,0,wikipedia
+2013,Wyoming Cowboys,0,1,wikipedia
+2014,Air Force Falcons,1,1,imported
+2014,Akron Zips,1,1,imported
+2014,Alabama Crimson Tide,0,1,imported
+2014,App State Mountaineers,0,0,imported
+2014,Arizona State Sun Devils,1,0,imported
+2014,Arizona Wildcats,1,1,imported
+2014,Arkansas Razorbacks,1,0,imported
+2014,Arkansas State Red Wolves,0,0,imported
+2014,Army Black Knights,0,0,imported
+2014,Auburn Tigers,1,1,imported
+2014,BYU Cougars,1,0,imported
+2014,Ball State Cardinals,0,0,imported
+2014,Baylor Bears,1,1,imported
+2014,Boise State Broncos,0,0,imported
+2014,Boston College Eagles,1,1,imported
+2014,Bowling Green Falcons,0,0,imported
+2014,Buffalo Bulls,1,1,imported
+2014,California Golden Bears,1,0,imported
+2014,Central Michigan Chippewas,0,1,imported
+2014,Cincinnati Bearcats,1,0,imported
+2014,Clemson Tigers,1,1,imported
+2014,Colorado Buffaloes,1,1,imported
+2014,Colorado State Rams,1,1,imported
+2014,Duke Blue Devils,0,1,imported
+2014,East Carolina Pirates,1,1,imported
+2014,Eastern Michigan Eagles,0,0,imported
+2014,Florida Atlantic Owls,1,0,imported
+2014,Florida Gators,0,1,imported
+2014,Florida International Panthers,0,1,imported
+2014,Florida State Seminoles,0,0,imported
+2014,Fresno State Bulldogs,1,1,imported
+2014,Georgia Bulldogs,1,0,imported
+2014,Georgia Southern Eagles,0,0,imported
+2014,Georgia State Panthers,1,1,imported
+2014,Georgia Tech Yellow Jackets,1,1,imported
+2014,Hawai'i Rainbow Warriors,1,0,imported
+2014,Houston Cougars,1,1,imported
+2014,Idaho Vandals,1,1,imported
+2014,Illinois Fighting Illini,1,1,imported
+2014,Indiana Hoosiers,0,0,imported
+2014,Iowa Hawkeyes,1,1,imported
+2014,Iowa State Cyclones,0,1,imported
+2014,Kansas Jayhawks,0,0,imported
+2014,Kansas State Wildcats,1,1,imported
+2014,Kent State Golden Flashes,1,1,imported
+2014,Kentucky Wildcats,1,1,imported
+2014,LSU Tigers,1,1,imported
+2014,Louisiana Ragin' Cajuns,1,1,imported
+2014,Louisiana Tech Bulldogs,1,0,imported
+2014,Louisville Cardinals,0,0,imported
+2014,Marshall Thundering Herd,1,1,imported
+2014,Maryland Terrapins,1,1,imported
+2014,Massachusetts Minutemen,0,0,imported
+2014,Memphis Tigers,1,1,imported
+2014,Miami (OH) RedHawks,0,0,imported
+2014,Miami Hurricanes,1,1,imported
+2014,Michigan State Spartans,1,1,imported
+2014,Michigan Wolverines,0,1,imported
+2014,Middle Tennessee Blue Raiders,1,1,imported
+2014,Minnesota Golden Gophers,1,1,imported
+2014,Mississippi State Bulldogs,0,1,imported
+2014,Missouri Tigers,1,1,imported
+2014,NC State Wolfpack,1,1,imported
+2014,Navy Midshipmen,1,1,imported
+2014,Nebraska Cornhuskers,1,1,imported
+2014,Nevada Wolf Pack,1,0,imported
+2014,New Mexico Lobos,1,0,imported
+2014,New Mexico State Aggies,1,0,imported
+2014,North Carolina Tar Heels,0,1,imported
+2014,North Texas Mean Green,1,1,imported
+2014,Northern Illinois Huskies,1,1,imported
+2014,Northwestern Wildcats,1,1,imported
+2014,Notre Dame Fighting Irish,0,0,imported
+2014,Ohio Bobcats,1,1,imported
+2014,Ohio State Buckeyes,1,0,imported
+2014,Oklahoma Sooners,1,1,imported
+2014,Oklahoma State Cowboys,1,0,imported
+2014,Old Dominion Monarchs,0,0,imported
+2014,Ole Miss Rebels,1,1,imported
+2014,Oregon Ducks,1,0,imported
+2014,Oregon State Beavers,0,1,imported
+2014,Penn State Nittany Lions,0,0,imported
+2014,Pittsburgh Panthers,1,1,imported
+2014,Purdue Boilermakers,1,1,imported
+2014,Rice Owls,0,1,imported
+2014,Rutgers Scarlet Knights,0,0,imported
+2014,SMU Mustangs,1,1,imported
+2014,San Diego State Aztecs,1,1,imported
+2014,San José State Spartans,1,0,imported
+2014,South Alabama Jaguars,1,0,imported
+2014,South Carolina Gamecocks,1,1,imported
+2014,South Florida Bulls,0,1,imported
+2014,Southern Miss Golden Eagles,0,1,imported
+2014,Stanford Cardinal,1,0,imported
+2014,Syracuse Orange,1,1,imported
+2014,TCU Horned Frogs,0,1,imported
+2014,Temple Owls,1,1,imported
+2014,Tennessee Volunteers,1,1,imported
+2014,Texas A&M Aggies,1,1,imported
+2014,Texas Longhorns,0,0,imported
+2014,Texas State Bobcats,1,1,imported
+2014,Texas Tech Red Raiders,1,1,imported
+2014,Toledo Rockets,1,0,imported
+2014,Troy Trojans,1,1,imported
+2014,Tulane Green Wave,1,1,imported
+2014,Tulsa Golden Hurricane,0,1,imported
+2014,UAB Blazers,0,0,imported
+2014,UCF Knights,1,0,imported
+2014,UCLA Bruins,1,0,imported
+2014,UConn Huskies,0,0,imported
+2014,UL Monroe Warhawks,1,1,imported
+2014,UNLV Rebels,1,1,imported
+2014,USC Trojans,0,0,imported
+2014,UTEP Miners,1,1,imported
+2014,UTSA Roadrunners,1,1,imported
+2014,Utah State Aggies,1,1,imported
+2014,Utah Utes,0,1,imported
+2014,Vanderbilt Commodores,0,0,imported
+2014,Virginia Cavaliers,1,1,imported
+2014,Virginia Tech Hokies,1,1,imported
+2014,Wake Forest Demon Deacons,0,0,imported
+2014,Washington Huskies,0,0,imported
+2014,Washington State Cougars,1,1,imported
+2014,West Virginia Mountaineers,1,0,imported
+2014,Western Kentucky Hilltoppers,0,1,imported
+2014,Western Michigan Broncos,1,1,imported
+2014,Wisconsin Badgers,1,1,imported
+2014,Wyoming Cowboys,0,0,imported
+2015,Air Force Falcons,1,1,imported
+2015,Akron Zips,1,1,imported
+2015,Alabama Crimson Tide,1,1,imported
+2015,App State Mountaineers,1,1,imported
+2015,Arizona State Sun Devils,1,1,imported
+2015,Arizona Wildcats,1,1,imported
+2015,Arkansas Razorbacks,0,1,imported
+2015,Arkansas State Red Wolves,1,1,imported
+2015,Army Black Knights,1,1,imported
+2015,Auburn Tigers,1,0,imported
+2015,BYU Cougars,1,0,imported
+2015,Ball State Cardinals,1,1,imported
+2015,Baylor Bears,0,1,imported
+2015,Boise State Broncos,0,1,imported
+2015,Boston College Eagles,0,1,imported
+2015,Bowling Green Falcons,0,0,imported
+2015,Buffalo Bulls,0,0,imported
+2015,California Golden Bears,1,1,imported
+2015,Central Michigan Chippewas,1,0,imported
+2015,Charlotte 49ers,0,0,wikipedia
+2015,Cincinnati Bearcats,1,1,imported
+2015,Clemson Tigers,0,1,imported
+2015,Colorado Buffaloes,1,0,imported
+2015,Colorado State Rams,0,0,imported
+2015,Duke Blue Devils,1,1,imported
+2015,East Carolina Pirates,0,1,imported
+2015,Eastern Michigan Eagles,1,1,imported
+2015,Florida Atlantic Owls,1,1,imported
+2015,Florida Gators,0,0,imported
+2015,Florida International Panthers,1,0,imported
+2015,Florida State Seminoles,1,1,imported
+2015,Fresno State Bulldogs,1,1,imported
+2015,Georgia Bulldogs,0,1,imported
+2015,Georgia Southern Eagles,1,1,imported
+2015,Georgia State Panthers,1,1,imported
+2015,Georgia Tech Yellow Jackets,1,1,imported
+2015,Hawai'i Rainbow Warriors,0,0,imported
+2015,Houston Cougars,0,0,imported
+2015,Idaho Vandals,1,0,imported
+2015,Illinois Fighting Illini,1,1,imported
+2015,Indiana Hoosiers,1,1,imported
+2015,Iowa Hawkeyes,1,1,imported
+2015,Iowa State Cyclones,1,1,imported
+2015,Kansas Jayhawks,0,1,imported
+2015,Kansas State Wildcats,1,1,imported
+2015,Kent State Golden Flashes,0,1,imported
+2015,Kentucky Wildcats,0,1,imported
+2015,LSU Tigers,1,0,imported
+2015,Louisiana Ragin' Cajuns,1,1,imported
+2015,Louisiana Tech Bulldogs,1,0,imported
+2015,Louisville Cardinals,1,1,imported
+2015,Marshall Thundering Herd,1,1,imported
+2015,Maryland Terrapins,1,0,imported
+2015,Massachusetts Minutemen,0,1,imported
+2015,Memphis Tigers,1,0,imported
+2015,Miami (OH) RedHawks,1,1,imported
+2015,Miami Hurricanes,1,1,imported
+2015,Michigan State Spartans,1,0,imported
+2015,Michigan Wolverines,0,0,imported
+2015,Middle Tennessee Blue Raiders,1,1,imported
+2015,Minnesota Golden Gophers,1,1,imported
+2015,Mississippi State Bulldogs,1,0,imported
+2015,Missouri Tigers,1,0,imported
+2015,NC State Wolfpack,1,1,imported
+2015,Navy Midshipmen,1,1,imported
+2015,Nebraska Cornhuskers,0,0,imported
+2015,Nevada Wolf Pack,1,0,imported
+2015,New Mexico Lobos,1,1,imported
+2015,New Mexico State Aggies,0,0,imported
+2015,North Carolina Tar Heels,1,0,imported
+2015,North Texas Mean Green,1,0,imported
+2015,Northern Illinois Huskies,1,1,imported
+2015,Northwestern Wildcats,1,1,imported
+2015,Notre Dame Fighting Irish,0,1,imported
+2015,Ohio Bobcats,1,1,imported
+2015,Ohio State Buckeyes,1,1,imported
+2015,Oklahoma Sooners,0,1,imported
+2015,Oklahoma State Cowboys,1,1,imported
+2015,Old Dominion Monarchs,1,1,imported
+2015,Ole Miss Rebels,1,1,imported
+2015,Oregon Ducks,1,1,imported
+2015,Oregon State Beavers,0,0,imported
+2015,Penn State Nittany Lions,1,1,imported
+2015,Pittsburgh Panthers,0,0,imported
+2015,Purdue Boilermakers,1,1,imported
+2015,Rice Owls,1,0,imported
+2015,Rutgers Scarlet Knights,0,1,imported
+2015,SMU Mustangs,0,0,imported
+2015,San Diego State Aztecs,0,1,imported
+2015,San José State Spartans,0,1,imported
+2015,South Alabama Jaguars,0,1,imported
+2015,South Carolina Gamecocks,1,1,imported
+2015,South Florida Bulls,0,0,imported
+2015,Southern Miss Golden Eagles,1,1,imported
+2015,Stanford Cardinal,1,1,imported
+2015,Syracuse Orange,0,1,imported
+2015,TCU Horned Frogs,1,0,imported
+2015,Temple Owls,1,1,imported
+2015,Tennessee Volunteers,0,1,imported
+2015,Texas A&M Aggies,1,0,imported
+2015,Texas Longhorns,1,1,imported
+2015,Texas State Bobcats,1,0,imported
+2015,Texas Tech Red Raiders,1,1,imported
+2015,Toledo Rockets,1,1,imported
+2015,Troy Trojans,1,0,imported
+2015,Tulane Green Wave,1,1,imported
+2015,Tulsa Golden Hurricane,0,0,imported
+2015,UAB Blazers,0,1,imported
+2015,UCF Knights,0,0,imported
+2015,UCLA Bruins,1,0,imported
+2015,UConn Huskies,0,1,imported
+2015,UL Monroe Warhawks,1,0,imported
+2015,UNLV Rebels,0,0,imported
+2015,USC Trojans,1,1,imported
+2015,UTEP Miners,1,1,imported
+2015,UTSA Roadrunners,1,1,imported
+2015,Utah State Aggies,1,0,imported
+2015,Utah Utes,0,0,imported
+2015,Vanderbilt Commodores,0,0,imported
+2015,Virginia Cavaliers,1,1,imported
+2015,Virginia Tech Hokies,1,1,imported
+2015,Wake Forest Demon Deacons,1,1,imported
+2015,Washington Huskies,1,1,imported
+2015,Washington State Cougars,0,0,imported
+2015,West Virginia Mountaineers,0,1,imported
+2015,Western Kentucky Hilltoppers,1,1,imported
+2015,Western Michigan Broncos,1,1,imported
+2015,Wisconsin Badgers,0,1,imported
+2015,Wyoming Cowboys,1,1,imported
+2016,Air Force Falcons,0,1,imported
+2016,Akron Zips,1,1,imported
+2016,Alabama Crimson Tide,1,0,imported
+2016,App State Mountaineers,1,1,imported
+2016,Arizona State Sun Devils,0,1,imported
+2016,Arizona Wildcats,1,0,imported
+2016,Arkansas Razorbacks,1,1,imported
+2016,Arkansas State Red Wolves,0,1,imported
+2016,Army Black Knights,1,1,imported
+2016,Auburn Tigers,1,0,imported
+2016,BYU Cougars,0,0,imported
+2016,Ball State Cardinals,1,0,imported
+2016,Baylor Bears,1,1,imported
+2016,Boise State Broncos,0,0,imported
+2016,Boston College Eagles,0,0,imported
+2016,Bowling Green Falcons,0,0,imported
+2016,Buffalo Bulls,1,1,imported
+2016,California Golden Bears,0,1,imported
+2016,Central Michigan Chippewas,1,1,imported
+2016,Charlotte 49ers,0,0,imported
+2016,Cincinnati Bearcats,0,1,imported
+2016,Clemson Tigers,1,1,imported
+2016,Colorado Buffaloes,1,1,imported
+2016,Colorado State Rams,1,0,imported
+2016,Duke Blue Devils,0,1,imported
+2016,East Carolina Pirates,0,0,imported
+2016,Eastern Michigan Eagles,1,0,imported
+2016,Florida Atlantic Owls,0,1,imported
+2016,Florida Gators,1,1,imported
+2016,Florida International Panthers,1,1,imported
+2016,Florida State Seminoles,1,1,imported
+2016,Fresno State Bulldogs,0,0,imported
+2016,Georgia Bulldogs,0,0,imported
+2016,Georgia Southern Eagles,0,0,imported
+2016,Georgia State Panthers,1,1,imported
+2016,Georgia Tech Yellow Jackets,1,1,imported
+2016,Hawai'i Rainbow Warriors,0,0,imported
+2016,Houston Cougars,1,1,imported
+2016,Idaho Vandals,1,1,imported
+2016,Illinois Fighting Illini,0,0,imported
+2016,Indiana Hoosiers,1,0,imported
+2016,Iowa Hawkeyes,1,1,imported
+2016,Iowa State Cyclones,0,0,imported
+2016,Kansas Jayhawks,1,1,imported
+2016,Kansas State Wildcats,1,1,imported
+2016,Kent State Golden Flashes,1,0,imported
+2016,Kentucky Wildcats,0,1,imported
+2016,LSU Tigers,1,0,imported
+2016,Louisiana Ragin' Cajuns,0,1,imported
+2016,Louisiana Tech Bulldogs,0,1,imported
+2016,Louisville Cardinals,0,1,imported
+2016,Marshall Thundering Herd,1,1,imported
+2016,Maryland Terrapins,0,0,imported
+2016,Massachusetts Minutemen,1,1,imported
+2016,Memphis Tigers,0,0,imported
+2016,Miami (OH) RedHawks,1,1,imported
+2016,Miami Hurricanes,0,0,imported
+2016,Michigan State Spartans,1,1,imported
+2016,Michigan Wolverines,1,0,imported
+2016,Middle Tennessee Blue Raiders,0,1,imported
+2016,Minnesota Golden Gophers,0,0,imported
+2016,Mississippi State Bulldogs,1,0,imported
+2016,Missouri Tigers,0,0,imported
+2016,NC State Wolfpack,0,1,imported
+2016,Navy Midshipmen,1,0,imported
+2016,Nebraska Cornhuskers,1,1,imported
+2016,Nevada Wolf Pack,0,1,imported
+2016,New Mexico Lobos,1,1,imported
+2016,New Mexico State Aggies,1,0,imported
+2016,North Carolina Tar Heels,0,1,imported
+2016,North Texas Mean Green,0,0,imported
+2016,Northern Illinois Huskies,0,0,imported
+2016,Northwestern Wildcats,1,1,imported
+2016,Notre Dame Fighting Irish,1,1,imported
+2016,Ohio Bobcats,1,1,imported
+2016,Ohio State Buckeyes,1,1,imported
+2016,Oklahoma Sooners,1,1,imported
+2016,Oklahoma State Cowboys,1,1,imported
+2016,Old Dominion Monarchs,1,1,imported
+2016,Ole Miss Rebels,1,1,imported
+2016,Oregon Ducks,0,0,imported
+2016,Oregon State Beavers,0,0,imported
+2016,Penn State Nittany Lions,0,1,imported
+2016,Pittsburgh Panthers,0,1,imported
+2016,Purdue Boilermakers,0,0,imported
+2016,Rice Owls,1,1,imported
+2016,Rutgers Scarlet Knights,0,0,imported
+2016,SMU Mustangs,1,1,imported
+2016,San Diego State Aztecs,1,1,imported
+2016,San José State Spartans,1,0,imported
+2016,South Alabama Jaguars,1,0,imported
+2016,South Carolina Gamecocks,0,0,imported
+2016,South Florida Bulls,1,0,imported
+2016,Southern Miss Golden Eagles,0,0,imported
+2016,Stanford Cardinal,1,1,imported
+2016,Syracuse Orange,0,0,imported
+2016,TCU Horned Frogs,1,0,imported
+2016,Temple Owls,0,1,imported
+2016,Tennessee Volunteers,1,0,imported
+2016,Texas A&M Aggies,0,1,imported
+2016,Texas Longhorns,0,1,imported
+2016,Texas State Bobcats,0,0,imported
+2016,Texas Tech Red Raiders,1,1,imported
+2016,Toledo Rockets,0,0,imported
+2016,Troy Trojans,1,1,imported
+2016,Tulane Green Wave,0,0,imported
+2016,Tulsa Golden Hurricane,0,1,imported
+2016,UCF Knights,0,0,imported
+2016,UCLA Bruins,0,1,imported
+2016,UConn Huskies,1,1,imported
+2016,UL Monroe Warhawks,0,0,imported
+2016,UNLV Rebels,1,1,imported
+2016,USC Trojans,0,0,imported
+2016,UTEP Miners,0,0,imported
+2016,UTSA Roadrunners,0,0,imported
+2016,Utah State Aggies,1,0,imported
+2016,Utah Utes,1,0,imported
+2016,Vanderbilt Commodores,1,1,imported
+2016,Virginia Cavaliers,0,0,imported
+2016,Virginia Tech Hokies,0,1,imported
+2016,Wake Forest Demon Deacons,1,1,imported
+2016,Washington Huskies,1,1,imported
+2016,Washington State Cougars,1,1,imported
+2016,West Virginia Mountaineers,0,1,imported
+2016,Western Kentucky Hilltoppers,0,1,imported
+2016,Western Michigan Broncos,1,1,imported
+2016,Wisconsin Badgers,1,0,imported
+2016,Wyoming Cowboys,1,1,imported
+2017,Air Force Falcons,1,1,imported
+2017,Akron Zips,1,1,imported
+2017,Alabama Crimson Tide,0,1,imported
+2017,App State Mountaineers,1,1,imported
+2017,Arizona State Sun Devils,0,0,imported
+2017,Arizona Wildcats,1,1,imported
+2017,Arkansas Razorbacks,1,0,imported
+2017,Arkansas State Red Wolves,1,1,imported
+2017,Army Black Knights,1,1,imported
+2017,Auburn Tigers,0,1,imported
+2017,BYU Cougars,1,1,imported
+2017,Ball State Cardinals,1,0,imported
+2017,Baylor Bears,0,0,imported
+2017,Boise State Broncos,1,1,imported
+2017,Boston College Eagles,1,1,imported
+2017,Bowling Green Falcons,1,1,imported
+2017,Buffalo Bulls,1,1,imported
+2017,California Golden Bears,0,0,imported
+2017,Central Michigan Chippewas,0,1,imported
+2017,Charlotte 49ers,1,1,imported
+2017,Cincinnati Bearcats,0,0,imported
+2017,Clemson Tigers,1,1,imported
+2017,Coastal Carolina Chanticleers,0,0,imported
+2017,Colorado Buffaloes,1,0,imported
+2017,Colorado State Rams,1,1,imported
+2017,Duke Blue Devils,1,1,imported
+2017,East Carolina Pirates,1,1,imported
+2017,Eastern Michigan Eagles,0,1,imported
+2017,Florida Atlantic Owls,0,0,imported
+2017,Florida Gators,1,1,imported
+2017,Florida International Panthers,0,0,imported
+2017,Florida State Seminoles,1,1,imported
+2017,Fresno State Bulldogs,0,0,imported
+2017,Georgia Bulldogs,1,1,imported
+2017,Georgia Southern Eagles,0,1,imported
+2017,Georgia State Panthers,0,0,imported
+2017,Georgia Tech Yellow Jackets,1,1,imported
+2017,Hawai'i Rainbow Warriors,0,0,imported
+2017,Houston Cougars,0,0,imported
+2017,Idaho Vandals,1,1,imported
+2017,Illinois Fighting Illini,1,1,imported
+2017,Indiana Hoosiers,0,1,imported
+2017,Iowa Hawkeyes,0,1,imported
+2017,Iowa State Cyclones,1,1,imported
+2017,Kansas Jayhawks,0,1,imported
+2017,Kansas State Wildcats,1,1,imported
+2017,Kent State Golden Flashes,1,1,imported
+2017,Kentucky Wildcats,1,0,imported
+2017,LSU Tigers,0,1,imported
+2017,Louisiana Ragin' Cajuns,0,1,imported
+2017,Louisiana Tech Bulldogs,1,1,imported
+2017,Louisville Cardinals,1,0,imported
+2017,Marshall Thundering Herd,1,1,imported
+2017,Maryland Terrapins,1,0,imported
+2017,Massachusetts Minutemen,1,0,imported
+2017,Memphis Tigers,0,1,imported
+2017,Miami (OH) RedHawks,1,1,imported
+2017,Miami Hurricanes,1,1,imported
+2017,Michigan State Spartans,1,1,imported
+2017,Michigan Wolverines,1,1,imported
+2017,Middle Tennessee Blue Raiders,1,0,imported
+2017,Minnesota Golden Gophers,0,0,imported
+2017,Mississippi State Bulldogs,1,0,imported
+2017,Missouri Tigers,1,1,imported
+2017,NC State Wolfpack,1,1,imported
+2017,Navy Midshipmen,1,1,imported
+2017,Nebraska Cornhuskers,1,0,imported
+2017,Nevada Wolf Pack,0,0,imported
+2017,New Mexico Lobos,1,1,imported
+2017,New Mexico State Aggies,0,1,imported
+2017,North Carolina Tar Heels,1,0,imported
+2017,North Texas Mean Green,1,0,imported
+2017,Northern Illinois Huskies,1,1,imported
+2017,Northwestern Wildcats,1,1,imported
+2017,Notre Dame Fighting Irish,0,0,imported
+2017,Ohio Bobcats,1,1,imported
+2017,Ohio State Buckeyes,0,1,imported
+2017,Oklahoma Sooners,0,1,imported
+2017,Oklahoma State Cowboys,1,1,imported
+2017,Old Dominion Monarchs,1,1,imported
+2017,Ole Miss Rebels,0,0,imported
+2017,Oregon Ducks,0,0,imported
+2017,Oregon State Beavers,1,1,imported
+2017,Penn State Nittany Lions,1,1,imported
+2017,Pittsburgh Panthers,0,1,imported
+2017,Purdue Boilermakers,0,0,imported
+2017,Rice Owls,1,0,imported
+2017,Rutgers Scarlet Knights,0,1,imported
+2017,SMU Mustangs,1,1,imported
+2017,San Diego State Aztecs,1,1,imported
+2017,San José State Spartans,0,0,imported
+2017,South Alabama Jaguars,1,1,imported
+2017,South Carolina Gamecocks,1,1,imported
+2017,South Florida Bulls,0,0,imported
+2017,Southern Miss Golden Eagles,1,1,imported
+2017,Stanford Cardinal,1,1,imported
+2017,Syracuse Orange,1,1,imported
+2017,TCU Horned Frogs,1,1,imported
+2017,Temple Owls,0,0,imported
+2017,Tennessee Volunteers,0,1,imported
+2017,Texas A&M Aggies,1,1,imported
+2017,Texas Longhorns,0,0,imported
+2017,Texas State Bobcats,0,1,imported
+2017,Texas Tech Red Raiders,1,1,imported
+2017,Toledo Rockets,1,1,imported
+2017,Troy Trojans,1,1,imported
+2017,Tulane Green Wave,1,1,imported
+2017,Tulsa Golden Hurricane,1,1,imported
+2017,UAB Blazers,0,0,imported
+2017,UCF Knights,1,1,imported
+2017,UCLA Bruins,0,1,imported
+2017,UConn Huskies,0,0,imported
+2017,UL Monroe Warhawks,1,1,imported
+2017,UNLV Rebels,1,1,imported
+2017,USC Trojans,1,1,imported
+2017,UTEP Miners,1,1,imported
+2017,UTSA Roadrunners,1,1,imported
+2017,Utah State Aggies,0,1,imported
+2017,Utah Utes,1,1,imported
+2017,Vanderbilt Commodores,1,1,imported
+2017,Virginia Cavaliers,1,1,imported
+2017,Virginia Tech Hokies,1,1,imported
+2017,Wake Forest Demon Deacons,1,0,imported
+2017,Washington Huskies,1,1,imported
+2017,Washington State Cougars,1,1,imported
+2017,West Virginia Mountaineers,0,1,imported
+2017,Western Kentucky Hilltoppers,0,0,imported
+2017,Western Michigan Broncos,0,0,imported
+2017,Wisconsin Badgers,1,0,imported
+2017,Wyoming Cowboys,1,0,imported
+2018,Air Force Falcons,1,0,imported
+2018,Akron Zips,1,0,imported
+2018,Alabama Crimson Tide,1,0,imported
+2018,App State Mountaineers,1,0,imported
+2018,Arizona State Sun Devils,0,0,imported
+2018,Arizona Wildcats,0,1,imported
+2018,Arkansas Razorbacks,0,0,imported
+2018,Arkansas State Red Wolves,1,1,imported
+2018,Army Black Knights,1,1,imported
+2018,Auburn Tigers,1,1,imported
+2018,BYU Cougars,0,1,imported
+2018,Ball State Cardinals,1,1,imported
+2018,Baylor Bears,1,1,imported
+2018,Boise State Broncos,1,1,imported
+2018,Boston College Eagles,1,1,imported
+2018,Bowling Green Falcons,1,1,imported
+2018,Buffalo Bulls,1,1,imported
+2018,California Golden Bears,1,1,imported
+2018,Central Michigan Chippewas,0,1,imported
+2018,Charlotte 49ers,0,0,imported
+2018,Cincinnati Bearcats,1,1,imported
+2018,Clemson Tigers,1,1,imported
+2018,Coastal Carolina Chanticleers,1,0,imported
+2018,Colorado Buffaloes,1,1,imported
+2018,Colorado State Rams,0,0,imported
+2018,Duke Blue Devils,1,1,imported
+2018,East Carolina Pirates,1,0,imported
+2018,Eastern Michigan Eagles,1,1,imported
+2018,Florida Atlantic Owls,0,0,imported
+2018,Florida Gators,0,0,imported
+2018,Florida International Panthers,1,1,imported
+2018,Florida State Seminoles,0,0,imported
+2018,Fresno State Bulldogs,1,0,imported
+2018,Georgia Bulldogs,1,1,imported
+2018,Georgia Southern Eagles,0,0,imported
+2018,Georgia State Panthers,1,1,imported
+2018,Georgia Tech Yellow Jackets,1,0,imported
+2018,Hawai'i Rainbow Warriors,1,0,imported
+2018,Houston Cougars,0,1,imported
+2018,Illinois Fighting Illini,0,1,imported
+2018,Indiana Hoosiers,1,1,imported
+2018,Iowa Hawkeyes,1,1,imported
+2018,Iowa State Cyclones,0,1,imported
+2018,Kansas Jayhawks,1,1,imported
+2018,Kansas State Wildcats,0,0,imported
+2018,Kent State Golden Flashes,0,0,imported
+2018,Kentucky Wildcats,1,1,imported
+2018,LSU Tigers,0,1,imported
+2018,Liberty Flames,0,0,imported
+2018,Louisiana Ragin' Cajuns,0,0,imported
+2018,Louisiana Tech Bulldogs,1,1,imported
+2018,Louisville Cardinals,1,0,imported
+2018,Marshall Thundering Herd,0,0,imported
+2018,Maryland Terrapins,0,1,imported
+2018,Massachusetts Minutemen,1,1,imported
+2018,Memphis Tigers,0,1,imported
+2018,Miami (OH) RedHawks,1,0,imported
+2018,Miami Hurricanes,1,1,imported
+2018,Michigan State Spartans,1,1,imported
+2018,Michigan Wolverines,0,1,imported
+2018,Middle Tennessee Blue Raiders,1,1,imported
+2018,Minnesota Golden Gophers,1,1,imported
+2018,Mississippi State Bulldogs,0,0,imported
+2018,Missouri Tigers,0,0,imported
+2018,NC State Wolfpack,1,1,imported
+2018,Navy Midshipmen,1,1,imported
+2018,Nebraska Cornhuskers,0,0,imported
+2018,Nevada Wolf Pack,1,1,imported
+2018,New Mexico Lobos,0,1,imported
+2018,New Mexico State Aggies,1,1,imported
+2018,North Carolina Tar Heels,1,1,imported
+2018,North Texas Mean Green,1,1,imported
+2018,Northern Illinois Huskies,1,0,imported
+2018,Northwestern Wildcats,1,1,imported
+2018,Notre Dame Fighting Irish,1,0,imported
+2018,Ohio Bobcats,1,1,imported
+2018,Ohio State Buckeyes,1,1,imported
+2018,Oklahoma Sooners,0,1,imported
+2018,Oklahoma State Cowboys,1,0,imported
+2018,Old Dominion Monarchs,1,1,imported
+2018,Ole Miss Rebels,1,1,imported
+2018,Oregon Ducks,1,1,imported
+2018,Oregon State Beavers,0,0,imported
+2018,Penn State Nittany Lions,0,1,imported
+2018,Pittsburgh Panthers,1,0,imported
+2018,Purdue Boilermakers,1,1,imported
+2018,Rice Owls,0,0,imported
+2018,Rutgers Scarlet Knights,0,1,imported
+2018,SMU Mustangs,0,0,imported
+2018,San Diego State Aztecs,1,0,imported
+2018,San José State Spartans,0,1,imported
+2018,South Alabama Jaguars,0,0,imported
+2018,South Carolina Gamecocks,1,1,imported
+2018,South Florida Bulls,1,1,imported
+2018,Southern Miss Golden Eagles,1,0,imported
+2018,Stanford Cardinal,0,1,imported
+2018,Syracuse Orange,1,1,imported
+2018,TCU Horned Frogs,1,1,imported
+2018,Temple Owls,1,0,imported
+2018,Tennessee Volunteers,0,0,imported
+2018,Texas A&M Aggies,0,0,imported
+2018,Texas Longhorns,1,1,imported
+2018,Texas State Bobcats,1,0,imported
+2018,Texas Tech Red Raiders,0,1,imported
+2018,Toledo Rockets,1,1,imported
+2018,Troy Trojans,1,1,imported
+2018,Tulane Green Wave,1,1,imported
+2018,Tulsa Golden Hurricane,1,1,imported
+2018,UAB Blazers,0,1,imported
+2018,UCF Knights,0,0,imported
+2018,UCLA Bruins,0,0,imported
+2018,UConn Huskies,0,1,imported
+2018,UL Monroe Warhawks,1,1,imported
+2018,UNLV Rebels,1,0,imported
+2018,USC Trojans,1,1,imported
+2018,UTEP Miners,0,0,imported
+2018,UTSA Roadrunners,0,0,imported
+2018,Utah State Aggies,1,1,imported
+2018,Utah Utes,1,1,imported
+2018,Vanderbilt Commodores,1,0,imported
+2018,Virginia Cavaliers,1,1,imported
+2018,Virginia Tech Hokies,1,1,imported
+2018,Wake Forest Demon Deacons,1,1,imported
+2018,Washington Huskies,0,1,imported
+2018,Washington State Cougars,1,0,imported
+2018,West Virginia Mountaineers,1,1,imported
+2018,Western Kentucky Hilltoppers,1,1,imported
+2018,Western Michigan Broncos,1,1,imported
+2018,Wisconsin Badgers,1,1,imported
+2018,Wyoming Cowboys,1,1,imported
+2019,Air Force Falcons,1,0,imported
+2019,Akron Zips,0,0,imported
+2019,Alabama Crimson Tide,0,1,imported
+2019,App State Mountaineers,0,0,imported
+2019,Arizona State Sun Devils,1,1,imported
+2019,Arizona Wildcats,1,1,imported
+2019,Arkansas Razorbacks,1,1,imported
+2019,Arkansas State Red Wolves,0,0,imported
+2019,Army Black Knights,1,0,imported
+2019,Auburn Tigers,0,1,imported
+2019,BYU Cougars,1,1,imported
+2019,Ball State Cardinals,1,1,imported
+2019,Baylor Bears,1,1,imported
+2019,Boise State Broncos,1,0,imported
+2019,Boston College Eagles,0,0,imported
+2019,Bowling Green Falcons,0,0,imported
+2019,Buffalo Bulls,1,1,imported
+2019,California Golden Bears,1,1,imported
+2019,Central Michigan Chippewas,0,0,imported
+2019,Charlotte 49ers,0,0,imported
+2019,Cincinnati Bearcats,1,1,imported
+2019,Clemson Tigers,1,1,imported
+2019,Coastal Carolina Chanticleers,0,1,imported
+2019,Colorado Buffaloes,0,0,imported
+2019,Colorado State Rams,1,1,imported
+2019,Duke Blue Devils,1,1,imported
+2019,East Carolina Pirates,0,0,imported
+2019,Eastern Michigan Eagles,1,1,imported
+2019,Florida Atlantic Owls,1,0,imported
+2019,Florida Gators,1,1,imported
+2019,Florida International Panthers,1,0,imported
+2019,Florida State Seminoles,0,1,imported
+2019,Fresno State Bulldogs,0,1,imported
+2019,Georgia Bulldogs,1,0,imported
+2019,Georgia Southern Eagles,1,1,imported
+2019,Georgia State Panthers,0,1,imported
+2019,Georgia Tech Yellow Jackets,0,0,imported
+2019,Hawai'i Rainbow Warriors,1,1,imported
+2019,Houston Cougars,0,0,imported
+2019,Illinois Fighting Illini,1,0,imported
+2019,Indiana Hoosiers,0,0,imported
+2019,Iowa Hawkeyes,1,1,imported
+2019,Iowa State Cyclones,0,1,imported
+2019,Kansas Jayhawks,0,0,imported
+2019,Kansas State Wildcats,0,0,imported
+2019,Kent State Golden Flashes,1,1,imported
+2019,Kentucky Wildcats,1,0,imported
+2019,LSU Tigers,1,1,imported
+2019,Liberty Flames,0,0,imported
+2019,Louisiana Ragin' Cajuns,1,1,imported
+2019,Louisiana Tech Bulldogs,1,0,imported
+2019,Louisville Cardinals,0,0,imported
+2019,Marshall Thundering Herd,1,0,imported
+2019,Maryland Terrapins,0,0,imported
+2019,Massachusetts Minutemen,0,0,imported
+2019,Memphis Tigers,0,0,imported
+2019,Miami (OH) RedHawks,1,1,imported
+2019,Miami Hurricanes,0,0,imported
+2019,Michigan State Spartans,0,1,imported
+2019,Michigan Wolverines,0,1,imported
+2019,Middle Tennessee Blue Raiders,1,1,imported
+2019,Minnesota Golden Gophers,1,0,imported
+2019,Mississippi State Bulldogs,0,1,imported
+2019,Missouri Tigers,1,1,imported
+2019,NC State Wolfpack,0,1,imported
+2019,Navy Midshipmen,1,0,imported
+2019,Nebraska Cornhuskers,1,1,imported
+2019,Nevada Wolf Pack,1,1,imported
+2019,New Mexico Lobos,0,0,imported
+2019,New Mexico State Aggies,0,1,imported
+2019,North Carolina Tar Heels,0,0,imported
+2019,North Texas Mean Green,0,1,imported
+2019,Northern Illinois Huskies,0,0,imported
+2019,Northwestern Wildcats,1,1,imported
+2019,Notre Dame Fighting Irish,1,1,imported
+2019,Ohio Bobcats,1,0,imported
+2019,Ohio State Buckeyes,1,0,imported
+2019,Oklahoma Sooners,1,0,imported
+2019,Oklahoma State Cowboys,0,1,imported
+2019,Old Dominion Monarchs,1,0,imported
+2019,Ole Miss Rebels,0,0,imported
+2019,Oregon Ducks,1,0,imported
+2019,Oregon State Beavers,1,1,imported
+2019,Penn State Nittany Lions,1,1,imported
+2019,Pittsburgh Panthers,0,1,imported
+2019,Purdue Boilermakers,1,1,imported
+2019,Rice Owls,1,1,imported
+2019,Rutgers Scarlet Knights,1,1,imported
+2019,SMU Mustangs,1,1,imported
+2019,San Diego State Aztecs,1,1,imported
+2019,San José State Spartans,1,1,imported
+2019,South Alabama Jaguars,1,1,imported
+2019,South Carolina Gamecocks,1,1,imported
+2019,South Florida Bulls,0,1,imported
+2019,Southern Miss Golden Eagles,0,1,imported
+2019,Stanford Cardinal,1,1,imported
+2019,Syracuse Orange,1,1,imported
+2019,TCU Horned Frogs,1,1,imported
+2019,Temple Owls,0,0,imported
+2019,Tennessee Volunteers,0,0,imported
+2019,Texas A&M Aggies,1,1,imported
+2019,Texas Longhorns,1,1,imported
+2019,Texas State Bobcats,0,0,imported
+2019,Texas Tech Red Raiders,0,0,imported
+2019,Toledo Rockets,1,1,imported
+2019,Troy Trojans,0,0,imported
+2019,Tulane Green Wave,0,1,imported
+2019,Tulsa Golden Hurricane,1,0,imported
+2019,UAB Blazers,1,1,imported
+2019,UCF Knights,1,1,imported
+2019,UCLA Bruins,0,1,imported
+2019,UConn Huskies,0,0,imported
+2019,UL Monroe Warhawks,1,1,imported
+2019,UNLV Rebels,0,1,imported
+2019,USC Trojans,0,1,imported
+2019,UTEP Miners,1,1,imported
+2019,UTSA Roadrunners,0,1,imported
+2019,Utah State Aggies,0,0,imported
+2019,Utah Utes,0,1,imported
+2019,Vanderbilt Commodores,0,1,imported
+2019,Virginia Cavaliers,1,1,imported
+2019,Virginia Tech Hokies,1,1,imported
+2019,Wake Forest Demon Deacons,1,0,imported
+2019,Washington Huskies,1,1,imported
+2019,Washington State Cougars,1,1,imported
+2019,West Virginia Mountaineers,0,0,imported
+2019,Western Kentucky Hilltoppers,0,1,imported
+2019,Western Michigan Broncos,1,1,imported
+2019,Wisconsin Badgers,1,1,imported
+2019,Wyoming Cowboys,1,0,imported
+2020,Air Force Falcons,1,1,imported
+2020,Akron Zips,1,1,imported
+2020,Alabama Crimson Tide,1,1,imported
+2020,App State Mountaineers,0,0,imported
+2020,Arizona State Sun Devils,0,0,imported
+2020,Arizona Wildcats,1,0,imported
+2020,Arkansas Razorbacks,0,0,imported
+2020,Arkansas State Red Wolves,1,1,imported
+2020,Army Black Knights,1,0,imported
+2020,Auburn Tigers,0,1,imported
+2020,BYU Cougars,1,1,imported
+2020,Ball State Cardinals,0,1,imported
+2020,Baylor Bears,0,0,imported
+2020,Boise State Broncos,1,1,imported
+2020,Boston College Eagles,0,0,imported
+2020,Bowling Green Falcons,1,1,imported
+2020,Buffalo Bulls,1,1,imported
+2020,California Golden Bears,0,1,imported
+2020,Central Michigan Chippewas,1,1,imported
+2020,Charlotte 49ers,0,1,imported
+2020,Cincinnati Bearcats,1,1,imported
+2020,Clemson Tigers,1,1,imported
+2020,Coastal Carolina Chanticleers,1,0,imported
+2020,Colorado Buffaloes,0,1,imported
+2020,Colorado State Rams,0,0,imported
+2020,Duke Blue Devils,1,1,imported
+2020,East Carolina Pirates,1,0,imported
+2020,Eastern Michigan Eagles,0,1,imported
+2020,Florida Atlantic Owls,0,0,imported
+2020,Florida Gators,1,1,imported
+2020,Florida International Panthers,1,1,imported
+2020,Florida State Seminoles,0,0,imported
+2020,Fresno State Bulldogs,1,0,imported
+2020,Georgia Bulldogs,0,1,imported
+2020,Georgia Southern Eagles,1,1,imported
+2020,Georgia State Panthers,1,1,imported
+2020,Georgia Tech Yellow Jackets,1,1,imported
+2020,Hawai'i Rainbow Warriors,0,0,imported
+2020,Houston Cougars,0,1,imported
+2020,Illinois Fighting Illini,1,1,imported
+2020,Indiana Hoosiers,0,1,imported
+2020,Iowa Hawkeyes,1,1,imported
+2020,Iowa State Cyclones,1,1,imported
+2020,Kansas Jayhawks,0,1,imported
+2020,Kansas State Wildcats,1,0,imported
+2020,Kent State Golden Flashes,1,1,imported
+2020,Kentucky Wildcats,1,1,imported
+2020,LSU Tigers,1,0,imported
+2020,Liberty Flames,1,1,imported
+2020,Louisiana Ragin' Cajuns,1,0,imported
+2020,Louisiana Tech Bulldogs,0,0,imported
+2020,Louisville Cardinals,1,1,imported
+2020,Marshall Thundering Herd,1,1,imported
+2020,Maryland Terrapins,1,1,imported
+2020,Massachusetts Minutemen,0,1,imported
+2020,Memphis Tigers,1,0,imported
+2020,Miami (OH) RedHawks,1,1,imported
+2020,Miami Hurricanes,0,1,imported
+2020,Michigan State Spartans,0,0,imported
+2020,Michigan Wolverines,1,1,imported
+2020,Middle Tennessee Blue Raiders,1,1,imported
+2020,Minnesota Golden Gophers,0,1,imported
+2020,Mississippi State Bulldogs,0,0,imported
+2020,Missouri Tigers,0,1,imported
+2020,NC State Wolfpack,1,1,imported
+2020,Navy Midshipmen,1,1,imported
+2020,Nebraska Cornhuskers,0,1,imported
+2020,Nevada Wolf Pack,1,0,imported
+2020,New Mexico Lobos,0,0,imported
+2020,New Mexico State Aggies,1,1,imported
+2020,North Carolina Tar Heels,1,1,imported
+2020,North Texas Mean Green,1,0,imported
+2020,Northern Illinois Huskies,1,1,imported
+2020,Northwestern Wildcats,0,1,imported
+2020,Notre Dame Fighting Irish,0,1,imported
+2020,Ohio Bobcats,1,1,imported
+2020,Ohio State Buckeyes,1,1,imported
+2020,Oklahoma Sooners,1,1,imported
+2020,Oklahoma State Cowboys,0,1,imported
+2020,Old Dominion Monarchs,0,0,imported
+2020,Ole Miss Rebels,0,0,imported
+2020,Oregon Ducks,0,1,imported
+2020,Oregon State Beavers,1,1,imported
+2020,Penn State Nittany Lions,0,1,imported
+2020,Pittsburgh Panthers,1,1,imported
+2020,Purdue Boilermakers,1,1,imported
+2020,Rice Owls,1,1,imported
+2020,Rutgers Scarlet Knights,0,0,imported
+2020,SMU Mustangs,0,1,imported
+2020,San Diego State Aztecs,0,0,imported
+2020,San José State Spartans,1,1,imported
+2020,South Alabama Jaguars,1,1,imported
+2020,South Carolina Gamecocks,0,1,imported
+2020,South Florida Bulls,0,0,imported
+2020,Southern Miss Golden Eagles,0,0,imported
+2020,Stanford Cardinal,1,1,imported
+2020,Syracuse Orange,0,0,imported
+2020,TCU Horned Frogs,1,1,imported
+2020,Temple Owls,1,1,imported
+2020,Tennessee Volunteers,1,1,imported
+2020,Texas A&M Aggies,1,1,imported
+2020,Texas Longhorns,0,0,imported
+2020,Texas State Bobcats,0,1,imported
+2020,Texas Tech Red Raiders,1,1,imported
+2020,Toledo Rockets,0,0,imported
+2020,Troy Trojans,1,1,imported
+2020,Tulane Green Wave,1,1,imported
+2020,Tulsa Golden Hurricane,1,1,imported
+2020,UAB Blazers,1,1,imported
+2020,UCF Knights,0,1,imported
+2020,UCLA Bruins,1,1,imported
+2020,UConn Huskies,1,1,imported
+2020,UL Monroe Warhawks,0,1,imported
+2020,UNLV Rebels,0,0,imported
+2020,USC Trojans,1,0,imported
+2020,UTEP Miners,1,1,imported
+2020,UTSA Roadrunners,0,0,imported
+2020,Utah State Aggies,0,0,imported
+2020,Utah Utes,1,1,imported
+2020,Vanderbilt Commodores,0,0,imported
+2020,Virginia Cavaliers,1,1,imported
+2020,Virginia Tech Hokies,1,0,imported
+2020,Wake Forest Demon Deacons,1,1,imported
+2020,Washington Huskies,0,1,imported
+2020,Washington State Cougars,0,0,imported
+2020,West Virginia Mountaineers,0,0,imported
+2020,Western Kentucky Hilltoppers,1,1,imported
+2020,Western Michigan Broncos,1,1,imported
+2020,Wisconsin Badgers,1,1,imported
+2020,Wyoming Cowboys,1,0,imported
+2021,Air Force Falcons,1,1,imported
+2021,Akron Zips,1,1,imported
+2021,Alabama Crimson Tide,0,1,imported
+2021,App State Mountaineers,0,1,imported
+2021,Arizona State Sun Devils,1,1,imported
+2021,Arizona Wildcats,0,0,imported
+2021,Arkansas Razorbacks,1,1,imported
+2021,Arkansas State Red Wolves,1,0,imported
+2021,Army Black Knights,1,1,imported
+2021,Auburn Tigers,0,0,imported
+2021,BYU Cougars,0,1,imported
+2021,Ball State Cardinals,1,1,imported
+2021,Baylor Bears,0,1,imported
+2021,Boise State Broncos,0,1,imported
+2021,Boston College Eagles,1,1,imported
+2021,Bowling Green Falcons,1,0,imported
+2021,Buffalo Bulls,0,0,imported
+2021,California Golden Bears,1,1,imported
+2021,Central Michigan Chippewas,0,1,imported
+2021,Charlotte 49ers,1,1,imported
+2021,Cincinnati Bearcats,1,0,imported
+2021,Clemson Tigers,1,1,imported
+2021,Coastal Carolina Chanticleers,1,1,imported
+2021,Colorado Buffaloes,1,0,imported
+2021,Colorado State Rams,0,1,imported
+2021,Duke Blue Devils,0,1,imported
+2021,East Carolina Pirates,1,1,imported
+2021,Eastern Michigan Eagles,1,1,imported
+2021,Florida Atlantic Owls,0,0,imported
+2021,Florida Gators,0,1,imported
+2021,Florida International Panthers,0,0,imported
+2021,Florida State Seminoles,1,1,imported
+2021,Fresno State Bulldogs,1,1,imported
+2021,Georgia Bulldogs,1,1,imported
+2021,Georgia Southern Eagles,0,1,imported
+2021,Georgia State Panthers,1,0,imported
+2021,Georgia Tech Yellow Jackets,1,1,imported
+2021,Hawai'i Rainbow Warriors,0,1,imported
+2021,Houston Cougars,1,1,imported
+2021,Illinois Fighting Illini,0,0,imported
+2021,Indiana Hoosiers,1,0,imported
+2021,Iowa Hawkeyes,1,1,imported
+2021,Iowa State Cyclones,1,1,imported
+2021,Kansas Jayhawks,0,0,imported
+2021,Kansas State Wildcats,1,1,imported
+2021,Kent State Golden Flashes,1,1,imported
+2021,Kentucky Wildcats,0,1,imported
+2021,LSU Tigers,0,0,imported
+2021,Liberty Flames,1,1,imported
+2021,Louisiana Ragin' Cajuns,0,1,imported
+2021,Louisiana Tech Bulldogs,1,1,imported
+2021,Louisville Cardinals,0,1,imported
+2021,Marshall Thundering Herd,1,0,imported
+2021,Maryland Terrapins,0,0,imported
+2021,Massachusetts Minutemen,0,1,imported
+2021,Memphis Tigers,1,1,imported
+2021,Miami (OH) RedHawks,1,1,imported
+2021,Miami Hurricanes,1,0,imported
+2021,Michigan State Spartans,1,1,imported
+2021,Michigan Wolverines,1,0,imported
+2021,Middle Tennessee Blue Raiders,0,1,imported
+2021,Minnesota Golden Gophers,1,1,imported
+2021,Mississippi State Bulldogs,1,1,imported
+2021,Missouri Tigers,1,0,imported
+2021,NC State Wolfpack,1,1,imported
+2021,Navy Midshipmen,1,1,imported
+2021,Nebraska Cornhuskers,1,1,imported
+2021,Nevada Wolf Pack,1,1,imported
+2021,New Mexico Lobos,1,1,imported
+2021,New Mexico State Aggies,1,1,imported
+2021,North Carolina Tar Heels,1,1,imported
+2021,North Texas Mean Green,1,0,imported
+2021,Northern Illinois Huskies,1,1,imported
+2021,Northwestern Wildcats,1,0,imported
+2021,Notre Dame Fighting Irish,1,0,imported
+2021,Ohio Bobcats,0,1,imported
+2021,Ohio State Buckeyes,1,1,imported
+2021,Oklahoma Sooners,1,1,imported
+2021,Oklahoma State Cowboys,1,1,imported
+2021,Old Dominion Monarchs,1,1,imported
+2021,Ole Miss Rebels,1,1,imported
+2021,Oregon Ducks,1,0,imported
+2021,Oregon State Beavers,1,1,imported
+2021,Penn State Nittany Lions,0,1,imported
+2021,Pittsburgh Panthers,1,1,imported
+2021,Purdue Boilermakers,1,0,imported
+2021,Rice Owls,0,1,imported
+2021,Rutgers Scarlet Knights,1,1,imported
+2021,SMU Mustangs,1,0,imported
+2021,San Diego State Aztecs,1,1,imported
+2021,San José State Spartans,1,1,imported
+2021,South Alabama Jaguars,0,0,imported
+2021,South Carolina Gamecocks,0,0,imported
+2021,South Florida Bulls,1,1,imported
+2021,Southern Miss Golden Eagles,0,0,imported
+2021,Stanford Cardinal,1,1,imported
+2021,Syracuse Orange,1,1,imported
+2021,TCU Horned Frogs,0,1,imported
+2021,Temple Owls,1,1,imported
+2021,Tennessee Volunteers,0,0,imported
+2021,Texas A&M Aggies,1,1,imported
+2021,Texas Longhorns,0,0,imported
+2021,Texas State Bobcats,1,1,imported
+2021,Texas Tech Red Raiders,0,1,imported
+2021,Toledo Rockets,1,1,imported
+2021,Troy Trojans,0,1,imported
+2021,Tulane Green Wave,0,0,imported
+2021,Tulsa Golden Hurricane,1,1,imported
+2021,UAB Blazers,1,1,imported
+2021,UCF Knights,0,0,imported
+2021,UCLA Bruins,1,1,imported
+2021,UConn Huskies,1,1,imported
+2021,UL Monroe Warhawks,0,0,imported
+2021,UNLV Rebels,1,1,imported
+2021,USC Trojans,1,1,imported
+2021,UTEP Miners,0,0,imported
+2021,UTSA Roadrunners,1,0,imported
+2021,Utah State Aggies,0,0,imported
+2021,Utah Utes,1,1,imported
+2021,Vanderbilt Commodores,0,0,imported
+2021,Virginia Cavaliers,1,1,imported
+2021,Virginia Tech Hokies,1,1,imported
+2021,Wake Forest Demon Deacons,1,1,imported
+2021,Washington Huskies,1,1,imported
+2021,Washington State Cougars,1,1,imported
+2021,West Virginia Mountaineers,1,0,imported
+2021,Western Kentucky Hilltoppers,0,1,imported
+2021,Western Michigan Broncos,0,1,imported
+2021,Wisconsin Badgers,1,1,imported
+2021,Wyoming Cowboys,0,1,imported
+2022,Air Force Falcons,1,0,imported
+2022,Akron Zips,0,0,imported
+2022,Alabama Crimson Tide,1,1,imported
+2022,App State Mountaineers,0,1,imported
+2022,Arizona State Sun Devils,0,0,imported
+2022,Arizona Wildcats,1,0,imported
+2022,Arkansas Razorbacks,1,1,imported
+2022,Arkansas State Red Wolves,1,1,imported
+2022,Army Black Knights,1,1,imported
+2022,Auburn Tigers,0,0,imported
+2022,BYU Cougars,1,1,imported
+2022,Ball State Cardinals,1,1,imported
+2022,Baylor Bears,1,1,imported
+2022,Boise State Broncos,1,1,imported
+2022,Boston College Eagles,0,1,imported
+2022,Bowling Green Falcons,0,1,imported
+2022,Buffalo Bulls,1,0,imported
+2022,California Golden Bears,1,1,imported
+2022,Central Michigan Chippewas,0,1,imported
+2022,Charlotte 49ers,1,0,imported
+2022,Cincinnati Bearcats,0,1,imported
+2022,Clemson Tigers,0,0,imported
+2022,Coastal Carolina Chanticleers,1,1,imported
+2022,Colorado Buffaloes,0,1,imported
+2022,Colorado State Rams,0,0,imported
+2022,Duke Blue Devils,0,0,imported
+2022,East Carolina Pirates,1,1,imported
+2022,Eastern Michigan Eagles,1,1,imported
+2022,Florida Atlantic Owls,0,0,imported
+2022,Florida Gators,0,0,imported
+2022,Florida International Panthers,0,0,imported
+2022,Florida State Seminoles,0,1,imported
+2022,Fresno State Bulldogs,0,0,imported
+2022,Georgia Bulldogs,1,1,imported
+2022,Georgia Southern Eagles,0,0,imported
+2022,Georgia State Panthers,0,1,imported
+2022,Georgia Tech Yellow Jackets,0,1,imported
+2022,Hawai'i Rainbow Warriors,0,1,imported
+2022,Houston Cougars,1,1,imported
+2022,Illinois Fighting Illini,0,1,imported
+2022,Indiana Hoosiers,0,0,imported
+2022,Iowa Hawkeyes,1,1,imported
+2022,Iowa State Cyclones,1,1,imported
+2022,James Madison Dukes,0,0,imported
+2022,Kansas Jayhawks,1,1,imported
+2022,Kansas State Wildcats,0,1,imported
+2022,Kent State Golden Flashes,1,0,imported
+2022,Kentucky Wildcats,0,1,imported
+2022,LSU Tigers,0,0,imported
+2022,Liberty Flames,1,0,imported
+2022,Louisiana Ragin' Cajuns,1,0,imported
+2022,Louisiana Tech Bulldogs,0,0,imported
+2022,Louisville Cardinals,0,1,imported
+2022,Marshall Thundering Herd,0,1,imported
+2022,Maryland Terrapins,1,1,imported
+2022,Massachusetts Minutemen,0,0,imported
+2022,Memphis Tigers,0,0,imported
+2022,Miami (OH) RedHawks,1,0,imported
+2022,Miami Hurricanes,0,0,imported
+2022,Michigan State Spartans,1,1,imported
+2022,Michigan Wolverines,1,0,imported
+2022,Middle Tennessee Blue Raiders,0,1,imported
+2022,Minnesota Golden Gophers,1,1,imported
+2022,Mississippi State Bulldogs,1,1,imported
+2022,Missouri Tigers,1,0,imported
+2022,NC State Wolfpack,1,1,imported
+2022,Navy Midshipmen,0,1,imported
+2022,Nebraska Cornhuskers,0,1,imported
+2022,Nevada Wolf Pack,0,0,imported
+2022,New Mexico Lobos,1,1,imported
+2022,New Mexico State Aggies,0,0,imported
+2022,North Carolina Tar Heels,1,0,imported
+2022,North Texas Mean Green,1,1,imported
+2022,Northern Illinois Huskies,1,1,imported
+2022,Northwestern Wildcats,1,1,imported
+2022,Notre Dame Fighting Irish,1,0,imported
+2022,Ohio Bobcats,1,0,imported
+2022,Ohio State Buckeyes,1,0,imported
+2022,Oklahoma Sooners,0,0,imported
+2022,Oklahoma State Cowboys,1,0,imported
+2022,Old Dominion Monarchs,0,1,imported
+2022,Ole Miss Rebels,0,1,imported
+2022,Oregon Ducks,0,0,imported
+2022,Oregon State Beavers,1,0,imported
+2022,Penn State Nittany Lions,1,1,imported
+2022,Pittsburgh Panthers,0,1,imported
+2022,Purdue Boilermakers,1,1,imported
+2022,Rice Owls,1,1,imported
+2022,Rutgers Scarlet Knights,1,0,imported
+2022,SMU Mustangs,0,0,imported
+2022,San Diego State Aztecs,1,1,imported
+2022,San José State Spartans,1,1,imported
+2022,South Alabama Jaguars,1,1,imported
+2022,South Carolina Gamecocks,1,1,imported
+2022,South Florida Bulls,0,0,imported
+2022,Southern Miss Golden Eagles,0,1,imported
+2022,Stanford Cardinal,1,1,imported
+2022,Syracuse Orange,0,1,imported
+2022,TCU Horned Frogs,0,0,imported
+2022,Temple Owls,0,0,imported
+2022,Tennessee Volunteers,1,1,imported
+2022,Texas A&M Aggies,1,0,imported
+2022,Texas Longhorns,1,1,imported
+2022,Texas State Bobcats,0,1,imported
+2022,Texas Tech Red Raiders,0,0,imported
+2022,Toledo Rockets,1,1,imported
+2022,Troy Trojans,0,0,imported
+2022,Tulane Green Wave,0,1,imported
+2022,Tulsa Golden Hurricane,1,0,imported
+2022,UAB Blazers,1,1,imported
+2022,UCF Knights,0,1,imported
+2022,UCLA Bruins,0,0,imported
+2022,UConn Huskies,0,1,imported
+2022,UL Monroe Warhawks,0,0,imported
+2022,UNLV Rebels,0,0,imported
+2022,USC Trojans,0,0,imported
+2022,UTEP Miners,1,1,imported
+2022,UTSA Roadrunners,0,1,imported
+2022,Utah State Aggies,1,1,imported
+2022,Utah Utes,1,1,imported
+2022,Vanderbilt Commodores,0,0,imported
+2022,Virginia Cavaliers,0,0,imported
+2022,Virginia Tech Hokies,0,0,imported
+2022,Wake Forest Demon Deacons,1,0,imported
+2022,Washington Huskies,0,0,imported
+2022,Washington State Cougars,0,0,imported
+2022,West Virginia Mountaineers,0,1,imported
+2022,Western Kentucky Hilltoppers,0,0,imported
+2022,Western Michigan Broncos,1,1,imported
+2022,Wisconsin Badgers,0,1,imported
+2022,Wyoming Cowboys,1,1,imported
+2023,Air Force Falcons,1,1,imported
+2023,Akron Zips,0,1,imported
+2023,Alabama Crimson Tide,0,0,imported
+2023,App State Mountaineers,0,0,imported
+2023,Arizona State Sun Devils,0,0,imported
+2023,Arizona Wildcats,1,1,imported
+2023,Arkansas Razorbacks,0,0,imported
+2023,Arkansas State Red Wolves,0,1,imported
+2023,Army Black Knights,0,1,imported
+2023,Auburn Tigers,0,0,imported
+2023,BYU Cougars,1,0,imported
+2023,Ball State Cardinals,1,1,imported
+2023,Baylor Bears,1,0,imported
+2023,Boise State Broncos,0,1,imported
+2023,Boston College Eagles,0,0,imported
+2023,Bowling Green Falcons,1,0,imported
+2023,Buffalo Bulls,0,0,imported
+2023,California Golden Bears,0,1,imported
+2023,Central Michigan Chippewas,1,1,imported
+2023,Charlotte 49ers,0,0,imported
+2023,Cincinnati Bearcats,0,0,imported
+2023,Clemson Tigers,0,1,imported
+2023,Coastal Carolina Chanticleers,0,0,imported
+2023,Colorado Buffaloes,0,0,imported
+2023,Colorado State Rams,1,1,imported
+2023,Duke Blue Devils,1,0,imported
+2023,East Carolina Pirates,1,1,imported
+2023,Eastern Michigan Eagles,1,0,imported
+2023,Florida Atlantic Owls,0,0,imported
+2023,Florida Gators,1,1,imported
+2023,Florida International Panthers,1,1,imported
+2023,Florida State Seminoles,1,1,imported
+2023,Fresno State Bulldogs,0,1,imported
+2023,Georgia Bulldogs,0,1,imported
+2023,Georgia Southern Eagles,1,0,imported
+2023,Georgia State Panthers,1,0,imported
+2023,Georgia Tech Yellow Jackets,0,1,imported
+2023,Hawai'i Rainbow Warriors,1,1,imported
+2023,Houston Cougars,0,1,imported
+2023,Illinois Fighting Illini,1,0,imported
+2023,Indiana Hoosiers,1,1,imported
+2023,Iowa Hawkeyes,1,1,imported
+2023,Iowa State Cyclones,0,1,imported
+2023,Jacksonville State Gamecocks,0,0,imported
+2023,James Madison Dukes,1,1,imported
+2023,Kansas Jayhawks,1,1,imported
+2023,Kansas State Wildcats,1,1,imported
+2023,Kennesaw State Owls,0,0,imported
+2023,Kent State Golden Flashes,0,0,imported
+2023,Kentucky Wildcats,0,1,imported
+2023,LSU Tigers,1,1,imported
+2023,Liberty Flames,0,1,imported
+2023,Louisiana Ragin' Cajuns,1,1,imported
+2023,Louisiana Tech Bulldogs,1,1,imported
+2023,Louisville Cardinals,0,0,imported
+2023,Marshall Thundering Herd,1,0,imported
+2023,Maryland Terrapins,0,1,imported
+2023,Massachusetts Minutemen,1,1,imported
+2023,Memphis Tigers,1,1,imported
+2023,Miami (OH) RedHawks,0,1,imported
+2023,Miami Hurricanes,0,0,imported
+2023,Michigan State Spartans,1,1,imported
+2023,Michigan Wolverines,1,1,imported
+2023,Middle Tennessee Blue Raiders,1,1,imported
+2023,Minnesota Golden Gophers,1,1,imported
+2023,Mississippi State Bulldogs,0,0,imported
+2023,Missouri Tigers,0,1,imported
+2023,NC State Wolfpack,0,1,imported
+2023,Navy Midshipmen,0,0,imported
+2023,Nebraska Cornhuskers,0,0,imported
+2023,Nevada Wolf Pack,1,1,imported
+2023,New Mexico Lobos,0,0,imported
+2023,New Mexico State Aggies,1,1,imported
+2023,North Carolina Tar Heels,0,1,imported
+2023,North Texas Mean Green,0,0,imported
+2023,Northern Illinois Huskies,1,1,imported
+2023,Northwestern Wildcats,1,0,imported
+2023,Notre Dame Fighting Irish,0,1,imported
+2023,Ohio Bobcats,1,1,imported
+2023,Ohio State Buckeyes,0,1,imported
+2023,Oklahoma Sooners,1,1,imported
+2023,Oklahoma State Cowboys,1,0,imported
+2023,Old Dominion Monarchs,0,1,imported
+2023,Ole Miss Rebels,1,0,imported
+2023,Oregon Ducks,1,1,imported
+2023,Oregon State Beavers,1,1,imported
+2023,Penn State Nittany Lions,1,1,imported
+2023,Pittsburgh Panthers,1,1,imported
+2023,Purdue Boilermakers,0,0,imported
+2023,Rice Owls,1,1,imported
+2023,Rutgers Scarlet Knights,0,1,imported
+2023,SMU Mustangs,1,1,imported
+2023,Sam Houston State,0,0,imported
+2023,San Diego State Aztecs,0,1,imported
+2023,San José State Spartans,1,1,imported
+2023,South Alabama Jaguars,1,1,imported
+2023,South Carolina Gamecocks,0,1,imported
+2023,South Florida Bulls,0,0,imported
+2023,Southern Miss Golden Eagles,1,0,imported
+2023,Stanford Cardinal,0,0,imported
+2023,Syracuse Orange,0,0,imported
+2023,TCU Horned Frogs,1,0,imported
+2023,Temple Owls,1,0,imported
+2023,Tennessee Volunteers,0,1,imported
+2023,Texas A&M Aggies,0,1,imported
+2023,Texas Longhorns,1,1,imported
+2023,Texas State Bobcats,0,0,imported
+2023,Texas Tech Red Raiders,1,1,imported
+2023,Toledo Rockets,1,1,imported
+2023,Troy Trojans,1,0,imported
+2023,Tulane Green Wave,0,0,imported
+2023,Tulsa Golden Hurricane,0,0,imported
+2023,UAB Blazers,0,0,imported
+2023,UCF Knights,0,1,imported
+2023,UCLA Bruins,1,0,imported
+2023,UConn Huskies,1,1,imported
+2023,UL Monroe Warhawks,1,1,imported
+2023,UNLV Rebels,0,0,imported
+2023,USC Trojans,1,1,imported
+2023,UTEP Miners,0,1,imported
+2023,UTSA Roadrunners,0,1,imported
+2023,Utah State Aggies,0,0,imported
+2023,Utah Utes,1,1,imported
+2023,Vanderbilt Commodores,1,1,imported
+2023,Virginia Cavaliers,1,1,imported
+2023,Virginia Tech Hokies,1,1,imported
+2023,Wake Forest Demon Deacons,1,1,imported
+2023,Washington Huskies,1,1,imported
+2023,Washington State Cougars,0,0,imported
+2023,West Virginia Mountaineers,0,1,imported
+2023,Western Kentucky Hilltoppers,0,1,imported
+2023,Western Michigan Broncos,0,1,imported
+2023,Wisconsin Badgers,0,0,imported
+2023,Wyoming Cowboys,1,1,imported
+2024,Air Force Falcons,1,1,imported
+2024,Akron Zips,0,1,imported
+2024,Alabama Crimson Tide,0,0,imported
+2024,App State Mountaineers,1,1,imported
+2024,Arizona State Sun Devils,0,1,imported
+2024,Arizona Wildcats,0,0,imported
+2024,Arkansas Razorbacks,0,1,imported
+2024,Arkansas State Red Wolves,0,1,imported
+2024,Army Black Knights,0,1,imported
+2024,Auburn Tigers,0,0,imported
+2024,BYU Cougars,1,1,imported
+2024,Ball State Cardinals,1,0,imported
+2024,Baylor Bears,0,1,imported
+2024,Boise State Broncos,0,0,imported
+2024,Boston College Eagles,0,0,imported
+2024,Bowling Green Falcons,1,1,imported
+2024,Buffalo Bulls,0,0,imported
+2024,California Golden Bears,0,1,imported
+2024,Central Michigan Chippewas,0,1,imported
+2024,Charlotte 49ers,1,1,imported
+2024,Cincinnati Bearcats,1,1,imported
+2024,Clemson Tigers,1,1,imported
+2024,Coastal Carolina Chanticleers,1,1,imported
+2024,Colorado Buffaloes,0,0,imported
+2024,Colorado State Rams,1,1,imported
+2024,Duke Blue Devils,0,0,imported
+2024,East Carolina Pirates,0,1,imported
+2024,Eastern Michigan Eagles,0,1,imported
+2024,Florida Atlantic Owls,1,1,imported
+2024,Florida Gators,1,1,imported
+2024,Florida International Panthers,1,1,imported
+2024,Florida State Seminoles,1,1,imported
+2024,Fresno State Bulldogs,1,1,imported
+2024,Georgia Bulldogs,1,1,imported
+2024,Georgia Southern Eagles,0,1,imported
+2024,Georgia State Panthers,0,0,imported
+2024,Georgia Tech Yellow Jackets,1,0,imported
+2024,Hawai'i Rainbow Warriors,0,0,imported
+2024,Houston Cougars,0,0,imported
+2024,Illinois Fighting Illini,1,1,imported
+2024,Indiana Hoosiers,0,0,imported
+2024,Iowa Hawkeyes,0,1,imported
+2024,Iowa State Cyclones,0,1,imported
+2024,Jacksonville State Gamecocks,1,0,imported
+2024,James Madison Dukes,0,0,imported
+2024,Kansas Jayhawks,0,1,imported
+2024,Kansas State Wildcats,0,1,imported
+2024,Kennesaw State Owls,0,0,imported
+2024,Kent State Golden Flashes,0,1,imported
+2024,Kentucky Wildcats,0,1,imported
+2024,LSU Tigers,0,0,imported
+2024,Liberty Flames,1,1,imported
+2024,Louisiana Ragin' Cajuns,1,0,imported
+2024,Louisiana Tech Bulldogs,1,0,imported
+2024,Louisville Cardinals,1,1,imported
+2024,Marshall Thundering Herd,0,1,imported
+2024,Maryland Terrapins,1,1,imported
+2024,Massachusetts Minutemen,0,1,imported
+2024,Memphis Tigers,1,0,imported
+2024,Miami (OH) RedHawks,1,1,imported
+2024,Miami Hurricanes,1,1,imported
+2024,Michigan State Spartans,0,0,imported
+2024,Michigan Wolverines,0,0,imported
+2024,Middle Tennessee Blue Raiders,0,0,imported
+2024,Minnesota Golden Gophers,1,0,imported
+2024,Mississippi State Bulldogs,0,0,imported
+2024,Missouri Tigers,1,0,imported
+2024,NC State Wolfpack,1,1,imported
+2024,Navy Midshipmen,0,1,imported
+2024,Nebraska Cornhuskers,1,1,imported
+2024,Nevada Wolf Pack,0,0,imported
+2024,New Mexico Lobos,0,0,imported
+2024,New Mexico State Aggies,0,0,imported
+2024,North Carolina Tar Heels,1,1,imported
+2024,North Texas Mean Green,1,1,imported
+2024,Northern Illinois Huskies,0,1,imported
+2024,Northwestern Wildcats,0,0,imported
+2024,Notre Dame Fighting Irish,0,1,imported
+2024,Ohio Bobcats,0,0,imported
+2024,Ohio State Buckeyes,1,1,imported
+2024,Oklahoma Sooners,0,1,imported
+2024,Oklahoma State Cowboys,1,1,imported
+2024,Old Dominion Monarchs,1,1,imported
+2024,Ole Miss Rebels,1,1,imported
+2024,Oregon Ducks,1,1,imported
+2024,Oregon State Beavers,0,0,imported
+2024,Penn State Nittany Lions,0,0,imported
+2024,Pittsburgh Panthers,0,1,imported
+2024,Purdue Boilermakers,1,1,imported
+2024,Rice Owls,1,1,imported
+2024,Rutgers Scarlet Knights,1,1,imported
+2024,SMU Mustangs,1,1,imported
+2024,Sam Houston State,0,0,imported
+2024,San Diego State Aztecs,0,0,imported
+2024,San José State Spartans,0,1,imported
+2024,South Alabama Jaguars,0,0,imported
+2024,South Carolina Gamecocks,1,1,imported
+2024,South Florida Bulls,1,1,imported
+2024,Southern Miss Golden Eagles,0,0,imported
+2024,Stanford Cardinal,1,1,imported
+2024,Syracuse Orange,0,0,imported
+2024,TCU Horned Frogs,1,0,imported
+2024,Temple Owls,1,1,imported
+2024,Tennessee Volunteers,1,1,imported
+2024,Texas A&M Aggies,0,0,imported
+2024,Texas Longhorns,1,1,imported
+2024,Texas State Bobcats,1,0,imported
+2024,Texas Tech Red Raiders,1,1,imported
+2024,Toledo Rockets,1,1,imported
+2024,Troy Trojans,0,0,imported
+2024,Tulane Green Wave,0,0,imported
+2024,Tulsa Golden Hurricane,1,1,imported
+2024,UAB Blazers,1,1,imported
+2024,UCF Knights,0,1,imported
+2024,UCLA Bruins,0,0,imported
+2024,UConn Huskies,0,0,imported
+2024,UL Monroe Warhawks,0,0,imported
+2024,UNLV Rebels,1,1,imported
+2024,USC Trojans,1,0,imported
+2024,UTEP Miners,0,0,imported
+2024,UTSA Roadrunners,1,1,imported
+2024,Utah State Aggies,1,0,imported
+2024,Utah Utes,1,1,imported
+2024,Vanderbilt Commodores,0,0,imported
+2024,Virginia Cavaliers,1,1,imported
+2024,Virginia Tech Hokies,1,1,imported
+2024,Wake Forest Demon Deacons,1,1,imported
+2024,Washington Huskies,0,0,imported
+2024,Washington State Cougars,1,1,imported
+2024,West Virginia Mountaineers,1,1,imported
+2024,Western Kentucky Hilltoppers,0,1,imported
+2024,Western Michigan Broncos,0,0,imported
+2024,Wisconsin Badgers,1,1,imported
+2024,Wyoming Cowboys,0,0,imported
+2025,Air Force Falcons,1,1,imported
+2025,Akron Zips,0,1,imported
+2025,Alabama Crimson Tide,1,1,imported
+2025,App State Mountaineers,0,0,imported
+2025,Arizona State Sun Devils,1,1,imported
+2025,Arizona Wildcats,0,0,imported
+2025,Arkansas Razorbacks,1,1,imported
+2025,Arkansas State Red Wolves,1,0,imported
+2025,Army Black Knights,1,1,imported
+2025,Auburn Tigers,1,1,imported
+2025,BYU Cougars,1,1,imported
+2025,Ball State Cardinals,0,1,imported
+2025,Baylor Bears,1,1,imported
+2025,Boise State Broncos,1,1,imported
+2025,Boston College Eagles,1,1,imported
+2025,Bowling Green Falcons,0,0,imported
+2025,Buffalo Bulls,1,1,imported
+2025,California Golden Bears,0,0,imported
+2025,Central Michigan Chippewas,0,0,imported
+2025,Charlotte 49ers,0,0,imported
+2025,Cincinnati Bearcats,1,1,imported
+2025,Clemson Tigers,1,1,imported
+2025,Coastal Carolina Chanticleers,0,0,imported
+2025,Colorado Buffaloes,1,1,imported
+2025,Colorado State Rams,1,0,imported
+2025,Delaware Fightin' Blue Hens,0,0,imported
+2025,Duke Blue Devils,1,1,imported
+2025,East Carolina Pirates,1,0,imported
+2025,Eastern Michigan Eagles,1,1,imported
+2025,Florida Atlantic Owls,0,0,imported
+2025,Florida Gators,0,1,imported
+2025,Florida International Panthers,0,1,imported
+2025,Florida State Seminoles,0,0,imported
+2025,Fresno State Bulldogs,0,0,imported
+2025,Georgia Bulldogs,1,1,imported
+2025,Georgia Southern Eagles,1,1,imported
+2025,Georgia State Panthers,0,0,imported
+2025,Georgia Tech Yellow Jackets,1,0,imported
+2025,Hawai'i Rainbow Warriors,0,1,imported
+2025,Houston Cougars,0,0,imported
+2025,Illinois Fighting Illini,1,1,imported
+2025,Indiana Hoosiers,1,1,imported
+2025,Iowa Hawkeyes,1,1,imported
+2025,Iowa State Cyclones,1,1,imported
+2025,Jacksonville State Gamecocks,0,0,imported
+2025,James Madison Dukes,1,0,imported
+2025,Kansas Jayhawks,1,1,imported
+2025,Kansas State Wildcats,1,1,imported
+2025,Kennesaw State Owls,0,0,imported
+2025,Kent State Golden Flashes,0,0,imported
+2025,Kentucky Wildcats,1,1,imported
+2025,LSU Tigers,1,1,imported
+2025,Liberty Flames,1,1,imported
+2025,Louisiana Ragin' Cajuns,1,1,imported
+2025,Louisiana Tech Bulldogs,0,0,imported
+2025,Louisville Cardinals,1,1,imported
+2025,Marshall Thundering Herd,0,0,imported
+2025,Maryland Terrapins,0,1,imported
+2025,Massachusetts Minutemen,0,0,imported
+2025,Memphis Tigers,1,1,imported
+2025,Miami (OH) RedHawks,1,1,imported
+2025,Miami Hurricanes,1,0,imported
+2025,Michigan State Spartans,1,1,imported
+2025,Michigan Wolverines,0,1,imported
+2025,Middle Tennessee Blue Raiders,1,1,imported
+2025,Minnesota Golden Gophers,1,0,imported
+2025,Mississippi State Bulldogs,1,1,imported
+2025,Missouri State Bears,0,0,imported
+2025,Missouri Tigers,1,1,imported
+2025,NC State Wolfpack,0,0,imported
+2025,Navy Midshipmen,1,1,imported
+2025,Nebraska Cornhuskers,0,0,imported
+2025,Nevada Wolf Pack,0,1,imported
+2025,New Mexico Lobos,0,0,imported
+2025,New Mexico State Aggies,0,1,imported
+2025,North Carolina Tar Heels,0,0,imported
+2025,North Texas Mean Green,1,0,imported
+2025,Northern Illinois Huskies,0,0,imported
+2025,Northwestern Wildcats,1,1,imported
+2025,Notre Dame Fighting Irish,1,0,imported
+2025,Ohio Bobcats,0,1,imported
+2025,Ohio State Buckeyes,1,0,imported
+2025,Oklahoma Sooners,0,1,imported
+2025,Oklahoma State Cowboys,0,0,imported
+2025,Old Dominion Monarchs,1,1,imported
+2025,Ole Miss Rebels,1,1,imported
+2025,Oregon Ducks,1,1,imported
+2025,Oregon State Beavers,1,0,imported
+2025,Penn State Nittany Lions,1,0,imported
+2025,Pittsburgh Panthers,1,1,imported
+2025,Purdue Boilermakers,0,0,imported
+2025,Rice Owls,0,0,imported
+2025,Rutgers Scarlet Knights,1,0,imported
+2025,SMU Mustangs,1,1,imported
+2025,Sam Houston Bearkats,0,0,imported
+2025,San Diego State Aztecs,1,0,imported
+2025,San José State Spartans,1,1,imported
+2025,South Alabama Jaguars,0,1,imported
+2025,South Carolina Gamecocks,0,1,imported
+2025,South Florida Bulls,1,1,imported
+2025,Southern Miss Golden Eagles,0,0,imported
+2025,Stanford Cardinal,0,1,imported
+2025,Syracuse Orange,1,1,imported
+2025,TCU Horned Frogs,1,1,imported
+2025,Temple Owls,0,0,imported
+2025,Tennessee Volunteers,1,1,imported
+2025,Texas A&M Aggies,1,1,imported
+2025,Texas Longhorns,1,1,imported
+2025,Texas State Bobcats,0,1,imported
+2025,Texas Tech Red Raiders,0,0,imported
+2025,Toledo Rockets,1,1,imported
+2025,Troy Trojans,1,1,imported
+2025,Tulane Green Wave,1,1,imported
+2025,Tulsa Golden Hurricane,0,0,imported
+2025,UAB Blazers,1,0,imported
+2025,UCF Knights,0,0,imported
+2025,UCLA Bruins,0,1,imported
+2025,UConn Huskies,1,1,imported
+2025,UL Monroe Warhawks,1,1,imported
+2025,UNLV Rebels,0,0,imported
+2025,USC Trojans,0,1,imported
+2025,UTEP Miners,1,1,imported
+2025,UTSA Roadrunners,1,1,imported
+2025,Utah State Aggies,0,0,imported
+2025,Utah Utes,0,1,imported
+2025,Vanderbilt Commodores,1,0,imported
+2025,Virginia Cavaliers,1,1,imported
+2025,Virginia Tech Hokies,0,0,imported
+2025,Wake Forest Demon Deacons,0,0,imported
+2025,Washington Huskies,0,0,imported
+2025,Washington State Cougars,0,0,imported
+2025,West Virginia Mountaineers,0,0,imported
+2025,Western Kentucky Hilltoppers,0,0,imported
+2025,Western Michigan Broncos,1,0,imported
+2025,Wisconsin Badgers,0,1,imported
+2025,Wyoming Cowboys,1,1,imported
+2026,Air Force Falcons,1,0,imported
+2026,Akron Zips,1,1,imported
+2026,Alabama Crimson Tide,1,1,imported
+2026,App State Mountaineers,0,1,imported
+2026,Arizona State Sun Devils,1,1,imported
+2026,Arizona Wildcats,1,1,imported
+2026,Arkansas Razorbacks,0,0,imported
+2026,Arkansas State Red Wolves,0,1,imported
+2026,Army Black Knights,1,0,imported
+2026,Auburn Tigers,0,1,imported
+2026,BYU Cougars,1,0,imported
+2026,Ball State Cardinals,1,1,imported
+2026,Baylor Bears,1,0,imported
+2026,Boise State Broncos,1,1,imported
+2026,Boston College Eagles,0,0,imported
+2026,Bowling Green Falcons,0,0,imported
+2026,Buffalo Bulls,0,0,imported
+2026,California Golden Bears,0,0,imported
+2026,Central Michigan Chippewas,1,1,imported
+2026,Charlotte 49ers,1,1,imported
+2026,Cincinnati Bearcats,0,0,imported
+2026,Clemson Tigers,0,1,imported
+2026,Coastal Carolina Chanticleers,0,0,imported
+2026,Colorado Buffaloes,0,0,imported
+2026,Colorado State Rams,0,1,imported
+2026,Delaware Fightin' Blue Hens,1,1,imported
+2026,Duke Blue Devils,1,1,imported
+2026,East Carolina Pirates,0,0,imported
+2026,Eastern Michigan Eagles,1,0,imported
+2026,Florida Atlantic Owls,0,1,imported
+2026,Florida Gators,0,0,imported
+2026,Florida International Panthers,1,1,imported
+2026,Florida State Seminoles,0,1,imported
+2026,Fresno State Bulldogs,1,1,imported
+2026,Georgia Bulldogs,1,1,imported
+2026,Georgia Southern Eagles,1,0,imported
+2026,Georgia State Panthers,1,0,imported
+2026,Georgia Tech Yellow Jackets,0,0,imported
+2026,Hawai'i Rainbow Warriors,1,1,imported
+2026,Houston Cougars,1,1,imported
+2026,Illinois Fighting Illini,1,0,imported
+2026,Indiana Hoosiers,1,1,imported
+2026,Iowa Hawkeyes,1,1,imported
+2026,Iowa State Cyclones,0,0,imported
+2026,Jacksonville State Gamecocks,0,1,imported
+2026,James Madison Dukes,0,0,imported
+2026,Kansas Jayhawks,1,1,imported
+2026,Kansas State Wildcats,0,0,imported
+2026,Kennesaw State Owls,1,1,imported
+2026,Kent State Golden Flashes,1,1,imported
+2026,Kentucky Wildcats,0,0,imported
+2026,LSU Tigers,0,1,imported
+2026,Liberty Flames,1,1,imported
+2026,Louisiana Ragin' Cajuns,1,1,imported
+2026,Louisiana Tech Bulldogs,0,1,imported
+2026,Louisville Cardinals,1,0,imported
+2026,Marshall Thundering Herd,1,0,imported
+2026,Maryland Terrapins,0,1,imported
+2026,Massachusetts Minutemen,0,1,imported
+2026,Memphis Tigers,0,0,imported
+2026,Miami (OH) RedHawks,0,1,imported
+2026,Miami Hurricanes,1,1,imported
+2026,Michigan State Spartans,0,1,imported
+2026,Michigan Wolverines,0,0,imported
+2026,Middle Tennessee Blue Raiders,0,1,imported
+2026,Minnesota Golden Gophers,1,1,imported
+2026,Mississippi State Bulldogs,1,0,imported
+2026,Missouri State Bears,0,0,imported
+2026,Missouri Tigers,0,1,imported
+2026,NC State Wolfpack,1,1,imported
+2026,Navy Midshipmen,1,0,imported
+2026,Nebraska Cornhuskers,1,0,imported
+2026,Nevada Wolf Pack,0,1,imported
+2026,New Mexico Lobos,1,1,imported
+2026,New Mexico State Aggies,1,1,imported
+2026,North Carolina Tar Heels,0,1,imported
+2026,North Dakota State Bison,0,0,imported
+2026,North Texas Mean Green,0,0,imported
+2026,Northern Illinois Huskies,0,0,imported
+2026,Northwestern Wildcats,0,1,imported
+2026,Notre Dame Fighting Irish,1,1,imported
+2026,Ohio Bobcats,0,0,imported
+2026,Ohio State Buckeyes,1,1,imported
+2026,Oklahoma Sooners,1,1,imported
+2026,Oklahoma State Cowboys,0,0,imported
+2026,Old Dominion Monarchs,0,1,imported
+2026,Ole Miss Rebels,0,1,imported
+2026,Oregon Ducks,0,1,imported
+2026,Oregon State Beavers,0,0,imported
+2026,Penn State Nittany Lions,0,0,imported
+2026,Pittsburgh Panthers,1,0,imported
+2026,Purdue Boilermakers,1,0,imported
+2026,Rice Owls,1,1,imported
+2026,Rutgers Scarlet Knights,1,0,imported
+2026,SMU Mustangs,0,0,imported
+2026,Sacramento State Hornets,0,0,imported
+2026,Sam Houston Bearkats,1,1,imported
+2026,San Diego State Aztecs,1,0,imported
+2026,San José State Spartans,1,0,imported
+2026,South Alabama Jaguars,0,1,imported
+2026,South Carolina Gamecocks,0,1,imported
+2026,South Florida Bulls,0,0,imported
+2026,Southern Miss Golden Eagles,0,0,imported
+2026,Stanford Cardinal,0,0,imported
+2026,Syracuse Orange,1,0,imported
+2026,TCU Horned Frogs,1,1,imported
+2026,Temple Owls,1,1,imported
+2026,Tennessee Volunteers,1,0,imported
+2026,Texas A&M Aggies,1,0,imported
+2026,Texas Longhorns,1,1,imported
+2026,Texas State Bobcats,1,0,imported
+2026,Texas Tech Red Raiders,1,1,imported
+2026,Toledo Rockets,0,0,imported
+2026,Troy Trojans,0,1,imported
+2026,Tulane Green Wave,0,1,imported
+2026,Tulsa Golden Hurricane,1,1,imported
+2026,UAB Blazers,1,0,imported
+2026,UCF Knights,1,1,imported
+2026,UCLA Bruins,0,0,imported
+2026,UConn Huskies,0,0,imported
+2026,UL Monroe Warhawks,0,0,imported
+2026,UNLV Rebels,1,1,imported
+2026,USC Trojans,1,0,imported
+2026,UTEP Miners,0,1,imported
+2026,UTSA Roadrunners,0,1,imported
+2026,Utah State Aggies,0,1,imported
+2026,Utah Utes,0,0,imported
+2026,Vanderbilt Commodores,1,1,imported
+2026,Virginia Cavaliers,0,1,imported
+2026,Virginia Tech Hokies,0,0,imported
+2026,Wake Forest Demon Deacons,1,1,imported
+2026,Washington Huskies,0,1,imported
+2026,Washington State Cougars,0,0,imported
+2026,West Virginia Mountaineers,1,1,imported
+2026,Western Kentucky Hilltoppers,0,1,imported
+2026,Western Michigan Broncos,1,0,imported
+2026,Wisconsin Badgers,1,1,imported
+2026,Wyoming Cowboys,0,1,imported

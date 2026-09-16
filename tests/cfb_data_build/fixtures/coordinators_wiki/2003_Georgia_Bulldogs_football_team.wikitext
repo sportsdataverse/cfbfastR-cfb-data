@@ -1,0 +1,366 @@
+<!-- title: 2003 Georgia Bulldogs football team | revid: 1337686692 -->
+{{short description|American college football season}}
+{{Use mdy dates|date=August 2023}}
+{{Use American English|date=February 2026}}
+{{Infobox college sports team season
+| year = 2003
+| team = Georgia Bulldogs
+| sport = football
+| image = Georgia Athletics logo.svg
+| image_size = 150
+| conference = [[Southeastern Conference]]
+| division = Eastern Division
+| short_conf = SEC
+| CoachRank = 6
+| APRank = 7
+| record = 11–3
+| conf_record = 6–2
+| head_coach = [[Mark Richt]]
+| hc_year = 3rd
+| off_coach = [[Neil Callaway]]
+| oc_year = 3rd
+| off_scheme = [[Pro-style offense|Pro-style]]
+| def_coach = [[Brian VanGorder]]
+| dc_year = 3rd
+| def_scheme = [[4–3 defense|4–3]]
+| captain = 
+| stadium = [[Sanford Stadium]]
+| champion = SEC Eastern Division co-champion<br>Capital One Bowl champion
+| conf_champ = [[2003 SEC Championship Game|SEC Championship Game]]
+| conf_champ_result = {{Tooltip|L|Lost}} 13–34 vs. [[2003 LSU Tigers football team|LSU]]
+| bowl = [[2004 Capital One Bowl|Capital One Bowl]]
+| bowl_result = {{Tooltip|W|Won}} 34–27 <sup>{{Abbr|OT|Overtime}}</sup> vs. [[2003 Purdue Boilermakers football team|Purdue]]
+}}
+{{2003 Southeastern Conference football standings}}
+The '''2003 Georgia Bulldogs football team''' represented the [[University of Georgia]] as a member of the [[Southeastern Conference]] (SEC) during the [[2003 NCAA Division I-A football season]]. Led by third-year head coach [[Mark Richt]], the Bulldogs compiled an overall record of 11–3 with a mark of 6–2 in conference play, sharing the SEC's Eastern Division title with [[2003 Florida Gators football team|Florida]] and [[2003 Tennessee Volunteers football team|Tennessee]]. Georgia advanced to the [[2003 SEC Championship Game|SEC Championship Game]], where the Bulldogs lost to the eventual [[Bowl Championship Series]] (BCS) champion, [[2003 LSU Tigers football team|LSU]]. The Bulldogs finished the season with an overtime win in the [[2004 Capital One Bowl|Capital One Bowl]] over [[2003 Purdue Boilermakers football team|Purdue]]. The team played home games at [[Sanford Stadium]] in [[Athens, Georgia]].
+
+==Schedule==
+{{CFB schedule
+| rankyear = 2003
+| poll = AP
+| timezone = Eastern
+
+|{{CFB schedule entry
+| date = August 30
+| time = 12:00 p.m.
+| w/l = w
+| nonconf = y
+| away = y
+| rank = 9
+| opponent = [[2003 Clemson Tigers football team|Clemson]]
+| site_stadium = [[Memorial Stadium (Clemson)|Memorial Stadium]]
+| site_cityst = [[Clemson, South Carolina|Clemson, SC]]
+| gamename = [[Clemson–Georgia football rivalry|rivalry]]
+| tv = [[College Football on ABC|ABC]]
+| score = 30–0
+| attend = 82,034
+}}
+|{{CFB schedule entry
+| date = September 6
+| time = 1:00 p.m.
+| w/l = w
+| nonconf = y
+| rank = 8
+| opponent = [[2003 Middle Tennessee Blue Raiders football team|Middle Tennessee]]
+| site_stadium = [[Sanford Stadium]]
+| site_cityst = [[Athens, Georgia|Athens, GA]]
+| tv = [[Pay-per-view|PPV]]
+| score = 29–10
+| attend = 92,058
+}}
+|{{CFB schedule entry
+| date = September 13
+| time = 3:30 p.m.
+| w/l = w
+| rank = 8
+| opponent = [[2003 South Carolina Gamecocks football team|South Carolina]]
+| opprank = 25
+| site_stadium = Sanford Stadium
+| site_cityst = Athens, GA
+| gamename = [[Georgia–South Carolina football rivalry|rivalry]]
+| tv = [[College Football on CBS Sports|CBS]]
+| score = 31–7
+| attend = 92,058
+}}
+|{{CFB schedule entry
+| date = September 20
+| time = 3:30 p.m.
+| w/l = l
+| away = y
+| rank = 7
+| opponent = [[2003 LSU Tigers football team|LSU]]
+| opprank = 11
+| site_stadium = [[Tiger Stadium (Louisiana)|Tiger Stadium]]
+| site_cityst = [[Baton Rouge, Louisiana|Baton Rouge, LA]]
+| gamename = ''[[College GameDay (football TV program)|College GameDay]]''
+| tv = CBS
+| score = 10–17
+| attend = 92,251
+}}
+|{{CFB schedule entry
+| date = October 4
+| time = 3:30 p.m.
+| w/l = w
+| rank = 12
+| opponent = [[2003 Alabama Crimson Tide football team|Alabama]]
+| site_stadium = Sanford Stadium
+| site_cityst = Athens, GA
+| gamename = [[Alabama–Georgia football rivalry|rivalry]]
+| tv = CBS
+| score = 37–23
+| attend = 92,058
+}}
+|{{CFB schedule entry
+| date = October 11
+| time = 7:45 p.m.
+| w/l = w
+| away = y
+| rank = 8
+| opponent = [[2003 Tennessee Volunteers football team|Tennessee]]
+| opprank = 13
+| site_stadium = [[Neyland Stadium]]
+| site_cityst = [[Knoxville, Tennessee|Knoxville, TN]]
+| gamename = [[Georgia–Tennessee football rivalry|rivalry]]
+| tv = [[ESPN2]]
+| score = 41–14
+| attend = 107,517
+}}
+|{{CFB schedule entry
+| date = October 18
+| time = 2:00 p.m.
+| w/l = w
+| away = y
+| rank = 5
+| opponent = [[2003 Vanderbilt Commodores football team|Vanderbilt]]
+| site_stadium = [[FirstBank Stadium|Vanderbilt Stadium]]
+| site_cityst = [[Nashville, Tennessee|Nashville, TN]]
+| gamename = [[Georgia–Vanderbilt football rivalry|rivalry]]
+| tv = PPV
+| score = 27–8
+| attend = 27,823
+}}
+|{{CFB schedule entry
+| date = October 25
+| time = 1:00 p.m.
+| w/l = w
+| nonconf = y
+| homecoming = y
+| rank = 5
+| opponent = [[2003 UAB Blazers football team|UAB]]
+| site_stadium = Sanford Stadium
+| site_cityst = Athens, GA
+| tv = 
+| score = 16–13
+| attend = 92,058
+| source = <ref>{{cite news|url=https://www.newspapers.com/clip/90573872/just-hangin-on-dogs-dodge-a-homecoming/|work=The Atlanta Constitution|title=Just hangin' on, Dogs dodge a homecoming comeuppance|date=October 26, 2003|accessdate=December 14, 2021|via=[[Newspapers.com]]}}</ref>
+}}
+|{{CFB schedule entry
+| date = November 1
+| time = 3:30 p.m.
+| w/l = l
+| neutral = y
+| rank = 4
+| opponent = [[2003 Florida Gators football team|Florida]]
+| opprank = 23
+| site_stadium = [[EverBank Stadium|Alltel Stadium]]
+| site_cityst = [[Jacksonville, Florida|Jacksonville, FL]]
+| gamename = [[Florida–Georgia football rivalry|rivalry]]
+| tv = CBS
+| score = 13–16
+| attend = 84,411
+}}
+|{{CFB schedule entry
+| date = November 15
+| time = 3:30 p.m.
+| w/l = w
+| rank = 6
+| opponent = [[2003 Auburn Tigers football team|Auburn]]
+| site_stadium = Sanford Stadium
+| site_cityst = Athens, GA
+| gamename = [[Deep South's Oldest Rivalry]]
+| tv = CBS
+| score = 26–7
+| attend = 92,058
+}}
+|{{CFB schedule entry
+| date = November 22
+| time = 12:30 p.m.
+| w/l = w
+| rank = 6
+| opponent = [[2003 Kentucky Wildcats football team|Kentucky]]
+| site_stadium = Sanford Stadium
+| site_cityst = Athens, GA
+| tv = [[Raycom Sports|JPS]]
+| score = 30–10
+| attend = 92,058
+}}
+|{{CFB schedule entry
+| date = November 29
+| time = 1:00 p.m.
+| w/l = w
+| nonconf = y
+| away = y
+| rank = 5
+| opponent = [[2003 Georgia Tech Yellow Jackets football team|Georgia Tech]]
+| site_stadium = [[Bobby Dodd Stadium]]
+| site_cityst = [[Atlanta|Atlanta, GA]]
+| gamename = [[Clean, Old-Fashioned Hate]]
+| tv = ABC
+| score = 34–17
+| attend = 55,000
+}}
+|{{CFB schedule entry
+| date = December 6
+| time = 8:00 p.m.
+| w/l = l
+| neutral = y
+| rank = 5
+| opponent = LSU
+| opprank = 3
+| site_stadium = [[Georgia Dome]]
+| site_cityst = Atlanta, GA
+| gamename = [[2003 SEC Championship Game|SEC Championship Game]], ''College GameDay''
+| tv = CBS
+| score = 13–34
+| attend = 74,913
+}}
+|{{CFB schedule entry
+| date = January 1, 2004
+| time = 1:00 p.m.
+| w/l = w
+| nonconf = y
+| neutral = y
+| rank = 11
+| opponent = [[2003 Purdue Boilermakers football team|Purdue]]
+| opprank = 12
+| site_stadium = [[Camping World Stadium|Florida Citrus Bowl]]
+| site_cityst = [[Orlando, Florida|Orlando, FL]]
+| gamename = [[2004 Capital One Bowl|Capital One Bowl]]
+| tv = ABC
+| score = 34–27
+| overtime = OT
+| attend = 64,565
+}}
+}}
+<ref>{{cite web |author=<!--Not stated--> |title=Georgia Bulldogs Schedule 2003 |url=https://www.espn.com/college-football/team/schedule/_/id/61/season/2003 |publisher=[[ESPN]] |access-date=September 15, 2025 }}</ref><ref>{{cite web |author=<!--Not stated--> |title=2003 Georgia Bulldogs Schedule and Results |url=https://www.sports-reference.com/cfb/schools/georgia/2003-schedule.html |website=College Football at Sports-Reference.com |publisher=[[Sports Reference]] |access-date=September 15, 2025 }}</ref><ref>{{cite web |author=<!--Not stated--> |title=2003 Football Schedule |url=https://georgiadogs.com/sports/football/schedule/2003 |publisher=University of Georgia Athletics |access-date=September 15, 2025 }}</ref>
+
+==Rankings==
+{{See also|2003 NCAA Division I-A football rankings}}
+{{Ranking movements
+| poll1title     = [[AP poll|AP]]
+| poll1firstweek = 0
+| poll1lastweek  = 16
+| poll1_0=11
+| poll1_1=8
+| poll1_2=8
+| poll1_3=7
+| poll1_4=12
+| poll1_5=11
+| poll1_6=8
+| poll1_7=4
+| poll1_8=4
+| poll1_9=4
+| poll1_10=9
+| poll1_11=7
+| poll1_12=6
+| poll1_13=5
+| poll1_14=5
+| poll1_15=11
+| poll1_16=7
+| poll2title     = [[Coaches Poll|Coaches]]
+| poll2firstweek =0
+| poll2lastweek  =16
+| poll2_0=9
+| poll2_1=8
+| poll2_2=8
+| poll2_3=7
+| poll2_4=12
+| poll2_5=12
+| poll2_6=10
+| poll2_7=5
+| poll2_8=5
+| poll2_9=4
+| poll2_10=9
+| poll2_11=6
+| poll2_12=6
+| poll2_13=5
+| poll2_14=5
+| poll2_15=11
+| poll2_16=6
+| poll3title     = [[Bowl Championship Series|BCS]]
+| poll3firstweek = 8
+| poll3lastweek  = 15
+| poll3_8=4
+| poll3_9=5
+| poll3_10=10
+| poll3_11=9
+| poll3_12=6
+| poll3_13=7
+| poll3_14=7
+| poll3_15=12
+}}
+
+==Game summaries==
+===Clemson===
+{{AFB game box start
+|Title=
+|Visitor=Georgia
+|V1=10 |V2=3 |V3=3 |V4=14
+|Host=Clemson
+|H1= 0|H2= 0|H3=0 |H4=0
+|Date=August 30
+|Location=[[Memorial Stadium (Clemson)|Memorial Stadium]], [[Clemson, South Carolina]]
+|StartTime=12:00 p.m.
+|TimeZone=EST
+|ElapsedTime=
+|Attendance=
+|Weather=
+|Referee=
+|TVAnnouncers=
+|TVStation=
+}}
+    {{AFB Game Box Scoring Entry |FirstEntry=yes |Quarter=Q1 |Time=9:21 |Team=UGA |Event=[[Fred Gibson (American football)|Fred Gibson]] 56 yard pass from [[David Greene (American football)|David Greene]] (Billy Bennett kick) |Score= UGA 7–0}}
+    {{AFB Game Box Scoring Entry |Quarter=Q1 |Time=1:50 |Team=UGA |Event=Billy Bennett 34 yard field goal |Score= UGA 10–0}}
+    {{AFB Game Box Scoring Entry |Quarter=Q2 |Time= 11:09|Team=UGA |Event=Billy Bennett 30 yard field goal |Score= UGA 13–0}}
+    {{AFB Game Box Scoring Entry |Quarter=Q3 |Time= 4:32|Team= UGA|Event= Billy Bennett 42 yard field goal |Score= UGA 16–0}}
+    {{AFB Game Box Scoring Entry |Quarter=Q4 |Time= 5:53|Team= UGA|Event=David Greene 3 yard run (Billy Bennett kick) |Score= UGA 23–0}}
+    {{AFB Game Box Scoring Entry |Quarter=Q4 |Time=2:42 |Team= UGA|Event=[[D. J. Shockley|D.J. Shockley]] 29 yard run (Billy Bennett kick) |Score=UGA 30–0 |LastEntry=yes}}
+{{AFB game box end}}
+
+<ref>[https://www.espn.com/college-football/boxscore?gameId=232420228 ESPN]</ref>
+
+{{Clear}}
+
+==Roster==
+{{American football roster/Header
+| year = 	2003
+| team = Georgia Bulldogs
+| teamcolors = f
+| offensive_players =
+{{American football roster/Player|num=14|class=Jr|first=David|last=Greene|dab=David Greene (American football)|pos=QB|link=y}}
+{{American football roster/Player|num=74|class=So|first=Max|last=Jean-Gilles|pos=OT|link=y}}
+{{American football roster/Player|num=3|class=So|first=D. J.|last=Shockley|pos=QB|link=y}}
+| defensive_players=
+{{American football roster/Player|num=22|class=Jr|first=Decory|last=Bryant|pos=CB}}
+{{American football roster/Player|num=10|class=So|first=Thomas|last=Davis|dab=Thomas Davis Sr.|pos=LB|link=y}}
+{{American football roster/Player|num=23|class=So|first=Tim|last=Jennings|pos=CB|link=y}}
+{{American football roster/Player|num=6|class=Sr|first=Sean|last=Jones|dab=Sean Jones (safety)|pos=DB|link=y}}
+{{American football roster/Player|num=47|class=Jr|first=David|last=Pollack|pos=DE|link=y}}
+| special_teams_players=
+
+}}
+{{American football roster/Footer|roster_url=https://web.archive.org/web/20031205024113/http://georgiadogs.ocsn.com:80/sports/m-footbl/mtt/geo-m-footbl-mtt.html
+| head_coach = *[[Mark Richt]]
+| asst_coach = 
+| accessdate= 
+}}
+
+==References==
+{{Reflist}}
+
+{{Georgia Bulldogs football navbox}}
+
+[[Category:2003 Southeastern Conference football season|Georgia]]
+[[Category:Georgia Bulldogs football seasons]]
+[[Category:Citrus Bowl champion seasons]]
+[[Category:2003 in sports in Georgia (U.S. state)|Georgia Bulldogs football]]

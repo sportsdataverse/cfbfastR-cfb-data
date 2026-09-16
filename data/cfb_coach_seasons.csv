@@ -1693,6 +1693,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2018,Troy Calhoun,Air Force,Mountain West,12,5,7,true
 2018,Terry Bowden,Akron,Mid-American,12,4,8,true
 2018,Nick Saban,Alabama,SEC,15,14,1,true
+2018,Mark Ivey,App State,Sun Belt,1,1,0,false
 2018,Scott Satterfield,App State,Sun Belt,12,10,2,true
 2018,Kevin Sumlin,Arizona,Pac-12,12,5,7,true
 2018,Herm Edwards,Arizona State,Pac-12,13,7,6,true
@@ -1705,6 +1706,8 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2018,Matt Rhule,Baylor,Big 12,13,7,6,true
 2018,Bryan Harsin,Boise State,Mountain West,13,10,3,true
 2018,Steve Addazio,Boston College,ACC,12,7,5,true
+2018,Carl Pelini,Bowling Green,Mid-American,5,2,3,false
+2018,Mike Jinks,Bowling Green,Mid-American,7,1,6,false
 2018,Lance Leipold,Buffalo,Mid-American,14,10,4,true
 2018,Justin Wilcox,California,Pac-12,13,7,6,true
 2018,John Bonamego,Central Michigan,Mid-American,12,1,11,true
@@ -1712,9 +1715,11 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2018,Luke Fickell,Cincinnati,American Athletic,13,11,2,true
 2018,Dabo Swinney,Clemson,ACC,15,15,0,true
 2018,Joe Moglia,Coastal Carolina,Sun Belt,12,5,7,true
+2018,Kurt Roper,Colorado,Pac-12,1,0,1,false
 2018,Mike MacIntyre,Colorado,Pac-12,11,5,6,true
 2018,Mike Bobo,Colorado State,Mountain West,12,3,9,true
 2018,David Cutcliffe,Duke,ACC,13,8,5,true
+2018,David Blackwell,East Carolina,American Athletic,1,0,1,false
 2018,Scottie Montgomery,East Carolina,American Athletic,11,3,8,true
 2018,Chris Creighton,Eastern Michigan,Mid-American,13,7,6,true
 2018,Dan Mullen,Florida,SEC,13,10,3,true
@@ -1765,6 +1770,8 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2018,Pat Fitzgerald,Northwestern,Big Ten,14,9,5,true
 2018,Brian Kelly,Notre Dame,FBS Independents,13,12,1,true
 2018,Frank Solich,Ohio,Mid-American,13,9,4,true
+2018,Ryan Day,Ohio State,Big Ten,3,3,0,false
+2018,Urban Meyer,Ohio State,Big Ten,11,10,1,false
 2018,Lincoln Riley,Oklahoma,Big 12,14,12,2,true
 2018,Mike Gundy,Oklahoma State,Big 12,13,7,6,true
 2018,Bobby Wilder,Old Dominion,Conference USA,12,4,8,true
@@ -1786,10 +1793,12 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2018,David Shaw,Stanford,Pac-12,13,9,4,true
 2018,Dino Babers,Syracuse,ACC,13,10,3,true
 2018,Gary Patterson,TCU,Big 12,13,7,6,true
+2018,Ed Foley,Temple,American Athletic,1,0,1,false
 2018,Geoff Collins,Temple,American Athletic,12,8,4,true
 2018,Jeremy Pruitt,Tennessee,SEC,12,5,7,true
 2018,Tom Herman,Texas,Big 12,14,10,4,true
 2018,Jimbo Fisher,Texas A&M,SEC,13,9,4,true
+2018,Chris Woods,Texas State,Sun Belt,1,0,1,false
 2018,Everett Withers,Texas State,Sun Belt,11,3,8,true
 2018,Kliff Kingsbury,Texas Tech,Big 12,12,5,7,true
 2018,Jason Candle,Toledo,Mid-American,13,7,6,true
@@ -1806,6 +1815,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2018,Dana Dimel,UTEP,Conference USA,12,1,11,true
 2018,Frank Wilson,UTSA,Conference USA,12,3,9,true
 2018,Kyle Whittingham,Utah,Pac-12,14,9,5,true
+2018,Frank Maile,Utah State,Mountain West,1,1,0,false
 2018,Matt Wells,Utah State,Mountain West,12,10,2,true
 2018,Derek Mason,Vanderbilt,SEC,13,6,7,true
 2018,Bronco Mendenhall,Virginia,ACC,13,8,5,true
@@ -1814,6 +1824,8 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2018,Chris Petersen,Washington,Pac-12,14,10,4,true
 2018,Mike Leach,Washington State,Pac-12,13,11,2,true
 2018,Dana Holgorsen,West Virginia,Big 12,12,8,4,true
+2018,Bobby Petrino,Western Kentucky,Conference USA,10,2,8,false
+2018,Mike Sanford Jr.,Western Kentucky,Conference USA,12,3,9,false
 2018,Tim Lester,Western Michigan,Mid-American,13,7,6,true
 2018,Paul Chryst,Wisconsin,Big Ten,13,8,5,true
 2018,Craig Bohl,Wyoming,Mountain West,12,6,6,true

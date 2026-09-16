@@ -161,9 +161,13 @@ _UTF8 = {
     "alt_name1", "alt_name2", "alt_name3", "classification", "color", "alt_color", "logo",
     "logo_2", "twitter", "venue_name", "city", "state", "zip", "country_code", "timezone",
 }  # fmt: skip
+#: `humidity` is NOT here: CFBD reports it whole in some seasons and fractional in
+#: others (2020: 450 of 560 weather rows carry values like 85.9, while 2016 and 2024
+#: are whole), so an Int64 contract fails `_typed` for those seasons. It is a
+#: measurement, so Float64 is the honest type.
 _INT = {
     "hc_tenure", "oc_cont", "dc_cont", "athlete_id", "returning_qb", "qb_starter_years",
-    "qb_games", "humidity", "snowfall", "wind_direction", "weather_condition_code",
+    "qb_games", "snowfall", "wind_direction", "weather_condition_code",
     "venue_id", "capacity", "year_constructed",
 }  # fmt: skip
 _BOOL = {"grass", "dome"}

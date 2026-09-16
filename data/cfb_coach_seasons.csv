@@ -1203,6 +1203,8 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2014,Bryan Harsin,Boise State,Mountain West,14,12,2,true
 2014,Steve Addazio,Boston College,ACC,13,7,6,true
 2014,Dino Babers,Bowling Green,Mid-American,14,8,6,true
+2014,Alex Wood,Buffalo,Mid-American,4,2,2,false
+2014,Jeff Quinn,Buffalo,Mid-American,7,3,4,false
 2014,Sonny Dykes,California,Pac-12,12,5,7,true
 2014,Dan Enos,Central Michigan,Mid-American,13,7,6,true
 2014,Tommy Tuberville,Cincinnati,American Athletic,13,9,4,true
@@ -1212,6 +1214,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2014,David Cutcliffe,Duke,ACC,13,9,4,true
 2014,Ruffin McNeill,East Carolina,American Athletic,13,8,5,true
 2014,Chris Creighton,Eastern Michigan,Mid-American,12,2,10,true
+2014,D.J. Durkin,Florida,SEC,1,1,0,false
 2014,Will Muschamp,Florida,SEC,11,6,5,true
 2014,Charlie Partridge,Florida Atlantic,Conference USA,12,3,9,true
 2014,Ron Turner,Florida International,Conference USA,12,4,8,true
@@ -1222,6 +1225,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2014,Trent Miles,Georgia State,Sun Belt,12,1,11,true
 2014,Paul Johnson,Georgia Tech,ACC,14,11,3,true
 2014,Norm Chow,Hawai'i,Mountain West,13,4,9,true
+2014,David Gibbs,Houston,American Athletic,1,1,0,false
 2014,Tony Levine,Houston,American Athletic,12,7,5,true
 2014,Paul Petrino,Idaho,Sun Belt,11,1,10,true
 2014,Tim Beckman,Illinois,Big Ten,13,6,7,true
@@ -1312,6 +1316,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2014,Dana Holgorsen,West Virginia,Big 12,13,7,6,true
 2014,Jeff Brohm,Western Kentucky,Conference USA,13,8,5,true
 2014,P.J. Fleck,Western Michigan,Mid-American,13,8,5,true
+2014,Barry Alvarez,Wisconsin,Big Ten,1,1,0,false
 2014,Gary Andersen,Wisconsin,Big Ten,13,10,3,true
 2014,Craig Bohl,Wyoming,Mountain West,12,4,8,true
 2015,Troy Calhoun,Air Force,Mountain West,14,8,6,true

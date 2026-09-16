@@ -24,7 +24,10 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2004,Ted Roof,Duke,ACC,11,2,9,true
 2004,John Thompson,East Carolina,Conference USA,11,2,9,true
 2004,Jeff Genyk,Eastern Michigan,Mid-American,11,4,7,true
+2004,Charlie Strong,Florida,SEC,1,0,1,false
 2004,Ron Zook,Florida,SEC,11,7,4,true
+2004,Howard Schnellenberger,Florida Atlantic,FBS Independents,12,9,3,true
+2004,Don Strock,Florida International,FCS Independents,10,3,7,true
 2004,Bobby Bowden,Florida State,ACC,12,9,3,true
 2004,Pat Hill,Fresno State,Western Athletic,12,9,3,true
 2004,Mark Richt,Georgia,SEC,12,10,2,true
@@ -104,6 +107,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2004,John Robinson,UNLV,Mountain West,11,2,9,true
 2004,Pete Carroll,USC,Pac-10,13,13,0,true
 2004,Mike Price,UTEP,Western Athletic,12,8,4,true
+2004,Kyle Whittingham,Utah,Mountain West,1,1,0,false
 2004,Urban Meyer,Utah,Mountain West,12,12,0,true
 2004,Mick Dennehy,Utah State,Sun Belt,11,3,8,true
 2004,Bobby Johnson,Vanderbilt,SEC,11,2,9,true

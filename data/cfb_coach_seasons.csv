@@ -144,7 +144,10 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2004,Ted Roof,Duke,ACC,11,2,9,true
 2004,John Thompson,East Carolina,Conference USA,11,2,9,true
 2004,Jeff Genyk,Eastern Michigan,Mid-American,11,4,7,true
+2004,Charlie Strong,Florida,SEC,1,0,1,false
 2004,Ron Zook,Florida,SEC,11,7,4,true
+2004,Howard Schnellenberger,Florida Atlantic,FBS Independents,12,9,3,true
+2004,Don Strock,Florida International,FCS Independents,10,3,7,true
 2004,Bobby Bowden,Florida State,ACC,12,9,3,true
 2004,Pat Hill,Fresno State,Western Athletic,12,9,3,true
 2004,Mark Richt,Georgia,SEC,12,10,2,true
@@ -224,6 +227,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2004,John Robinson,UNLV,Mountain West,11,2,9,true
 2004,Pete Carroll,USC,Pac-10,13,13,0,true
 2004,Mike Price,UTEP,Western Athletic,12,8,4,true
+2004,Kyle Whittingham,Utah,Mountain West,1,1,0,false
 2004,Urban Meyer,Utah,Mountain West,12,12,0,true
 2004,Mick Dennehy,Utah State,Sun Belt,11,3,8,true
 2004,Bobby Johnson,Vanderbilt,SEC,11,2,9,true
@@ -373,6 +377,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2006,Turner Gill,Buffalo,Mid-American,12,2,10,true
 2006,Jeff Tedford,California,Pac-10,13,10,3,true
 2006,Brian Kelly,Central Michigan,Mid-American,13,9,4,true
+2006,Brian Kelly,Cincinnati,Big East,1,1,0,false
 2006,Mark Dantonio,Cincinnati,Big East,12,7,5,true
 2006,Tommy Bowden,Clemson,ACC,13,8,5,true
 2006,Dan Hawkins,Colorado,Big 12,12,2,10,true
@@ -506,6 +511,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2007,Pat Hill,Fresno State,Western Athletic,13,9,4,true
 2007,Mark Richt,Georgia,SEC,13,11,2,true
 2007,Chan Gailey,Georgia Tech,ACC,12,7,5,true
+2007,Jon Tenuta,Georgia Tech,ACC,1,0,1,false
 2007,June Jones,Hawai'i,Western Athletic,13,12,1,true
 2007,Art Briles,Houston,Conference USA,12,8,4,true
 2007,Ron Zook,Illinois,Big Ten,13,9,4,true
@@ -532,6 +538,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2007,Sylvester Croom,Mississippi State,SEC,13,8,5,true
 2007,Gary Pinkel,Missouri,Big 12,14,12,2,true
 2007,Tom O'Brien,NC State,ACC,12,5,7,true
+2007,Ken Niumatalolo,Navy,FBS Independents,1,0,1,false
 2007,Paul Johnson,Navy,FBS Independents,12,8,4,true
 2007,Bill Callahan,Nebraska,Big 12,12,5,7,true
 2007,Chris Ault,Nevada,Western Athletic,13,6,7,true
@@ -574,6 +581,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2007,Todd Graham,Tulsa,Conference USA,14,10,4,true
 2007,Neil Callaway,UAB,Conference USA,12,2,10,true
 2007,George O'Leary,UCF,Conference USA,14,10,4,true
+2007,DeWayne Walker,UCLA,Pac-10,1,0,1,false
 2007,Karl Dorrell,UCLA,Pac-10,12,6,6,true
 2007,Randy Edsall,UConn,Big East,13,9,4,true
 2007,Charlie Weatherbie,UL Monroe,Sun Belt,12,6,6,true
@@ -604,6 +612,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2008,Tommy Tuberville,Auburn,SEC,12,5,7,true
 2008,Bronco Mendenhall,BYU,Mountain West,13,10,3,true
 2008,Brady Hoke,Ball State,Mid-American,13,12,1,true
+2008,Stan Parrish,Ball State,Mid-American,1,0,1,false
 2008,Art Briles,Baylor,Big 12,12,4,8,true
 2008,Chris Petersen,Boise State,Western Athletic,13,12,1,true
 2008,Jeff Jagodzinski,Boston College,ACC,14,9,5,true
@@ -612,6 +621,8 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2008,Jeff Tedford,California,Pac-10,13,9,4,true
 2008,Butch Jones,Central Michigan,Mid-American,13,8,5,true
 2008,Brian Kelly,Cincinnati,Big East,14,11,3,true
+2008,Dabo Swinney,Clemson,ACC,7,4,3,false
+2008,Tommy Bowden,Clemson,ACC,6,3,3,false
 2008,Dan Hawkins,Colorado,Big 12,12,5,7,true
 2008,Steve Fairchild,Colorado State,Mountain West,13,7,6,true
 2008,David Cutcliffe,Duke,ACC,12,4,8,true
@@ -748,7 +759,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2009,Ron Zook,Illinois,Big Ten,12,3,9,true
 2009,Bill Lynch,Indiana,Big Ten,12,4,8,true
 2009,Kirk Ferentz,Iowa,Big Ten,13,11,2,true
-2009,Paul Rhoads,Iowa State,Big 12,12,7,5,true
+2009,Paul Rhoads,Iowa State,Big 12,13,7,5,true
 2009,Mark Mangino,Kansas,Big 12,12,5,7,true
 2009,Bill Snyder,Kansas State,Big 12,12,6,6,true
 2009,Doug Martin,Kent State,Mid-American,12,5,7,true
@@ -1131,6 +1142,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2012,Larry Fedora,North Carolina,ACC,12,8,4,true
 2012,Dan McCarney,North Texas,Sun Belt,12,4,8,true
 2012,Dave Doeren,Northern Illinois,Mid-American,13,12,1,true
+2012,Rod Carey,Northern Illinois,Mid-American,1,0,1,false
 2012,Pat Fitzgerald,Northwestern,Big Ten,13,10,3,true
 2012,Brian Kelly,Notre Dame,FBS Independents,13,12,1,true
 2012,Frank Solich,Ohio,Mid-American,13,9,4,true
@@ -1142,7 +1154,8 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2012,Mike Riley,Oregon State,Pac-12,13,9,4,true
 2012,Bill O'Brien,Penn State,Big Ten,12,8,4,true
 2012,Paul Chryst,Pittsburgh,Big East,13,6,7,true
-2012,Danny Hope,Purdue,Big Ten,6,3,3,true
+2012,Danny Hope,Purdue,Big Ten,12,3,3,true
+2012,Patrick Higgins,Purdue,Big Ten,1,0,1,false
 2012,David Bailiff,Rice,Conference USA,13,7,6,true
 2012,Kyle Flood,Rutgers,Big East,13,9,4,true
 2012,June Jones,SMU,Conference USA,13,7,6,true
@@ -1157,12 +1170,15 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2012,Gary Patterson,TCU,Big 12,13,7,6,true
 2012,Steve Addazio,Temple,Big East,11,4,7,true
 2012,Derek Dooley,Tennessee,SEC,11,4,7,true
+2012,Jim Chaney,Tennessee,SEC,1,1,0,false
 2012,Mack Brown,Texas,Big 12,13,9,4,true
 2012,Kevin Sumlin,Texas A&M,SEC,13,11,2,true
 2012,Dennis Franchione,Texas State,Western Athletic,12,4,8,true
 2012,Tommy Tuberville,Texas Tech,Big 12,12,7,5,true
 2012,Matt Campbell,Toledo,Mid-American,13,9,4,true
 2012,Larry Blakeney,Troy,Sun Belt,12,5,7,true
+2012,Curtis Johnson,Tulane,Conference USA,12,2,10,false
+2012,Mark Hutson,Tulane,Conference USA,6,0,6,false
 2012,Bill Blankenship,Tulsa,Conference USA,14,11,3,true
 2012,Garrick McGee,UAB,Conference USA,12,3,9,true
 2012,George O'Leary,UCF,Conference USA,14,10,4,true
@@ -1184,6 +1200,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2012,Dana Holgorsen,West Virginia,Big 12,13,7,6,true
 2012,Willie Taggart,Western Kentucky,Sun Belt,12,7,5,true
 2012,Bill Cubit,Western Michigan,Mid-American,12,4,8,true
+2012,Barry Alvarez,Wisconsin,Big Ten,1,0,1,false
 2012,Bret Bielema,Wisconsin,Big Ten,13,8,5,true
 2012,Dave Christensen,Wyoming,Mountain West,12,4,8,true
 2013,Troy Calhoun,Air Force,Mountain West,12,2,10,true
@@ -1210,7 +1227,11 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2013,Jim McElwain,Colorado State,Mountain West,14,8,6,true
 2013,David Cutcliffe,Duke,ACC,14,10,4,true
 2013,Ruffin McNeill,East Carolina,Conference USA,13,10,3,true
+2013,Ron English,Eastern Michigan,Mid-American,9,1,8,false
+2013,Stan Parrish,Eastern Michigan,Mid-American,3,1,2,false
 2013,Will Muschamp,Florida,SEC,12,4,8,true
+2013,Brian Wright,Florida Atlantic,Conference USA,4,4,0,false
+2013,Carl Pelini,Florida Atlantic,Conference USA,8,2,6,false
 2013,Ron Turner,Florida International,Conference USA,12,1,11,true
 2013,Jimbo Fisher,Florida State,ACC,14,14,0,true
 2013,Tim DeRuyter,Fresno State,Mountain West,13,11,2,true
@@ -1237,6 +1258,8 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2013,Charley Molnar,Massachusetts,Mid-American,12,1,11,true
 2013,Justin Fuente,Memphis,American Athletic,12,3,9,true
 2013,Al Golden,Miami,ACC,13,9,4,true
+2013,Don Treadwell,Miami (OH),Mid-American,5,0,5,false
+2013,Mike Bath,Miami (OH),Mid-American,7,0,7,false
 2013,Brady Hoke,Michigan,Big Ten,13,7,6,true
 2013,Mark Dantonio,Michigan State,Big Ten,14,13,1,true
 2013,Rick Stockstill,Middle Tennessee,Conference USA,13,8,5,true
@@ -1274,7 +1297,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2013,Willie Taggart,South Florida,American Athletic,12,2,10,true
 2013,Todd Monken,Southern Miss,Conference USA,12,1,11,true
 2013,David Shaw,Stanford,Pac-12,14,11,3,true
-2013,Scott Shafer,Syracuse,ACC,12,6,6,true
+2013,Scott Shafer,Syracuse,ACC,13,6,6,true
 2013,Gary Patterson,TCU,Big 12,12,4,8,true
 2013,Matt Rhule,Temple,American Athletic,12,2,10,true
 2013,Butch Jones,Tennessee,SEC,12,5,7,true
@@ -1292,14 +1315,18 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2013,Paul Pasqualoni,UConn,American Athletic,4,0,4,true
 2013,Todd Berry,UL Monroe,Sun Belt,12,6,6,true
 2013,Bobby Hauck,UNLV,Mountain West,13,7,6,true
+2013,Clay Helton,USC,Pac-12,1,1,0,false
+2013,Ed Orgeron,USC,Pac-12,8,6,2,false
+2013,Lane Kiffin,USC,Pac-12,5,3,2,false
 2013,Sean Kugler,UTEP,Conference USA,12,2,10,true
 2013,Larry Coker,UTSA,Conference USA,12,7,5,true
 2013,Kyle Whittingham,Utah,Pac-12,12,5,7,true
 2013,Matt Wells,Utah State,Mountain West,14,9,5,true
 2013,James Franklin,Vanderbilt,SEC,13,9,4,true
-2013,Mike London,Virginia,ACC,12,2,10,true
+2013,Mike London,Virginia,ACC,13,2,10,true
 2013,Frank Beamer,Virginia Tech,ACC,13,8,5,true
 2013,Jim Grobe,Wake Forest,ACC,12,4,8,true
+2013,Marques Tuiasosopo,Washington,Pac-12,1,1,0,false
 2013,Steve Sarkisian,Washington,Pac-12,12,8,4,true
 2013,Mike Leach,Washington State,Pac-12,13,6,7,true
 2013,Dana Holgorsen,West Virginia,Big 12,12,4,8,true
@@ -1323,6 +1350,8 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2014,Bryan Harsin,Boise State,Mountain West,14,12,2,true
 2014,Steve Addazio,Boston College,ACC,13,7,6,true
 2014,Dino Babers,Bowling Green,Mid-American,14,8,6,true
+2014,Alex Wood,Buffalo,Mid-American,4,2,2,false
+2014,Jeff Quinn,Buffalo,Mid-American,7,3,4,false
 2014,Sonny Dykes,California,Pac-12,12,5,7,true
 2014,Dan Enos,Central Michigan,Mid-American,13,7,6,true
 2014,Tommy Tuberville,Cincinnati,American Athletic,13,9,4,true
@@ -1332,6 +1361,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2014,David Cutcliffe,Duke,ACC,13,9,4,true
 2014,Ruffin McNeill,East Carolina,American Athletic,13,8,5,true
 2014,Chris Creighton,Eastern Michigan,Mid-American,12,2,10,true
+2014,D.J. Durkin,Florida,SEC,1,1,0,false
 2014,Will Muschamp,Florida,SEC,11,6,5,true
 2014,Charlie Partridge,Florida Atlantic,Conference USA,12,3,9,true
 2014,Ron Turner,Florida International,Conference USA,12,4,8,true
@@ -1342,6 +1372,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2014,Trent Miles,Georgia State,Sun Belt,12,1,11,true
 2014,Paul Johnson,Georgia Tech,ACC,14,11,3,true
 2014,Norm Chow,Hawai'i,Mountain West,13,4,9,true
+2014,David Gibbs,Houston,American Athletic,1,1,0,false
 2014,Tony Levine,Houston,American Athletic,12,7,5,true
 2014,Paul Petrino,Idaho,Sun Belt,11,1,10,true
 2014,Tim Beckman,Illinois,Big Ten,13,6,7,true
@@ -1432,6 +1463,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2014,Dana Holgorsen,West Virginia,Big 12,13,7,6,true
 2014,Jeff Brohm,Western Kentucky,Conference USA,13,8,5,true
 2014,P.J. Fleck,Western Michigan,Mid-American,13,8,5,true
+2014,Barry Alvarez,Wisconsin,Big Ten,1,1,0,false
 2014,Gary Andersen,Wisconsin,Big Ten,13,10,3,true
 2014,Craig Bohl,Wyoming,Mountain West,12,4,8,true
 2015,Troy Calhoun,Air Force,Mountain West,14,8,6,true
@@ -1470,6 +1502,8 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2015,Willie Fritz,Georgia Southern,Sun Belt,13,9,4,true
 2015,Trent Miles,Georgia State,Sun Belt,13,6,7,true
 2015,Paul Johnson,Georgia Tech,ACC,12,3,9,true
+2015,Chris Naeole,Hawai'i,Mountain West,4,1,3,false
+2015,Norm Chow,Hawai'i,Mountain West,9,2,7,false
 2015,Tom Herman,Houston,American Athletic,14,13,1,true
 2015,Paul Petrino,Idaho,Sun Belt,12,4,8,true
 2015,Bill Cubit,Illinois,Big Ten,12,5,7,true
@@ -1493,6 +1527,8 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2015,Jim Harbaugh,Michigan,Big Ten,13,10,3,true
 2015,Mark Dantonio,Michigan State,Big Ten,14,12,2,true
 2015,Rick Stockstill,Middle Tennessee,Conference USA,13,7,6,true
+2015,Jerry Kill,Minnesota,Big Ten,7,4,3,false
+2015,Tracy Claeys,Minnesota,Big Ten,6,2,4,false
 2015,Dan Mullen,Mississippi State,SEC,13,9,4,true
 2015,Gary Pinkel,Missouri,SEC,12,5,7,true
 2015,Dave Doeren,NC State,ACC,13,7,6,true
@@ -1523,6 +1559,8 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2015,Rocky Long,San Diego State,Mountain West,14,11,3,true
 2015,Ron Caragher,San José State,Mountain West,13,6,7,true
 2015,Joey Jones,South Alabama,Sun Belt,12,5,7,true
+2015,Shawn Elliott,South Carolina,SEC,6,1,5,false
+2015,Steve Spurrier,South Carolina,SEC,6,2,4,false
 2015,Willie Taggart,South Florida,American Athletic,13,8,5,true
 2015,Todd Monken,Southern Miss,Conference USA,14,9,5,true
 2015,David Shaw,Stanford,Pac-12,14,12,2,true
@@ -1534,6 +1572,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2015,Kevin Sumlin,Texas A&M,SEC,13,8,5,true
 2015,Dennis Franchione,Texas State,Sun Belt,12,3,9,true
 2015,Kliff Kingsbury,Texas Tech,Big 12,13,7,6,true
+2015,Jason Candle,Toledo,Mid-American,1,1,0,false
 2015,Matt Campbell,Toledo,Mid-American,11,9,2,true
 2015,Neal Brown,Troy,Sun Belt,12,4,8,true
 2015,Curtis Johnson,Tulane,American Athletic,12,3,9,true
@@ -1590,21 +1629,28 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2016,Charlie Partridge,Florida Atlantic,Conference USA,12,3,9,true
 2016,Ron Turner,Florida International,Conference USA,4,0,4,true
 2016,Jimbo Fisher,Florida State,ACC,13,10,3,true
+2016,Eric Kiesau,Fresno State,Mountain West,4,0,4,false
+2016,Tim DeRuyter,Fresno State,Mountain West,8,1,7,false
 2016,Kirby Smart,Georgia,SEC,13,8,5,true
 2016,Tyson Summers,Georgia Southern,Sun Belt,12,5,7,true
-2016,Trent Miles,Georgia State,Sun Belt,9,1,8,true
+2016,Tim Lappano,Georgia State,Sun Belt,2,1,1,false
+2016,Trent Miles,Georgia State,Sun Belt,10,1,8,true
 2016,Paul Johnson,Georgia Tech,ACC,13,9,4,true
 2016,Nick Rolovich,Hawai'i,Mountain West,14,7,7,true
+2016,Major Applewhite,Houston,American Athletic,1,0,1,false
 2016,Tom Herman,Houston,American Athletic,12,9,3,true
 2016,Paul Petrino,Idaho,Sun Belt,13,9,4,true
 2016,Lovie Smith,Illinois,Big Ten,12,3,9,true
 2016,Kevin Wilson,Indiana,Big Ten,12,6,6,true
+2016,Tom Allen,Indiana,Big Ten,1,0,1,false
 2016,Kirk Ferentz,Iowa,Big Ten,13,8,5,true
 2016,Matt Campbell,Iowa State,Big 12,12,3,9,true
 2016,David Beaty,Kansas,Big 12,12,2,10,true
 2016,Bill Snyder,Kansas State,Big 12,13,9,4,true
 2016,Paul Haynes,Kent State,Mid-American,12,3,9,true
 2016,Mark Stoops,Kentucky,SEC,13,7,6,true
+2016,Ed Orgeron,LSU,SEC,8,6,2,false
+2016,Les Miles,LSU,SEC,4,2,2,false
 2016,Mark Hudspeth,Louisiana,Sun Belt,13,6,7,true
 2016,Skip Holtz,Louisiana Tech,Conference USA,14,9,5,true
 2016,Bobby Petrino,Louisville,ACC,13,9,4,true
@@ -1641,6 +1687,8 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2016,Gary Andersen,Oregon State,Pac-12,12,4,8,true
 2016,James Franklin,Penn State,Big Ten,14,11,3,true
 2016,Pat Narduzzi,Pittsburgh,ACC,13,8,5,true
+2016,Darrell Hazell,Purdue,Big Ten,6,3,3,false
+2016,Gerad Parker,Purdue,Big Ten,6,0,6,false
 2016,David Bailiff,Rice,Conference USA,12,3,9,true
 2016,Chris Ash,Rutgers,Big Ten,12,2,10,true
 2016,Chad Morris,SMU,American Athletic,12,5,7,true
@@ -1813,6 +1861,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2018,Troy Calhoun,Air Force,Mountain West,12,5,7,true
 2018,Terry Bowden,Akron,Mid-American,12,4,8,true
 2018,Nick Saban,Alabama,SEC,15,14,1,true
+2018,Mark Ivey,App State,Sun Belt,1,1,0,false
 2018,Scott Satterfield,App State,Sun Belt,12,10,2,true
 2018,Kevin Sumlin,Arizona,Pac-12,12,5,7,true
 2018,Herm Edwards,Arizona State,Pac-12,13,7,6,true
@@ -1825,6 +1874,8 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2018,Matt Rhule,Baylor,Big 12,13,7,6,true
 2018,Bryan Harsin,Boise State,Mountain West,13,10,3,true
 2018,Steve Addazio,Boston College,ACC,12,7,5,true
+2018,Carl Pelini,Bowling Green,Mid-American,5,2,3,false
+2018,Mike Jinks,Bowling Green,Mid-American,7,1,6,false
 2018,Lance Leipold,Buffalo,Mid-American,14,10,4,true
 2018,Justin Wilcox,California,Pac-12,13,7,6,true
 2018,John Bonamego,Central Michigan,Mid-American,12,1,11,true
@@ -1832,9 +1883,11 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2018,Luke Fickell,Cincinnati,American Athletic,13,11,2,true
 2018,Dabo Swinney,Clemson,ACC,15,15,0,true
 2018,Joe Moglia,Coastal Carolina,Sun Belt,12,5,7,true
+2018,Kurt Roper,Colorado,Pac-12,1,0,1,false
 2018,Mike MacIntyre,Colorado,Pac-12,11,5,6,true
 2018,Mike Bobo,Colorado State,Mountain West,12,3,9,true
 2018,David Cutcliffe,Duke,ACC,13,8,5,true
+2018,David Blackwell,East Carolina,American Athletic,1,0,1,false
 2018,Scottie Montgomery,East Carolina,American Athletic,11,3,8,true
 2018,Chris Creighton,Eastern Michigan,Mid-American,13,7,6,true
 2018,Dan Mullen,Florida,SEC,13,10,3,true
@@ -1885,6 +1938,8 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2018,Pat Fitzgerald,Northwestern,Big Ten,14,9,5,true
 2018,Brian Kelly,Notre Dame,FBS Independents,13,12,1,true
 2018,Frank Solich,Ohio,Mid-American,13,9,4,true
+2018,Ryan Day,Ohio State,Big Ten,3,3,0,false
+2018,Urban Meyer,Ohio State,Big Ten,11,10,1,false
 2018,Lincoln Riley,Oklahoma,Big 12,14,12,2,true
 2018,Mike Gundy,Oklahoma State,Big 12,13,7,6,true
 2018,Bobby Wilder,Old Dominion,Conference USA,12,4,8,true
@@ -1906,10 +1961,12 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2018,David Shaw,Stanford,Pac-12,13,9,4,true
 2018,Dino Babers,Syracuse,ACC,13,10,3,true
 2018,Gary Patterson,TCU,Big 12,13,7,6,true
+2018,Ed Foley,Temple,American Athletic,1,0,1,false
 2018,Geoff Collins,Temple,American Athletic,12,8,4,true
 2018,Jeremy Pruitt,Tennessee,SEC,12,5,7,true
 2018,Tom Herman,Texas,Big 12,14,10,4,true
 2018,Jimbo Fisher,Texas A&M,SEC,13,9,4,true
+2018,Chris Woods,Texas State,Sun Belt,1,0,1,false
 2018,Everett Withers,Texas State,Sun Belt,11,3,8,true
 2018,Kliff Kingsbury,Texas Tech,Big 12,12,5,7,true
 2018,Jason Candle,Toledo,Mid-American,13,7,6,true
@@ -1926,6 +1983,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2018,Dana Dimel,UTEP,Conference USA,12,1,11,true
 2018,Frank Wilson,UTSA,Conference USA,12,3,9,true
 2018,Kyle Whittingham,Utah,Pac-12,14,9,5,true
+2018,Frank Maile,Utah State,Mountain West,1,1,0,false
 2018,Matt Wells,Utah State,Mountain West,12,10,2,true
 2018,Derek Mason,Vanderbilt,SEC,13,6,7,true
 2018,Bronco Mendenhall,Virginia,ACC,13,8,5,true
@@ -1934,6 +1992,8 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2018,Chris Petersen,Washington,Pac-12,14,10,4,true
 2018,Mike Leach,Washington State,Pac-12,13,11,2,true
 2018,Dana Holgorsen,West Virginia,Big 12,12,8,4,true
+2018,Bobby Petrino,Western Kentucky,Conference USA,10,2,8,false
+2018,Mike Sanford Jr.,Western Kentucky,Conference USA,12,3,9,false
 2018,Tim Lester,Western Michigan,Mid-American,13,7,6,true
 2018,Paul Chryst,Wisconsin,Big Ten,13,8,5,true
 2018,Craig Bohl,Wyoming,Mountain West,12,6,6,true
@@ -1941,8 +2001,10 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2019,Tom Arth,Akron,Mid-American,12,0,12,true
 2019,Nick Saban,Alabama,SEC,13,11,2,true
 2019,Eli Drinkwitz,App State,Sun Belt,13,12,1,true
+2019,Shawn Clark,App State,Sun Belt,1,1,0,false
 2019,Kevin Sumlin,Arizona,Pac-12,12,4,8,true
 2019,Herm Edwards,Arizona State,Pac-12,13,8,5,true
+2019,Barry Lunney Jr.,Arkansas,SEC,2,0,2,false
 2019,Chad Morris,Arkansas,SEC,10,2,8,true
 2019,Blake Anderson,Arkansas State,Sun Belt,13,8,5,true
 2019,Jeff Monken,Army,FBS Independents,13,5,8,true
@@ -1968,6 +2030,8 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2019,Dan Mullen,Florida,SEC,13,11,2,true
 2019,Lane Kiffin,Florida Atlantic,Conference USA,14,11,3,true
 2019,Butch Davis,Florida International,Conference USA,13,6,7,true
+2019,Odell Haggins,Florida State,ACC,4,2,2,false
+2019,Willie Taggart,Florida State,ACC,9,4,5,false
 2019,Jeff Tedford,Fresno State,Mountain West,12,4,8,true
 2019,Kirby Smart,Georgia,SEC,14,12,2,true
 2019,Chad Lunsford,Georgia Southern,Sun Belt,13,7,6,true
@@ -2023,6 +2087,8 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2019,Pat Narduzzi,Pittsburgh,ACC,13,8,5,true
 2019,Jeff Brohm,Purdue,Big Ten,12,4,8,true
 2019,Mike Bloomgren,Rice,Conference USA,12,3,9,true
+2019,Chris Ash,Rutgers,Big Ten,4,1,3,false
+2019,Nunzio Campanile,Rutgers,Big Ten,8,1,7,false
 2019,Sonny Dykes,SMU,American Athletic,13,10,3,true
 2019,Rocky Long,San Diego State,Mountain West,13,10,3,true
 2019,Brent Brennan,San José State,Mountain West,12,5,7,true
@@ -2075,6 +2141,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2020,Blake Anderson,Arkansas State,Sun Belt,11,4,7,true
 2020,Jeff Monken,Army,FBS Independents,12,9,3,true
 2020,Gus Malzahn,Auburn,SEC,10,6,4,true
+2020,Kevin Steele,Auburn,SEC,1,0,1,false
 2020,Kalani Sitake,BYU,FBS Independents,12,11,1,true
 2020,Mike Neu,Ball State,Mid-American,8,7,1,true
 2020,Dave Aranda,Baylor,Big 12,9,2,7,true
@@ -2105,6 +2172,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2020,Todd Graham,Hawai'i,Mountain West,9,5,4,true
 2020,Dana Holgorsen,Houston,American Athletic,8,3,5,true
 2020,Lovie Smith,Illinois,Big Ten,7,2,5,true
+2020,Rod Smith,Illinois,Big Ten,1,0,1,false
 2020,Tom Allen,Indiana,Big Ten,8,6,2,true
 2020,Kirk Ferentz,Iowa,Big Ten,8,6,2,true
 2020,Matt Campbell,Iowa State,Big 12,12,9,3,true
@@ -2144,6 +2212,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2020,Ryan Day,Ohio State,Big Ten,8,7,1,true
 2020,Lincoln Riley,Oklahoma,Big 12,11,9,2,true
 2020,Mike Gundy,Oklahoma State,Big 12,11,8,3,true
+2020,Ricky Rahne,Old Dominion,,0,0,0,true
 2020,Lane Kiffin,Ole Miss,SEC,10,5,5,true
 2020,Mario Cristobal,Oregon,Pac-12,7,4,3,true
 2020,Jonathan Smith,Oregon State,Pac-12,7,2,5,true
@@ -2156,7 +2225,12 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2020,Brady Hoke,San Diego State,Mountain West,8,4,4,true
 2020,Brent Brennan,San José State,Mountain West,8,7,1,true
 2020,Steve Campbell,South Alabama,Sun Belt,11,4,7,true
+2020,Mike Bobo,South Carolina,SEC,3,0,3,false
+2020,Will Muschamp,South Carolina,SEC,7,2,5,false
 2020,Jeff Scott,South Florida,American Athletic,9,1,8,true
+2020,Jay Hopson,Southern Miss,Conference USA,1,0,1,false
+2020,Scotty Walden,Southern Miss,Conference USA,4,1,3,false
+2020,Tim Billings,Southern Miss,Conference USA,5,2,3,false
 2020,David Shaw,Stanford,Pac-12,6,4,2,true
 2020,Dino Babers,Syracuse,ACC,11,1,10,true
 2020,Gary Patterson,TCU,Big 12,10,6,4,true
@@ -2173,13 +2247,17 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2020,Bill Clark,UAB,Conference USA,9,6,3,true
 2020,Josh Heupel,UCF,American Athletic,10,6,4,true
 2020,Chip Kelly,UCLA,Pac-12,7,3,4,true
+2020,Randy Edsall,UConn,,0,0,0,true
 2020,Matt Viator,UL Monroe,Sun Belt,10,0,10,true
 2020,Marcus Arroyo,UNLV,Mountain West,6,0,6,true
 2020,Clay Helton,USC,Pac-12,6,5,1,true
 2020,Dana Dimel,UTEP,Conference USA,8,3,5,true
 2020,Jeff Traylor,UTSA,Conference USA,12,7,5,true
 2020,Kyle Whittingham,Utah,Pac-12,5,3,2,true
+2020,Frank Maile,Utah State,Mountain West,3,1,2,false
+2020,Gary Andersen,Utah State,Mountain West,3,0,3,false
 2020,Derek Mason,Vanderbilt,SEC,8,0,8,true
+2020,Todd Fitch,Vanderbilt,SEC,1,0,1,false
 2020,Bronco Mendenhall,Virginia,ACC,10,5,5,true
 2020,Justin Fuente,Virginia Tech,ACC,11,5,6,true
 2020,Dave Clawson,Wake Forest,ACC,9,4,5,true
@@ -2191,6 +2269,8 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2020,Paul Chryst,Wisconsin,Big Ten,7,4,3,true
 2020,Craig Bohl,Wyoming,Mountain West,6,2,4,true
 2021,Troy Calhoun,Air Force,Mountain West,13,10,3,true
+2021,Oscar Rodriguez,Akron,Mid-American,3,0,3,false
+2021,Tom Arth,Akron,Mid-American,9,2,7,false
 2021,Nick Saban,Alabama,SEC,15,13,2,true
 2021,Shawn Clark,App State,Sun Belt,14,10,4,true
 2021,Jedd Fisch,Arizona,Pac-12,12,1,11,true
@@ -2218,11 +2298,15 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2021,Mike Houston,East Carolina,American Athletic,12,7,5,true
 2021,Chris Creighton,Eastern Michigan,Mid-American,13,7,6,true
 2021,Dan Mullen,Florida,SEC,11,5,6,true
+2021,Greg Knox,Florida,SEC,1,1,0,false
 2021,Willie Taggart,Florida Atlantic,Conference USA,12,5,7,true
 2021,Butch Davis,Florida International,Conference USA,12,1,11,true
 2021,Mike Norvell,Florida State,ACC,12,5,7,true
 2021,Kalen DeBoer,Fresno State,Mountain West,12,9,3,true
+2021,Lee Marks,Fresno State,Mountain West,1,1,0,false
 2021,Kirby Smart,Georgia,SEC,15,14,1,true
+2021,Chad Lunsford,Georgia Southern,Sun Belt,4,1,3,false
+2021,Kevin Whitley,Georgia Southern,Sun Belt,8,2,6,false
 2021,Shawn Elliott,Georgia State,Sun Belt,13,8,5,true
 2021,Geoff Collins,Georgia Tech,ACC,12,3,9,true
 2021,Todd Graham,Hawai'i,Mountain West,13,6,7,true
@@ -2235,14 +2319,19 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2021,Chris Klieman,Kansas State,Big 12,13,8,5,true
 2021,Sean Lewis,Kent State,Mid-American,14,7,7,true
 2021,Mark Stoops,Kentucky,SEC,13,10,3,true
+2021,Brad Davis,LSU,SEC,1,0,1,false
 2021,Ed Orgeron,LSU,SEC,12,6,6,true
 2021,Hugh Freeze,Liberty,FBS Independents,13,8,5,true
 2021,Billy Napier,Louisiana,Sun Belt,13,12,1,true
+2021,Michael Desormeaux,Louisiana,Sun Belt,1,1,0,false
 2021,Skip Holtz,Louisiana Tech,Conference USA,12,3,9,true
 2021,Scott Satterfield,Louisville,ACC,13,6,7,true
 2021,Charles Huff,Marshall,Conference USA,13,7,6,true
 2021,Mike Locksley,Maryland,Big Ten,13,7,6,true
+2021,Alex Miller,Massachusetts,FBS Independents,3,0,3,false
+2021,Walt Bell,Massachusetts,FBS Independents,9,1,8,false
 2021,Ryan Silverfield,Memphis,American Athletic,12,6,6,true
+2021,Jess Simpson,Miami,ACC,0,0,0,false
 2021,Manny Diaz,Miami,ACC,12,7,5,true
 2021,Chuck Martin,Miami (OH),Mid-American,13,7,6,true
 2021,Jim Harbaugh,Michigan,Big Ten,14,12,2,true
@@ -2255,6 +2344,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2021,Ken Niumatalolo,Navy,American Athletic,12,4,8,true
 2021,Scott Frost,Nebraska,Big Ten,12,3,9,true
 2021,Jay Norvell,Nevada,Mountain West,12,8,4,true
+2021,Vai Taua,Nevada,Mountain West,1,0,1,false
 2021,Danny Gonzales,New Mexico,Mountain West,12,3,9,true
 2021,Doug Martin,New Mexico State,FBS Independents,12,2,10,true
 2021,Mack Brown,North Carolina,ACC,13,6,7,true
@@ -2262,12 +2352,15 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2021,Thomas Hammock,Northern Illinois,Mid-American,14,9,5,true
 2021,Pat Fitzgerald,Northwestern,Big Ten,12,3,9,true
 2021,Brian Kelly,Notre Dame,FBS Independents,12,11,1,true
+2021,Marcus Freeman,Notre Dame,FBS Independents,1,0,1,false
 2021,Tim Albin,Ohio,Mid-American,12,3,9,true
 2021,Ryan Day,Ohio State,Big Ten,13,11,2,true
+2021,Bob Stoops,Oklahoma,Big 12,1,1,0,false
 2021,Lincoln Riley,Oklahoma,Big 12,12,10,2,true
 2021,Mike Gundy,Oklahoma State,Big 12,14,12,2,true
 2021,Ricky Rahne,Old Dominion,Conference USA,13,6,7,true
 2021,Lane Kiffin,Ole Miss,SEC,13,10,3,true
+2021,Bryan McClendon,Oregon,Pac-12,1,0,1,false
 2021,Mario Cristobal,Oregon,Pac-12,13,10,3,true
 2021,Jonathan Smith,Oregon State,Pac-12,13,7,6,true
 2021,James Franklin,Penn State,Big Ten,13,7,6,true
@@ -2275,21 +2368,28 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2021,Jeff Brohm,Purdue,Big Ten,13,9,4,true
 2021,Mike Bloomgren,Rice,Conference USA,12,4,8,true
 2021,Greg Schiano,Rutgers,Big Ten,13,5,8,true
+2021,Jim Leavitt,SMU,American Athletic,0,0,0,false
 2021,Sonny Dykes,SMU,American Athletic,12,8,4,true
 2021,Brady Hoke,San Diego State,Mountain West,14,12,2,true
 2021,Brent Brennan,San José State,Mountain West,12,5,7,true
 2021,Kane Wommack,South Alabama,Sun Belt,12,5,7,true
+2021,Steve Campbell,South Alabama,Sun Belt,0,0,0,false
 2021,Shane Beamer,South Carolina,SEC,13,7,6,true
 2021,Jeff Scott,South Florida,American Athletic,12,2,10,true
 2021,Will Hall,Southern Miss,Conference USA,12,3,9,true
 2021,David Shaw,Stanford,Pac-12,12,3,9,true
 2021,Dino Babers,Syracuse,ACC,12,5,7,true
+2021,Gary Patterson,TCU,Big 12,8,3,5,false
+2021,Jerry Kill,TCU,Big 12,4,2,2,false
 2021,Rod Carey,Temple,American Athletic,12,3,9,true
 2021,Josh Heupel,Tennessee,SEC,13,7,6,true
 2021,Steve Sarkisian,Texas,Big 12,12,5,7,true
 2021,Jimbo Fisher,Texas A&M,SEC,12,8,4,true
 2021,Jake Spavital,Texas State,Sun Belt,12,4,8,true
+2021,Matt Wells,Texas Tech,Big 12,8,5,3,false
+2021,Sonny Cumbie,Texas Tech,Big 12,5,2,3,false
 2021,Jason Candle,Toledo,Mid-American,13,7,6,true
+2021,Brandon Hall,Troy,Sun Belt,1,0,1,false
 2021,Chip Lindsey,Troy,Sun Belt,11,5,6,true
 2021,Willie Fritz,Tulane,American Athletic,12,2,10,true
 2021,Philip Montgomery,Tulsa,American Athletic,13,7,6,true
@@ -2297,8 +2397,10 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2021,Gus Malzahn,UCF,American Athletic,13,9,4,true
 2021,Chip Kelly,UCLA,Pac-12,12,8,4,true
 2021,Lou Spanos,UConn,FBS Independents,10,1,9,true
+2021,Randy Edsall,UConn,FBS Independents,2,0,2,false
 2021,Terry Bowden,UL Monroe,Sun Belt,12,4,8,true
 2021,Marcus Arroyo,UNLV,Mountain West,12,2,10,true
+2021,Clay Helton,USC,Pac-12,2,1,1,false
 2021,Donte Williams,USC,Pac-12,10,3,7,true
 2021,Dana Dimel,UTEP,Conference USA,13,7,6,true
 2021,Jeff Traylor,UTSA,Conference USA,14,12,2,true
@@ -2306,7 +2408,13 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2021,Blake Anderson,Utah State,Mountain West,14,11,3,true
 2021,Clark Lea,Vanderbilt,SEC,12,2,10,true
 2021,Bronco Mendenhall,Virginia,ACC,12,6,6,true
+2021,J.C. Price,Virginia Tech,ACC,3,1,2,false
+2021,Justin Fuente,Virginia Tech,ACC,10,5,5,false
 2021,Dave Clawson,Wake Forest,ACC,14,11,3,true
+2021,Bob Gregory,Washington,Pac-12,3,0,3,false
+2021,Jimmy Lake,Washington,Pac-12,9,4,5,false
+2021,Jake Dickert,Washington State,Pac-12,6,3,3,false
+2021,Nick Rolovich,Washington State,Pac-12,7,4,3,false
 2021,Neal Brown,West Virginia,Big 12,13,6,7,true
 2021,Tyson Helton,Western Kentucky,Conference USA,14,9,5,true
 2021,Tim Lester,Western Michigan,Mid-American,13,8,5,true
@@ -2317,9 +2425,13 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2022,Nick Saban,Alabama,SEC,13,11,2,true
 2022,Shawn Clark,App State,Sun Belt,12,6,6,true
 2022,Jedd Fisch,Arizona,Pac-12,12,5,7,true
+2022,Herm Edwards,Arizona State,Pac-12,3,1,2,false
+2022,Shaun Aguano,Arizona State,Pac-12,9,2,7,false
 2022,Sam Pittman,Arkansas,SEC,13,7,6,true
 2022,Butch Jones,Arkansas State,Sun Belt,12,3,9,true
 2022,Jeff Monken,Army,FBS Independents,12,6,6,true
+2022,Bryan Harsin,Auburn,SEC,8,3,5,false
+2022,Cadillac Williams,Auburn,SEC,4,2,2,false
 2022,Kalani Sitake,BYU,FBS Independents,13,8,5,true
 2022,Mike Neu,Ball State,Mid-American,12,5,7,true
 2022,Dave Aranda,Baylor,Big 12,13,6,7,true
@@ -2329,9 +2441,15 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2022,Maurice Linguist,Buffalo,Mid-American,13,7,6,true
 2022,Justin Wilcox,California,Pac-12,12,4,8,true
 2022,Jim McElwain,Central Michigan,Mid-American,12,4,8,true
+2022,Peter Rossomando,Charlotte,Conference USA,4,2,2,false
+2022,Will Healy,Charlotte,Conference USA,8,1,7,false
+2022,Kerry Coombs,Cincinnati,American Athletic,1,0,1,false
 2022,Luke Fickell,Cincinnati,American Athletic,12,9,3,true
 2022,Dabo Swinney,Clemson,ACC,14,11,3,true
+2022,Chad Staggs,Coastal Carolina,Sun Belt,1,0,1,false
 2022,Jamey Chadwell,Coastal Carolina,Sun Belt,12,9,3,true
+2022,Karl Dorrell,Colorado,Pac-12,5,0,5,false
+2022,Mike Sanford Jr.,Colorado,Pac-12,7,1,6,false
 2022,Jay Norvell,Colorado State,Mountain West,12,3,9,true
 2022,Mike Elko,Duke,ACC,13,9,4,true
 2022,Mike Houston,East Carolina,American Athletic,13,8,5,true
@@ -2344,6 +2462,8 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2022,Kirby Smart,Georgia,SEC,15,15,0,true
 2022,Clay Helton,Georgia Southern,Sun Belt,13,6,7,true
 2022,Shawn Elliott,Georgia State,Sun Belt,12,4,8,true
+2022,Brent Key,Georgia Tech,ACC,8,4,4,false
+2022,Geoff Collins,Georgia Tech,ACC,4,1,3,false
 2022,Timmy Chang,Hawai'i,Mountain West,13,3,10,true
 2022,Dana Holgorsen,Houston,American Athletic,13,8,5,true
 2022,Bret Bielema,Illinois,Big Ten,13,8,5,true
@@ -2357,8 +2477,10 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2022,Mark Stoops,Kentucky,SEC,13,7,6,true
 2022,Brian Kelly,LSU,SEC,14,10,4,true
 2022,Hugh Freeze,Liberty,FBS Independents,12,8,4,true
+2022,Josh Aldridge,Liberty,FBS Independents,1,0,1,false
 2022,Michael Desormeaux,Louisiana,Sun Belt,13,6,7,true
 2022,Sonny Cumbie,Louisiana Tech,Conference USA,12,3,9,true
+2022,Deion Branch,Louisville,ACC,1,1,0,false
 2022,Scott Satterfield,Louisville,ACC,12,7,5,true
 2022,Charles Huff,Marshall,Sun Belt,13,9,4,true
 2022,Mike Locksley,Maryland,Big Ten,13,8,5,true
@@ -2371,13 +2493,17 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2022,Rick Stockstill,Middle Tennessee,Conference USA,13,8,5,true
 2022,P.J. Fleck,Minnesota,Big Ten,13,9,4,true
 2022,Mike Leach,Mississippi State,SEC,12,8,4,true
+2022,Zach Arnett,Mississippi State,SEC,1,1,0,false
 2022,Eli Drinkwitz,Missouri,SEC,13,6,7,true
 2022,Dave Doeren,NC State,ACC,13,8,5,true
 2022,Ken Niumatalolo,Navy,American Athletic,12,4,8,true
+2022,Mickey Joseph,Nebraska,Big Ten,9,3,6,false
+2022,Scott Frost,Nebraska,Big Ten,3,1,2,false
 2022,Ken Wilson,Nevada,Mountain West,12,2,10,true
 2022,Danny Gonzales,New Mexico,Mountain West,12,2,10,true
 2022,Jerry Kill,New Mexico State,FBS Independents,13,7,6,true
 2022,Mack Brown,North Carolina,ACC,14,9,5,true
+2022,Phil Bennett,North Texas,Conference USA,1,0,1,false
 2022,Seth Littrell,North Texas,Conference USA,13,7,6,true
 2022,Thomas Hammock,Northern Illinois,Mid-American,12,3,9,true
 2022,Pat Fitzgerald,Northwestern,Big Ten,12,1,11,true
@@ -2392,6 +2518,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2022,Jonathan Smith,Oregon State,Pac-12,13,10,3,true
 2022,James Franklin,Penn State,Big Ten,13,11,2,true
 2022,Pat Narduzzi,Pittsburgh,ACC,13,9,4,true
+2022,Brian Brohm,Purdue,Big Ten,1,0,1,false
 2022,Jeff Brohm,Purdue,Big Ten,13,8,5,true
 2022,Mike Bloomgren,Rice,Conference USA,13,5,8,true
 2022,Greg Schiano,Rutgers,Big Ten,12,4,8,true
@@ -2400,6 +2527,8 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2022,Brent Brennan,San José State,Mountain West,12,7,5,true
 2022,Kane Wommack,South Alabama,Sun Belt,13,10,3,true
 2022,Shane Beamer,South Carolina,SEC,13,8,5,true
+2022,Daniel Da Prato,South Florida,American Athletic,3,0,3,false
+2022,Jeff Scott,South Florida,American Athletic,9,1,8,false
 2022,Will Hall,Southern Miss,Sun Belt,13,7,6,true
 2022,David Shaw,Stanford,Pac-12,12,3,9,true
 2022,Dino Babers,Syracuse,ACC,13,7,6,true
@@ -2434,6 +2563,9 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2022,Neal Brown,West Virginia,Big 12,12,5,7,true
 2022,Tyson Helton,Western Kentucky,Conference USA,14,9,5,true
 2022,Tim Lester,Western Michigan,Mid-American,12,5,7,true
+2022,Jim Leonhard,Wisconsin,Big Ten,7,4,3,false
+2022,Luke Fickell,Wisconsin,Big Ten,1,1,0,false
+2022,Paul Chryst,Wisconsin,Big Ten,5,2,3,false
 2022,Craig Bohl,Wyoming,Mountain West,13,7,6,true
 2023,Troy Calhoun,Air Force,Mountain West,13,9,4,true
 2023,Joe Moorhead,Akron,Mid-American,12,2,10,true
@@ -2448,6 +2580,8 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2023,Kalani Sitake,BYU,Big 12,12,5,7,true
 2023,Mike Neu,Ball State,Mid-American,12,4,8,true
 2023,Dave Aranda,Baylor,Big 12,12,3,9,true
+2023,Andy Avalos,Boise State,Mountain West,10,5,5,false
+2023,Spencer Danielson,Boise State,Mountain West,4,3,1,false
 2023,Jeff Hafley,Boston College,ACC,13,7,6,true
 2023,Scot Loeffler,Bowling Green,Mid-American,13,7,6,true
 2023,Maurice Linguist,Buffalo,Mid-American,12,3,9,true
@@ -2460,6 +2594,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2023,Deion Sanders,Colorado,Pac-12,12,4,8,true
 2023,Jay Norvell,Colorado State,Mountain West,12,5,7,true
 2023,Mike Elko,Duke,ACC,12,7,5,true
+2023,Trooper Taylor,Duke,ACC,1,1,0,false
 2023,Mike Houston,East Carolina,American Athletic,12,2,10,true
 2023,Chris Creighton,Eastern Michigan,Mid-American,13,6,7,true
 2023,Billy Napier,Florida,SEC,12,5,7,true
@@ -2479,6 +2614,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2023,Matt Campbell,Iowa State,Big 12,13,7,6,true
 2023,Rich Rodriguez,Jacksonville State,Conference USA,13,9,4,true
 2023,Curt Cignetti,James Madison,Sun Belt,12,11,1,true
+2023,Damian Wroblewski,James Madison,Sun Belt,1,0,1,false
 2023,Lance Leipold,Kansas,Big 12,13,9,4,true
 2023,Chris Klieman,Kansas State,Big 12,13,9,4,true
 2023,Kenni Burns,Kent State,Mid-American,12,1,11,true
@@ -2496,8 +2632,10 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2023,Chuck Martin,Miami (OH),Mid-American,14,11,3,true
 2023,Jim Harbaugh,Michigan,Big Ten,15,15,0,true
 2023,Harlon Barnett,Michigan State,Big Ten,10,2,8,true
+2023,Mel Tucker,Michigan State,Big Ten,2,2,0,false
 2023,Rick Stockstill,Middle Tennessee,Conference USA,12,4,8,true
 2023,P.J. Fleck,Minnesota,Big Ten,13,6,7,true
+2023,Greg Knox,Mississippi State,SEC,2,1,1,false
 2023,Zach Arnett,Mississippi State,SEC,10,4,6,true
 2023,Eli Drinkwitz,Missouri,SEC,13,11,2,true
 2023,Dave Doeren,NC State,ACC,13,9,4,true
@@ -2519,6 +2657,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2023,Lane Kiffin,Ole Miss,SEC,13,11,2,true
 2023,Dan Lanning,Oregon,Pac-12,14,12,2,true
 2023,Jonathan Smith,Oregon State,Pac-12,12,8,4,true
+2023,Kefense Hynson,Oregon State,Pac-12,1,0,1,false
 2023,James Franklin,Penn State,Big Ten,13,10,3,true
 2023,Pat Narduzzi,Pittsburgh,ACC,12,3,9,true
 2023,Ryan Walters,Purdue,Big Ten,12,4,8,true
@@ -2534,14 +2673,19 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2023,Will Hall,Southern Miss,Sun Belt,12,3,9,true
 2023,Troy Taylor,Stanford,Pac-12,12,3,9,true
 2023,Dino Babers,Syracuse,ACC,11,5,6,true
+2023,Nunzio Campanile,Syracuse,ACC,2,1,1,false
 2023,Sonny Dykes,TCU,Big 12,12,5,7,true
 2023,Stan Drayton,Temple,American Athletic,12,3,9,true
 2023,Josh Heupel,Tennessee,SEC,13,9,4,true
 2023,Steve Sarkisian,Texas,Big 12,14,12,2,true
+2023,Elijah Robinson,Texas A&M,SEC,3,1,2,false
+2023,Jimbo Fisher,Texas A&M,SEC,10,6,4,false
 2023,G.J. Kinne,Texas State,Sun Belt,13,8,5,true
 2023,Joey McGuire,Texas Tech,Big 12,13,7,6,true
 2023,Jason Candle,Toledo,Mid-American,14,11,3,true
+2023,Greg Gasparato,Troy,Sun Belt,1,0,1,false
 2023,Jon Sumrall,Troy,Sun Belt,13,11,2,true
+2023,Slade Nagle,Tulane,American Athletic,1,0,1,false
 2023,Willie Fritz,Tulane,American Athletic,13,11,2,true
 2023,Kevin Wilson,Tulsa,American Athletic,12,4,8,true
 2023,Trent Dilfer,UAB,American Athletic,12,4,8,true
@@ -2702,8 +2846,12 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2025,Dowell Loggains,App State,Sun Belt,13,5,8,true
 2025,Brent Brennan,Arizona,Big 12,13,9,4,true
 2025,Kenny Dillingham,Arizona State,Big 12,13,8,5,true
+2025,Bobby Petrino,Arkansas,SEC,7,0,7,false
+2025,Sam Pittman,Arkansas,SEC,5,2,3,false
 2025,Butch Jones,Arkansas State,Sun Belt,13,7,6,true
 2025,Jeff Monken,Army,American Athletic,13,7,6,true
+2025,D.J. Durkin,Auburn,SEC,3,1,2,false
+2025,Hugh Freeze,Auburn,SEC,9,4,5,false
 2025,Kalani Sitake,BYU,Big 12,14,12,2,true
 2025,Mike Uremovich,Ball State,Mid-American,12,4,8,true
 2025,Dave Aranda,Baylor,Big 12,12,5,7,true
@@ -2712,16 +2860,22 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2025,Eddie George,Bowling Green,Mid-American,12,4,8,true
 2025,Pete Lembo,Buffalo,Mid-American,12,5,7,true
 2025,Justin Wilcox,California,ACC,11,6,5,true
+2025,Nick Rolovich,California,ACC,2,1,1,false
 2025,Matt Drinkall,Central Michigan,Mid-American,13,7,6,true
 2025,Tim Albin,Charlotte,American Athletic,12,1,11,true
 2025,Scott Satterfield,Cincinnati,Big 12,13,7,6,true
 2025,Dabo Swinney,Clemson,ACC,13,7,6,true
+2025,Jeremiah Johnson,Coastal Carolina,Sun Belt,1,0,1,false
 2025,Tim Beck,Coastal Carolina,Sun Belt,12,6,6,true
 2025,Deion Sanders,Colorado,Big 12,12,3,9,true
+2025,Jay Norvell,Colorado State,Mountain West,7,2,5,false
+2025,Tyson Summers,Colorado State,Mountain West,5,0,5,false
 2025,Ryan Carty,Delaware,Conference USA,13,7,6,true
 2025,Manny Diaz,Duke,ACC,14,9,5,true
 2025,Blake Harrell,East Carolina,American Athletic,13,9,4,true
 2025,Chris Creighton,Eastern Michigan,Mid-American,12,4,8,true
+2025,Billy Gonzales,Florida,SEC,5,1,4,false
+2025,Billy Napier,Florida,SEC,7,3,4,false
 2025,Zach Kittley,Florida Atlantic,American Athletic,12,4,8,true
 2025,Willie Simmons,Florida International,Conference USA,13,7,6,true
 2025,Mike Norvell,Florida State,ACC,12,5,7,true
@@ -2743,6 +2897,8 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2025,Jerry Mack,Kennesaw State,Conference USA,14,10,4,true
 2025,Mark Carney,Kent State,Mid-American,12,5,7,true
 2025,Mark Stoops,Kentucky,SEC,12,5,7,true
+2025,Brian Kelly,LSU,SEC,8,5,3,false
+2025,Frank Wilson,LSU,SEC,5,2,3,false
 2025,Jamey Chadwell,Liberty,Conference USA,12,4,8,true
 2025,Michael Desormeaux,Louisiana,Sun Belt,13,6,7,true
 2025,Sonny Cumbie,Louisiana Tech,Conference USA,13,8,5,true
@@ -2750,15 +2906,18 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2025,Tony Gibson,Marshall,Sun Belt,12,5,7,true
 2025,Mike Locksley,Maryland,Big Ten,12,4,8,true
 2025,Joe Harasymiak,Massachusetts,Mid-American,12,0,12,true
+2025,Reggie Howard,Memphis,American Athletic,1,0,1,false
 2025,Ryan Silverfield,Memphis,American Athletic,12,8,4,true
 2025,Mario Cristobal,Miami,ACC,16,13,3,true
 2025,Chuck Martin,Miami (OH),Mid-American,14,7,7,true
+2025,Biff Poggi,Michigan,Big Ten,1,0,1,false
 2025,Sherrone Moore,Michigan,Big Ten,12,9,3,true
 2025,Jonathan Smith,Michigan State,Big Ten,12,4,8,true
 2025,Derek Mason,Middle Tennessee,Conference USA,12,3,9,true
 2025,P.J. Fleck,Minnesota,Big Ten,13,8,5,true
 2025,Jeff Lebby,Mississippi State,SEC,13,5,8,true
 2025,Eli Drinkwitz,Missouri,SEC,13,8,5,true
+2025,Nick Petrino,Missouri State,Conference USA,1,0,1,false
 2025,Ryan Beard,Missouri State,Conference USA,12,7,5,true
 2025,Dave Doeren,NC State,ACC,13,8,5,true
 2025,Brian Newberry,Navy,American Athletic,13,11,2,true
@@ -2767,16 +2926,25 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2025,Jason Eck,New Mexico,Mountain West,13,9,4,true
 2025,Tony Sanchez,New Mexico State,Conference USA,12,4,8,true
 2025,Bill Belichick,North Carolina,ACC,12,4,8,true
+2025,Drew Svoboda,North Texas,American Athletic,1,1,0,false
 2025,Eric Morris,North Texas,American Athletic,13,11,2,true
 2025,Thomas Hammock,Northern Illinois,Mid-American,12,3,9,true
 2025,David Braun,Northwestern,Big Ten,13,7,6,true
 2025,Marcus Freeman,Notre Dame,FBS Independents,12,10,2,true
 2025,Brian Smith,Ohio,Mid-American,12,8,4,true
+2025,John Hauser,Ohio,Mid-American,1,1,0,false
 2025,Ryan Day,Ohio State,Big Ten,14,12,2,true
 2025,Brent Venables,Oklahoma,SEC,13,10,3,true
+2025,Doug Meacham,Oklahoma State,Big 12,9,0,9,false
+2025,Mike Gundy,Oklahoma State,Big 12,3,1,2,false
 2025,Ricky Rahne,Old Dominion,Sun Belt,13,10,3,true
 2025,Lane Kiffin,Ole Miss,SEC,12,11,1,true
+2025,Pete Golding,Ole Miss,SEC,3,2,1,false
 2025,Dan Lanning,Oregon,Big Ten,15,13,2,true
+2025,Robb Akey,Oregon State,Pac-12,5,2,3,false
+2025,Trent Bray,Oregon State,Pac-12,7,0,7,false
+2025,James Franklin,Penn State,Big Ten,6,3,3,false
+2025,Terry Smith,Penn State,Big Ten,7,4,3,false
 2025,Pat Narduzzi,Pittsburgh,ACC,13,8,5,true
 2025,Barry Odom,Purdue,Big Ten,12,2,10,true
 2025,Scott Abell,Rice,American Athletic,13,5,8,true
@@ -2788,6 +2956,8 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2025,Major Applewhite,South Alabama,Sun Belt,12,4,8,true
 2025,Shane Beamer,South Carolina,SEC,12,4,8,true
 2025,Alex Golesh,South Florida,American Athletic,12,9,3,true
+2025,Kevin Patrick,South Florida,American Athletic,1,0,1,false
+2025,Blake Anderson,Southern Miss,Sun Belt,1,0,1,false
 2025,Charles Huff,Southern Miss,Sun Belt,12,7,5,true
 2025,Frank Reich,Stanford,ACC,12,4,8,true
 2025,Fran Brown,Syracuse,ACC,12,3,9,true
@@ -2799,10 +2969,16 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2025,G.J. Kinne,Texas State,Sun Belt,13,7,6,true
 2025,Joey McGuire,Texas Tech,Big 12,14,12,2,true
 2025,Jason Candle,Toledo,Mid-American,12,8,4,true
+2025,Robert Weiner,Toledo,Mid-American,1,0,1,false
 2025,Gerad Parker,Troy,Sun Belt,14,8,6,true
 2025,Jon Sumrall,Tulane,American Athletic,14,11,3,true
 2025,Tre Lamb,Tulsa,American Athletic,12,4,8,true
+2025,Alex Mortensen,UAB,American Athletic,6,2,4,false
+2025,Trent Dilfer,UAB,American Athletic,6,2,4,false
 2025,Scott Frost,UCF,Big 12,12,5,7,true
+2025,Deshaun Foster,UCLA,Big Ten,3,0,3,false
+2025,Tim Skipper,UCLA,Big Ten,9,3,6,false
+2025,Gordon Sammis,UConn,FBS Independents,1,0,1,false
 2025,Jim Mora,UConn,FBS Independents,12,9,3,true
 2025,Bryant Vincent,UL Monroe,Sun Belt,12,3,9,true
 2025,Dan Mullen,UNLV,Mountain West,14,10,4,true
@@ -2810,11 +2986,15 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2025,Scotty Walden,UTEP,Conference USA,12,2,10,true
 2025,Jeff Traylor,UTSA,American Athletic,13,7,6,true
 2025,Kyle Whittingham,Utah,Big 12,12,10,2,true
+2025,Morgan Scalley,Utah,Big 12,1,1,0,false
 2025,Bronco Mendenhall,Utah State,Mountain West,13,6,7,true
 2025,Clark Lea,Vanderbilt,SEC,13,10,3,true
 2025,Tony Elliott,Virginia,ACC,14,11,3,true
+2025,Brent Pry,Virginia Tech,ACC,3,0,3,false
+2025,Philip Montgomery,Virginia Tech,ACC,9,3,6,false
 2025,Jake Dickert,Wake Forest,ACC,13,9,4,true
 2025,Jedd Fisch,Washington,Big Ten,13,9,4,true
+2025,Jesse Bobbit,Washington State,Pac-12,1,1,0,false
 2025,Jimmy Rogers,Washington State,Pac-12,12,6,6,true
 2025,Rich Rodriguez,West Virginia,Big 12,12,4,8,true
 2025,Tyson Helton,Western Kentucky,Conference USA,13,9,4,true

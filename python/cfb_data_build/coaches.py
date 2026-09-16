@@ -157,7 +157,16 @@ def coach_rows_from_cfbd(payload: list[dict[str, Any]], season: int) -> pl.DataF
                     "coach": name,
                     "school": str(s.get("school") or ""),
                     "conference": s.get("conference"),
-                    "games": int(s.get("games") or 0),
+                    # CFBD can report fewer games than the record it ships for the
+                    # same coach-season (Todd Berry, UL Monroe 2015: games 12,
+                    # record 2-11), which fails load_coach_seasons' invariant and
+                    # takes coach_tendencies down for every season refreshed after
+                    # it. `games` is games coached, so the record is the floor;
+                    # an in-progress season (0-0) still yields 0.
+                    "games": max(
+                        int(s.get("games") or 0),
+                        int(s.get("wins") or 0) + int(s.get("losses") or 0),
+                    ),
                     "wins": int(s.get("wins") or 0),
                     "losses": int(s.get("losses") or 0),
                 }

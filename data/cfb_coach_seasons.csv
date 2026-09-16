@@ -1350,6 +1350,8 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2015,Willie Fritz,Georgia Southern,Sun Belt,13,9,4,true
 2015,Trent Miles,Georgia State,Sun Belt,13,6,7,true
 2015,Paul Johnson,Georgia Tech,ACC,12,3,9,true
+2015,Chris Naeole,Hawai'i,Mountain West,4,1,3,false
+2015,Norm Chow,Hawai'i,Mountain West,9,2,7,false
 2015,Tom Herman,Houston,American Athletic,14,13,1,true
 2015,Paul Petrino,Idaho,Sun Belt,12,4,8,true
 2015,Bill Cubit,Illinois,Big Ten,12,5,7,true
@@ -1373,6 +1375,8 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2015,Jim Harbaugh,Michigan,Big Ten,13,10,3,true
 2015,Mark Dantonio,Michigan State,Big Ten,14,12,2,true
 2015,Rick Stockstill,Middle Tennessee,Conference USA,13,7,6,true
+2015,Jerry Kill,Minnesota,Big Ten,7,4,3,false
+2015,Tracy Claeys,Minnesota,Big Ten,6,2,4,false
 2015,Dan Mullen,Mississippi State,SEC,13,9,4,true
 2015,Gary Pinkel,Missouri,SEC,12,5,7,true
 2015,Dave Doeren,NC State,ACC,13,7,6,true
@@ -1403,6 +1407,8 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2015,Rocky Long,San Diego State,Mountain West,14,11,3,true
 2015,Ron Caragher,San José State,Mountain West,13,6,7,true
 2015,Joey Jones,South Alabama,Sun Belt,12,5,7,true
+2015,Shawn Elliott,South Carolina,SEC,6,1,5,false
+2015,Steve Spurrier,South Carolina,SEC,6,2,4,false
 2015,Willie Taggart,South Florida,American Athletic,13,8,5,true
 2015,Todd Monken,Southern Miss,Conference USA,14,9,5,true
 2015,David Shaw,Stanford,Pac-12,14,12,2,true
@@ -1414,6 +1420,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2015,Kevin Sumlin,Texas A&M,SEC,13,8,5,true
 2015,Dennis Franchione,Texas State,Sun Belt,12,3,9,true
 2015,Kliff Kingsbury,Texas Tech,Big 12,13,7,6,true
+2015,Jason Candle,Toledo,Mid-American,1,1,0,false
 2015,Matt Campbell,Toledo,Mid-American,11,9,2,true
 2015,Neal Brown,Troy,Sun Belt,12,4,8,true
 2015,Curtis Johnson,Tulane,American Athletic,12,3,9,true
@@ -1421,7 +1428,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2015,George O'Leary,UCF,American Athletic,8,0,8,true
 2015,Jim Mora,UCLA,Pac-12,13,8,5,true
 2015,Bob Diaco,UConn,American Athletic,13,6,7,true
-2015,Todd Berry,UL Monroe,Sun Belt,13,2,11,true
+2015,Todd Berry,UL Monroe,Sun Belt,12,2,11,true
 2015,Tony Sanchez,UNLV,Mountain West,12,3,9,true
 2015,Clay Helton,USC,Pac-12,9,5,4,true
 2015,Sean Kugler,UTEP,Conference USA,12,5,7,true

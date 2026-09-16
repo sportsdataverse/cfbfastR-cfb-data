@@ -386,6 +386,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2007,Pat Hill,Fresno State,Western Athletic,13,9,4,true
 2007,Mark Richt,Georgia,SEC,13,11,2,true
 2007,Chan Gailey,Georgia Tech,ACC,12,7,5,true
+2007,Jon Tenuta,Georgia Tech,ACC,1,0,1,false
 2007,June Jones,Hawai'i,Western Athletic,13,12,1,true
 2007,Art Briles,Houston,Conference USA,12,8,4,true
 2007,Ron Zook,Illinois,Big Ten,13,9,4,true
@@ -412,6 +413,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2007,Sylvester Croom,Mississippi State,SEC,13,8,5,true
 2007,Gary Pinkel,Missouri,Big 12,14,12,2,true
 2007,Tom O'Brien,NC State,ACC,12,5,7,true
+2007,Ken Niumatalolo,Navy,FBS Independents,1,0,1,false
 2007,Paul Johnson,Navy,FBS Independents,12,8,4,true
 2007,Bill Callahan,Nebraska,Big 12,12,5,7,true
 2007,Chris Ault,Nevada,Western Athletic,13,6,7,true
@@ -454,6 +456,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2007,Todd Graham,Tulsa,Conference USA,14,10,4,true
 2007,Neil Callaway,UAB,Conference USA,12,2,10,true
 2007,George O'Leary,UCF,Conference USA,14,10,4,true
+2007,DeWayne Walker,UCLA,Pac-10,1,0,1,false
 2007,Karl Dorrell,UCLA,Pac-10,12,6,6,true
 2007,Randy Edsall,UConn,Big East,13,9,4,true
 2007,Charlie Weatherbie,UL Monroe,Sun Belt,12,6,6,true

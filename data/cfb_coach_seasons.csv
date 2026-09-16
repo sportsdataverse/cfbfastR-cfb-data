@@ -1955,6 +1955,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2020,Blake Anderson,Arkansas State,Sun Belt,11,4,7,true
 2020,Jeff Monken,Army,FBS Independents,12,9,3,true
 2020,Gus Malzahn,Auburn,SEC,10,6,4,true
+2020,Kevin Steele,Auburn,SEC,1,0,1,false
 2020,Kalani Sitake,BYU,FBS Independents,12,11,1,true
 2020,Mike Neu,Ball State,Mid-American,8,7,1,true
 2020,Dave Aranda,Baylor,Big 12,9,2,7,true
@@ -1985,6 +1986,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2020,Todd Graham,Hawai'i,Mountain West,9,5,4,true
 2020,Dana Holgorsen,Houston,American Athletic,8,3,5,true
 2020,Lovie Smith,Illinois,Big Ten,7,2,5,true
+2020,Rod Smith,Illinois,Big Ten,1,0,1,false
 2020,Tom Allen,Indiana,Big Ten,8,6,2,true
 2020,Kirk Ferentz,Iowa,Big Ten,8,6,2,true
 2020,Matt Campbell,Iowa State,Big 12,12,9,3,true
@@ -2024,6 +2026,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2020,Ryan Day,Ohio State,Big Ten,8,7,1,true
 2020,Lincoln Riley,Oklahoma,Big 12,11,9,2,true
 2020,Mike Gundy,Oklahoma State,Big 12,11,8,3,true
+2020,Ricky Rahne,Old Dominion,,0,0,0,true
 2020,Lane Kiffin,Ole Miss,SEC,10,5,5,true
 2020,Mario Cristobal,Oregon,Pac-12,7,4,3,true
 2020,Jonathan Smith,Oregon State,Pac-12,7,2,5,true
@@ -2036,7 +2039,12 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2020,Brady Hoke,San Diego State,Mountain West,8,4,4,true
 2020,Brent Brennan,San José State,Mountain West,8,7,1,true
 2020,Steve Campbell,South Alabama,Sun Belt,11,4,7,true
+2020,Mike Bobo,South Carolina,SEC,3,0,3,false
+2020,Will Muschamp,South Carolina,SEC,7,2,5,false
 2020,Jeff Scott,South Florida,American Athletic,9,1,8,true
+2020,Jay Hopson,Southern Miss,Conference USA,1,0,1,false
+2020,Scotty Walden,Southern Miss,Conference USA,4,1,3,false
+2020,Tim Billings,Southern Miss,Conference USA,5,2,3,false
 2020,David Shaw,Stanford,Pac-12,6,4,2,true
 2020,Dino Babers,Syracuse,ACC,11,1,10,true
 2020,Gary Patterson,TCU,Big 12,10,6,4,true
@@ -2053,13 +2061,17 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2020,Bill Clark,UAB,Conference USA,9,6,3,true
 2020,Josh Heupel,UCF,American Athletic,10,6,4,true
 2020,Chip Kelly,UCLA,Pac-12,7,3,4,true
+2020,Randy Edsall,UConn,,0,0,0,true
 2020,Matt Viator,UL Monroe,Sun Belt,10,0,10,true
 2020,Marcus Arroyo,UNLV,Mountain West,6,0,6,true
 2020,Clay Helton,USC,Pac-12,6,5,1,true
 2020,Dana Dimel,UTEP,Conference USA,8,3,5,true
 2020,Jeff Traylor,UTSA,Conference USA,12,7,5,true
 2020,Kyle Whittingham,Utah,Pac-12,5,3,2,true
+2020,Frank Maile,Utah State,Mountain West,3,1,2,false
+2020,Gary Andersen,Utah State,Mountain West,3,0,3,false
 2020,Derek Mason,Vanderbilt,SEC,8,0,8,true
+2020,Todd Fitch,Vanderbilt,SEC,1,0,1,false
 2020,Bronco Mendenhall,Virginia,ACC,10,5,5,true
 2020,Justin Fuente,Virginia Tech,ACC,11,5,6,true
 2020,Dave Clawson,Wake Forest,ACC,9,4,5,true

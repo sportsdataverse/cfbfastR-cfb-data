@@ -261,6 +261,59 @@ def starters_from_pbp(pbp: pl.DataFrame) -> pl.DataFrame:
     )
 
 
+def game_starters(pbp: pl.DataFrame) -> pl.DataFrame:
+    """Per (season, team, game): the passer with the most attempts in that game.
+
+    This is the per-game "starter" the returning-starter rule is built on --
+    the release has no designated starter, and the attempts leader in a single
+    game is the closest faithful stand-in.
+    """
+    return (
+        pbp.filter((pl.col("pass") == 1) & pl.col("passer_player_id").is_not_null())
+        .select(
+            pl.col("season").cast(pl.Int64),
+            pl.col("week").cast(pl.Int64),
+            pl.col("game_id"),
+            pl.col("pos_team").alias("team"),
+            pl.col("passer_player_id").cast(pl.Int64).alias("athlete_id"),
+        )
+        .group_by("season", "week", "game_id", "team", "athlete_id")
+        .agg(pl.len().alias("attempts"))
+        .sort(
+            ["season", "team", "game_id", "attempts", "athlete_id"],
+            descending=[False, False, False, True, False],
+        )
+        .unique(subset=["season", "team", "game_id"], keep="first", maintain_order=True)
+    )
+
+
+def prior_season_starters(starts: pl.DataFrame) -> pl.DataFrame:
+    """Per (season, team): the opening-day starter and the plurality-of-games starter.
+
+    A quarterback counts as returning if he was EITHER, so both are carried.
+    Ties are broken by total attempts started, then by athlete id, so the
+    choice never depends on row order.
+    """
+    opening = (
+        starts.sort(["season", "team", "week", "game_id"])
+        .unique(subset=["season", "team"], keep="first", maintain_order=True)
+        .select("season", "team", pl.col("athlete_id").alias("opening_starter"))
+    )
+    plurality = (
+        starts.group_by("season", "team", "athlete_id")
+        .agg(
+            pl.len().alias("games_started"), pl.col("attempts").sum().alias("attempts")
+        )
+        .sort(
+            ["season", "team", "games_started", "attempts", "athlete_id"],
+            descending=[False, False, True, True, False],
+        )
+        .unique(subset=["season", "team"], keep="first", maintain_order=True)
+        .select("season", "team", pl.col("athlete_id").alias("plurality_starter"))
+    )
+    return opening.join(plurality, on=["season", "team"], how="full", coalesce=True)
+
+
 def qb_game_counts(pbp: pl.DataFrame) -> pl.DataFrame:
     """Per (season, athlete): distinct games in which the athlete threw a pass."""
     return (
@@ -276,10 +329,18 @@ def qb_game_counts(pbp: pl.DataFrame) -> pl.DataFrame:
     )
 
 
-def qb_starters(starters: pl.DataFrame, appearances: pl.DataFrame) -> pl.DataFrame:
+def qb_starters(
+    starters: pl.DataFrame,
+    appearances: pl.DataFrame,
+    prior: pl.DataFrame | None = None,
+) -> pl.DataFrame:
     """The full QB block per (season, team), derived from the starter series.
 
-    * ``returning_qb`` -- the same athlete started for the same team last season
+    * ``returning_qb`` -- 1 when this season's starter was, for the same team
+      last season, EITHER the opening-day starter OR the starter of a
+      plurality of games (``prior``, from :func:`prior_season_starters`);
+      otherwise 0. Without ``prior`` it falls back to "was last season's
+      attempts leader", which is the weaker test.
     * ``qb_starter_years`` -- how many earlier seasons this athlete was a
       starter anywhere (0 for a first-time starter)
     * ``qb_games`` -- games ENTERING the season in which the athlete threw a
@@ -292,11 +353,20 @@ def qb_starters(starters: pl.DataFrame, appearances: pl.DataFrame) -> pl.DataFra
         .with_columns((pl.col("n") - 1).alias("qb_starter_years"))
         .select("season", "team", "athlete_id", "qb_starter_years")
     )
-    prev = s.select(
-        (pl.col("season") + 1).alias("season"),
-        pl.col("team"),
-        pl.col("athlete_id").alias("prev_athlete_id"),
-    )
+    if prior is None:
+        prev = s.select(
+            (pl.col("season") + 1).alias("season"),
+            pl.col("team"),
+            pl.col("athlete_id").alias("prev_opening"),
+            pl.col("athlete_id").alias("prev_plurality"),
+        )
+    else:
+        prev = prior.select(
+            (pl.col("season") + 1).alias("season"),
+            pl.col("team"),
+            pl.col("opening_starter").alias("prev_opening"),
+            pl.col("plurality_starter").alias("prev_plurality"),
+        )
     # games entering the season: sum the athlete's appearances in EVERY earlier
     # season, not only the seasons he has an appearance row for
     career = (
@@ -314,9 +384,10 @@ def qb_starters(starters: pl.DataFrame, appearances: pl.DataFrame) -> pl.DataFra
         .join(prev, on=["season", "team"], how="left")
         .join(career, on=["season", "team", "athlete_id"], how="left")
         .with_columns(
-            returning_qb=(pl.col("athlete_id") == pl.col("prev_athlete_id"))
-            .fill_null(False)  # noqa: FBT003
-            .cast(pl.Int64),
+            returning_qb=(
+                (pl.col("athlete_id") == pl.col("prev_opening")).fill_null(False)  # noqa: FBT003
+                | (pl.col("athlete_id") == pl.col("prev_plurality")).fill_null(False)  # noqa: FBT003
+            ).cast(pl.Int64),
             qb_games=pl.col("prior_games").fill_null(0).cast(pl.Int64),
         )
         .select(
@@ -462,13 +533,16 @@ def build_qb_table(seasons: list[int], *, pbp_loader=None) -> pl.DataFrame:
     """Rebuild the QB starter table for ``seasons`` from the ESPN pbp release."""
     if pbp_loader is None:
         pbp_loader = _load_pbp_columns
-    starters, counts = [], []
+    starters, counts, starts = [], [], []
     for season in seasons:
         frame = pbp_loader(season)
         starters.append(starters_from_pbp(frame))
         counts.append(qb_game_counts(frame))
+        starts.append(game_starters(frame))
     return qb_starters(
-        pl.concat(starters, how="vertical"), pl.concat(counts, how="vertical")
+        pl.concat(starters, how="vertical"),
+        pl.concat(counts, how="vertical"),
+        prior_season_starters(pl.concat(starts, how="vertical")),
     )
 
 
@@ -480,6 +554,7 @@ def _load_pbp_columns(season: int) -> pl.DataFrame:
         "season",
         "game_id",
         "pos_team",
+        "week",
         "pass",
         "passer_player_name",
         "passer_player_id",

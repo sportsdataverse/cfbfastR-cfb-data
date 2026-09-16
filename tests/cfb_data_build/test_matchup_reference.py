@@ -17,18 +17,23 @@ ovr_rtprod              0.955 / 0.959 recomputed as the rounded mean of the
                                       it; the gap is rounding on halves
 oc_cont                 0.889 / 0.890 derived from a newer coordinator
 dc_cont                 0.894 / 0.903 vintage than the 2025 line used
-returning_qb            0.840 / 0.827 see the QB note
+returning_qb            0.847 / 0.833 a DEFINED rule (below), measured
+                                      against a hand projection
 qb_name                 0.673 / 0.651 "
 athlete_id              0.693 / 0.673 "
 qb_starter_years        0.678 / 0.656 "
 qb_games                0.069 / 0.066 "
 ======================= ============= =====================================
 
-**The QB block measures a different quantity on purpose.** The delivered line
-carries a hand-maintained PRESEASON PROJECTION of each team's starter. This
-port derives the season's REALIZED starter -- the passer with the most
-attempts in the ESPN play-by-play release -- which is reproducible and
-backfilled to 2004, but is known only after the fact: for the season it
+``returning_qb`` follows a stated rule rather than the source's: it is 1 when
+this season's starter was, for the same team last season, EITHER the
+opening-day starter OR the starter of a plurality of games, else 0.
+
+**The rest of the QB block measures a different quantity on purpose.** The
+delivered line carries a hand-maintained PRESEASON PROJECTION of each team's
+starter. This port derives the season's REALIZED starter -- the passer with
+the most attempts in the ESPN play-by-play release -- which is reproducible
+and backfilled to 2004, but is known only after the fact: for the season it
 describes these five columns are post-hoc, and a backtest that feeds them as
 pregame inputs will be optimistic. ``qb_games`` diverges furthest because the
 source counted appearances through an athlete id its own name join left null
@@ -317,3 +322,69 @@ def test_match_team_names_on_an_empty_table_returns_a_typed_frame() -> None:
     out, missing = match_team_names(empty, ["Alabama"])
     assert out.height == 0 and missing == []
     assert "team" in out.columns and out.schema["off_rtprod"] == pl.Float64
+
+
+def test_returning_qb_is_the_opening_day_or_plurality_starter() -> None:
+    """Either prior-season starter counts; a third quarterback does not.
+
+    2023 team A: QB 1 starts the opener and is then replaced, so QB 1 is the
+    opening-day starter and QB 2 started a plurality of games. Both make a
+    2024 starter "returning".
+    """
+    from cfb_data_build.matchup_reference import game_starters, prior_season_starters
+
+    pbp = pl.DataFrame(
+        {
+            "season": [2023] * 8,
+            "week": [1, 1, 2, 2, 3, 3, 4, 4],
+            "game_id": [10, 10, 11, 11, 12, 12, 13, 13],
+            "pos_team": ["A"] * 8,
+            "pass": [True] * 8,
+            "passer_player_id": [1, 1, 2, 2, 2, 2, 2, 2],
+        }
+    )
+    prior = prior_season_starters(game_starters(pbp))
+    assert prior.row(0, named=True)["opening_starter"] == 1
+    assert prior.row(0, named=True)["plurality_starter"] == 2
+
+    appear = pl.DataFrame({"season": [2023], "athlete_id": [1], "games": [1]})
+    for athlete, expected in ((1, 1), (2, 1), (3, 0)):
+        starter = pl.DataFrame(
+            {
+                "season": [2024],
+                "team": ["A"],
+                "qb_name": ["x"],
+                "athlete_id": [athlete],
+            }
+        )
+        out = qb_starters(starter, appear, prior)
+        assert out["returning_qb"].to_list() == [expected], athlete
+
+
+def test_returning_qb_needs_the_same_team() -> None:
+    """A quarterback who started elsewhere last season is not returning."""
+    from cfb_data_build.matchup_reference import prior_season_starters
+
+    prior = prior_season_starters(
+        pl.DataFrame(
+            {
+                "season": [2023],
+                "week": [1],
+                "game_id": [1],
+                "team": ["A"],
+                "athlete_id": [7],
+                "attempts": [20],
+            }
+        )
+    )
+    moved = pl.DataFrame(
+        {"season": [2024], "team": ["B"], "qb_name": ["x"], "athlete_id": [7]}
+    )
+    out = qb_starters(
+        moved,
+        pl.DataFrame(
+            schema={"season": pl.Int64, "athlete_id": pl.Int64, "games": pl.Int64}
+        ),
+        prior,
+    )
+    assert out["returning_qb"].to_list() == [0]

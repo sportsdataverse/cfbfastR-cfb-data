@@ -484,6 +484,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2008,Tommy Tuberville,Auburn,SEC,12,5,7,true
 2008,Bronco Mendenhall,BYU,Mountain West,13,10,3,true
 2008,Brady Hoke,Ball State,Mid-American,13,12,1,true
+2008,Stan Parrish,Ball State,Mid-American,1,0,1,false
 2008,Art Briles,Baylor,Big 12,12,4,8,true
 2008,Chris Petersen,Boise State,Western Athletic,13,12,1,true
 2008,Jeff Jagodzinski,Boston College,ACC,14,9,5,true
@@ -492,6 +493,8 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2008,Jeff Tedford,California,Pac-10,13,9,4,true
 2008,Butch Jones,Central Michigan,Mid-American,13,8,5,true
 2008,Brian Kelly,Cincinnati,Big East,14,11,3,true
+2008,Dabo Swinney,Clemson,ACC,7,4,3,false
+2008,Tommy Bowden,Clemson,ACC,6,3,3,false
 2008,Dan Hawkins,Colorado,Big 12,12,5,7,true
 2008,Steve Fairchild,Colorado State,Mountain West,13,7,6,true
 2008,David Cutcliffe,Duke,ACC,12,4,8,true

@@ -954,7 +954,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2012,Rich Ellerson,Army,FBS Independents,12,2,10,true
 2012,Gene Chizik,Auburn,SEC,12,3,9,true
 2012,Bronco Mendenhall,BYU,FBS Independents,13,8,5,true
-2012,Pete Lembo,Ball State,Mid-American,13,9,4,true
+2012,Pete Lembo,Ball State,Mid-American,12,9,4,true
 2012,Art Briles,Baylor,Big 12,13,8,5,true
 2012,Chris Petersen,Boise State,Mountain West,13,11,2,true
 2012,Frank Spaziani,Boston College,ACC,12,2,10,true
@@ -1011,6 +1011,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2012,Larry Fedora,North Carolina,ACC,12,8,4,true
 2012,Dan McCarney,North Texas,Sun Belt,12,4,8,true
 2012,Dave Doeren,Northern Illinois,Mid-American,13,12,1,true
+2012,Rod Carey,Northern Illinois,Mid-American,1,0,1,false
 2012,Pat Fitzgerald,Northwestern,Big Ten,13,10,3,true
 2012,Brian Kelly,Notre Dame,FBS Independents,13,12,1,true
 2012,Frank Solich,Ohio,Mid-American,13,9,4,true
@@ -1022,7 +1023,8 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2012,Mike Riley,Oregon State,Pac-12,13,9,4,true
 2012,Bill O'Brien,Penn State,Big Ten,12,8,4,true
 2012,Paul Chryst,Pittsburgh,Big East,13,6,7,true
-2012,Danny Hope,Purdue,Big Ten,6,3,3,true
+2012,Danny Hope,Purdue,Big Ten,12,3,3,true
+2012,Patrick Higgins,Purdue,Big Ten,1,0,1,false
 2012,David Bailiff,Rice,Conference USA,13,7,6,true
 2012,Kyle Flood,Rutgers,Big East,13,9,4,true
 2012,June Jones,SMU,Conference USA,13,7,6,true
@@ -1037,12 +1039,15 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2012,Gary Patterson,TCU,Big 12,13,7,6,true
 2012,Steve Addazio,Temple,Big East,11,4,7,true
 2012,Derek Dooley,Tennessee,SEC,11,4,7,true
+2012,Jim Chaney,Tennessee,SEC,1,1,0,false
 2012,Mack Brown,Texas,Big 12,13,9,4,true
 2012,Kevin Sumlin,Texas A&M,SEC,13,11,2,true
 2012,Dennis Franchione,Texas State,Western Athletic,12,4,8,true
 2012,Tommy Tuberville,Texas Tech,Big 12,12,7,5,true
 2012,Matt Campbell,Toledo,Mid-American,13,9,4,true
 2012,Larry Blakeney,Troy,Sun Belt,12,5,7,true
+2012,Curtis Johnson,Tulane,Conference USA,12,2,10,false
+2012,Mark Hutson,Tulane,Conference USA,6,0,6,false
 2012,Bill Blankenship,Tulsa,Conference USA,14,11,3,true
 2012,Garrick McGee,UAB,Conference USA,12,3,9,true
 2012,George O'Leary,UCF,Conference USA,14,10,4,true
@@ -1064,6 +1069,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2012,Dana Holgorsen,West Virginia,Big 12,13,7,6,true
 2012,Willie Taggart,Western Kentucky,Sun Belt,12,7,5,true
 2012,Bill Cubit,Western Michigan,Mid-American,12,4,8,true
+2012,Barry Alvarez,Wisconsin,Big Ten,1,0,1,false
 2012,Bret Bielema,Wisconsin,Big Ten,13,8,5,true
 2012,Dave Christensen,Wyoming,Mountain West,12,4,8,true
 2013,Troy Calhoun,Air Force,Mountain West,12,2,10,true

@@ -1090,7 +1090,11 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2013,Jim McElwain,Colorado State,Mountain West,14,8,6,true
 2013,David Cutcliffe,Duke,ACC,14,10,4,true
 2013,Ruffin McNeill,East Carolina,Conference USA,13,10,3,true
+2013,Ron English,Eastern Michigan,Mid-American,9,1,8,false
+2013,Stan Parrish,Eastern Michigan,Mid-American,3,1,2,false
 2013,Will Muschamp,Florida,SEC,12,4,8,true
+2013,Brian Wright,Florida Atlantic,Conference USA,4,4,0,false
+2013,Carl Pelini,Florida Atlantic,Conference USA,8,2,6,false
 2013,Ron Turner,Florida International,Conference USA,12,1,11,true
 2013,Jimbo Fisher,Florida State,ACC,14,14,0,true
 2013,Tim DeRuyter,Fresno State,Mountain West,13,11,2,true
@@ -1117,6 +1121,8 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2013,Charley Molnar,Massachusetts,Mid-American,12,1,11,true
 2013,Justin Fuente,Memphis,American Athletic,12,3,9,true
 2013,Al Golden,Miami,ACC,13,9,4,true
+2013,Don Treadwell,Miami (OH),Mid-American,5,0,5,false
+2013,Mike Bath,Miami (OH),Mid-American,7,0,7,false
 2013,Brady Hoke,Michigan,Big Ten,13,7,6,true
 2013,Mark Dantonio,Michigan State,Big Ten,14,13,1,true
 2013,Rick Stockstill,Middle Tennessee,Conference USA,13,8,5,true
@@ -1154,7 +1160,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2013,Willie Taggart,South Florida,American Athletic,12,2,10,true
 2013,Todd Monken,Southern Miss,Conference USA,12,1,11,true
 2013,David Shaw,Stanford,Pac-12,14,11,3,true
-2013,Scott Shafer,Syracuse,ACC,12,6,6,true
+2013,Scott Shafer,Syracuse,ACC,13,6,6,true
 2013,Gary Patterson,TCU,Big 12,12,4,8,true
 2013,Matt Rhule,Temple,American Athletic,12,2,10,true
 2013,Butch Jones,Tennessee,SEC,12,5,7,true
@@ -1172,14 +1178,18 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2013,Paul Pasqualoni,UConn,American Athletic,4,0,4,true
 2013,Todd Berry,UL Monroe,Sun Belt,12,6,6,true
 2013,Bobby Hauck,UNLV,Mountain West,13,7,6,true
+2013,Clay Helton,USC,Pac-12,1,1,0,false
+2013,Ed Orgeron,USC,Pac-12,8,6,2,false
+2013,Lane Kiffin,USC,Pac-12,5,3,2,false
 2013,Sean Kugler,UTEP,Conference USA,12,2,10,true
 2013,Larry Coker,UTSA,Conference USA,12,7,5,true
 2013,Kyle Whittingham,Utah,Pac-12,12,5,7,true
 2013,Matt Wells,Utah State,Mountain West,14,9,5,true
 2013,James Franklin,Vanderbilt,SEC,13,9,4,true
-2013,Mike London,Virginia,ACC,12,2,10,true
+2013,Mike London,Virginia,ACC,13,2,10,true
 2013,Frank Beamer,Virginia Tech,ACC,13,8,5,true
 2013,Jim Grobe,Wake Forest,ACC,12,4,8,true
+2013,Marques Tuiasosopo,Washington,Pac-12,1,1,0,false
 2013,Steve Sarkisian,Washington,Pac-12,12,8,4,true
 2013,Mike Leach,Washington State,Pac-12,13,6,7,true
 2013,Dana Holgorsen,West Virginia,Big 12,12,4,8,true

@@ -1,8 +1,22 @@
-From https://github.com/sportsdataverse/cfbfastR-cfb-data
- * [new branch]        feat/cpoe-air-yards-model -> origin/feat/cpoe-air-yards-model
   pos_team: 100.0% of rows resolved to a team name
   def_pos_team: 100.0% of rows resolved to a team name
 pbp 2024: 163142 rows from 966 games
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/coaches.py", line 275, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/coaches.py", line 265, in main
+    out = refresh_coach_seasons(seasons, path=args.path)
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/coaches.py", line 237, in refresh_coach_seasons
+    current = load_coach_seasons(path)
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/coaches.py", line 88, in load_coach_seasons
+    raise ValueError(
+    ...<2 lines>...
+    )
+ValueError: /mnt/sdv_repos/cfbfastR-cfb-data/data/cfb_coach_seasons.csv: 1 coach-season(s) declare fewer games than wins + losses (e.g. {'season': 2015, 'coach': 'Todd Berry', 'school': 'UL Monroe', 'conference': 'Sun Belt', 'games': 12, 'wins': 2, 'losses': 11, 'clean_attribution': True}); games must be games coached
+::warning ::coach roster refresh for season 2024 exited with code 1
 play_participants 2024: 151764 rows from 966 games
 team_box 2024: 1932 rows from 966 games
 player_box 2024: 78993 rows from 966 games
@@ -32,9 +46,58 @@ adv_drives 2024: 1892 rows from 966 games
   pos_team: 100.0% of rows resolved to a team name
 adv_situational 2024: 1892 rows from 966 games
   def_pos_team: 100.0% of rows resolved to a team name
-adv_defensive_players 2024: 5558 rows from 966 games
+adv_defensive_players 2024: 5557 rows from 966 games
   pos_team: 100.0% of rows resolved to a team name
 adv_specialists 2024: 9348 rows from 966 games
+  pos_team: 100.0% of rows resolved to a team name
+adv_player_usage 2024: 19838 rows from 966 games
+  pos_team: 100.0% of rows resolved to a team name
+adv_position_group_usage 2024: 7491 rows from 966 games
+  def_pos_team: 100.0% of rows resolved to a team name
+adv_tackles 2024: 33691 rows from 966 games
+  def_pos_team: 100.0% of rows resolved to a team name
+adv_position_group_tackles 2024: 6612 rows from 966 games
+  pos_team: 100.0% of rows resolved to a team name
+adv_team_usage 2024: 1892 rows from 966 games
+  pos_team: 100.0% of rows resolved to a team name
+adv_drive_scripting 2024: 3784 rows from 966 games
+  pos_team: 100.0% of rows resolved to a team name
+usage_players 2024: 4178 rows from 966 games
+  pos_team: 100.0% of rows resolved to a team name
+usage_position_groups 2024: 1050 rows from 966 games
+  def_pos_team: 100.0% of rows resolved to a team name
+usage_tackles 2024: 9868 rows from 966 games
+  def_pos_team: 100.0% of rows resolved to a team name
+usage_position_group_tackles 2024: 1407 rows from 966 games
+  pos_team: 100.0% of rows resolved to a team name
+usage_teams 2024: 235 rows from 966 games
+  pos_team: 100.0% of rows resolved to a team name
+usage_drive_scripting 2024: 470 rows from 966 games
+  pos_team: 100.0% of rows resolved to a team name
+adv_st_kickers 2024: 3339 rows from 966 games
+  pos_team: 100.0% of rows resolved to a team name
+adv_st_punters 2024: 2015 rows from 966 games
+  pos_team: 100.0% of rows resolved to a team name
+adv_st_returners 2024: 3141 rows from 966 games
+  def_pos_team: 100.0% of rows resolved to a team name
+adv_st_blocks 2024: 85 rows from 966 games
+  pos_team: 100.0% of rows resolved to a team name
+adv_st_team 2024: 1892 rows from 966 games
+  pos_team: 100.0% of rows resolved to a team name
+usage_st_kickers 2024: 880 rows from 966 games
+  pos_team: 100.0% of rows resolved to a team name
+usage_st_punters 2024: 332 rows from 966 games
+  pos_team: 100.0% of rows resolved to a team name
+usage_st_returners 2024: 1084 rows from 966 games
+  def_pos_team: 100.0% of rows resolved to a team name
+usage_st_blocks 2024: 81 rows from 966 games
+  pos_team: 100.0% of rows resolved to a team name
+usage_st_team 2024: 235 rows from 966 games
+  pos_team: 100.0% of rows resolved to a team name
+team_tendencies 2024: 235 rows from 966 games
+  coaches: 130 attributed team-seasons for 2024
+  pos_team: 100.0% of rows resolved to a team name
+coach_tendencies 2024: 130 rows from 966 games
   adv_team_gamelog 2024: 1892 rows, 90 cols
 
 === gamelog: 0 failures ===
@@ -135,8 +198,20 @@ cfb_rosters 2024: 27477 rows from 966/966 games | position 100.0% | division 100
   cfb_team_summaries_weekly 2024: 2119 rows, 384 cols, 16 weekly snapshots
 
 === team_summaries_weekly: 0 failures ===
-::warning::no 247 recruits store at /home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-raw/cfb/recruits/json; skipping recruiting datasets
+  cfb_matchup_features 2024: 1719 rows, 45 cols
+
+=== matchup_features: 0 failures ===
+  cfb_matchup_line 2024: 764 rows, 268 cols
+
+=== matchup_line: 0 failures ===
+  cfb_recruits 2024: 4012 rows
+
+=== recruits: 0 failures ===
+  cfb_team_talent 2024: 317 rows
+
+=== team_talent: 0 failures ===
   cfb_returning_production 2024: 229 rows
 
 === returning_production: 0 failures ===
-pushed: CFB Data Updated (Start: 2024 End: 2024) (attempt 1)
+push rejected (attempt 1); syncing with origin
+::error ::cannot rebase onto origin/main for: CFB Data Updated (Start: 2024 End: 2024)

@@ -248,6 +248,35 @@ def test_cfbd_rows_and_refresh(tmp_path):
     assert again.filter(pl.col("season") == 2026).height == 3
 
 
+def test_cfbd_games_below_the_record_take_the_record_as_the_floor():
+    """CFBD ships Todd Berry, UL Monroe 2015 as games=12 with a 2-11 record.
+
+    `games` is games coached, so a row like that fails load_coach_seasons and
+    takes coach_tendencies down for every season refreshed afterwards.
+    """
+    payload = [
+        {
+            "firstName": "Todd",
+            "lastName": "Berry",
+            "seasons": [
+                {"school": "UL Monroe", "year": 2015, "games": 12, "wins": 2, "losses": 11}
+            ],
+        }
+    ]
+    row = coaches_mod.coach_rows_from_cfbd(payload, 2015).row(0, named=True)
+    assert row["games"] == 13 and (row["wins"], row["losses"]) == (2, 11)
+
+    # an in-progress season reports 0-0 and must stay 0, not become a played game
+    live = [
+        {
+            "firstName": "In",
+            "lastName": "Progress",
+            "seasons": [{"school": "Alpha", "year": 2026, "games": 0, "wins": 0, "losses": 0}],
+        }
+    ]
+    assert coaches_mod.coach_rows_from_cfbd(live, 2026).row(0, named=True)["games"] == 0
+
+
 def test_cfbd_error_envelope_is_an_error_not_an_empty_season(monkeypatch):
     class _Resp:
         def __enter__(self):

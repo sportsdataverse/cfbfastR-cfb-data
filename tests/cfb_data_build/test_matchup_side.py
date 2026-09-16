@@ -175,12 +175,13 @@ def test_weather_tidy_keeps_the_first_row_per_game_and_the_documented_dtypes() -
     payload = [
         {"id": 1, "temperature": 70.5, "humidity": 40, "weatherCondition": "Clear"},
         {"id": 1, "temperature": 99.0, "humidity": 1, "weatherCondition": "Storm"},
-        {"id": 2, "temperature": None, "humidity": 55.0},
+        # CFBD ships fractional humidity in some seasons (2020) and whole in others
+        {"id": 2, "temperature": None, "humidity": 85.9},
     ]
     out = tidy_cfbd_weather(payload)
     assert out.height == 2 and out.columns == ["game_id", *WEATHER_COLS]
     assert out.row(0, named=True)["weather_condition"] == "Clear"
-    assert out.schema["humidity"] == pl.Int64 and out["humidity"].to_list() == [40, 55]
+    assert out.schema["humidity"] == pl.Float64 and out["humidity"].to_list() == [40.0, 85.9]
     assert out.schema["snowfall"] == pl.Int64 and out["snowfall"].null_count() == 2
     assert tidy_cfbd_weather([]).columns == ["game_id", *WEATHER_COLS]
 

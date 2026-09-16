@@ -1428,7 +1428,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2015,George O'Leary,UCF,American Athletic,8,0,8,true
 2015,Jim Mora,UCLA,Pac-12,13,8,5,true
 2015,Bob Diaco,UConn,American Athletic,13,6,7,true
-2015,Todd Berry,UL Monroe,Sun Belt,12,2,11,true
+2015,Todd Berry,UL Monroe,Sun Belt,13,2,11,true
 2015,Tony Sanchez,UNLV,Mountain West,12,3,9,true
 2015,Clay Helton,USC,Pac-12,9,5,4,true
 2015,Sean Kugler,UTEP,Conference USA,12,5,7,true
@@ -1477,21 +1477,28 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2016,Charlie Partridge,Florida Atlantic,Conference USA,12,3,9,true
 2016,Ron Turner,Florida International,Conference USA,4,0,4,true
 2016,Jimbo Fisher,Florida State,ACC,13,10,3,true
+2016,Eric Kiesau,Fresno State,Mountain West,4,0,4,false
+2016,Tim DeRuyter,Fresno State,Mountain West,8,1,7,false
 2016,Kirby Smart,Georgia,SEC,13,8,5,true
 2016,Tyson Summers,Georgia Southern,Sun Belt,12,5,7,true
-2016,Trent Miles,Georgia State,Sun Belt,9,1,8,true
+2016,Tim Lappano,Georgia State,Sun Belt,2,1,1,false
+2016,Trent Miles,Georgia State,Sun Belt,10,1,8,true
 2016,Paul Johnson,Georgia Tech,ACC,13,9,4,true
 2016,Nick Rolovich,Hawai'i,Mountain West,14,7,7,true
+2016,Major Applewhite,Houston,American Athletic,1,0,1,false
 2016,Tom Herman,Houston,American Athletic,12,9,3,true
 2016,Paul Petrino,Idaho,Sun Belt,13,9,4,true
 2016,Lovie Smith,Illinois,Big Ten,12,3,9,true
 2016,Kevin Wilson,Indiana,Big Ten,12,6,6,true
+2016,Tom Allen,Indiana,Big Ten,1,0,1,false
 2016,Kirk Ferentz,Iowa,Big Ten,13,8,5,true
 2016,Matt Campbell,Iowa State,Big 12,12,3,9,true
 2016,David Beaty,Kansas,Big 12,12,2,10,true
 2016,Bill Snyder,Kansas State,Big 12,13,9,4,true
 2016,Paul Haynes,Kent State,Mid-American,12,3,9,true
 2016,Mark Stoops,Kentucky,SEC,13,7,6,true
+2016,Ed Orgeron,LSU,SEC,8,6,2,false
+2016,Les Miles,LSU,SEC,4,2,2,false
 2016,Mark Hudspeth,Louisiana,Sun Belt,13,6,7,true
 2016,Skip Holtz,Louisiana Tech,Conference USA,14,9,5,true
 2016,Bobby Petrino,Louisville,ACC,13,9,4,true
@@ -1528,6 +1535,8 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2016,Gary Andersen,Oregon State,Pac-12,12,4,8,true
 2016,James Franklin,Penn State,Big Ten,14,11,3,true
 2016,Pat Narduzzi,Pittsburgh,ACC,13,8,5,true
+2016,Darrell Hazell,Purdue,Big Ten,6,3,3,false
+2016,Gerad Parker,Purdue,Big Ten,6,0,6,false
 2016,David Bailiff,Rice,Conference USA,12,3,9,true
 2016,Chris Ash,Rutgers,Big Ten,12,2,10,true
 2016,Chad Morris,SMU,American Athletic,12,5,7,true

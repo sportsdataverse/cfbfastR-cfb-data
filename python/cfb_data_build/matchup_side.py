@@ -21,8 +21,8 @@ part and leaves the rest null with its documented dtype:
   game, joined by ``game_id`` only.
 
 That fills 68 of the line's 90 side / meta / weather columns (4 side inputs
-x 2 sides, 25 meta x 2, 10 weather). The other 22 (11 per side) are not
-derivable from CFBD and stay null: ``team_talent_weighted`` (a
+x 2 sides, 25 meta x 2, 10 weather). The other 22 (11 per side) come from the
+versioned tables in ``cfb_data_build.matchup_reference``: ``team_talent_weighted`` (a
 rank-decayed roster sum from a recruiting site), ``off/def/ovr_rtprod`` (an
 external returning-production table whose numbers are not CFBD's
 ``percentPPA``), ``oc_cont`` / ``dc_cont`` (coordinator continuity from a
@@ -309,9 +309,19 @@ def head_coaches(coaches: pl.DataFrame, season: int) -> pl.DataFrame:
 
 
 def team_side_inputs(
-    season: int, *, talent: pl.DataFrame, teams: pl.DataFrame, coaches: pl.DataFrame
+    season: int,
+    *,
+    talent: pl.DataFrame,
+    teams: pl.DataFrame,
+    coaches: pl.DataFrame,
+    reference: pl.DataFrame | None = None,
 ) -> pl.DataFrame:
-    """Per CFBD school: the 15 side-input columns (the derivable four filled) + 25 meta.
+    """Per CFBD school: the 15 side-input columns + the 25 meta columns.
+
+    Four columns come straight from CFBD (``join_name``, ``talent``,
+    ``head_coach``, ``hc_tenure``). The other eleven come from ``reference``
+    (:func:`cfb_data_build.matchup_reference.season_reference`); without it
+    they stay null with their documented dtype.
 
     Keyed by ``team`` in CFBD's spelling; the line builder maps it to the
     delivered spelling when it prefixes the columns per side.
@@ -333,17 +343,32 @@ def team_side_inputs(
             .otherwise(pl.col("talent"))
         )
     )
+    if reference is not None:
+        extra = [c for c in SIDE_INPUT_COLS if c in reference.columns]
+        assert reference.schema["team"] == out.schema["team"]
+        out = out.join(reference.select(["team", *extra]), on="team", how="left")
     return _typed(out, SIDE_INPUT_COLS).select(
         ["team", *SIDE_INPUT_COLS, *TEAM_META_COLS]
     )
 
 
 def side_input_frames(season: int) -> tuple[pl.DataFrame, pl.DataFrame]:
-    """(per-team side inputs + meta, per-game weather) for one season, from CFBD."""
+    """(per-team side inputs + meta, per-game weather) for one season.
+
+    CFBD supplies talent, coaches, team meta and weather; the versioned
+    reference tables under ``data/`` supply the eleven columns CFBD does not
+    publish.
+    """
+    from cfb_data_build.matchup_reference import season_reference
+
+    teams = tidy_cfbd_teams(fetch_cfbd_teams(season))
     side = team_side_inputs(
         season,
         talent=tidy_cfbd_talent(fetch_cfbd_talent(season)),
-        teams=tidy_cfbd_teams(fetch_cfbd_teams(season)),
+        teams=teams,
         coaches=tidy_cfbd_coaches(fetch_cfbd_coaches(season)),
+        reference=season_reference(
+            season, teams=teams, schools=teams["team"].to_list()
+        ),
     )
     return side, tidy_cfbd_weather(fetch_cfbd_weather(season))

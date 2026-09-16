@@ -93,8 +93,10 @@ RELEASE_NOTES: dict[str, str] = {
         "week-1 (and any later opener's) features are the prior season's "
         "full-season values. Weather (CFBD /games/weather), team / venue meta "
         "(/teams), talent (/talent) and the head coach with tenure (/coaches) "
-        "are filled; the source's proprietary side inputs (roster talent sum, "
-        "returning production, coordinator continuity, projected QB) are null."
+        "are filled from CFBD; roster talent, returning production, coach "
+        "continuity and the QB block come from the versioned reference tables "
+        "under data/ (the QB identity is the realized usage leader, post-hoc "
+        "for the season it describes)."
     ),
 }
 

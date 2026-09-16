@@ -2359,6 +2359,8 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2023,Kalani Sitake,BYU,Big 12,12,5,7,true
 2023,Mike Neu,Ball State,Mid-American,12,4,8,true
 2023,Dave Aranda,Baylor,Big 12,12,3,9,true
+2023,Andy Avalos,Boise State,Mountain West,10,5,5,false
+2023,Spencer Danielson,Boise State,Mountain West,4,3,1,false
 2023,Jeff Hafley,Boston College,ACC,13,7,6,true
 2023,Scot Loeffler,Bowling Green,Mid-American,13,7,6,true
 2023,Maurice Linguist,Buffalo,Mid-American,12,3,9,true
@@ -2371,6 +2373,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2023,Deion Sanders,Colorado,Pac-12,12,4,8,true
 2023,Jay Norvell,Colorado State,Mountain West,12,5,7,true
 2023,Mike Elko,Duke,ACC,12,7,5,true
+2023,Trooper Taylor,Duke,ACC,1,1,0,false
 2023,Mike Houston,East Carolina,American Athletic,12,2,10,true
 2023,Chris Creighton,Eastern Michigan,Mid-American,13,6,7,true
 2023,Billy Napier,Florida,SEC,12,5,7,true
@@ -2390,6 +2393,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2023,Matt Campbell,Iowa State,Big 12,13,7,6,true
 2023,Rich Rodriguez,Jacksonville State,Conference USA,13,9,4,true
 2023,Curt Cignetti,James Madison,Sun Belt,12,11,1,true
+2023,Damian Wroblewski,James Madison,Sun Belt,1,0,1,false
 2023,Lance Leipold,Kansas,Big 12,13,9,4,true
 2023,Chris Klieman,Kansas State,Big 12,13,9,4,true
 2023,Kenni Burns,Kent State,Mid-American,12,1,11,true
@@ -2407,8 +2411,10 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2023,Chuck Martin,Miami (OH),Mid-American,14,11,3,true
 2023,Jim Harbaugh,Michigan,Big Ten,15,15,0,true
 2023,Harlon Barnett,Michigan State,Big Ten,10,2,8,true
+2023,Mel Tucker,Michigan State,Big Ten,2,2,0,false
 2023,Rick Stockstill,Middle Tennessee,Conference USA,12,4,8,true
 2023,P.J. Fleck,Minnesota,Big Ten,13,6,7,true
+2023,Greg Knox,Mississippi State,SEC,2,1,1,false
 2023,Zach Arnett,Mississippi State,SEC,10,4,6,true
 2023,Eli Drinkwitz,Missouri,SEC,13,11,2,true
 2023,Dave Doeren,NC State,ACC,13,9,4,true
@@ -2430,6 +2436,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2023,Lane Kiffin,Ole Miss,SEC,13,11,2,true
 2023,Dan Lanning,Oregon,Pac-12,14,12,2,true
 2023,Jonathan Smith,Oregon State,Pac-12,12,8,4,true
+2023,Kefense Hynson,Oregon State,Pac-12,1,0,1,false
 2023,James Franklin,Penn State,Big Ten,13,10,3,true
 2023,Pat Narduzzi,Pittsburgh,ACC,12,3,9,true
 2023,Ryan Walters,Purdue,Big Ten,12,4,8,true
@@ -2445,14 +2452,19 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2023,Will Hall,Southern Miss,Sun Belt,12,3,9,true
 2023,Troy Taylor,Stanford,Pac-12,12,3,9,true
 2023,Dino Babers,Syracuse,ACC,11,5,6,true
+2023,Nunzio Campanile,Syracuse,ACC,2,1,1,false
 2023,Sonny Dykes,TCU,Big 12,12,5,7,true
 2023,Stan Drayton,Temple,American Athletic,12,3,9,true
 2023,Josh Heupel,Tennessee,SEC,13,9,4,true
 2023,Steve Sarkisian,Texas,Big 12,14,12,2,true
+2023,Elijah Robinson,Texas A&M,SEC,3,1,2,false
+2023,Jimbo Fisher,Texas A&M,SEC,10,6,4,false
 2023,G.J. Kinne,Texas State,Sun Belt,13,8,5,true
 2023,Joey McGuire,Texas Tech,Big 12,13,7,6,true
 2023,Jason Candle,Toledo,Mid-American,14,11,3,true
+2023,Greg Gasparato,Troy,Sun Belt,1,0,1,false
 2023,Jon Sumrall,Troy,Sun Belt,13,11,2,true
+2023,Slade Nagle,Tulane,American Athletic,1,0,1,false
 2023,Willie Fritz,Tulane,American Athletic,13,11,2,true
 2023,Kevin Wilson,Tulsa,American Athletic,12,4,8,true
 2023,Trent Dilfer,UAB,American Athletic,12,4,8,true

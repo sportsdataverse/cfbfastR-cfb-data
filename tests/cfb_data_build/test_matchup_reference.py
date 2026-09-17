@@ -56,6 +56,7 @@ from cfb_data_build.matchup_reference import (
     load_coach_continuity,
     load_qb_starters,
     match_team_names,
+    resolve_names,
     qb_game_counts,
     qb_starters,
     season_reference,
@@ -128,10 +129,21 @@ def test_reference_agrees_with_the_delivered_line(
 def test_only_a_new_fbs_member_is_unfilled(
     oracle: pl.DataFrame, reference: pl.DataFrame
 ) -> None:
-    """Every team on the 2025 line resolves except ones the tables predate."""
+    """Every team on the 2025 line resolves.
+
+    Missouri State used to be the one gap, and not because the tables predate it:
+    its returning-production row was being handed to Missouri S&T (Division II),
+    whose "missourist" contraction expands to "missouristate" and sorts first in
+    the school list. Resolution is by candidate rank now, so the row reaches
+    Missouri State (see test_candidate_collisions_resolve_by_rank_not_input_order).
+    """
     on_line = set(oracle["home_team"].to_list()) | set(oracle["away_team"].to_list())
     filled = set(reference.filter(pl.col("off_rtprod").is_not_null())["team"].to_list())
-    assert sorted(on_line - filled) == ["Missouri State"]
+    assert sorted(on_line - filled) == []
+    teams = pl.read_parquet(FIX / "cfbd_teams_2025.parquet")["team"].to_list()
+    assert teams.index("Missouri S&T") < teams.index("Missouri State")  # the ordering that exposed it
+    resolved, _ = resolve_names(["Missouri State"], teams)
+    assert resolved["Missouri State"][0] == "Missouri State"
 
 
 def test_continuity_is_backfilled_to_the_first_derivable_season() -> None:
@@ -174,7 +186,7 @@ def test_starter_is_the_passer_with_the_most_attempts() -> None:
             "season": [2008] * 5,
             "game_id": [1, 1, 2, 2, 2],
             "pos_team": ["A", "A", "A", "A", "B"],
-            "pass": [1, 1, 1, 0, 1],
+            "pass_attempt": [True, True, True, False, True],
             "passer_player_name": ["Backup", "Starter", "Starter", None, "Only"],
             "passer_player_id": [2, 1, 1, None, 3],
         }
@@ -343,7 +355,7 @@ def test_returning_qb_is_the_opening_day_or_plurality_starter() -> None:
             "week": [1, 1, 2, 2, 3, 3, 4, 4],
             "game_id": [10, 10, 11, 11, 12, 12, 13, 13],
             "pos_team": ["A"] * 8,
-            "pass": [True] * 8,
+            "pass_attempt": [True] * 8,
             "passer_player_id": [1, 1, 2, 2, 2, 2, 2, 2],
         }
     )
@@ -392,3 +404,92 @@ def test_returning_qb_needs_the_same_team() -> None:
         prior,
     )
     assert out["returning_qb"].to_list() == [0]
+
+
+def test_a_sack_is_not_a_pass_attempt() -> None:
+    """Starters and game counts use ``pass_attempt``, never raw pass rows.
+
+    QB 2 has more pass ROWS (one attempt, two sacks) but fewer attempts than
+    QB 1; QB 3 only took a sack in game 2, which is not a game he threw in.
+    """
+    pbp = pl.DataFrame(
+        {
+            "season": [2019] * 6,
+            "game_id": [1, 1, 1, 1, 1, 2],
+            "pos_team": ["A"] * 6,
+            "pass_attempt": [True, True, True, False, False, False],
+            "passer_player_name": ["One", "One", "Two", "Two", "Two", "Three"],
+            "passer_player_id": [1, 1, 2, 2, 2, 3],
+        }
+    )
+    assert starters_from_pbp(pbp)["athlete_id"].to_list() == [1]
+    assert sorted(qb_game_counts(pbp)["athlete_id"].to_list()) == [1, 2]
+
+
+def test_a_vacant_post_is_never_a_retained_coordinator() -> None:
+    """Washington State is 'Vacant' in consecutive seasons: that is not continuity."""
+    src = pl.DataFrame(
+        {
+            "season": [2013, 2014, 2015],
+            "school_mascot": ["WSU Cougars"] * 3,
+            "offensive_coordinators": ["Vacant", "Vacant", "TBD"],
+            "defensive_coordinators": ["Mike Breske", "Mike Breske", "Alex Grinch"],
+        }
+    )
+    out = coach_continuity(src).sort("season")
+    assert out["oc_cont"].to_list() == [0, 0]
+    assert out["dc_cont"].to_list() == [1, 0]
+
+
+def test_continuity_compares_every_coordinator_slot() -> None:
+    """A third co-coordinator retained the next season is continuity (WKU 2022 -> 2023)."""
+    src = pl.DataFrame(
+        {
+            "season": [2022, 2023],
+            "school_mascot": ["WKU Hilltoppers"] * 2,
+            "offensive_coordinators": ["Ben Arbuckle / Josh Crawford / Zack Lankford", "Zack Lankford"],
+            "defensive_coordinators": ["X / Y / Z", "Q"],
+        }
+    )
+    out = coach_continuity(src)
+    assert out["oc_cont"].to_list() == [1]
+    assert out["dc_cont"].to_list() == [0]
+
+
+def test_candidate_collisions_resolve_by_rank_not_input_order() -> None:
+    """'michigan' is Michigan's own key and only a shorthand of Michigan State's."""
+    names = ["Michigan", "Michigan State", "Michigan St"]
+    for schools in (["Michigan State", "Michigan"], ["Michigan", "Michigan State"]):
+        resolved, missing = resolve_names(names, schools)
+        assert missing == []
+        assert resolved["Michigan"][0] == "Michigan", schools
+        assert resolved["Michigan State"][0] == "Michigan State", schools
+        assert resolved["Michigan St"][0] == "Michigan State", schools
+    # two different schools producing the same key at the same rank is an error, not a coin flip
+    with pytest.raises(ValueError, match="ambiguous"):
+        resolve_names(["Zeta"], ["Alpha", "Beta"], aliases={"alpha": "zeta", "beta": "zeta"})
+
+
+def test_the_qb_pbp_loader_drops_duplicate_plays(monkeypatch: pytest.MonkeyPatch) -> None:
+    """A duplicated ESPN play row must not add an attempt (deduped on game_id + id)."""
+    import sportsdataverse.cfb as sdv_cfb
+
+    from cfb_data_build import matchup_reference as mr
+
+    raw = pl.DataFrame(
+        {
+            "season": [2020, 2020, 2020],
+            "game_id": [1, 1, 1],
+            "id": [10, 10, 11],  # play 10 appears twice
+            "pos_team": ["A"] * 3,
+            "week": [1] * 3,
+            "pass_attempt": [True] * 3,
+            "passer_player_name": ["Q"] * 3,
+            "passer_player_id": [7] * 3,
+            "extra": [0, 0, 0],
+        }
+    )
+    monkeypatch.setattr(sdv_cfb, "load_cfb_pbp", lambda seasons: raw)
+    out = mr._load_pbp_columns(2020)
+    assert out.height == 2 and "id" not in out.columns
+

@@ -26,7 +26,8 @@ versioned tables in ``cfb_data_build.matchup_reference``: ``team_talent_weighted
 rank-decayed roster sum from a recruiting site), ``off/def/ovr_rtprod`` (an
 external returning-production table whose numbers are not CFBD's
 ``percentPPA``), ``oc_cont`` / ``dc_cont`` (coordinator continuity from a
-wiki scrape), and the projected-starter QB block ``athlete_id`` / ``qb_name``
+wiki scrape), and the REALIZED-starter QB block (post-hoc: the season's
+most-attempts passer, not a pregame projection) ``athlete_id`` / ``qb_name``
 / ``returning_qb`` / ``qb_starter_years`` / ``qb_games``.
 """
 

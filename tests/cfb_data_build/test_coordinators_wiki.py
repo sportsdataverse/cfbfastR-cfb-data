@@ -269,3 +269,33 @@ def test_canonicalizing_across_seasons_tolerates_two_spellings() -> None:
         "San José State Spartans",
         "Brand New Program Owls",  # unresolved keeps its own spelling
     ]
+
+
+def test_a_backfill_never_drops_a_school_whose_article_did_not_resolve(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """Replacement is keyed on (season, school_mascot), not the whole season."""
+    table = tmp_path / "wiki.csv"
+    row = {
+        "season": 2020, "head_coach": "x", "first_season": 2019,
+        "defensive_coordinators": "d", "source_title": "t", "source_revid": 1,
+    }
+    pl.DataFrame(
+        [
+            {**row, "school_mascot": "A Aces", "offensive_coordinators": "Old A"},
+            {**row, "school_mascot": "B Bears", "offensive_coordinators": "Old B"},
+        ],
+        schema=cw.COLUMNS,
+    ).write_csv(table)
+    monkeypatch.setattr(cw, "TABLE", table)
+    monkeypatch.setattr(cw, "fbs_schools", lambda season: {"A": "Aces", "B": "Bears"})
+    # this run resolves A only; B's article is a transient miss
+    fresh = pl.DataFrame(
+        [{**row, "school_mascot": "A Aces", "offensive_coordinators": "New A"}], schema=cw.COLUMNS
+    )
+    monkeypatch.setattr(cw, "build_season", lambda season, schools, **kw: (fresh, ["B"]))
+    assert cw.main(["backfill", "--start-season", "2020", "--end-season", "2020"]) == 0
+    out = cw.load_table().sort("school_mascot")
+    assert out["school_mascot"].to_list() == ["A Aces", "B Bears"]
+    assert out["offensive_coordinators"].to_list() == ["New A", "Old B"]
+

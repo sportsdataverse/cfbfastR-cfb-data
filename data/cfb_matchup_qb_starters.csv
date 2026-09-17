@@ -92,7 +92,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2004,Rice Owls,Joel Armstrong,149925,0,0,0
 2004,Richmond Spiders,Stacy Tutt,117767,0,0,0
 2004,Rutgers Scarlet Knights,Ryan Hart,135377,0,0,0
-2004,SMU Mustangs,Chris Phillips,147861,0,0,0
+2004,SMU Mustangs,Tony Eckert,157301,0,0,0
 2004,San Diego State Aztecs,Matt Dlugolecki,120295,0,0,0
 2004,San Jose State Spartans,Dale Rogers,147041,0,0,0
 2004,South Carolina Gamecocks,Syvelle Newton,146835,0,0,0
@@ -109,7 +109,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2004,Texas Tech Red Raiders,Sonny Cumbie,118210,0,0,0
 2004,The Citadel Bulldogs,Duran Lawson,148558,0,0,0
 2004,Toledo Rockets,Bruce Gradkowski,114338,0,0,0
-2004,Troy Trojans,D.T. McDowell,164451,0,0,0
+2004,Troy Trojans,Aaron Leak,108526,0,0,0
 2004,Tulane Green Wave,Lester Ricard,134032,0,0,0
 2004,Tulsa Golden Hurricane,James Kilian,105974,0,0,0
 2004,UAB Blazers,Darrell Hackney,115044,0,0,0
@@ -168,7 +168,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2005,Florida Intl Golden Panthers,Josh Padrick,151970,0,0,0
 2005,Florida State Seminoles,Drew Weatherford,167354,0,0,0
 2005,Fresno State Bulldogs,Paul Pinegar,120888,1,1,6
-2005,Georgia Bulldogs,DJ Shockley,127637,0,0,8
+2005,Georgia Bulldogs,DJ Shockley,127637,0,0,7
 2005,Georgia Tech Yellow Jackets,Reggie Ball,145781,1,1,12
 2005,Hawai'i Rainbow Warriors,Colton Brennan,145275,0,0,0
 2005,Houston Cougars,"art at 13:22 (1st), Kevin Kolb",147493,1,1,3
@@ -231,7 +231,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2005,Rutgers Scarlet Knights,Ryan Hart,135377,1,1,11
 2005,SMU Mustangs,Jerad Romo,157321,0,0,3
 2005,Sacramento State Hornets,Brad Tredway,158217,0,0,0
-2005,Sam Houston State Bearkats,Noah Allen,136681,0,0,0
+2005,Sam Houston State Bearkats,Wade Pate,152526,0,0,0
 2005,San Diego State Aztecs,Darren Mougey,169851,0,0,0
 2005,San Jose State Spartans,Adam Tafralis,148370,0,0,2
 2005,South Carolina Gamecocks,Blake Mitchell,146834,0,0,5
@@ -249,7 +249,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2005,Texas Longhorns,Vince Young,135107,1,1,11
 2005,Texas State Bobcats,Barrick Nealy,120407,0,0,0
 2005,Texas Tech Red Raiders,Cody Hodges,118234,0,0,3
-2005,The Citadel Bulldogs,Duran Lawson,163925,0,0,1
+2005,The Citadel Bulldogs,Justin Knox,163924,0,0,0
 2005,Toledo Rockets,Bruce Gradkowski,114338,1,1,4
 2005,Troy Trojans,Carl Meadows,137383,0,0,0
 2005,Tulane Green Wave,Lester Ricard,134032,1,1,1
@@ -269,7 +269,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2005,Virginia Tech Hokies,Marcus Vick,135239,0,0,0
 2005,Wake Forest Demon Deacons,Cory Randolph,116872,1,1,11
 2005,Washington Huskies,Isaiah Stanback,136579,0,0,5
-2005,Washington State Cougars,Alex Brink,145238,1,1,7
+2005,Washington State Cougars,Alex Brink,145238,0,1,7
 2005,Weber State Wildcats,Ian Pizarro,140679,0,0,0
 2005,West Virginia Mountaineers,Pat White,159846,0,0,0
 2005,Western Carolina Catamounts,Justin Clark,139994,0,0,0
@@ -414,7 +414,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2006,Texas A&M Aggies,Stephen Mcgee,156336,0,0,7
 2006,Texas Longhorns,Colt Mccoy,175772,0,0,0
 2006,Texas Tech Red Raiders,Graham Harrell,160425,0,0,6
-2006,The Citadel Bulldogs,Duran Lawson,163925,1,1,2
+2006,The Citadel Bulldogs,Duran Lawson,163925,1,0,2
 2006,Toledo Rockets,Aaron Opelt,184598,0,0,0
 2006,Troy Trojans,Omar Haugabook,184540,0,0,0
 2006,Tulane Green Wave,Lester Ricard,134032,1,2,10
@@ -424,7 +424,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2006,UCF Knights,Steven Moffett,150032,1,2,15
 2006,UCLA Bruins,Patrick Cowan,159805,0,0,0
 2006,UNLV Rebels,Rocky Hinds,161082,0,0,0
-2006,USC Trojans,John Booty,145168,0,0,6
+2006,USC Trojans,John Booty,145168,0,0,5
 2006,UTEP Miners,Jordan Palmer,136814,1,2,17
 2006,Utah State Aggies,Leon Jackson,149338,1,1,3
 2006,Utah Utes,Brett Ratliff,169928,0,0,4
@@ -474,7 +474,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2007,Colorado Buffaloes,Cody Hawkins,188466,0,0,0
 2007,Colorado State Rams,Caleb Hanie,160036,1,1,15
 2007,Connecticut Huskies,Tyler Lorenzen,169130,0,0,0
-2007,Delaware Blue Hens,Joe Flacco,146278,0,0,2
+2007,Delaware Blue Hens,Joe Flacco,146278,0,0,1
 2007,Delaware State Hornets,Vashon Winton,161011,0,0,0
 2007,Duke Blue Devils,Thaddeus Lewis,191344,1,1,12
 2007,East Carolina Pirates,Patrick Pinkney,162666,0,0,0
@@ -494,19 +494,19 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2007,Grambling State Tigers,Brandon Landers,164537,0,0,1
 2007,Hawai'i Rainbow Warriors,Colt Brennan,145275,1,2,10
 2007,Houston Cougars,Case Keenum,191981,0,0,0
-2007,Howard Bison,Brian Johnson,111644,0,0,1
+2007,Howard Bison,Brian Johnson,111644,0,0,0
 2007,Idaho Vandals,Nathan Enderle,185026,0,0,0
 2007,Illinois Fighting Illini,Juice Williams,174873,0,0,2
 2007,Illinois State Redbirds,Luke Drone,159940,0,0,0
 2007,Indiana Hoosiers,Kellen Lewis,174294,1,1,11
-2007,Indiana State Sycamores,Reilly Murphy,185840,1,1,1
+2007,Indiana State Sycamores,Charles Dowdell,185845,0,0,0
 2007,Iowa Hawkeyes,Jake Christensen,169329,0,0,3
 2007,Iowa State Cyclones,Bret Meyer,145404,1,3,34
 2007,Kansas Jayhawks,Todd Reesing,184336,0,0,3
 2007,Kansas State Wildcats,Josh Freeman,192029,1,1,8
 2007,Kent State Golden Flashes,Julian Edelman,193061,1,1,9
 2007,Kentucky Wildcats,Andre' Woodson,146711,1,2,23
-2007,LSU Tigers,Matt Flynn,146744,0,0,14
+2007,LSU Tigers,Matt Flynn,146744,0,0,13
 2007,Liberty Flames,Brock Smith,171996,1,1,1
 2007,Louisiana Monroe Warhawks,Kinsmon Lancaster,173878,1,1,4
 2007,Louisiana Ragin' Cajuns,Michael Desormeaux,157747,0,0,3
@@ -518,7 +518,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2007,Massachusetts Minutemen,Liam Coen,157911,1,1,1
 2007,McNeese State Cowboys,Derrick Fourroux,173765,1,1,2
 2007,Memphis Tigers,Martin Hankins,152455,1,1,12
-2007,Miami (OH) RedHawks,Daniel Raudabaugh,170710,0,0,4
+2007,Miami (OH) RedHawks,Daniel Raudabaugh,170710,0,0,3
 2007,Miami Hurricanes,Kyle Wright,146486,1,2,23
 2007,Michigan State Spartans,Brian Hoyer,160772,0,0,10
 2007,Michigan Wolverines,Chad Henne,160898,1,3,36
@@ -584,7 +584,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2007,Texas Longhorns,Colt McCoy,175772,1,1,13
 2007,Texas State Bobcats,Bradley George,102126,0,0,0
 2007,Texas Tech Red Raiders,Graham Harrell,160425,1,1,19
-2007,The Citadel Bulldogs,Duran Lawson,163925,1,2,4
+2007,The Citadel Bulldogs,Duran Lawson,163925,1,1,4
 2007,Toledo Rockets,Aaron Opelt,184598,1,1,9
 2007,Troy Trojans,Omar Haugabook,184540,1,1,4
 2007,Tulane Green Wave,Anthony Scelfo,177110,0,0,2
@@ -594,7 +594,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2007,UCF Knights,Kyle Israel,157896,0,0,11
 2007,UCLA Bruins,Ben Olson,135256,1,0,6
 2007,UNLV Rebels,Travis Dixon,185081,0,0,0
-2007,USC Trojans,John David Booty,145168,1,1,19
+2007,USC Trojans,John David Booty,145168,1,1,18
 2007,UTEP Miners,Trevor Vittatoe,189709,0,0,0
 2007,Utah State Aggies,Leon Jackson III,149338,1,2,5
 2007,Utah Utes,Brian Johnson,156973,0,1,16
@@ -638,20 +638,20 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2008,Buffalo Bulls,Drew Willy,170700,1,3,22
 2008,Cal Poly Mustangs,Jonathan Dally,233053,0,0,0
 2008,California Golden Bears,Kevin Riley,188427,0,0,2
-2008,Central Arkansas Bears,Nathan Brown,178909,0,1,0
+2008,Central Arkansas Bears,Nathan Brown,178909,0,0,0
 2008,Central Michigan Chippewas,Dan LeFevour,170586,1,2,27
 2008,Charleston Southern Buccaneers,Tribble Reese,160376,0,0,2
-2008,Chattanooga Mocs,Tony Pastore,170654,0,0,0
+2008,Chattanooga Mocs,Jare Gault,180608,0,0,0
 2008,Cincinnati Bearcats,Tony Pike,169390,0,0,4
 2008,Clemson Tigers,Cullen Harper,160367,1,1,16
 2008,Coastal Carolina Chanticleers,William Richardson,162614,0,0,0
 2008,Colorado Buffaloes,Cody Hawkins,188466,1,1,13
-2008,Colorado State Rams,Billy Farris,169826,0,0,5
+2008,Colorado State Rams,Billy Farris,169826,0,0,4
 2008,Connecticut Huskies,Tyler Lorenzen,169130,1,1,12
 2008,Delaware Blue Hens,Rob Schoenhoft,174008,0,0,5
 2008,Delaware State Hornets,Anthony Glaud,184506,0,0,3
 2008,Duke Blue Devils,Thaddeus Lewis,191344,1,2,21
-2008,East All-Stars,Chase Daniel,177296,0,3,32
+2008,East All-Stars,Chase Daniel,177296,0,2,32
 2008,East Carolina Pirates,Patrick Pinkney,162666,1,1,11
 2008,Eastern Illinois Panthers,Bodie Reeder,185923,0,0,1
 2008,Eastern Kentucky Colonels,Allan Holland,161175,1,1,3
@@ -659,13 +659,13 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2008,Eastern Washington Eagles,Matt Nichols,171156,1,2,3
 2008,Florida Atlantic Owls,Rusty Smith,180299,1,1,11
 2008,Florida Gators,Tim Tebow,183484,1,1,22
-2008,Florida Intl Golden Panthers,Paul McCall,177565,0,0,3
+2008,Florida Intl Golden Panthers,Paul McCall,177565,0,0,2
 2008,Florida State Seminoles,Christian Ponder,183733,0,0,1
-2008,Fresno State Bulldogs,Tom Brandstater,147211,1,3,18
+2008,Fresno State Bulldogs,Tom Brandstater,147211,1,2,18
 2008,Furman Paladins,Jordan Sorrells,173429,1,1,1
 2008,Gardner-Webb Bulldogs,Devin Campbell,162458,0,0,1
 2008,Georgia Bulldogs,Matthew Stafford,183518,1,2,26
-2008,Georgia Southern Eagles,Antonio Henton,188307,0,0,2
+2008,Georgia Southern Eagles,Lee Chapple,238422,0,0,0
 2008,Georgia Tech Yellow Jackets,Josh Nesbitt,236253,0,0,7
 2008,Hawai'i Rainbow Warriors,Greg Alexander,382996,0,0,0
 2008,Hofstra Pride,Cory Christopher,234261,0,0,0
@@ -677,7 +677,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2008,Indiana Hoosiers,Kellen Lewis,174294,1,2,23
 2008,Indiana State Sycamores,Calvin Schmidtke,385938,0,0,0
 2008,Iowa Hawkeyes,Richard Stanzi,188298,0,0,1
-2008,Iowa State Cyclones,Austen Arnaud,188980,0,0,6
+2008,Iowa State Cyclones,Austen Arnaud,188980,0,0,5
 2008,Jacksonville State Gamecocks,Ryan Perrilloux,176394,0,0,13
 2008,James Madison Dukes,Rodney Landers,162173,0,0,0
 2008,Kansas Jayhawks,Todd Reesing,184336,1,1,16
@@ -695,7 +695,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2008,Massachusetts Minutemen,Liam Coen,157911,1,2,2
 2008,McNeese State Cowboys,Derrick Fourroux,173765,1,2,3
 2008,Memphis Tigers,Arkelon Hall,174651,0,0,0
-2008,Miami (OH) RedHawks,Daniel Raudabaugh,170710,1,1,11
+2008,Miami (OH) RedHawks,Daniel Raudabaugh,170710,1,1,10
 2008,Miami Hurricanes,Robert Marve,236058,0,0,0
 2008,Michigan State Spartans,Brian Hoyer,160772,1,1,23
 2008,Michigan Wolverines,Steven Threet,232227,0,0,0
@@ -703,12 +703,12 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2008,Minnesota Golden Gophers,Adam Weber,188157,1,1,12
 2008,Mississippi State Bulldogs,Tyson Lee,378217,0,0,0
 2008,Missouri State Bears,Cody Kirby,233986,1,1,1
-2008,Missouri Tigers,Chase Daniel,177296,1,2,32
+2008,Missouri Tigers,Chase Daniel,177296,1,3,32
 2008,Montana State Bobcats,Cody Kempt,189142,0,0,2
-2008,Morgan State Bears,Carlton Jackson,169515,0,0,9
+2008,Morgan State Bears,Carlton Jackson,169515,0,0,8
 2008,Murray State Racers,Chris Franklin,185203,0,0,1
 2008,NC State Wolfpack,Russell Wilson,238093,0,0,0
-2008,NORTH All-Stars,Nathan Brown,178909,0,0,0
+2008,NORTH All-Stars,Nathan Brown,178909,0,1,0
 2008,Navy Midshipmen,Jarod Bryant,182913,0,0,10
 2008,Nebraska Cornhuskers,Joe Ganz,162701,0,0,9
 2008,Nevada Wolf Pack,Colin Kaepernick,183575,1,1,10
@@ -725,7 +725,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2008,Northern Colorado Bears,Bryan Waggener,232026,0,0,0
 2008,Northern Illinois Huskies,Chandler Harnish,237674,0,0,0
 2008,Northern Iowa Panthers,Patrick Grace,172077,0,0,0
-2008,Northwestern State Demons,John Hundley,170847,0,0,1
+2008,Northwestern State Demons,John Hundley,170847,0,0,0
 2008,Northwestern Wildcats,C.J. Bacher,156796,1,2,19
 2008,Notre Dame Fighting Irish,Jimmy Clausen,231813,1,1,10
 2008,Ohio Bobcats,Boo Jackson,379032,0,0,0
@@ -735,7 +735,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2008,Ole Miss Rebels,Jevan Snead,183449,0,0,5
 2008,Oregon Ducks,Jeremiah Masoli,381755,0,0,0
 2008,Oregon State Beavers,Lyle Moevao,189163,0,0,8
-2008,Penn State Nittany Lions,Daryll Clark,185917,0,0,10
+2008,Penn State Nittany Lions,Daryll Clark,185917,0,0,9
 2008,Pittsburgh Panthers,Bill Stull,173548,1,0,5
 2008,Portland State Vikings,Drew Hubel,234074,0,0,0
 2008,Purdue Boilermakers,Curtis Painter,161031,1,2,35
@@ -764,7 +764,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2008,TCU Horned Frogs,Andy Dalton,183253,1,1,11
 2008,Temple Owls,Adam DiMichele,189953,1,2,15
 2008,Tennessee Tech Golden Eagles,Josh Lowery,238031,0,0,0
-2008,Tennessee Volunteers,Jonathan Crompton,175658,0,0,9
+2008,Tennessee Volunteers,Jonathan Crompton,175658,0,0,8
 2008,Tennessee-Martin Skyhawks,Cade Thompson,173686,0,0,2
 2008,Texas A&M Aggies,Jerrod Johnson,191668,0,0,2
 2008,Texas Longhorns,Colt McCoy,175772,1,2,26
@@ -780,7 +780,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2008,UC Davis Aggies,Daniel Alfaro,187897,0,0,0
 2008,UCF Knights,Rob Calabrese,383842,0,0,0
 2008,UCLA Bruins,Kevin Craft,169840,0,1,8
-2008,UNLV Rebels,Omar Clayton,237933,0,0,6
+2008,UNLV Rebels,Omar Clayton,237933,0,0,5
 2008,USC Trojans,Mark Sanchez,174154,0,0,8
 2008,UTEP Miners,Trevor Vittatoe,189709,1,1,6
 2008,Utah State Aggies,Diondre Borel,238343,0,0,0
@@ -794,7 +794,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2008,Washington Huskies,Ronnie Fouch,232019,0,0,0
 2008,Washington State Cougars,Kevin Lopina,173745,0,0,0
 2008,Weber State Wildcats,Cameron Higgins,187103,1,1,1
-2008,West All-Stars,Tom Brandstater,147211,0,2,18
+2008,West All-Stars,Tom Brandstater,147211,0,3,18
 2008,West Virginia Mountaineers,Pat White,159846,1,3,37
 2008,Western Carolina Catamounts,Andy Horn,171685,0,1,1
 2008,Western Illinois Leathernecks,Matt Barr,185345,1,1,1
@@ -810,13 +810,13 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2009,Alabama Crimson Tide,Greg McElroy,191494,0,0,5
 2009,Alcorn State Braves,Tim Buckley,193206,1,1,1
 2009,Appalachian State Mountaineers,DeAndre Presley,381870,0,0,1
-2009,Arizona State Sun Devils,Danny Sullivan,183330,0,0,11
+2009,Arizona State Sun Devils,Danny Sullivan,183330,0,0,10
 2009,Arizona Wildcats,Nick Foles,238803,0,0,1
 2009,Arkansas Razorbacks,Ryan Mallett,232007,0,0,10
 2009,Arkansas State Red Wolves,Corey Leonard,171349,1,3,22
 2009,Army Black Knights,Trent Steelman,483302,0,0,0
 2009,Auburn Tigers,Chris Todd,378238,1,0,7
-2009,BYU Cougars,Max Hall,160307,1,2,25
+2009,BYU Cougars,Max Hall,160307,1,3,25
 2009,Ball State Cardinals,Kelly Page,378384,0,0,0
 2009,Baylor Bears,Nick Florence,379895,0,0,0
 2009,Boise State Broncos,Kellen Moore,232560,1,1,13
@@ -829,10 +829,10 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2009,Central Michigan Chippewas,Dan LeFevour,170586,1,3,37
 2009,Charleston Southern Buccaneers,A.J. Toscano,478032,0,0,0
 2009,Chattanooga Mocs,B.J. Coleman,236000,0,0,1
-2009,Cincinnati Bearcats,Tony Pike,169390,1,2,16
+2009,Cincinnati Bearcats,Tony Pike,169390,1,1,16
 2009,Clemson Tigers,Kyle Parker,377866,0,0,0
 2009,Coastal Carolina Chanticleers,Zach MacDowall,183454,0,0,1
-2009,Colorado Buffaloes,Tyler Hansen,380345,0,0,5
+2009,Colorado Buffaloes,Cody Hawkins,188466,1,2,25
 2009,Colorado State Rams,Grant Stucker,176430,0,0,1
 2009,Connecticut Huskies,Zach Frazer,240787,0,0,4
 2009,Delaware Blue Hens,Pat Devlin,188680,0,0,8
@@ -842,19 +842,19 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2009,East Carolina Pirates,Patrick Pinkney,162666,1,2,25
 2009,Eastern Illinois Panthers,Jake Christensen,169329,0,1,22
 2009,Eastern Kentucky Colonels,T.J. Pryor,485526,0,0,0
-2009,Eastern Michigan Eagles,Alex Gillett,482077,0,0,0
+2009,Eastern Michigan Eagles,Kyle McMahon,241449,0,0,11
 2009,Eastern Washington Eagles,Matt Nichols,171156,1,3,5
 2009,Elon Phoenix,Scott Riddle,233773,0,0,0
 2009,Florida A&M Rattlers,Curtis Pulley,178757,0,0,8
 2009,Florida Atlantic Owls,Rusty Smith,180299,1,2,24
 2009,Florida Gators,Tim Tebow,183484,1,2,36
-2009,Florida Intl Golden Panthers,Paul McCall,177565,1,1,13
+2009,Florida Intl Golden Panthers,Paul McCall,177565,1,1,12
 2009,Florida State Seminoles,Christian Ponder,183733,1,1,14
 2009,Fresno State Bulldogs,Ryan Colburn,170078,0,0,2
 2009,Furman Paladins,Jordan Sorrells,173429,1,2,2
 2009,Gardner-Webb Bulldogs,Stan Doolittle,186410,0,1,2
 2009,Georgia Bulldogs,Joe Cox,171814,0,0,12
-2009,Georgia Southern Eagles,Lee Chapple,238422,0,0,1
+2009,Georgia Southern Eagles,Lee Chapple,238422,1,1,1
 2009,Georgia Tech Yellow Jackets,Josh Nesbitt,236253,1,1,16
 2009,Grambling State Tigers,Greg Dillon,386686,0,0,0
 2009,Hawai'i Rainbow Warriors,Bryant Moniz,480919,0,0,0
@@ -868,7 +868,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2009,Indiana Hoosiers,Ben Chappell,188708,0,0,9
 2009,Indiana State Sycamores,Chris Stutzriem,232488,0,0,8
 2009,Iowa Hawkeyes,Richard Stanzi,188298,1,1,14
-2009,Iowa State Cyclones,Austen Arnaud,188980,1,1,18
+2009,Iowa State Cyclones,Austen Arnaud,188980,1,1,17
 2009,Jackson State Tigers,Trae Rutland,175877,0,0,0
 2009,Jacksonville State Gamecocks,Marques Ivory,382477,0,0,0
 2009,James Madison Dukes,Drew Dudzik,186142,0,0,1
@@ -898,10 +898,10 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2009,Mississippi Valley State Delta Devils,Paul Roberts,190139,0,0,0
 2009,Missouri State Bears,Cody Kirby,233986,1,2,2
 2009,Missouri Tigers,Blaine Gabbert,381364,0,0,3
-2009,Morgan State Bears,Carlton Jackson,169515,1,1,10
+2009,Morgan State Bears,Carlton Jackson,169515,1,1,9
 2009,Murray State Racers,Nico Yantko,175724,1,0,1
 2009,NC State Wolfpack,Russell Wilson,238093,1,1,11
-2009,NORTH All-Stars,Tony Pike,169390,0,1,16
+2009,NORTH All-Stars,Tony Pike,169390,0,2,16
 2009,Navy Midshipmen,Ricky Dobbs,240655,0,0,4
 2009,Nebraska Cornhuskers,Zac Lee,232216,0,0,1
 2009,Nevada Wolf Pack,Colin Kaepernick,183575,1,2,22
@@ -919,17 +919,17 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2009,Northern Colorado Bears,Bryan Waggener,232026,1,1,1
 2009,Northern Illinois Huskies,Chandler Harnish,237674,1,1,10
 2009,Northern Iowa Panthers,Pat Grace,172077,1,1,1
-2009,Northwestern State Demons,John Hundley,170847,1,1,2
+2009,Northwestern State Demons,John Hundley,170847,1,1,1
 2009,Northwestern Wildcats,Mike Kafka,169280,0,1,10
 2009,Notre Dame Fighting Irish,Jimmy Clausen,231813,1,2,23
 2009,Ohio Bobcats,Theo Scott,232795,1,0,8
 2009,Ohio State Buckeyes,Terrelle Pryor,379070,1,1,13
 2009,Oklahoma Sooners,Landry Jones,377845,0,0,0
-2009,Oklahoma State Cowboys,Zac Robinson,174054,1,2,29
+2009,Oklahoma State Cowboys,Zac Robinson,174054,1,3,29
 2009,Ole Miss Rebels,Jevan Snead,183449,1,1,18
 2009,Oregon Ducks,Jeremiah Masoli,381755,1,1,12
 2009,Oregon State Beavers,Sean Canfield,168823,0,1,17
-2009,Penn State Nittany Lions,Daryll Clark,185917,1,1,23
+2009,Penn State Nittany Lions,Daryll Clark,185917,1,1,22
 2009,Pittsburgh Panthers,Bill Stull,173548,1,1,17
 2009,Portland State Vikings,Drew Hubel,234074,1,1,1
 2009,Purdue Boilermakers,Joey Elliott,173694,0,0,8
@@ -938,7 +938,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2009,Richmond Spiders,Eric Ward,172969,1,2,2
 2009,Rutgers Scarlet Knights,Tom Savage,514116,0,0,0
 2009,SMU Mustangs,Bo Levi Mitchell,380309,1,1,12
-2009,SOUTH All-Stars,Zac Robinson,174054,0,3,29
+2009,SOUTH All-Stars,Zac Robinson,174054,0,2,29
 2009,Sacramento State Hornets,Jason Smith,241960,0,1,2
 2009,Sam Houston State Bearkats,Blake Joseph,170233,0,0,12
 2009,Samford Bulldogs,Dustin Taliaferro,379467,1,1,1
@@ -958,9 +958,9 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2009,Stephen F Austin Lumberjacks,Jeremy Moses,233840,1,1,1
 2009,Syracuse Orange,Greg Paulus,480614,0,0,0
 2009,TCU Horned Frogs,Andy Dalton,183253,1,2,22
-2009,Temple Owls,Vaughn Charlton,189949,0,0,10
+2009,Temple Owls,Vaughn Charlton,189949,0,0,9
 2009,Tennessee Tech Golden Eagles,Lee Sweeney,169665,1,1,2
-2009,Tennessee Volunteers,Jonathan Crompton,175658,1,1,17
+2009,Tennessee Volunteers,Jonathan Crompton,175658,1,1,16
 2009,Tennessee-Martin Skyhawks,Cade Thompson,173686,1,1,4
 2009,Texas A&M Aggies,Jerrod Johnson,191668,1,1,13
 2009,Texas Longhorns,Colt McCoy,175772,1,3,39
@@ -977,7 +977,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2009,UC Davis Aggies,Greg Denham,187892,0,0,0
 2009,UCF Knights,Brett Hodges,169067,0,0,8
 2009,UCLA Bruins,Kevin Prince,380716,0,0,0
-2009,UNLV Rebels,Omar Clayton,237933,1,1,15
+2009,UNLV Rebels,Omar Clayton,237933,1,1,14
 2009,USC Trojans,Matt Barkley,480322,0,0,0
 2009,UTEP Miners,Trevor Vittatoe,189709,1,2,17
 2009,Utah State Aggies,Diondre Borel,238343,1,1,12
@@ -985,12 +985,12 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2009,VMI Keydets,Cameron Jones,234707,0,0,0
 2009,Vanderbilt Commodores,Larry Smith,236079,0,0,2
 2009,Virginia Cavaliers,Jameel Sewell,177413,0,2,23
-2009,Virginia Tech Hokies,Tyrod Taylor,236838,1,1,23
+2009,Virginia Tech Hokies,Tyrod Taylor,236838,1,1,22
 2009,Wake Forest Demon Deacons,Riley Skinner,169077,1,3,36
 2009,Washington Huskies,Jake Locker,184374,1,1,16
 2009,Washington State Cougars,Marshall Lobbestael,236759,0,0,5
 2009,Weber State Wildcats,Cameron Higgins,187103,1,2,2
-2009,West All-Stars,Max Hall,160307,0,3,25
+2009,West All-Stars,Max Hall,160307,0,2,25
 2009,West Virginia Mountaineers,Jarrett Brown,174442,0,0,13
 2009,Western Illinois Leathernecks,Matt Barr,185345,1,2,2
 2009,Western Kentucky Hilltoppers,Kawaun Jakes,382917,0,0,0
@@ -999,7 +999,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2009,Wisconsin Badgers,Scott Tolzien,188112,0,0,2
 2009,Wofford Terriers,Mitch Allen,234576,0,0,0
 2009,Wyoming Cowboys,Austyn Carta-Samuels,481988,0,0,0
-2009,Youngstown State Penguins,Brandon Summers,169492,0,0,5
+2009,Youngstown State Penguins,Brandon Summers,169492,0,0,4
 2010,Air Force Falcons,Tim Jefferson,386275,1,2,18
 2010,Akron Zips,Patrick Nicely,482011,1,1,7
 2010,Alabama Crimson Tide,Greg McElroy,191494,1,1,19
@@ -1029,14 +1029,14 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2010,Cincinnati Bearcats,Zach Collaros,232807,0,0,8
 2010,Clemson Tigers,Kyle Parker,377866,1,1,14
 2010,Coastal Carolina Chanticleers,Zach MacDowall,183454,1,1,3
-2010,Colorado Buffaloes,Cody Hawkins,188466,1,2,32
+2010,Colorado Buffaloes,Cody Hawkins,188466,1,3,32
 2010,Colorado State Rams,Pete Thomas,501565,0,0,0
 2010,Connecticut Huskies,Zach Frazer,240787,1,1,12
 2010,Duke Blue Devils,Sean Renfree,381689,0,0,5
 2010,East Carolina Pirates,Dominique Davis,500941,0,0,0
 2010,Eastern Illinois Panthers,Brandon Large,485494,0,0,0
 2010,Eastern Kentucky Colonels,T.J. Pryor,485526,1,1,2
-2010,Eastern Michigan Eagles,Alex Gillett,482077,0,1,8
+2010,Eastern Michigan Eagles,Alex Gillett,482077,0,0,8
 2010,Eastern Washington Eagles,Bo Levi Mitchell,498090,0,0,0
 2010,Elon Phoenix,Scott Riddle,233773,1,1,1
 2010,Florida A&M Rattlers,Martin Ukpai,476597,0,0,0
@@ -1061,7 +1061,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2010,Indiana Hoosiers,Ben Chappell,188708,1,1,21
 2010,Indiana State Sycamores,Ronnie Fouch,498942,0,0,0
 2010,Iowa Hawkeyes,Ricky Stanzi,188298,1,2,25
-2010,Iowa State Cyclones,Austen Arnaud,188980,1,2,29
+2010,Iowa State Cyclones,Austen Arnaud,188980,1,2,28
 2010,Jacksonville State Gamecocks,Marques Ivory,382477,1,1,1
 2010,James Madison Dukes,Drew Dudzik,186142,1,1,2
 2010,Kansas Jayhawks,Jordan Webb,480812,0,0,0
@@ -1083,10 +1083,10 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2010,Miami (OH) RedHawks,Zac Dysert,385212,1,1,9
 2010,Miami Hurricanes,Jacory Harris,377700,1,1,24
 2010,Michigan State Spartans,Kirk Cousins,238910,1,1,15
-2010,Michigan Wolverines,Denard Robinson,480237,0,0,10
+2010,Michigan Wolverines,Denard Robinson,480237,0,0,9
 2010,Middle Tennessee Blue Raiders,Dwight Dasher,237244,1,2,30
 2010,Minnesota Golden Gophers,Adam Weber,188157,1,3,38
-2010,Mississippi State Bulldogs,Chris Relf,237175,0,0,10
+2010,Mississippi State Bulldogs,Chris Relf,237175,0,0,9
 2010,Missouri State Bears,Cody Kirby,233986,1,3,3
 2010,Missouri Tigers,Blaine Gabbert,381364,1,1,16
 2010,Montana State Bobcats,Denarius McGhee,487403,0,0,0
@@ -1158,7 +1158,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2010,Texas Southern Tigers,Arvell Nelson,188294,1,1,3
 2010,Texas State Bobcats,Tyler Arndt,500310,0,0,0
 2010,Texas Tech Red Raiders,Taylor Potts,185054,1,1,21
-2010,The Citadel Bulldogs,Matthew Thompson,499749,0,0,0
+2010,The Citadel Bulldogs,Sam Martin,499740,0,0,0
 2010,Toledo Rockets,Austin Dantin,481225,0,0,6
 2010,Towson Tigers,Chris Hart,505725,0,0,0
 2010,Troy Trojans,Corey Robinson,480981,0,0,0
@@ -1167,8 +1167,8 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2010,UAB Blazers,Bryan Ellis,237276,0,0,1
 2010,UC Davis Aggies,Randy Wright,487067,0,0,0
 2010,UCF Knights,Jeffrey Godfrey,503649,0,0,0
-2010,UCLA Bruins,Richard Brehaut,480235,0,0,6
-2010,UNLV Rebels,Omar Clayton,237933,1,2,26
+2010,UCLA Bruins,Richard Brehaut,480235,0,0,4
+2010,UNLV Rebels,Omar Clayton,237933,1,2,25
 2010,USC Trojans,Matt Barkley,480322,1,1,12
 2010,UTEP Miners,Trevor Vittatoe,189709,1,3,26
 2010,Utah State Aggies,Diondre Borel,238343,1,2,24
@@ -1177,7 +1177,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2010,Vanderbilt Commodores,Larry Smith,236079,1,1,10
 2010,Villanova Wildcats,Chris Whitney,234108,0,0,1
 2010,Virginia Cavaliers,Marc Verica,183667,0,1,15
-2010,Virginia Tech Hokies,Tyrod Taylor,236838,1,2,36
+2010,Virginia Tech Hokies,Tyrod Taylor,236838,1,2,35
 2010,Wake Forest Demon Deacons,Tanner Price,500554,0,0,0
 2010,Washington Huskies,Jake Locker,184374,1,2,28
 2010,Washington State Cougars,Jeff Tuel,482620,1,0,5
@@ -1199,7 +1199,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2011,Appalachian State Mountaineers,DeAndre Presley,381870,1,2,3
 2011,Arizona State Sun Devils,Brock Osweiler,480396,0,0,10
 2011,Arizona Wildcats,Nick Foles,238803,1,2,24
-2011,Arkansas Razorbacks,Tyler Wilson,382642,0,0,11
+2011,Arkansas Razorbacks,Tyler Wilson,382642,0,0,10
 2011,Arkansas State Red Wolves,Ryan Aplin,384784,1,1,17
 2011,Army Black Knights,Trent Steelman,483302,1,2,24
 2011,Auburn Tigers,Barrett Trotter,382672,0,0,4
@@ -1221,7 +1221,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2011,Cincinnati Bearcats,Zach Collaros,232807,1,1,19
 2011,Clemson Tigers,Tajh Boyd,480221,0,0,6
 2011,Coastal Carolina Chanticleers,Aramis Hillary,382766,0,0,1
-2011,Colorado Buffaloes,Tyler Hansen,380345,1,1,20
+2011,Colorado Buffaloes,Tyler Hansen,380345,1,0,19
 2011,Colorado State Rams,Pete Thomas,501565,1,1,12
 2011,Connecticut Huskies,Johnny McEntee,382317,0,0,0
 2011,Delaware Blue Hens,Trevor Sasek,484528,0,0,0
@@ -1229,7 +1229,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2011,East Carolina Pirates,Dominique Davis,500941,1,1,13
 2011,Eastern Illinois Panthers,Jimmy Garoppolo,499514,0,0,0
 2011,Eastern Kentucky Colonels,Jared Mcclain,519443,0,0,0
-2011,Eastern Michigan Eagles,Alex Gillett,482077,1,2,19
+2011,Eastern Michigan Eagles,Alex Gillett,482077,1,1,19
 2011,Eastern Washington Eagles,Bo Levi Mitchell,511732,0,0,0
 2011,Elon Phoenix,Thomas Wilson,480271,0,0,0
 2011,Florida A&M Rattlers,Austin Trainor,488424,0,0,0
@@ -1265,29 +1265,29 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2011,LSU Tigers,Jarrett Lee,232417,0,1,27
 2011,Liberty Flames,Mike Brown,237885,1,1,1
 2011,Louisiana Monroe Warhawks,Kolton Browning,481248,1,1,11
-2011,Louisiana Ragin' Cajuns,Blaine Gautier,384890,0,0,8
+2011,Louisiana Ragin' Cajuns,Blaine Gautier,384890,0,0,7
 2011,Louisiana Tech Bulldogs,Nick Isham,512769,0,0,0
 2011,Louisville Cardinals,Teddy Bridgewater,511614,0,0,0
 2011,Maine Black Bears,Warren Smith,385531,1,2,2
 2011,Marshall Thundering Herd,Rakeem Cato,518267,0,0,0
-2011,Maryland Terrapins,Danny O'Brien,480847,1,1,12
+2011,Maryland Terrapins,Danny O'Brien,480847,1,1,11
 2011,Massachusetts Minutemen,Kellen Pagel,487558,0,0,1
 2011,McNeese State Cowboys,Cody Stroud,500095,1,1,1
 2011,Memphis Tigers,Taylor Reed,515483,0,0,0
 2011,Miami (OH) RedHawks,Zac Dysert,385212,1,2,19
 2011,Miami Hurricanes,Jacory Harris,377700,1,2,34
 2011,Michigan State Spartans,Kirk Cousins,238910,1,2,28
-2011,Michigan Wolverines,Denard Robinson,480237,1,1,23
+2011,Michigan Wolverines,Denard Robinson,480237,1,1,22
 2011,Middle Tennessee Blue Raiders,Logan Kilgore,501571,1,0,2
 2011,Minnesota Golden Gophers,Marqueis Gray,381929,0,0,9
-2011,Mississippi State Bulldogs,Chris Relf,237175,1,1,23
+2011,Mississippi State Bulldogs,Chris Relf,237175,1,1,22
 2011,Missouri State Bears,Kierra Harris,517095,0,0,0
 2011,Missouri Tigers,James Franklin,501816,0,0,2
 2011,Montana State Bobcats,DeNarius McGhee,487403,1,1,1
 2011,Morgan State Bears,Robert Council,498831,0,0,0
 2011,Murray State Racers,Casey Brockman,485606,0,0,0
 2011,NC State Wolfpack,Mike Glennon,381967,0,0,10
-2011,Navy Midshipmen,Kriss Proctor,386176,0,0,3
+2011,Navy Midshipmen,Kriss Proctor,386176,0,0,2
 2011,Nebraska Cornhuskers,Taylor Martinez,481547,1,1,12
 2011,Nevada Wolf Pack,Cody Fajardo,501241,0,0,0
 2011,New Hampshire Wildcats,Kevin Decker,234281,0,0,1
@@ -1307,7 +1307,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2011,Northwestern State Demons,Brad Henderson,511138,0,0,0
 2011,Northwestern Wildcats,Dan Persa,237001,1,1,11
 2011,Notre Dame Fighting Irish,Tommy Rees,500923,0,0,7
-2011,Ohio Bobcats,Tyler Tettleton,489481,0,0,4
+2011,Ohio Bobcats,Tyler Tettleton,489481,0,0,3
 2011,Ohio State Buckeyes,Braxton Miller,512838,0,0,0
 2011,Oklahoma Sooners,Landry Jones,377845,1,2,26
 2011,Oklahoma State Cowboys,Brandon Weeden,235677,1,1,17
@@ -1320,10 +1320,10 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2011,Presbyterian College Blue Hose,Ryan Singer,498436,0,0,0
 2011,Purdue Boilermakers,Caleb TerBush,382027,0,0,1
 2011,Rhode Island Rams,Steve Probst,498566,1,1,1
-2011,Rice Owls,Taylor McHargue,482478,1,0,4
+2011,Rice Owls,Nick Fanuzzi,237197,1,2,20
 2011,Richmond Spiders,Aaron Corp,236574,1,1,5
 2011,Rutgers Scarlet Knights,Chas Dodd,503835,1,1,11
-2011,SMU Mustangs,J.J. McDermott,238790,0,0,9
+2011,SMU Mustangs,J.J. McDermott,238790,0,0,8
 2011,Sacramento State Hornets,Jeff Fleming,480613,0,1,10
 2011,Sam Houston State Bearkats,Brian Bell,500163,0,0,0
 2011,Samford Bulldogs,Dustin Taliaferro,379467,1,3,3
@@ -1345,12 +1345,12 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2011,Stony Brook Seawolves,Michael Coulter,238896,1,1,1
 2011,Syracuse Orange,Ryan Nassib,382584,1,1,20
 2011,TCU Horned Frogs,Casey Pachall,481287,0,0,3
-2011,Temple Owls,Chester Stewart,236523,1,0,17
+2011,Temple Owls,Chester Stewart,236523,1,0,16
 2011,Tennessee State Tigers,Michael German,506849,0,0,0
 2011,Tennessee Tech Golden Eagles,Tre Lamb,477810,1,1,4
 2011,Tennessee Volunteers,Tyler Bray,501546,0,1,9
 2011,Tennessee-Martin Skyhawks,Derek Carr,477795,1,1,2
-2011,Texas A&M Aggies,Ryan Tannehill,232059,0,0,12
+2011,Texas A&M Aggies,Ryan Tannehill,232059,0,0,11
 2011,Texas Longhorns,David Ash,511262,0,0,0
 2011,Texas State Bobcats,Tyler Arndt,500310,1,1,1
 2011,Texas Tech Red Raiders,Seth Doege,377942,0,0,4
@@ -1395,20 +1395,20 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2012,Alcorn State Braves,John Gibbs,539240,0,0,0
 2012,Appalachian State Mountaineers,Jamal Jackson,486056,0,0,2
 2012,Arizona State Sun Devils,Taylor Kelly,504700,0,0,1
-2012,Arizona Wildcats,Matt Scott,378126,0,0,13
-2012,Arkansas Razorbacks,Tyler Wilson,382642,1,1,24
+2012,Arizona Wildcats,Matt Scott,378126,0,0,12
+2012,Arkansas Razorbacks,Tyler Wilson,382642,1,1,23
 2012,Arkansas State Red Wolves,Ryan Aplin,384784,1,2,29
 2012,Army Black Knights,Trent Steelman,483302,1,3,32
-2012,Auburn Tigers,Kiehl Frazier,515946,0,0,6
+2012,Auburn Tigers,Kiehl Frazier,515946,0,0,5
 2012,Austin Peay Governors,Jake Ryan,476845,1,2,3
-2012,BYU Cougars,Riley Nelson,487650,0,0,17
+2012,BYU Cougars,Riley Nelson,487650,0,0,16
 2012,Ball State Cardinals,Keith Wenning,503695,1,2,22
 2012,Baylor Bears,Nick Florence,379895,0,1,14
 2012,Bethune-Cookman Wildcats,Jackie Wilson,506819,1,1,1
-2012,Boise State Broncos,Joe Southwick,483461,0,0,12
+2012,Boise State Broncos,Joe Southwick,483461,0,0,11
 2012,Boston College Eagles,Chase Rettig,501665,1,2,21
 2012,Bowling Green Falcons,Matt Schilz,482947,1,2,21
-2012,Buffalo Bulls,Alex Zordich,503736,0,0,9
+2012,Buffalo Bulls,Alex Zordich,503736,0,0,8
 2012,Cal Poly Mustangs,Andre Broadous,379828,1,2,3
 2012,California Golden Bears,Zach Maynard,384118,1,2,26
 2012,Central Arkansas Bears,Wynrick Smothers,486614,0,1,2
@@ -1427,7 +1427,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2012,Eastern Illinois Panthers,Jimmy Garoppolo,499514,1,1,1
 2012,Eastern Kentucky Colonels,Jared McClain,519443,1,1,1
 2012,Eastern Michigan Eagles,Tyler Benz,504525,0,0,2
-2012,Eastern Washington Eagles,Kyle Padron,483247,0,1,24
+2012,Eastern Washington Eagles,Kyle Padron,483247,0,1,23
 2012,Elon Phoenix,Thomas Wilson,480271,1,1,1
 2012,Florida A&M Rattlers,Damien Fleming,519942,0,0,1
 2012,Florida Atlantic Owls,Graham Wilbert,384831,1,1,12
@@ -1463,7 +1463,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2012,Kentucky Wildcats,Jalen Whitlow,530943,0,0,0
 2012,LSU Tigers,Zach Mettenberger,480251,0,0,1
 2012,Louisiana Monroe Warhawks,Kolton Browning,481248,1,2,22
-2012,Louisiana Ragin' Cajuns,Terrance Broadway,503922,0,0,4
+2012,Louisiana Ragin' Cajuns,Terrance Broadway,503922,0,0,3
 2012,Louisiana Tech Bulldogs,Colby Cameron,385667,0,0,14
 2012,Louisville Cardinals,Teddy Bridgewater,511614,1,1,13
 2012,Maine Black Bears,Marcus Wasilewski,483845,0,0,0
@@ -1475,7 +1475,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2012,Miami (OH) RedHawks,Zac Dysert,385212,1,3,31
 2012,Miami Hurricanes,Stephen Morris,501142,1,0,11
 2012,Michigan State Spartans,Andrew Maxwell,481710,0,0,9
-2012,Michigan Wolverines,Denard Robinson,480237,1,2,35
+2012,Michigan Wolverines,Denard Robinson,480237,1,2,34
 2012,Middle Tennessee Blue Raiders,Logan Kilgore,501571,1,1,11
 2012,Minnesota Golden Gophers,Philip Nelson,530738,0,0,0
 2012,Mississippi State Bulldogs,Tyler Russell,483147,0,0,15
@@ -1490,7 +1490,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2012,New Hampshire Wildcats,Andy Vailas,498533,0,0,1
 2012,New Mexico Lobos,B.R. Holbrook,381195,1,2,22
 2012,New Mexico State Aggies,Andrew Manley,500846,1,0,8
-2012,Nicholls State Colonels,Landry Klann,505481,0,0,2
+2012,Nicholls State Colonels,Landry Klann,505481,0,0,1
 2012,Norfolk State Spartans,Nico Flores,488081,0,0,2
 2012,North Carolina Central Eagles,Jordan Reid,487433,0,0,0
 2012,North Carolina Tar Heels,Bryn Renner,480234,1,1,14
@@ -1503,7 +1503,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2012,Northwestern State Demons,Brad Henderson,511138,1,1,2
 2012,Northwestern Wildcats,Trevor Siemian,500419,0,0,6
 2012,Notre Dame Fighting Irish,Everett Golson,515409,0,0,0
-2012,Ohio Bobcats,Tyler Tettleton,489481,1,1,18
+2012,Ohio Bobcats,Tyler Tettleton,489481,1,1,17
 2012,Ohio State Buckeyes,Braxton Miller,512838,1,1,12
 2012,Oklahoma Sooners,Landry Jones,377845,1,3,39
 2012,Oklahoma State Cowboys,Clint Chelf,481725,0,0,6
@@ -1516,7 +1516,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2012,Presbyterian College Blue Hose,Tamyn Garrick,514078,0,0,0
 2012,Purdue Boilermakers,Robert Marve,236058,0,1,23
 2012,Rhode Island Rams,Bob Bentsen,538161,0,0,0
-2012,Rice Owls,Taylor McHargue,482478,1,1,12
+2012,Rice Owls,Taylor McHargue,482478,1,0,12
 2012,Richmond Spiders,John Laub,478111,0,0,1
 2012,Rutgers Scarlet Knights,Gary Nova,518344,0,0,10
 2012,SMU Mustangs,Garrett Gilbert,480209,0,1,23
@@ -1533,7 +1533,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2012,South Dakota State Jackrabbits,Austin Sumner,506664,0,0,1
 2012,South Florida Bulls,B.J. Daniels,382201,1,3,37
 2012,Southeast Missouri State Redhawks,Scott Lathrop,518956,0,0,0
-2012,Southeastern Louisiana Lions,Nathan Stanley,382725,0,0,10
+2012,Southeastern Louisiana Lions,Nathan Stanley,382725,0,0,8
 2012,Southern Illinois Salukis,Kory Faulkner,485728,0,0,0
 2012,Southern Mississippi Golden Eagles,Anthony Alford,531770,0,0,0
 2012,Southern Utah Thunderbirds,Brad Sorensen,501337,1,2,3
@@ -1552,14 +1552,14 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2012,Texas State Bobcats,Shaun Rutherford,512866,1,0,2
 2012,Texas Tech Red Raiders,Seth Doege,377942,1,1,16
 2012,The Citadel Bulldogs,Aaron Miller,515435,0,0,1
-2012,Toledo Rockets,Terrance Owens,481228,0,1,18
+2012,Toledo Rockets,Terrance Owens,481228,1,1,18
 2012,Towson Tigers,Grant Enders,519428,0,0,0
 2012,Troy Trojans,Corey Robinson,480981,1,2,21
 2012,Tulane Green Wave,Ryan Griffin,383463,1,3,33
 2012,Tulsa Golden Hurricane,Cody Green,481555,0,0,16
 2012,UAB Blazers,Austin Brown,518239,0,0,0
 2012,UC Davis Aggies,Randy Wright,487067,1,2,4
-2012,UCF Knights,Blake Bortles,505719,1,0,8
+2012,UCF Knights,Blake Bortles,505719,0,0,8
 2012,UCLA Bruins,Brett Hundley,511982,0,0,0
 2012,UNLV Rebels,Nick Sherry,517186,0,0,0
 2012,USC Trojans,Matt Barkley,480322,1,3,36
@@ -1578,7 +1578,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2012,Washington State Cougars,Jeff Tuel,482620,0,1,20
 2012,Weber State Wildcats,Mike Hoke,477335,1,1,3
 2012,West Virginia Mountaineers,Geno Smith,488025,1,2,31
-2012,Western Carolina Catamounts,Eddie Sullivan,503285,0,0,5
+2012,Western Carolina Catamounts,Eddie Sullivan,503285,0,0,4
 2012,Western Illinois Leathernecks,Josh Hudson,516120,1,1,1
 2012,Western Kentucky Hilltoppers,Kawaun Jakes,382917,1,3,33
 2012,Western Michigan Broncos,Alex Carder,383521,1,2,27
@@ -1670,7 +1670,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2013,Lamar Cardinals,Caleb Berry,499979,0,0,0
 2013,Liberty Flames,Josh Woodrum,514651,0,0,0
 2013,Louisiana Monroe Warhawks,Kolton Browning,481248,1,3,33
-2013,Louisiana Ragin' Cajuns,Terrance Broadway,503922,1,1,16
+2013,Louisiana Ragin' Cajuns,Terrance Broadway,503922,1,1,15
 2013,Louisiana Tech Bulldogs,Ryan Higgins,531316,0,0,0
 2013,Louisville Cardinals,Teddy Bridgewater,511614,1,2,26
 2013,Maine Black Bears,Marcus Wasilewski,483845,1,1,1
@@ -1709,9 +1709,9 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2013,Northern Illinois Huskies,Jordan Lynch,482142,1,1,22
 2013,Northern Iowa Panthers,Sawyer Kollmorgen,515648,1,1,2
 2013,Northwestern State Demons,Zach Adkins,549719,0,0,0
-2013,Northwestern Wildcats,Trevor Siemian,500419,0,1,19
+2013,Northwestern Wildcats,Trevor Siemian,500419,1,1,19
 2013,Notre Dame Fighting Irish,Tommy Rees,500923,0,1,29
-2013,Ohio Bobcats,Tyler Tettleton,489481,1,2,28
+2013,Ohio Bobcats,Tyler Tettleton,489481,1,2,27
 2013,Ohio State Buckeyes,Braxton Miller,512838,1,2,24
 2013,Oklahoma Sooners,Blake Bell,501882,0,0,8
 2013,Oklahoma State Cowboys,Clint Chelf,481725,1,1,14
@@ -1726,7 +1726,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2013,Presbyterian College Blue Hose,Tamyn Garrick,514078,1,1,2
 2013,Purdue Boilermakers,Danny Etling,550170,0,0,0
 2013,Rhode Island Rams,Bob Bentsen,538161,1,1,1
-2013,Rice Owls,Taylor McHargue,482478,1,2,24
+2013,Rice Owls,Taylor McHargue,482478,1,1,24
 2013,Richmond Spiders,Michael Strauss,501175,0,0,1
 2013,Rutgers Scarlet Knights,Gary Nova,518344,1,1,23
 2013,SMU Mustangs,Garrett Gilbert,480209,1,2,35
@@ -1743,12 +1743,12 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2013,South Dakota State Jackrabbits,Austin Sumner,506664,1,1,2
 2013,South Florida Bulls,Mike White,549804,0,0,0
 2013,Southeast Missouri State Redhawks,Scott Lathrop,518956,1,1,1
-2013,Southeastern Louisiana Lions,Bryan Bennett,504745,0,0,12
+2013,Southeastern Louisiana Lions,Bryan Bennett,504745,0,0,11
 2013,Southern Illinois Salukis,Kory Faulkner,485728,1,1,1
 2013,Southern Jaguars,Dray Joseph,500646,0,0,0
 2013,Southern Mississippi Golden Eagles,Nick Mullens,552880,0,0,0
 2013,Southern Utah Thunderbirds,Aaron Cantu,547096,0,0,0
-2013,Stanford Cardinal,Kevin Hogan,516357,0,0,8
+2013,Stanford Cardinal,Kevin Hogan,516357,0,0,7
 2013,Stephen F Austin Lumberjacks,Brady Attaway,486741,1,2,4
 2013,Stony Brook Seawolves,Lyle Negron,516690,0,0,0
 2013,Syracuse Orange,Terrel Hunt,514440,0,0,0
@@ -1788,7 +1788,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2013,Washington State Cougars,Connor Halliday,504823,0,0,13
 2013,Weber State Wildcats,Austin Chipoletti,547106,0,0,0
 2013,West Virginia Mountaineers,Clint Trickett,501098,0,0,12
-2013,Western Carolina Catamounts,Eddie Sullivan,503285,1,1,7
+2013,Western Carolina Catamounts,Eddie Sullivan,503285,1,1,6
 2013,Western Illinois Leathernecks,Trenton Norvell,535735,0,0,0
 2013,Western Kentucky Hilltoppers,Brandon Doughty,504866,0,0,4
 2013,Western Michigan Broncos,Zach Terrell,532645,0,0,0
@@ -1852,8 +1852,8 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2014,Fordham Rams,Mike Nebrich,512108,1,1,5
 2014,Fresno State Bulldogs,Brian Burrell,546271,0,0,5
 2014,Furman Paladins,P.J. Blazejowski,559492,0,0,0
-2014,Gardner-Webb Bulldogs,Lucas Beatty,502467,1,2,3
-2014,Georgia Bulldogs,Hutson Mason,504004,0,0,11
+2014,Gardner-Webb Bulldogs,Tyrell Maxwell,3140998,0,0,0
+2014,Georgia Bulldogs,Hutson Mason,504004,0,0,10
 2014,Georgia Southern Eagles,Kevin Ellison,532925,1,1,1
 2014,Georgia State Panthers,Nick Arbuckle,3124848,0,0,0
 2014,Georgia Tech Yellow Jackets,Justin Thomas,531104,0,0,6
@@ -1879,7 +1879,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2014,Lamar Cardinals,Caleb Berry,499979,1,1,2
 2014,Liberty Flames,Josh Woodrum,514651,1,1,2
 2014,Louisiana Monroe Warhawks,Pete Thomas,501565,0,3,30
-2014,Louisiana Ragin' Cajuns,Terrance Broadway,503922,1,2,28
+2014,Louisiana Ragin' Cajuns,Terrance Broadway,503922,1,2,27
 2014,Louisiana Tech Bulldogs,Cody Sokol,530696,0,0,0
 2014,Louisville Cardinals,Will Gardner,530357,0,0,5
 2014,Maine Black Bears,Dan Collins,533619,0,0,1
@@ -1901,8 +1901,8 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2014,Montana State Bobcats,Dakota Prukop,533805,0,0,0
 2014,Murray State Racers,KD Humphries,532909,0,0,1
 2014,NC State Wolfpack,Jacoby Brissett,512191,0,0,8
-2014,NORTH All-Stars,Sean Mannion,504786,0,3,34
-2014,National,Jameill Showers,500571,0,2,16
+2014,NORTH All-Stars,Sean Mannion,504786,0,4,34
+2014,National,Jameill Showers,500571,0,1,16
 2014,Navy Midshipmen,Keenan Reynolds,530568,1,2,25
 2014,Nebraska Cornhuskers,Tommy Armstrong Jr.,533270,1,0,8
 2014,Nevada Wolf Pack,Cody Fajardo,501241,1,3,32
@@ -1930,21 +1930,21 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2014,Old Dominion Monarchs,Taylor Heinicke,513949,1,1,12
 2014,Ole Miss Rebels,Bo Wallace,500990,1,2,25
 2014,Oregon Ducks,Marcus Mariota,511459,1,2,26
-2014,Oregon State Beavers,Sean Mannion,504786,1,4,34
+2014,Oregon State Beavers,Sean Mannion,504786,1,3,34
 2014,Penn State Nittany Lions,Christian Hackenberg,552329,1,1,12
 2014,Pittsburgh Panthers,Chad Voytik,530450,0,0,3
 2014,Portland State Vikings,Kieran McDonagh,529363,1,2,2
 2014,Presbyterian College Blue Hose,Heys McMath,547381,0,0,0
 2014,Purdue Boilermakers,Austin Appleby,534770,0,0,1
 2014,Rhode Island Rams,Mack Lowrie,547236,0,0,0
-2014,Rice Owls,Driphus Jackson,514894,0,0,10
+2014,Rice Owls,Driphus Jackson,514894,0,0,9
 2014,Richmond Spiders,Michael Strauss,501175,1,1,2
 2014,Rutgers Scarlet Knights,Gary Nova,518344,1,2,33
 2014,SMU Mustangs,Garrett Krstich,519812,0,0,1
 2014,SOUTH All-Stars,Garrett Grayson,515528,0,2,23
 2014,Sacramento State Hornets,Garrett Safron,498266,1,2,4
 2014,Sam Houston State Bearkats,Jared Johnson,538456,0,0,0
-2014,Samford Bulldogs,Michael Eubank,517400,0,0,13
+2014,Samford Bulldogs,Michael Eubank,517400,0,0,12
 2014,San Diego State Aztecs,Quinn Kaehler,547570,1,1,12
 2014,San Jose State Spartans,Joe Gray,512675,0,0,2
 2014,Savannah State Tigers,Ker-Sean Wilson,3131252,0,0,0
@@ -1955,12 +1955,12 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2014,South Dakota State Jackrabbits,Zach Lujan,3140828,0,0,0
 2014,South Florida Bulls,Mike White,549804,1,1,6
 2014,Southeast Missouri State Redhawks,Kyle Snyder,534028,0,0,0
-2014,Southeastern Louisiana Lions,Bryan Bennett,504745,1,1,13
+2014,Southeastern Louisiana Lions,Bryan Bennett,504745,1,1,12
 2014,Southern Illinois Salukis,Mark Iannotti,512983,0,0,1
 2014,Southern Jaguars,Austin Howard,3140995,0,0,0
 2014,Southern Mississippi Golden Eagles,Nick Mullens,552880,1,1,9
-2014,Southern Utah Thunderbirds,Ammon Olsen,485026,0,0,4
-2014,Stanford Cardinal,Kevin Hogan,516357,1,1,22
+2014,Southern Utah Thunderbirds,Ammon Olsen,485026,0,0,3
+2014,Stanford Cardinal,Kevin Hogan,516357,1,1,21
 2014,Stephen F Austin Lumberjacks,Zach Conque,535983,0,0,0
 2014,Stony Brook Seawolves,Conor Bednarski,549332,0,0,0
 2014,Syracuse Orange,AJ Long,3116756,0,0,0
@@ -1979,13 +1979,13 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2014,Tulane Green Wave,Tanner Lee,545757,0,0,0
 2014,Tulsa Golden Hurricane,Dane Evans,532273,0,0,8
 2014,UAB Blazers,Cody Clements,3129249,0,0,0
-2014,UC Davis Aggies,London Lacy,505882,0,0,2
+2014,UC Davis Aggies,London Lacy,505882,0,0,1
 2014,UCF Knights,Justin Holman,551184,0,0,3
 2014,UCLA Bruins,Brett Hundley,511982,1,2,27
 2014,UNLV Rebels,Blake Decker,3125318,0,0,0
 2014,USC Trojans,Cody Kessler,513329,1,1,15
 2014,UT San Antonio Roadrunners,Tucker Carter,535979,0,0,5
-2014,UTEP Miners,Jameill Showers,500571,1,1,16
+2014,UTEP Miners,Jameill Showers,500571,1,2,16
 2014,Utah State Aggies,Darell Garretson,550720,1,1,8
 2014,Utah Utes,Travis Wilson,531051,1,2,20
 2014,VMI Keydets,Al Cobb,547410,0,0,0
@@ -2023,7 +2023,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2015,Arkansas Razorbacks,Brandon Allen,515915,1,2,29
 2015,Arkansas State Red Wolves,Fredi Knighten,538156,1,1,21
 2015,Army Black Knights,Ahmad Bradshaw,3129089,0,0,0
-2015,Auburn Tigers,Sean White,3121585,0,0,0
+2015,Auburn Tigers,Jeremy Johnson,550019,1,0,11
 2015,Austin Peay Governors,Trey Taylor,552240,1,1,1
 2015,BYU Cougars,Tanner Mangum,545796,0,0,0
 2015,Ball State Cardinals,Riley Neal,3915468,0,0,0
@@ -2050,7 +2050,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2015,Delaware Blue Hens,Joe Walker,3912052,0,0,0
 2015,Delaware State Hornets,Esayah Obado,538378,0,0,0
 2015,Duke Blue Devils,Thomas Sirk,530478,0,0,7
-2015,EAST All-Stars,Jake Rudock,518380,0,3,25
+2015,EAST All-Stars,Jake Rudock,518380,0,2,25
 2015,East Carolina Pirates,Blake Kemp,3126168,0,0,0
 2015,Eastern Illinois Panthers,Jalen Whitlow,530943,1,2,22
 2015,Eastern Kentucky Colonels,Bennie Coney,535722,1,1,4
@@ -2063,9 +2063,9 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2015,Florida Intl Golden Panthers,Alex McGough,3128843,1,1,10
 2015,Florida State Seminoles,Everett Golson,515409,0,2,25
 2015,Fordham Rams,Kevin Anderson,552663,0,0,0
-2015,Fresno State Bulldogs,Zack Greenlee,550587,0,0,3
+2015,Fresno State Bulldogs,Kilton Anderson,3124529,0,0,0
 2015,Furman Paladins,Reese Hannon,533146,0,2,2
-2015,Gardner-Webb Bulldogs,Tyrell Maxwell,3140998,0,0,1
+2015,Gardner-Webb Bulldogs,Tyrell Maxwell,3140998,1,1,1
 2015,Georgia Bulldogs,Greyson Lambert,530521,0,1,16
 2015,Georgia Southern Eagles,Kevin Ellison,532925,1,2,13
 2015,Georgia State Panthers,Nick Arbuckle,3124848,1,1,10
@@ -2077,7 +2077,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2015,Idaho State Bengals,Michael Sanders,3925391,0,0,0
 2015,Idaho Vandals,Matt Linehan,553235,1,1,10
 2015,Illinois Fighting Illini,Wes Lunt,534652,1,1,14
-2015,Illinois State Redbirds,Tre Roberson,513034,0,0,20
+2015,Illinois State Redbirds,Jake Kolbe,3118441,0,0,0
 2015,Incarnate Word Cardinals,Trent Brittain,548839,0,0,0
 2015,Indiana Hoosiers,Nate Sudfeld,535825,1,1,24
 2015,Indiana State Sycamores,Matt Adam,547511,0,0,0
@@ -2090,11 +2090,11 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2015,Kansas State Wildcats,Joe Hubener,517248,0,0,5
 2015,Kent State Golden Flashes,Colin Reardon,531864,1,2,22
 2015,Kentucky Wildcats,Patrick Towles,530944,1,1,17
-2015,LSU Tigers,Brandon Harris,559751,0,0,7
+2015,LSU Tigers,Brandon Harris,559751,0,0,6
 2015,Lamar Cardinals,Carson Earp,3910114,0,0,0
 2015,Liberty Flames,Josh Woodrum,514651,1,2,4
 2015,Louisiana Monroe Warhawks,Garrett Smith,3124944,0,0,0
-2015,Louisiana Ragin' Cajuns,Brooks Haack,531678,0,0,10
+2015,Louisiana Ragin' Cajuns,Brooks Haack,531678,0,0,9
 2015,Louisiana Tech Bulldogs,Jeff Driskel,511889,0,2,29
 2015,Louisville Cardinals,Lamar Jackson,3916387,0,0,0
 2015,Maine Black Bears,Dan Collins,533619,1,1,2
@@ -2105,7 +2105,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2015,Miami (OH) RedHawks,Billy Bahl,3915317,0,0,0
 2015,Miami Hurricanes,Brad Kaaya,3123048,1,1,13
 2015,Michigan State Spartans,Connor Cook,512705,1,2,29
-2015,Michigan Wolverines,Jake Rudock,518380,0,2,25
+2015,Michigan Wolverines,Jake Rudock,518380,0,3,25
 2015,Middle Tennessee Blue Raiders,Brent Stockstill,545683,0,0,1
 2015,Minnesota Golden Gophers,Mitch Leidner,530731,1,1,20
 2015,Mississippi State Bulldogs,Dak Prescott,512030,1,3,33
@@ -2116,8 +2116,8 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2015,Morgan State Bears,Moses Skillon,534927,0,0,1
 2015,Murray State Racers,KD Humphries,532909,1,1,3
 2015,NC State Wolfpack,Jacoby Brissett,512191,1,1,21
-2015,NORTH All-Stars,Carson Wentz,515607,0,1,1
-2015,National,Ammon Olsen,485026,0,1,6
+2015,NORTH All-Stars,Cody Kessler,513329,0,3,28
+2015,National,Ammon Olsen,485026,0,2,5
 2015,Navy Midshipmen,Keenan Reynolds,530568,1,3,36
 2015,Nebraska Cornhuskers,Tommy Armstrong Jr.,533270,1,1,21
 2015,Nevada Wolf Pack,Tyler Stewart,536228,0,0,4
@@ -2127,14 +2127,14 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2015,Nicholls State Colonels,Tuskani Figaro,533373,0,0,2
 2015,Norfolk State Spartans,Greg Hankerson,550873,0,0,10
 2015,North Carolina A&T Aggies,Lamar Raynard,3139898,0,0,0
-2015,North Carolina Central Eagles,Malcolm Bell,537229,0,0,2
+2015,North Carolina Central Eagles,Quinn Billerman,3120893,1,1,1
 2015,North Carolina Tar Heels,Marquise Williams,516347,1,1,28
 2015,North Dakota Fighting Hawks,Keaton Studsrud,3119431,0,0,0
 2015,North Texas Mean Green,Damarcus Smith,3914499,0,0,0
 2015,Northern Arizona Lumberjacks,Kyren Poe,515301,1,2,2
 2015,Northern Illinois Huskies,Drew Hare,532480,1,1,16
 2015,Northern Iowa Panthers,Aaron Bailey,546062,0,0,5
-2015,Northwestern State Demons,Joel Blumenthal,3911356,0,0,0
+2015,Northwestern State Demons,J.D. Almond,549717,0,0,0
 2015,Northwestern Wildcats,Clayton Thorson,3116144,0,0,0
 2015,Notre Dame Fighting Irish,DeShone Kizer,3129302,0,0,0
 2015,Ohio Bobcats,Derrius Vick,511552,1,0,20
@@ -2152,7 +2152,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2015,Presbyterian College Blue Hose,Tamyn Garrick,514078,0,2,3
 2015,Purdue Boilermakers,David Blough,3116188,0,0,0
 2015,Rhode Island Rams,Paul Mroz,3913273,0,0,0
-2015,Rice Owls,Driphus Jackson,514894,1,1,23
+2015,Rice Owls,Driphus Jackson,514894,1,1,22
 2015,Richmond Spiders,Kyle Lauletta,548643,0,0,0
 2015,Rutgers Scarlet Knights,Chris Laviano,547549,0,0,5
 2015,SMU Mustangs,Matt Davis,532113,0,0,10
@@ -2168,14 +2168,14 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2015,South Carolina Gamecocks,Perry Orth,548144,0,0,2
 2015,South Dakota Coyotes,Ryan Saeger,537987,0,0,1
 2015,South Dakota State Jackrabbits,Zach Lujan,3140828,1,1,1
-2015,South Florida Bulls,Quinton Flowers,3139591,0,0,4
+2015,South Florida Bulls,Quinton Flowers,3139591,0,0,3
 2015,Southeast Missouri State Redhawks,Tay Bender,3910149,0,0,0
 2015,Southeastern Louisiana Lions,Donovan Isom,3122873,0,0,0
 2015,Southern Illinois Salukis,Mark Iannotti,512983,1,1,2
 2015,Southern Jaguars,Austin Howard,3140995,1,1,1
 2015,Southern Mississippi Golden Eagles,Nick Mullens,552880,1,2,19
-2015,Southern Utah Thunderbirds,Ammon Olsen,485026,1,2,6
-2015,Stanford Cardinal,Kevin Hogan,516357,1,2,35
+2015,Southern Utah Thunderbirds,Ammon Olsen,485026,0,1,5
+2015,Stanford Cardinal,Kevin Hogan,516357,1,2,34
 2015,Stephen F Austin Lumberjacks,Zach Conque,535983,1,1,1
 2015,Syracuse Orange,Eric Dungey,3916447,0,0,0
 2015,TCU Horned Frogs,Trevone Boykin,517127,1,2,35
@@ -2237,7 +2237,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2016,Arkansas Razorbacks,Austin Allen,547206,0,0,6
 2016,Arkansas State Red Wolves,Justice Hansen,3116379,0,0,0
 2016,Army Black Knights,Ahmad Bradshaw,3129089,1,1,8
-2016,Auburn Tigers,Sean White,3121585,0,1,7
+2016,Auburn Tigers,Sean White,3121585,0,0,7
 2016,Austin Peay Governors,JaVaughn Craig,4051927,0,0,0
 2016,BYU Cougars,Taysom Hill,482594,1,1,24
 2016,Ball State Cardinals,Riley Neal,3915468,1,1,11
@@ -2278,7 +2278,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2016,Fordham Rams,Kevin Anderson,552663,1,1,1
 2016,Fresno State Bulldogs,Chason Virgil,3918038,0,0,3
 2016,Furman Paladins,P.J. Blazejowski,559492,0,1,2
-2016,Gardner-Webb Bulldogs,Tyrell Maxwell,3140998,1,1,2
+2016,Gardner-Webb Bulldogs,Tyrell Maxwell,3140998,1,2,2
 2016,Georgia Bulldogs,Jacob Eason,4035003,0,0,0
 2016,Georgia Southern Eagles,Kevin Ellison,532925,1,3,24
 2016,Georgia State Panthers,Conner Manning,550226,0,0,1
@@ -2292,7 +2292,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2016,Idaho State Bengals,Tanner Gueller,3139063,0,0,2
 2016,Idaho Vandals,Matt Linehan,553235,1,2,20
 2016,Illinois Fighting Illini,Wes Lunt,534652,1,3,26
-2016,Illinois State Redbirds,Jake Kolbe,3118441,0,0,1
+2016,Illinois State Redbirds,Jake Kolbe,3118441,1,1,1
 2016,Incarnate Word Cardinals,Trent Brittain,548839,1,1,1
 2016,Indiana Hoosiers,Richard Lagow,546687,0,0,0
 2016,Indiana State Sycamores,Isaac Harker,3908555,0,0,0
@@ -2334,8 +2334,8 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2016,Montana State Bobcats,Tyler Bruggman,550623,0,0,0
 2016,Morgan State Bears,Chris Andrews,534019,0,0,3
 2016,Murray State Racers,KD Humphries,532909,1,2,5
-2016,NC State Wolfpack,Ryan Finley,546288,0,0,6
-2016,NORTH All-Stars,Nathan Peterman,532065,0,2,21
+2016,NC State Wolfpack,Ryan Finley,546288,0,0,5
+2016,NORTH All-Stars,Nathan Peterman,532065,0,1,21
 2016,Navy Midshipmen,Will Worth,551208,0,0,1
 2016,Nebraska Cornhuskers,Tommy Armstrong Jr.,533270,1,2,31
 2016,Nevada Wolf Pack,Tyler Stewart,536228,1,1,17
@@ -2343,7 +2343,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2016,New Mexico State Aggies,Tyler Rogers,3124981,1,1,15
 2016,Nicholls Colonels,Chase Fourcade,4051573,0,0,0
 2016,North Carolina A&T Aggies,Lamar Raynard,3139898,1,1,1
-2016,North Carolina Central Eagles,Malcolm Bell,537229,1,1,4
+2016,North Carolina Central Eagles,Malcolm Bell,537229,1,0,4
 2016,North Carolina Tar Heels,Mitchell Trubisky,545238,0,0,17
 2016,North Dakota Fighting Hawks,Keaton Studsrud,3119431,1,1,1
 2016,North Dakota State Bison,Easton Stick,3120590,0,0,0
@@ -2352,7 +2352,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2016,Northern Colorado Bears,Kyle Sloter,531792,0,0,0
 2016,Northern Illinois Huskies,Anthony Maddie,532644,0,0,8
 2016,Northern Iowa Panthers,Aaron Bailey,546062,1,1,6
-2016,Northwestern State Demons,Brooks Haack,531678,0,1,20
+2016,Northwestern State Demons,Brooks Haack,531678,0,1,19
 2016,Northwestern Wildcats,Clayton Thorson,3116144,1,1,13
 2016,Notre Dame Fighting Irish,DeShone Kizer,3129302,1,1,13
 2016,Ohio Bobcats,Greg Windham,532440,0,0,12
@@ -2363,8 +2363,8 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2016,Ole Miss Rebels,Chad Kelly,534580,1,1,18
 2016,Oregon Ducks,Justin Herbert,4038941,0,0,0
 2016,Oregon State Beavers,Marcus McMaryion,3127332,0,0,7
-2016,Penn State Nittany Lions,Trace McSorley,3116172,0,0,6
-2016,Pittsburgh Panthers,Nathan Peterman,532065,1,1,21
+2016,Penn State Nittany Lions,Trace McSorley,3116172,0,0,5
+2016,Pittsburgh Panthers,Nathan Peterman,532065,1,2,21
 2016,Portland State Vikings,Alex Kuresa,515503,1,1,2
 2016,Prairie View Panthers,Trey Green,537695,0,1,1
 2016,Presbyterian College Blue Hose,Ben Cheek,3121291,0,0,1
@@ -2385,7 +2385,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2016,South Carolina State Bulldogs,Caleb York,3928366,0,0,0
 2016,South Dakota Coyotes,Chris Streveler,545477,0,0,3
 2016,South Dakota State Jackrabbits,Taryn Christion,3909004,0,0,0
-2016,South Florida Bulls,Quinton Flowers,3139591,1,1,17
+2016,South Florida Bulls,Quinton Flowers,3139591,1,1,16
 2016,Southeast Missouri State Redhawks,Jesse Hosket,4034549,0,0,0
 2016,Southeastern Louisiana Lions,Justin Alo,3929728,0,0,1
 2016,Southern Illinois Salukis,Josh Straughan,4043167,0,0,0
@@ -2426,7 +2426,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2016,Villanova Wildcats,Zach Bednarczyk,3120851,0,0,0
 2016,Virginia Cavaliers,Kurt Benkert,545645,0,0,2
 2016,Virginia Tech Hokies,Jerod Evans,556465,0,0,0
-2016,Wagner Seahawks,Alex Thomson,3913137,1,1,2
+2016,Wagner Seahawks,Alex Thomson,3913137,0,1,2
 2016,Wake Forest Demon Deacons,John Wolford,3124092,1,2,23
 2016,Washington Huskies,Jake Browning,3886812,1,1,12
 2016,Washington State Cougars,Luke Falk,550629,1,1,17
@@ -2443,18 +2443,18 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2016,Wyoming Cowboys,Josh Allen,3918298,0,0,2
 2016,Youngstown State Penguins,Ricky Davis,549189,0,0,1
 2017,Abilene Christian Wildcats,Dallas Sealey,3134120,1,1,2
-2017,Air Force Falcons,Arion Worthman,4038186,0,0,6
+2017,Air Force Falcons,Arion Worthman,4038186,0,0,5
 2017,Akron Zips,Thomas Woodson,550357,1,2,28
 2017,Alabama A&M Bulldogs,Aqeel Glass,4250212,0,0,0
 2017,Alabama Crimson Tide,Jalen Hurts,4040715,1,1,15
 2017,Alabama State Hornets,Kobie Jones,4044687,0,0,0
 2017,Albany Great Danes,Will Brunson,3911901,0,0,0
 2017,Alcorn State Braves,Lenorris Footman,547796,0,0,1
-2017,American,John O'Korn,545550,0,1,25
+2017,American,John O'Korn,545550,0,2,25
 2017,Appalachian State Mountaineers,Taylor Lamb,548447,1,3,37
 2017,Arizona State Sun Devils,Manny Wilkins,3128814,1,1,10
 2017,Arizona Wildcats,Khalil Tate,4039602,0,0,6
-2017,Arkansas Razorbacks,Austin Allen,547206,1,2,19
+2017,Arkansas Razorbacks,Austin Allen,547206,1,1,19
 2017,Arkansas State Red Wolves,Justice Hansen,3116379,1,1,13
 2017,Arkansas-Pine Bluff Golden Lions,Brandon Duncan,553007,0,0,0
 2017,Army Black Knights,Ahmad Bradshaw,3129089,1,2,19
@@ -2485,7 +2485,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2017,Delaware Blue Hens,Joe Walker,3912052,0,1,1
 2017,Delaware State Hornets,Jack McDaniels,4259966,0,0,0
 2017,Duke Blue Devils,Daniel Jones,3917792,1,1,11
-2017,East All-Stars,J.T. Barrett,545624,0,2,36
+2017,East All-Stars,J.T. Barrett,545624,0,3,36
 2017,East Carolina Pirates,Gardner Minshew II,4038524,0,0,7
 2017,Eastern Illinois Panthers,Mitch Kimble,545275,1,1,3
 2017,Eastern Kentucky Colonels,Tim Boyle,546675,0,0,18
@@ -2498,9 +2498,9 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2017,Florida Intl Golden Panthers,Alex McGough,3128843,1,3,30
 2017,Florida State Seminoles,James Blackman,4240020,0,0,0
 2017,Fordham Rams,Kevin Anderson,552663,1,2,2
-2017,Fresno State Bulldogs,Marcus McMaryion,3127332,0,1,15
+2017,Fresno State Bulldogs,Marcus McMaryion,3127332,0,1,14
 2017,Furman Paladins,P.J. Blazejowski,559492,1,2,3
-2017,Gardner-Webb Bulldogs,Tyrell Maxwell,3140998,1,2,3
+2017,Gardner-Webb Bulldogs,Tyrell Maxwell,3140998,1,3,3
 2017,Georgia Bulldogs,Jake Fromm,4240689,0,0,0
 2017,Georgia Southern Eagles,Shai Werts,4036650,0,0,0
 2017,Georgia State Panthers,Conner Manning,550226,1,1,11
@@ -2529,7 +2529,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2017,Kentucky Wildcats,Stephen Johnson,557882,1,2,13
 2017,LSU Tigers,Danny Etling,550170,1,2,24
 2017,Lamar Cardinals,Darrel Colbert Jr.,3128413,0,0,7
-2017,Liberty Flames,Stephen Calvert,4029885,1,0,2
+2017,Liberty Flames,Stephen Calvert,4029885,0,0,2
 2017,Louisiana Monroe Warhawks,Caleb Evans,4036585,0,0,6
 2017,Louisiana Ragin' Cajuns,Jordan Davis,3124912,0,0,4
 2017,Louisiana Tech Bulldogs,J'Mar Smith,3914382,1,0,5
@@ -2543,7 +2543,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2017,Miami (OH) RedHawks,Gus Ragland,3125968,1,1,15
 2017,Miami Hurricanes,Malik Rosier,3123047,0,0,5
 2017,Michigan State Spartans,Brian Lewerke,3929824,0,0,4
-2017,Michigan Wolverines,John O'Korn,545550,0,2,25
+2017,Michigan Wolverines,John O'Korn,545550,0,1,25
 2017,Middle Tennessee Blue Raiders,Brent Stockstill,545683,1,2,23
 2017,Minnesota Golden Gophers,Demry Croft,3728285,0,0,3
 2017,Mississippi State Bulldogs,Nick Fitzgerald,558337,1,1,17
@@ -2553,9 +2553,9 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2017,Montana State Bobcats,Chris Murray,4047491,0,0,1
 2017,Morgan State Bears,Elijah Staley,559650,0,0,2
 2017,Murray State Racers,Corey Newble,4249971,0,0,0
-2017,NC State Wolfpack,Ryan Finley,546288,1,1,19
+2017,NC State Wolfpack,Ryan Finley,546288,1,1,18
 2017,NORTH All-Stars,Tanner Lee,545757,0,3,19
-2017,National,Austin Allen,547206,0,1,19
+2017,National,Logan Woodside,545910,0,3,27
 2017,Navy Midshipmen,Zach Abey,3916251,0,0,3
 2017,Nebraska Cornhuskers,Tanner Lee,545757,0,2,19
 2017,Nevada Wolf Pack,Ty Gangi,3122611,0,0,8
@@ -2572,18 +2572,18 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2017,Northern Colorado Bears,Jacob Knipp,3121083,0,0,0
 2017,Northern Illinois Huskies,Marcus Childers,4039470,0,0,0
 2017,Northern Iowa Panthers,Eli Dunne,3120656,0,0,1
-2017,Northwestern State Demons,J.D. Almond,549717,0,0,3
+2017,Northwestern State Demons,J.D. Almond,549717,0,1,3
 2017,Northwestern Wildcats,Clayton Thorson,3116144,1,2,26
-2017,Notre Dame Fighting Irish,Brandon Wimbush,3932451,0,0,2
+2017,Notre Dame Fighting Irish,Brandon Wimbush,3932451,0,0,1
 2017,Ohio Bobcats,Nathan Rourke,4244688,0,0,0
-2017,Ohio State Buckeyes,J.T. Barrett,545624,1,3,36
+2017,Ohio State Buckeyes,J.T. Barrett,545624,1,2,36
 2017,Oklahoma Sooners,Baker Mayfield,550373,1,2,34
 2017,Oklahoma State Cowboys,Mason Rudolph,3116407,1,2,29
 2017,Old Dominion Monarchs,Steven Williams,4243485,0,0,0
 2017,Ole Miss Rebels,Shea Patterson,4035292,0,0,3
 2017,Oregon Ducks,Justin Herbert,4038941,1,1,8
 2017,Oregon State Beavers,Darell Garretson,550720,1,2,19
-2017,Penn State Nittany Lions,Trace McSorley,3116172,1,1,20
+2017,Penn State Nittany Lions,Trace McSorley,3116172,1,1,19
 2017,Pittsburgh Panthers,Ben DiNucci,3895785,0,0,1
 2017,Portland State Vikings,Jalani Eason,4248831,0,0,0
 2017,Presbyterian College Blue Hose,Ben Cheek,3121291,1,1,3
@@ -2601,7 +2601,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2017,South Alabama Jaguars,Cole Garvin,3139423,0,0,5
 2017,South Carolina Gamecocks,Jake Bentley,4038809,1,1,7
 2017,South Dakota Coyotes,Chris Streveler,545477,1,1,4
-2017,South Florida Bulls,Quinton Flowers,3139591,1,2,29
+2017,South Florida Bulls,Quinton Flowers,3139591,1,2,28
 2017,Southeast Missouri State Redhawks,Jesse Hosket,4034549,1,1,1
 2017,Southern Illinois Salukis,Sam Straub,3121350,0,0,1
 2017,Southern Jaguars,Glendon McDaniel,4251245,0,0,0
@@ -2620,7 +2620,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2017,Texas Longhorns,Sam Ehlinger,4241820,0,0,0
 2017,Texas State Bobcats,Damian Williams,546603,0,0,15
 2017,Texas Tech Red Raiders,Nic Shimonek,545364,0,1,5
-2017,The Citadel Bulldogs,Jordan Black,3911676,0,0,1
+2017,The Citadel Bulldogs,Dominique Allen,3131803,1,2,3
 2017,Toledo Rockets,Logan Woodside,545910,1,2,27
 2017,Towson Tigers,Ryan Stover,4033880,0,0,0
 2017,Troy Trojans,Brandon Silvers,546145,1,3,33
@@ -2635,7 +2635,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2017,USC Trojans,Sam Darnold,3912547,1,1,13
 2017,UT Martin Skyhawks,Troy Cook,551552,1,1,3
 2017,UT San Antonio Roadrunners,Dalton Sturm,3124037,1,2,22
-2017,UTEP Miners,Zack Greenlee,550587,1,1,16
+2017,UTEP Miners,Zack Greenlee,550587,1,0,16
 2017,Utah State Aggies,Jordan Love,4036378,0,0,0
 2017,Utah Utes,Tyler Huntley,4035671,0,0,3
 2017,VMI Keydets,Duncan Hodges,4032411,0,0,0
@@ -2677,11 +2677,11 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2018,Army Black Knights,Kelvin Hopkins Jr.,4036923,0,0,6
 2018,Auburn Tigers,Jarrett Stidham,3892775,1,1,24
 2018,Austin Peay Governors,JaVaughn Craig,4051927,1,1,3
-2018,BYU Cougars,Zach Wilson,4361259,0,0,0
+2018,BYU Cougars,Tanner Mangum,545796,1,2,25
 2018,Ball State Cardinals,Riley Neal,3915468,1,2,25
-2018,Baylor Bears,Charlie Brewer,4241222,0,1,7
+2018,Baylor Bears,Charlie Brewer,4241222,1,1,7
 2018,Bethune-Cookman Wildcats,David Israel,4259407,0,0,0
-2018,Boise State Broncos,Brett Rypien,3722362,1,3,37
+2018,Boise State Broncos,Brett Rypien,3722362,1,4,37
 2018,Boston College Eagles,Anthony Brown Jr.,4035312,1,1,10
 2018,Bowling Green Falcons,Jarret Doege,4244029,0,0,7
 2018,Buffalo Bulls,Tyree Jackson,3916564,1,2,18
@@ -2695,15 +2695,15 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2018,Chattanooga Mocs,Nick Tiano,3917280,1,1,2
 2018,Cincinnati Bearcats,Desmond Ridder,4239086,0,0,0
 2018,Clemson Tigers,Trevor Lawrence,4360310,0,0,0
-2018,Coastal Carolina Chanticleers,Kilton Anderson,3124529,0,0,13
+2018,Coastal Carolina Chanticleers,Kilton Anderson,3124529,0,1,13
 2018,Colgate Raiders,Sage Attwood,3909280,0,0,1
 2018,Colorado Buffaloes,Steven Montez,3915436,1,1,20
-2018,Colorado State Rams,K.J. Carta-Samuels,3127291,0,0,12
+2018,Colorado State Rams,K.J. Carta-Samuels,3127291,0,0,11
 2018,Delaware State Hornets,Jack McDaniels,4259966,1,1,2
 2018,Drake Bulldogs,Grant Kraemer,4051481,0,0,0
 2018,Duke Blue Devils,Daniel Jones,3917792,1,2,24
 2018,Duquesne Dukes,Daniel Parr,3919110,0,0,11
-2018,East All-Stars,David Blough,3116188,0,3,30
+2018,East All-Stars,David Blough,3116188,0,2,29
 2018,East Carolina Pirates,Reid Herring,4038520,0,0,1
 2018,East Tennessee State Buccaneers,Logan Marchi,3914214,0,1,9
 2018,Eastern Illinois Panthers,Johnathan Brantley,4040641,0,0,6
@@ -2717,7 +2717,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2018,Florida International Panthers,James Morgan,3914395,0,2,17
 2018,Florida State Seminoles,Deondre Francois,3921561,1,1,14
 2018,Fordham Rams,Luke Medlock,3128842,0,0,1
-2018,Fresno State Bulldogs,Marcus McMaryion,3127332,1,2,29
+2018,Fresno State Bulldogs,Marcus McMaryion,3127332,1,2,28
 2018,Furman Paladins,Darren Grainger,4369448,0,0,0
 2018,Gardner-Webb Bulldogs,Jordan Smith,4246131,0,0,0
 2018,Georgia Bulldogs,Jake Fromm,4240689,1,1,15
@@ -2728,7 +2728,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2018,Hawai'i Rainbow Warriors,Cole McDonald,4038220,0,0,3
 2018,Holy Cross Crusaders,Emmett Clifford,4030554,0,0,0
 2018,Houston Baptist Huskies,Bailey Zappe,4250360,1,1,1
-2018,Houston Cougars,D'Eriq King,4039300,1,0,11
+2018,Houston Cougars,D'Eriq King,4039300,1,0,10
 2018,Howard Bison,Caylin Newton,4247724,1,1,2
 2018,Idaho State Bengals,Tanner Gueller,3139063,1,2,6
 2018,Idaho Vandals,Mason Petrino,4048933,0,0,6
@@ -2754,10 +2754,10 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2018,Louisiana Ragin' Cajuns,Andre Nunez,4241553,0,0,4
 2018,Louisiana Tech Bulldogs,J'Mar Smith,3914382,1,1,18
 2018,Louisville Cardinals,Jawon Pass,4035995,0,0,4
-2018,Maine Black Bears,Isaiah Robinson,4250012,0,0,0
+2018,Maine Black Bears,Chris Ferguson,4034303,1,1,1
 2018,Marshall Thundering Herd,Isaiah Green,4261909,0,0,0
 2018,Maryland Terrapins,Kasim Hill,4241937,0,0,3
-2018,Massachusetts Minutemen,Ross Comis,3125927,0,0,19
+2018,Massachusetts Minutemen,Ross Comis,3125927,0,0,16
 2018,McNeese Cowboys,James Tabary,3123719,0,1,7
 2018,Memphis Tigers,Brady White,3893630,0,0,2
 2018,Mercer Bears,Robert Riddle,4248731,0,0,0
@@ -2773,7 +2773,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2018,Monmouth Hawks,Kenji Bahar,3910249,0,1,1
 2018,Morgan State Bears,DeAndre Harris,4030759,0,0,2
 2018,Murray State Racers,Drew Anderson,4040826,0,0,5
-2018,NC State Wolfpack,Ryan Finley,546288,1,2,32
+2018,NC State Wolfpack,Ryan Finley,546288,1,2,31
 2018,NORTH All-Stars,Drew Lock,3924327,0,4,37
 2018,National,Jake Browning,3886812,0,4,39
 2018,Navy Midshipmen,Garret Lewis,3916282,0,0,4
@@ -2798,16 +2798,16 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2018,Ohio Bobcats,Nathan Rourke,4244688,1,1,12
 2018,Ohio State Buckeyes,Dwayne Haskins,4040616,0,0,8
 2018,Oklahoma Sooners,Kyler Murray,3917315,0,0,11
-2018,Oklahoma State Cowboys,Taylor Cornelius,3122424,0,0,6
+2018,Oklahoma State Cowboys,Taylor Cornelius,3122424,0,0,5
 2018,Old Dominion Monarchs,Blake LaRussa,3914543,1,0,10
 2018,Ole Miss Rebels,Jordan Ta'amu,4242418,0,0,6
 2018,Oregon Ducks,Justin Herbert,4038941,1,2,16
 2018,Oregon State Beavers,Jake Luton,3124900,1,0,9
-2018,Penn State Nittany Lions,Trace McSorley,3116172,1,2,33
+2018,Penn State Nittany Lions,Trace McSorley,3116172,1,2,32
 2018,Pittsburgh Panthers,Kenny Pickett,4240703,0,0,4
 2018,Portland State Vikings,Davis Alexander,4028076,0,0,1
 2018,Prairie View Panthers,Jalen Morton,3933408,0,0,2
-2018,Purdue Boilermakers,David Blough,3116188,0,2,30
+2018,Purdue Boilermakers,David Blough,3116188,0,3,29
 2018,Rhode Island Rams,JaJuan Lawson,3124662,0,0,3
 2018,Rice Owls,Shawn Stankavage,3122170,0,0,1
 2018,Richmond Spiders,Kevin Johnson,3912397,0,0,0
@@ -2818,11 +2818,11 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2018,Samford Bulldogs,Devlin Hodges,3127051,1,3,3
 2018,San Diego State Aztecs,Ryan Agnew,3921648,0,0,4
 2018,San Jose State Spartans,Josh Love,3921685,1,0,13
-2018,Savannah State Tigers,D'Vonn Gibbons,4266583,0,0,1
+2018,Savannah State Tigers,TJ Bell,4250466,1,1,1
 2018,South Alabama Jaguars,Evan Orth,3129265,0,0,1
 2018,South Carolina Gamecocks,Jake Bentley,4038809,1,2,20
 2018,South Carolina State Bulldogs,Tyrece Nick,4251048,0,0,0
-2018,South Dakota Coyotes,Austin Simmons,4041531,0,0,1
+2018,South Dakota Coyotes,Austin Simmons,4041531,0,0,0
 2018,South Florida Bulls,Blake Barnett,3858944,0,0,5
 2018,Southeast Missouri State Redhawks,Anthony Cooper,559516,0,0,0
 2018,Southeastern Louisiana Lions,Chason Virgil,3918038,0,1,16
@@ -2848,13 +2848,13 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2018,Toledo Rockets,Eli Peters,4039495,0,0,0
 2018,Towson Tigers,Tom Flacco,3916725,0,0,6
 2018,Troy Trojans,Sawyer Smith,4039901,0,0,6
-2018,Tulane Green Wave,Jonathan Banks,3916103,1,1,10
+2018,Tulane Green Wave,Justin McMillan,3843247,0,0,1
 2018,Tulsa Golden Hurricane,Seth Boomer,4244601,0,0,0
 2018,UAB Blazers,A.J. Erdely,545682,1,1,14
 2018,UC Davis Aggies,Jake Maier,4248777,1,1,1
 2018,UCF Knights,McKenzie Milton,4042113,1,2,22
 2018,UCLA Bruins,Wilton Speight,3115966,0,1,21
-2018,UConn Huskies,David Pindell,4239134,1,0,7
+2018,UConn Huskies,David Pindell,4239134,1,0,6
 2018,UL Monroe Warhawks,Caleb Evans,4036585,0,1,18
 2018,UNLV Rebels,Max Gilliam,4035856,0,0,0
 2018,USC Trojans,JT Daniels,4374303,0,0,0
@@ -2873,7 +2873,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2018,Washington Huskies,Jake Browning,3886812,1,3,39
 2018,Washington State Cougars,Gardner Minshew II,4038524,0,1,17
 2018,Weber State Wildcats,Kaden Jenks,4251112,0,0,0
-2018,West All-Stars,Brett Rypien,3722362,0,4,37
+2018,West All-Stars,Brett Rypien,3722362,0,3,37
 2018,West Virginia Mountaineers,Will Grier,559556,1,1,17
 2018,Western Carolina Catamounts,Tyrie Adams,3911636,1,2,4
 2018,Western Illinois Leathernecks,Sean McGuire,3121628,1,2,3
@@ -2891,22 +2891,22 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2019,Alabama State Hornets,KHA'Darris Davis,4250415,0,0,1
 2019,Albany Great Danes,Jeff Undercuffler Jr.,4366715,0,0,0
 2019,Alcorn State Braves,Noah Johnson,3928455,1,2,3
-2019,American,Brian Lewerke,3929824,0,3,28
+2019,American,Brian Lewerke,3929824,0,2,28
 2019,Appalachian State Mountaineers,Zac Thomas,4036429,1,1,13
 2019,Arizona State Sun Devils,Jayden Daniels,4426348,0,0,0
 2019,Arizona Wildcats,Khalil Tate,4039602,1,2,28
-2019,Arkansas Razorbacks,Nick Starkel,4035225,0,0,11
+2019,Arkansas Razorbacks,Nick Starkel,4035225,0,0,10
 2019,Arkansas State Red Wolves,Layne Hatcher,4361222,0,0,0
 2019,Arkansas-Pine Bluff Golden Lions,Shannon Patrick,4383503,0,0,0
 2019,Army Black Knights,Kelvin Hopkins Jr.,4036923,1,1,18
 2019,Auburn Tigers,Bo Nix,4426338,0,0,0
-2019,BYU Cougars,Zach Wilson,4361259,1,1,9
+2019,BYU Cougars,Zach Wilson,4361259,1,0,9
 2019,Ball State Cardinals,Drew Plitt,4039210,0,0,12
 2019,Baylor Bears,Charlie Brewer,4241222,1,2,20
 2019,Bethune-Cookman Wildcats,Akevious Williams,3945456,1,0,1
 2019,Boise State Broncos,Hank Bachmeier,4426499,0,0,0
 2019,Boston College Eagles,Dennis Grosel,4239939,0,0,0
-2019,Bowling Green Falcons,Grant Loy,4046743,0,0,12
+2019,Bowling Green Falcons,Grant Loy,4046743,0,0,11
 2019,Bucknell Bison,Tarrin Earle,4367450,0,0,0
 2019,Buffalo Bulls,Kyle Vantrease,4239714,0,0,5
 2019,Cal Poly Mustangs,Jalen Hamler,4364470,0,0,0
@@ -2926,7 +2926,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2019,Colorado State Rams,Patrick O'Brien,4034857,0,0,3
 2019,Delaware Blue Hens,Nolan Henderson,4248104,0,0,0
 2019,Duke Blue Devils,Quentin Harris,3917793,0,0,12
-2019,East All-Stars,James Morgan,3914395,0,4,29
+2019,East All-Stars,James Morgan,3914395,0,3,29
 2019,East Carolina Pirates,Holton Ahlers,4360131,0,0,10
 2019,East Tennessee State Buccaneers,Trey Mitchell,4383427,0,0,0
 2019,Eastern Illinois Panthers,Johnathan Brantley,4040641,1,1,7
@@ -2937,7 +2937,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2019,Florida A&M Rattlers,Ryan Stanley,3927948,1,1,2
 2019,Florida Atlantic Owls,Chris Robison,4241399,1,1,11
 2019,Florida Gators,Kyle Trask,4034946,0,0,3
-2019,Florida International Panthers,James Morgan,3914395,1,3,29
+2019,Florida International Panthers,James Morgan,3914395,1,4,29
 2019,Florida State Seminoles,James Blackman,4240020,0,1,15
 2019,Fordham Rams,Tim DeMorat,4367790,0,0,0
 2019,Fresno State Bulldogs,Jorge Reyna,4242995,0,0,4
@@ -2968,7 +2968,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2019,Kansas Jayhawks,Carter Stanley,3917957,0,0,20
 2019,Kansas State Wildcats,Skylar Thompson,4036419,1,1,18
 2019,Kennesaw State Owls,Daniel David,3917141,0,0,0
-2019,Kent State Golden Flashes,Dustin Crum,4244068,0,0,14
+2019,Kent State Golden Flashes,Dustin Crum,4244068,0,0,13
 2019,Kentucky Wildcats,Sawyer Smith,4039901,0,1,18
 2019,LSU Tigers,Joe Burrow,3915511,1,1,21
 2019,Lamar Cardinals,Jordan Hoy,4243484,0,0,4
@@ -2976,7 +2976,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2019,Louisiana Ragin' Cajuns,Levi Lewis,4241556,0,0,18
 2019,Louisiana Tech Bulldogs,J'Mar Smith,3914382,1,2,31
 2019,Louisville Cardinals,Malik Cunningham,4240069,0,0,7
-2019,Maine Black Bears,Chris Ferguson,4034303,1,1,3
+2019,Maine Black Bears,Chris Ferguson,4034303,1,2,3
 2019,Marshall Thundering Herd,Isaiah Green,4261909,1,1,10
 2019,Maryland Terrapins,Josh Jackson,4037603,0,1,16
 2019,Massachusetts Minutemen,Andrew Brito,4572366,0,0,0
@@ -2985,11 +2985,11 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2019,Mercer Bears,Kaelan Riley,4043931,0,1,3
 2019,Miami (OH) RedHawks,Brett Gabbert,4427243,0,0,0
 2019,Miami Hurricanes,Jarren Williams,4362507,0,0,1
-2019,Michigan State Spartans,Brian Lewerke,3929824,1,2,28
+2019,Michigan State Spartans,Brian Lewerke,3929824,1,3,28
 2019,Michigan Wolverines,Shea Patterson,4035292,1,2,23
-2019,Middle Tennessee Blue Raiders,Asher O'Hara,4374350,0,0,2
+2019,Middle Tennessee Blue Raiders,Asher O'Hara,4374350,0,0,1
 2019,Minnesota Golden Gophers,Tanner Morgan,4240756,0,0,9
-2019,Mississippi State Bulldogs,Tommy Stevens,3791110,0,0,13
+2019,Mississippi State Bulldogs,Tommy Stevens,3791110,0,0,11
 2019,Missouri State Bears,Peyton Huslig,4248313,1,2,2
 2019,Missouri Tigers,Kelly Bryant,3728240,0,2,24
 2019,Monmouth Hawks,Kenji Bahar,3910249,1,2,2
@@ -3000,7 +3000,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2019,NC State Wolfpack,Devin Leary,4361653,0,0,0
 2019,NORTH All-Stars,Anthony Gordon,4055171,0,1,2
 2019,National,Reid Sinnett,3926936,0,0,0
-2019,Navy Midshipmen,Malcolm Perry,4039436,0,0,10
+2019,Navy Midshipmen,Malcolm Perry,4039436,0,0,9
 2019,Nebraska Cornhuskers,Adrian Martinez,4361182,1,1,11
 2019,Nevada Wolf Pack,Carson Strong,4361435,0,0,0
 2019,New Hampshire Wildcats,Max Brosmer,4573398,0,0,0
@@ -3038,7 +3038,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2019,Rutgers Scarlet Knights,Johnny Langan,4360204,0,0,0
 2019,SE Louisiana Lions,Chason Virgil,3918038,0,2,18
 2019,SMU Mustangs,Shane Buechele,4039034,0,1,23
-2019,SOUTH All-Stars,Jalen Hurts,4040715,0,3,42
+2019,SOUTH All-Stars,Justin Herbert,4038941,0,4,29
 2019,Sacramento State Hornets,Kevin Thomson,3125336,1,2,2
 2019,Sam Houston State Bearkats,Ty Brock,4250390,0,0,0
 2019,Samford Bulldogs,Liam Welch,4034607,0,0,0
@@ -3047,7 +3047,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2019,South Alabama Jaguars,Cephus Johnson III,4249400,0,0,6
 2019,South Carolina Gamecocks,Ryan Hilinski,4426657,0,0,0
 2019,South Carolina State Bulldogs,Tyrece Nick,4251048,1,1,2
-2019,South Dakota Coyotes,Austin Simmons,4041531,1,1,2
+2019,South Dakota Coyotes,Austin Simmons,4041531,1,1,1
 2019,South Dakota State Jackrabbits,J'Bore Gibbs,4368285,0,0,0
 2019,South Florida Bulls,Jordan McCloud,4360890,0,0,0
 2019,Southeast Missouri State Redhawks,Daniel Santacaterina,3921977,0,0,9
@@ -3073,7 +3073,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2019,Toledo Rockets,Mitchell Guadagni,3932903,1,0,11
 2019,Towson Tigers,Tom Flacco,3916725,1,1,7
 2019,Troy Trojans,Kaleb Barker,4039910,1,0,16
-2019,Tulane Green Wave,Justin McMillan,3843247,0,0,9
+2019,Tulane Green Wave,Justin McMillan,3843247,1,1,9
 2019,Tulsa Golden Hurricane,Zach Smith,4035409,0,0,19
 2019,UAB Blazers,Tyler Johnston III,4239793,0,0,11
 2019,UC Davis Aggies,Jake Maier,4248777,1,2,3
@@ -3103,7 +3103,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2019,Western Illinois Leathernecks,Connor Sampson,4031136,0,0,1
 2019,Western Kentucky Hilltoppers,Ty Storey,3886621,0,1,12
 2019,Western Michigan Broncos,Jon Wassink,3916726,1,2,17
-2019,William & Mary Tribe,Kilton Anderson,3124529,0,1,22
+2019,William & Mary Tribe,Kilton Anderson,3124529,0,2,22
 2019,Wisconsin Badgers,Jack Coan,4242331,0,0,8
 2019,Wofford Terriers,Joe Newman,4032575,1,1,2
 2019,Wyoming Cowboys,Sean Chambers,4361690,0,0,4
@@ -3115,12 +3115,12 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2020,Appalachian State Mountaineers,Zac Thomas,4036429,1,2,27
 2020,Arizona State Sun Devils,Jayden Daniels,4426348,1,1,12
 2020,Arizona Wildcats,Grant Gunnell,4427351,0,0,8
-2020,Arkansas Razorbacks,Feleipe Franks,4034948,0,2,27
+2020,Arkansas Razorbacks,Feleipe Franks,4034948,0,3,27
 2020,Arkansas State Red Wolves,Logan Bonner,4036473,1,0,12
 2020,Army Black Knights,Christian Anderson,4258447,0,0,4
 2020,Auburn Tigers,Bo Nix,4426338,1,1,13
 2020,Austin Peay Governors,Jeremiah Oatsvall,4249033,0,1,4
-2020,BYU Cougars,Zach Wilson,4361259,1,2,18
+2020,BYU Cougars,Zach Wilson,4361259,1,1,18
 2020,Ball State Cardinals,Drew Plitt,4039210,1,1,24
 2020,Baylor Bears,Charlie Brewer,4241222,1,3,34
 2020,Boise State Broncos,Hank Bachmeier,4426499,1,1,8
@@ -3162,7 +3162,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2020,Jacksonville State Gamecocks,Zerrick Cooper,4035460,0,0,6
 2020,Kansas Jayhawks,Jalon Daniels,4596472,0,0,0
 2020,Kansas State Wildcats,Will Howard,4429955,0,0,0
-2020,Kent State Golden Flashes,Dustin Crum,4244068,1,1,27
+2020,Kent State Golden Flashes,Dustin Crum,4244068,1,1,26
 2020,Kentucky Wildcats,Terry Wilson,4038940,1,1,15
 2020,LSU Tigers,Max Johnson,4685740,0,0,0
 2020,Liberty Flames,Malik Willis,4242512,0,0,7
@@ -3175,16 +3175,16 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2020,Memphis Tigers,Brady White,3893630,1,2,30
 2020,Mercer Bears,Harrison Frost,4259933,0,0,1
 2020,Miami (OH) RedHawks,Brett Gabbert,4427243,1,1,14
-2020,Miami Hurricanes,D'Eriq King,4039300,0,1,26
-2020,Michigan State Spartans,Rocky Lombardi,4241965,0,0,10
-2020,Michigan Wolverines,Joe Milton III,4360698,0,0,6
-2020,Middle Tennessee Blue Raiders,Asher O'Hara,4374350,1,1,14
+2020,Miami Hurricanes,D'Eriq King,4039300,0,1,25
+2020,Michigan State Spartans,Rocky Lombardi,4241965,0,0,9
+2020,Michigan Wolverines,Joe Milton III,4360698,0,0,5
+2020,Middle Tennessee Blue Raiders,Asher O'Hara,4374350,1,1,13
 2020,Minnesota Golden Gophers,Tanner Morgan,4240756,1,1,22
 2020,Mississippi State Bulldogs,Will Rogers,102597,0,0,0
 2020,Missouri State Bears,Jaden Johnson,4429915,0,0,0
 2020,Missouri Tigers,Connor Bazelak,4426444,0,0,2
 2020,NC State Wolfpack,Bailey Hockman,4240025,0,0,7
-2020,National,Feleipe Franks,4034948,0,3,27
+2020,National,Feleipe Franks,4034948,0,2,27
 2020,Navy Midshipmen,Dalen Morris,4243715,0,0,0
 2020,Nebraska Cornhuskers,Adrian Martinez,4361182,1,2,21
 2020,Nevada Wolf Pack,Carson Strong,4361435,1,1,10
@@ -3210,7 +3210,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2020,Rutgers Scarlet Knights,Noah Vedral,4243539,0,0,12
 2020,SMU Mustangs,Shane Buechele,4039034,1,2,36
 2020,San Diego State Aztecs,Carson Baker,4361497,0,0,1
-2020,San José State Spartans,Nick Starkel,4035225,0,1,19
+2020,San José State Spartans,Nick Starkel,4035225,0,1,18
 2020,South Alabama Jaguars,Desmond Trotter,4373851,0,0,6
 2020,South Carolina Gamecocks,Collin Hill,4036357,0,0,18
 2020,South Florida Bulls,Jordan McCloud,4360890,1,1,12
@@ -3238,7 +3238,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2020,USC Trojans,Kedon Slovis,4428512,1,1,12
 2020,UTEP Miners,Gavin Hardison,4575668,0,0,2
 2020,UTSA Roadrunners,Frank Harris,4245186,1,0,3
-2020,Utah State Aggies,Jason Shelley,4243258,0,0,14
+2020,Utah State Aggies,Jason Shelley,4243258,0,0,13
 2020,Utah Utes,Jake Bentley,4038809,0,3,33
 2020,Vanderbilt Commodores,Ken Seals,4431375,0,0,0
 2020,Virginia Cavaliers,Brennan Armstrong,4370775,0,0,8
@@ -3247,23 +3247,23 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2020,Washington Huskies,Dylan Morris,4569598,0,0,0
 2020,Washington State Cougars,Jayden de Laura,4697623,0,0,0
 2020,West Virginia Mountaineers,Jarret Doege,4244029,0,1,23
-2020,Western Carolina Catamounts,Will Jones,4250525,1,1,2
+2020,Western Carolina Catamounts,Will Jones,4250525,1,1,1
 2020,Western Kentucky Hilltoppers,Tyrrell Pigrome,4036210,0,0,28
 2020,Western Michigan Broncos,Kaleb Eleby,4362230,0,0,5
 2020,Wisconsin Badgers,Graham Mertz,4426335,0,0,2
 2020,Wyoming Cowboys,Levi Williams,4428890,0,0,3
 2021,Abilene Christian Wildcats,Stone Earle,4691272,0,0,2
 2021,Air Force Falcons,Haaziq Daniels,4693814,1,1,5
-2021,Akron Zips,DJ Irons,4368768,0,0,0
-2021,Alabama Crimson Tide,Bryce Young,4685720,0,0,7
+2021,Akron Zips,Zach Gibson,4568336,1,1,10
+2021,Alabama Crimson Tide,Bryce Young,4685720,0,0,6
 2021,Alabama State Hornets,Ryan Nettles,4428105,0,0,0
 2021,Albany Great Danes,Jeff Undercuffler Jr.,4366715,0,1,1
 2021,Alcorn State Braves,Felix Harper,4051442,0,0,2
-2021,American,Bailey Zappe,4250360,0,4,6
+2021,American,Chase Garbers,4242408,0,4,24
 2021,Appalachian State Mountaineers,Chase Brice,4239994,0,1,31
 2021,Arizona State Sun Devils,Jayden Daniels,4426348,1,2,16
 2021,Arizona Wildcats,Will Plummer,4430635,0,0,3
-2021,Arkansas Razorbacks,KJ Jefferson,4567149,0,0,7
+2021,Arkansas Razorbacks,KJ Jefferson,4567149,0,0,6
 2021,Arkansas State Red Wolves,Layne Hatcher,4361222,0,1,21
 2021,Arkansas-Pine Bluff Golden Lions,Skyler Perry,4383504,0,1,2
 2021,Army Black Knights,Christian Anderson,4258447,1,1,10
@@ -3292,7 +3292,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2021,Coastal Carolina Chanticleers,Grayson McCall,4427936,1,1,13
 2021,Colgate Raiders,Grant Breneman,4247540,0,2,2
 2021,Colorado Buffaloes,Brendon Lewis,4429149,0,0,1
-2021,Colorado State Rams,Todd Centeio,4243276,1,0,25
+2021,Colorado State Rams,Todd Centeio,4243276,1,0,24
 2021,Delaware Blue Hens,Nolan Henderson,4248104,0,1,1
 2021,Duke Blue Devils,Gunnar Holmberg,4360403,0,0,5
 2021,Duquesne Dukes,Darius Perrantes,4573455,0,0,0
@@ -3304,7 +3304,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2021,Elon Phoenix,Davis Cheek,4248286,0,3,3
 2021,Florida A&M Rattlers,Rasean McKay,4390274,0,0,2
 2021,Florida Atlantic Owls,N'Kosi Perry,4240628,0,1,23
-2021,Florida Gators,Emory Jones,4360230,0,0,16
+2021,Florida Gators,Emory Jones,4360230,0,0,15
 2021,Florida International Panthers,Max Bortenschlager,4036215,1,1,17
 2021,Florida State Seminoles,Jordan Travis,4360799,1,1,14
 2021,Fordham Rams,Tim DeMorat,4367790,0,1,1
@@ -3334,8 +3334,8 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2021,Kansas Jayhawks,Jason Bean,4360900,0,0,15
 2021,Kansas State Wildcats,Skylar Thompson,4036419,1,2,34
 2021,Kennesaw State Owls,Xavier Shepherd,4430474,0,0,0
-2021,Kent State Golden Flashes,Dustin Crum,4244068,1,2,31
-2021,Kentucky Wildcats,Will Levis,4361418,0,0,9
+2021,Kent State Golden Flashes,Dustin Crum,4244068,1,2,30
+2021,Kentucky Wildcats,Will Levis,4361418,0,0,8
 2021,LSU Tigers,Max Johnson,4685740,0,1,5
 2021,Lamar Cardinals,Jalen Dummett,4696233,0,0,0
 2021,Liberty Flames,Malik Willis,4242512,1,1,17
@@ -3357,7 +3357,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2021,Middle Tennessee Blue Raiders,Chase Cunningham,4291782,0,0,7
 2021,Minnesota Golden Gophers,Tanner Morgan,4240756,1,2,29
 2021,Mississippi State Bulldogs,Will Rogers,102597,1,1,9
-2021,Missouri State Bears,Jason Shelley,4243258,0,1,18
+2021,Missouri State Bears,Jason Shelley,4243258,0,1,17
 2021,Missouri Tigers,Connor Bazelak,4426444,1,1,12
 2021,Montana Grizzlies,TEAM,-6729,0,0,0
 2021,Montana State Bobcats,Matthew McKay,4240096,0,0,8
@@ -3378,11 +3378,11 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2021,North Texas Mean Green,Austin Aune,4360163,1,1,9
 2021,Northern Arizona Lumberjacks,RJ Martinez,4876244,0,0,0
 2021,Northern Colorado Bears,Dylan McCaffrey,4258191,0,0,8
-2021,Northern Illinois Huskies,Rocky Lombardi,4241965,0,1,16
+2021,Northern Illinois Huskies,Rocky Lombardi,4241965,0,1,15
 2021,Northern Iowa Panthers,Will McElvain,4384603,0,1,1
 2021,Northwestern State Demons,Kaleb Fletcher,4251149,0,0,0
 2021,Northwestern Wildcats,Ryan Hilinski,4426657,0,1,12
-2021,Notre Dame Fighting Irish,Jack Coan,4242331,0,2,22
+2021,Notre Dame Fighting Irish,Jack Coan,4242331,0,1,22
 2021,Ohio Bobcats,Kurtis Rourke,4430431,1,1,3
 2021,Ohio State Buckeyes,C.J. Stroud,4432577,0,0,0
 2021,Oklahoma Sooners,Caleb Williams,4431611,0,0,0
@@ -3406,7 +3406,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2021,Sacramento State Hornets,Jake Dunniway,4280496,0,0,0
 2021,Samford Bulldogs,Liam Welch,4034607,0,1,1
 2021,San Diego State Aztecs,Lucas Johnson,4037293,0,0,5
-2021,San José State Spartans,Nick Starkel,4035225,1,2,27
+2021,San José State Spartans,Nick Starkel,4035225,1,2,26
 2021,South Alabama Jaguars,Jake Bentley,4038809,0,4,38
 2021,South Carolina Gamecocks,Luke Doty,4429079,0,0,3
 2021,South Carolina State Bulldogs,Corey Fields Jr.,4384546,0,0,2
@@ -3426,12 +3426,12 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2021,Tennessee Tech Golden Eagles,Drew Martin,4368912,0,0,0
 2021,Tennessee Volunteers,Hendon Hooker,4240858,0,2,17
 2021,Texas A&M Aggies,Zach Calzada,4426847,0,0,3
-2021,Texas Longhorns,Casey Thompson,4362073,0,0,5
+2021,Texas Longhorns,Casey Thompson,4362073,0,0,4
 2021,Texas Southern Tigers,Andrew Body,4887151,0,0,0
 2021,Texas State Bobcats,Brady McBride,4371730,1,1,12
 2021,Texas Tech Red Raiders,Henry Colombi,4259219,0,0,16
 2021,Toledo Rockets,Dequan Finn,4427191,0,0,4
-2021,Towson Tigers,Chris Ferguson,4034303,0,2,10
+2021,Towson Tigers,Chris Ferguson,4034303,0,3,10
 2021,Troy Trojans,Gunnar Watson,4362723,1,1,15
 2021,Tulane Green Wave,Michael Pratt,4685039,1,1,10
 2021,Tulsa Golden Hurricane,Davis Brin,4362365,0,0,2
@@ -3457,11 +3457,11 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2021,Washington Huskies,Dylan Morris,4569598,1,1,4
 2021,Washington State Cougars,Jayden de Laura,4697623,1,1,4
 2021,Weber State Wildcats,Bronson Barron,4697131,0,0,0
-2021,West All-Stars,Jack Coan,4242331,0,1,22
+2021,West All-Stars,Jack Coan,4242331,0,2,22
 2021,West Virginia Mountaineers,Jarret Doege,4244029,1,2,33
 2021,Western Carolina Catamounts,Rogan Wells,4408865,0,0,0
 2021,Western Illinois Leathernecks,Connor Sampson,4031136,0,1,2
-2021,Western Kentucky Hilltoppers,Bailey Zappe,4250360,0,5,6
+2021,Western Kentucky Hilltoppers,Bailey Zappe,4250360,0,4,6
 2021,Western Michigan Broncos,Kaleb Eleby,4362230,1,1,11
 2021,William & Mary Tribe,Darius Wilson,4878151,0,0,0
 2021,Wisconsin Badgers,Graham Mertz,4426335,1,1,9
@@ -3470,9 +3470,9 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2021,Yale Bulldogs,Nolan Grooms,4573680,0,0,0
 2021,Youngstown State Penguins,Demeatric Crenshaw,4430650,0,0,0
 2022,Air Force Falcons,Haaziq Daniels,4693814,1,2,16
-2022,Akron Zips,DJ Irons,4368768,1,1,7
+2022,Akron Zips,DJ Irons,4368768,1,0,7
 2022,Alabama A&M Bulldogs,Xavier Lankford,4749280,0,0,0
-2022,Alabama Crimson Tide,Bryce Young,4685720,1,1,22
+2022,Alabama Crimson Tide,Bryce Young,4685720,1,1,21
 2022,Alabama State Hornets,Myles Crawley,4693861,0,0,1
 2022,Albany Great Danes,Reese Poffenbarger,4875866,0,0,0
 2022,Alcorn State Braves,Aaron Allen,4384187,0,0,23
@@ -3480,7 +3480,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2022,Appalachian State Mountaineers,Chase Brice,4239994,1,2,45
 2022,Arizona State Sun Devils,Trenton Bourguet,4569184,0,0,4
 2022,Arizona Wildcats,Jayden de Laura,4697623,0,2,16
-2022,Arkansas Razorbacks,KJ Jefferson,4567149,1,1,19
+2022,Arkansas Razorbacks,KJ Jefferson,4567149,1,1,18
 2022,Arkansas State Red Wolves,James Blackman,4240020,1,2,36
 2022,Arkansas-Pine Bluff Golden Lions,Skyler Perry,4383504,1,2,3
 2022,Army Black Knights,Cade Ballard,4577303,0,0,4
@@ -3490,7 +3490,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2022,Ball State Cardinals,John Paddock,4361636,0,0,4
 2022,Baylor Bears,Blake Shapen,4565315,0,0,5
 2022,Bethune-Cookman Wildcats,Jalon Jones,4574809,0,0,0
-2022,Boise State Broncos,Taylen Green,4431325,0,0,1
+2022,Boise State Broncos,Taylen Green,4431325,0,0,0
 2022,Boston College Eagles,Phil Jurkovec,4372768,1,1,21
 2022,Bowling Green Falcons,Matt McDonald,4239937,1,2,17
 2022,Bryant Bulldogs,Zevi Eckhaus,4876066,1,1,1
@@ -3514,7 +3514,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2022,Delaware Blue Hens,Nolan Henderson,4248104,1,2,2
 2022,Duke Blue Devils,Riley Leonard,4683423,0,0,6
 2022,Duquesne Dukes,Joe Mischler,4362303,0,0,2
-2022,East All-Stars,Aidan O'Connell,4260394,0,3,21
+2022,East All-Stars,Aidan O'Connell,4260394,0,2,21
 2022,East Carolina Pirates,Holton Ahlers,4360131,1,3,41
 2022,East Tennessee State Buccaneers,Tyler Ridell,4577478,0,0,1
 2022,Eastern Illinois Panthers,Jonah O'Brien,4570840,0,0,0
@@ -3550,16 +3550,16 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2022,Iowa Hawkeyes,Spencer Petras,4360480,1,2,23
 2022,Iowa State Cyclones,Hunter Dekkers,4565358,0,0,5
 2022,Jacksonville State Gamecocks,Zion Webb,4249638,0,0,2
-2022,James Madison Dukes,Todd Centeio,4243276,0,1,36
+2022,James Madison Dukes,Todd Centeio,4243276,0,1,35
 2022,Kansas Jayhawks,Jalon Daniels,4596472,0,1,13
 2022,Kansas State Wildcats,Will Howard,4429955,0,1,14
 2022,Kennesaw State Owls,Xavier Shepherd,4430474,1,1,1
 2022,Kent State Golden Flashes,Collin Schlee,4428439,0,0,9
-2022,Kentucky Wildcats,Will Levis,4361418,1,1,22
+2022,Kentucky Wildcats,Will Levis,4361418,1,1,21
 2022,LSU Tigers,Jayden Daniels,4426348,0,3,29
 2022,Lafayette Leopards,Ryan Schuster,5083846,0,0,0
 2022,Lamar Cardinals,Mike Chandler II,4431018,0,0,1
-2022,Liberty Flames,Johnathan Bennett,4426687,0,0,13
+2022,Liberty Flames,Johnathan Bennett,4426687,0,0,12
 2022,Long Island University Sharks,Derek Green,4360550,0,0,3
 2022,Louisiana Ragin' Cajuns,Ben Wooldridge,4373895,0,0,4
 2022,Louisiana Tech Bulldogs,Parker McNeil,4686137,0,0,1
@@ -3578,7 +3578,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2022,Middle Tennessee Blue Raiders,Chase Cunningham,4291782,1,1,13
 2022,Minnesota Golden Gophers,Tanner Morgan,4240756,1,3,42
 2022,Mississippi State Bulldogs,Will Rogers,102597,1,2,22
-2022,Missouri State Bears,Jason Shelley,4243258,1,2,19
+2022,Missouri State Bears,Jason Shelley,4243258,1,2,18
 2022,Missouri Tigers,Brady Cook,4429435,0,0,5
 2022,Montana State Bobcats,Tommy Mellott,4775196,0,0,0
 2022,Morgan State Bears,Carson Baker,4361497,0,1,8
@@ -3586,7 +3586,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2022,NC State Wolfpack,Devin Leary,4361653,1,2,24
 2022,National,Jake Haener,4243322,0,2,22
 2022,Navy Midshipmen,Tai Lavatai,4686164,1,1,10
-2022,Nebraska Cornhuskers,Casey Thompson,4362073,0,1,16
+2022,Nebraska Cornhuskers,Casey Thompson,4362073,0,1,15
 2022,Nevada Wolf Pack,Nate Cox,4262162,0,0,5
 2022,New Hampshire Wildcats,Max Brosmer,4573398,0,1,1
 2022,New Mexico Lobos,Miles Kendrick,4360331,0,0,15
@@ -3598,7 +3598,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2022,North Dakota Fighting Hawks,Tommy Schuster,4579073,1,1,1
 2022,North Dakota State Bison,Cam Miller,4693331,0,0,0
 2022,North Texas Mean Green,Austin Aune,4360163,1,2,21
-2022,Northern Colorado Bears,Jacob Sirmon,4361091,0,0,8
+2022,Northern Colorado Bears,Jacob Sirmon,4361091,0,0,7
 2022,Northern Illinois Huskies,Ethan Hampton,4618083,0,0,1
 2022,Northern Iowa Panthers,Theo Day,4360846,0,0,1
 2022,Northwestern State Demons,Zachary Clement,4573600,0,0,1
@@ -3615,7 +3615,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2022,Penn State Nittany Lions,Sean Clifford,4259592,1,3,38
 2022,Pittsburgh Panthers,Kedon Slovis,4428512,0,3,26
 2022,Portland State Vikings,Dante Chachere,4426894,0,0,0
-2022,Purdue Boilermakers,Aidan O'Connell,4260394,1,2,21
+2022,Purdue Boilermakers,Aidan O'Connell,4260394,1,3,21
 2022,Rhode Island Rams,Kasim Hill,4241937,1,2,14
 2022,Rice Owls,TJ McMahon,4362896,0,0,1
 2022,Richmond Spiders,Reece Udinski,4249295,0,2,9
@@ -3708,17 +3708,17 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2023,Appalachian State Mountaineers,Joey Aguilar,5151948,0,0,0
 2023,Arizona State Sun Devils,Trenton Bourguet,4569184,1,1,10
 2023,Arizona Wildcats,Noah Fifita,4801717,0,0,3
-2023,Arkansas Razorbacks,KJ Jefferson,4567149,1,2,30
+2023,Arkansas Razorbacks,KJ Jefferson,4567149,1,2,29
 2023,Arkansas State Red Wolves,Jaylen Raynor,5080403,0,0,0
 2023,Arkansas-Pine Bluff Golden Lions,Mekhi Hagens,5084305,0,0,0
-2023,Army Black Knights,Bryson Daily,4879928,0,0,2
+2023,Army Black Knights,Bryson Daily,4879928,0,0,1
 2023,Auburn Tigers,Payton Thorne,4430590,0,2,29
 2023,Austin Peay Governors,Mike DiLiello,4689970,1,1,8
 2023,BYU Cougars,Kedon Slovis,4428512,0,4,37
 2023,Ball State Cardinals,Kiael Kelly,4431416,0,0,0
 2023,Baylor Bears,Blake Shapen,4565315,1,1,18
 2023,Bethune-Cookman Wildcats,Walter Simmons III,4431565,0,0,1
-2023,Boise State Broncos,Taylen Green,4431325,1,1,10
+2023,Boise State Broncos,Taylen Green,4431325,1,1,9
 2023,Boston College Eagles,Tommy Castellanos,4773919,0,0,3
 2023,Bowling Green Falcons,Connor Bazelak,4426444,0,3,32
 2023,Bryant Bulldogs,Zevi Eckhaus,4876066,1,2,2
@@ -3733,7 +3733,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2023,Charleston Southern Buccaneers,Tony Bartalo,5086865,0,0,0
 2023,Charlotte 49ers,Trexler Ivey,4689585,0,0,0
 2023,Chattanooga Mocs,Luke Schomburg,5083895,0,0,0
-2023,Cincinnati Bearcats,Emory Jones,4360230,0,1,35
+2023,Cincinnati Bearcats,Emory Jones,4360230,0,1,34
 2023,Clemson Tigers,Cade Klubnik,4685413,0,0,8
 2023,Coastal Carolina Chanticleers,Grayson McCall,4427936,1,3,33
 2023,Colgate Raiders,Michael Brescia,4876662,1,1,2
@@ -3765,7 +3765,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2023,Grambling Tigers,Myles Crawley,4693861,0,1,2
 2023,Hawai'i Rainbow Warriors,Brayden Schager,4709977,1,1,16
 2023,Holy Cross Crusaders,Matthew Sluka,4695904,1,2,2
-2023,Houston Christian Huskies,Colby Suits,4365325,0,1,15
+2023,Houston Christian Huskies,Colby Suits,4365325,0,1,14
 2023,Houston Cougars,Donovan Smith,4690977,0,1,15
 2023,Howard Bison,Quinton Williams,4579549,1,2,3
 2023,Idaho State Bengals,Jordan Cooke,5158746,0,0,0
@@ -3774,7 +3774,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2023,Incarnate Word Cardinals,Zach Calzada,4426847,0,1,15
 2023,Indiana Hoosiers,Brendan Sorsby,4899046,0,0,1
 2023,Indiana State Sycamores,Elijah Owens,5155321,0,0,0
-2023,Iowa Hawkeyes,Deacon Hill,4565552,0,0,1
+2023,Iowa Hawkeyes,Deacon Hill,4565552,0,0,0
 2023,Iowa State Cyclones,Rocco Becht,4801299,0,0,2
 2023,Jackson State Tigers,Jason Brown,4248558,0,0,9
 2023,Jacksonville State Gamecocks,Zion Webb,4249638,1,1,3
@@ -3782,12 +3782,12 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2023,Kansas Jayhawks,Jason Bean,4360900,0,1,33
 2023,Kansas State Wildcats,Will Howard,4429955,1,2,21
 2023,Kennesaw State Owls,Jonathan Murphy,4573878,0,0,1
-2023,Kent State Golden Flashes,Michael Alaimo,4430829,0,0,4
+2023,Kent State Golden Flashes,Michael Alaimo,4430829,0,0,3
 2023,Kentucky Wildcats,Devin Leary,4361653,0,3,30
 2023,LSU Tigers,Jayden Daniels,4426348,1,4,43
 2023,Lafayette Leopards,Dean DeNobile,5083847,0,0,0
 2023,Lamar Cardinals,Robert Coleman,5154910,0,0,0
-2023,Liberty Flames,Kaidon Salter,4432803,0,0,10
+2023,Liberty Flames,Kaidon Salter,4432803,0,0,9
 2023,Long Island University Sharks,Luca Stanzani,4837195,0,0,2
 2023,Louisiana Ragin' Cajuns,Zeon Chriss-Gremillion,4870518,0,0,3
 2023,Louisiana Tech Bulldogs,Hank Bachmeier,4426499,0,3,29
@@ -3795,7 +3795,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2023,Maine Black Bears,Derek Robertson,4696065,0,0,1
 2023,Marshall Thundering Herd,Cam Fancher,4700135,1,1,10
 2023,Maryland Terrapins,Taulia Tagovailoa,4567097,1,3,31
-2023,Massachusetts Minutemen,Taisun Phommachanh,4426430,0,0,12
+2023,Massachusetts Minutemen,Taisun Phommachanh,4426430,0,0,11
 2023,McNeese Cowboys,Nate Glantz,5081856,0,0,0
 2023,Memphis Tigers,Seth Henigan,4606194,1,2,24
 2023,Mercer Bears,Carter Peevy,4692052,0,0,2
@@ -3810,7 +3810,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2023,Missouri State Bears,Jacob Clark,4569535,0,0,1
 2023,Missouri Tigers,Brady Cook,4429435,1,1,17
 2023,Monmouth Hawks,Marquez McCray,4367591,0,0,0
-2023,Morgan State Bears,Duce Taylor,4887689,0,0,1
+2023,Morgan State Bears,TEAM,-6756,0,0,0
 2023,Murray State Racers,DJ Williams,4697094,1,0,1
 2023,NC State Wolfpack,Brennan Armstrong,4370775,0,3,38
 2023,Navy Midshipmen,Tai Lavatai,4686164,1,2,16
@@ -3828,8 +3828,8 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2023,North Dakota Fighting Hawks,Tommy Schuster,4579073,1,2,2
 2023,North Texas Mean Green,Chandler Rogers,4570554,0,1,13
 2023,Northern Arizona Lumberjacks,Kai Millner,4643625,0,0,2
-2023,Northern Colorado Bears,Jacob Sirmon,4361091,1,1,9
-2023,Northern Illinois Huskies,Rocky Lombardi,4241965,1,2,32
+2023,Northern Colorado Bears,Jacob Sirmon,4361091,1,1,8
+2023,Northern Illinois Huskies,Rocky Lombardi,4241965,1,2,31
 2023,Northern Iowa Panthers,Theo Day,4360846,1,1,2
 2023,Northwestern State Demons,Tyler Vander Waal,4240351,0,1,18
 2023,Northwestern Wildcats,Ben Bryant,4360056,0,2,31
@@ -3869,7 +3869,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2023,Southern Miss Golden Eagles,Billy Wiles,4682927,0,0,1
 2023,Southern Utah Thunderbirds,Justin Miller,4571184,1,2,2
 2023,St. Francis (PA) Red Flash,Cole Doyle,5088330,1,1,1
-2023,Stanford Cardinal,Ashton Daniels,4838679,0,0,5
+2023,Stanford Cardinal,Ashton Daniels,4838679,0,0,4
 2023,Stephen F. Austin Lumberjacks,Brian Maurer,4427928,0,0,11
 2023,Stony Brook Seawolves,Casey Case,4566381,0,0,0
 2023,Syracuse Orange,Garrett Shrader,4426966,1,2,31
@@ -3878,12 +3878,12 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2023,Temple Owls,E.J. Warner,4916436,1,1,10
 2023,Tennessee State Tigers,Deveon Bryant,4383604,0,0,1
 2023,Tennessee Tech Golden Eagles,Ethan Roberts,4695009,0,0,0
-2023,Tennessee Volunteers,Joe Milton III,4360698,0,1,26
+2023,Tennessee Volunteers,Joe Milton III,4360698,0,1,25
 2023,Texas A&M Aggies,Max Johnson,4685740,0,2,21
 2023,Texas A&M-Commerce Lions,Peter Parrish,4427244,0,0,1
 2023,Texas Longhorns,Quinn Ewers,4889929,1,1,10
 2023,Texas Southern Tigers,Jace Wilson,4877211,0,0,0
-2023,Texas State Bobcats,TJ Finley,4431948,0,0,18
+2023,Texas State Bobcats,TJ Finley,4431948,0,0,17
 2023,Texas Tech Red Raiders,Behren Morton,4431465,0,0,8
 2023,The Citadel Bulldogs,Graeson Underwood,4691745,0,0,0
 2023,Toledo Rockets,Dequan Finn,4427191,1,2,27
@@ -3897,7 +3897,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2023,UCF Knights,John Rhys Plumlee,4426494,1,1,25
 2023,UCLA Bruins,Dante Moore,4870921,0,0,0
 2023,UConn Huskies,Ta'Quan Roberson,4427313,0,0,5
-2023,UL Monroe Warhawks,Jiya Wright,4895117,0,0,4
+2023,UL Monroe Warhawks,Jiya Wright,4895117,0,0,3
 2023,UNLV Rebels,Jayden Maiava,4685454,0,0,0
 2023,USC Trojans,Caleb Williams,4431611,1,2,24
 2023,UT Martin Skyhawks,Kinkead Dent,4567241,0,0,4
@@ -3906,13 +3906,13 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2023,Utah State Aggies,Cooper Legas,4430033,1,1,11
 2023,Utah Tech Trailblazers,Kobe Tracy,4694576,0,0,0
 2023,Utah Utes,Bryson Barnes,4695600,0,0,5
-2023,VMI Keydets,Collin Shannon,5083941,0,0,1
+2023,VMI Keydets,Collin Shannon,5083941,0,0,0
 2023,Vanderbilt Commodores,AJ Swann,5081405,1,1,8
 2023,Villanova Wildcats,Connor Watkins,4428805,1,1,1
 2023,Virginia Cavaliers,Anthony Colandrea,5044387,0,0,0
 2023,Virginia Tech Hokies,Kyron Drones,4678010,0,0,3
 2023,Wagner Seahawks,Damien Mazil,5100516,0,0,0
-2023,Wake Forest Demon Deacons,Mitch Griffis,4433829,1,0,6
+2023,Wake Forest Demon Deacons,Mitch Griffis,4433829,1,0,5
 2023,Washington Huskies,Michael Penix Jr.,4360423,1,3,32
 2023,Washington State Cougars,Cam Ward,4688380,1,2,13
 2023,Weber State Wildcats,Kylan Weisser,4366190,0,0,1
@@ -3935,10 +3935,10 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2024,App State Mountaineers,Joey Aguilar,5151948,0,1,14
 2024,Arizona State Sun Devils,Sam Leavitt,5078810,0,0,4
 2024,Arizona Wildcats,Noah Fifita,4801717,1,1,15
-2024,Arkansas Razorbacks,Taylen Green,4431325,0,2,23
+2024,Arkansas Razorbacks,Taylen Green,4431325,0,2,22
 2024,Arkansas State Red Wolves,Jaylen Raynor,5080403,1,1,11
 2024,Arkansas-Pine Bluff Golden Lions,Mekhi Hagens,5084305,1,1,1
-2024,Army Black Knights,Bryson Daily,4879928,1,1,13
+2024,Army Black Knights,Bryson Daily,4879928,1,1,12
 2024,Auburn Tigers,Payton Thorne,4430590,1,3,42
 2024,Austin Peay Governors,Austin Smith,4597247,0,1,17
 2024,BYU Cougars,Jake Retzlaff,5150611,0,0,4
@@ -3977,7 +3977,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2024,Eastern Kentucky Colonels,Matt Morrissey,4878834,0,1,1
 2024,Eastern Michigan Eagles,Cole Snyder,4570057,0,2,29
 2024,Eastern Washington Eagles,Kekoa Visperas,4876140,1,1,3
-2024,Elon Phoenix,Matthew Downing,4379400,0,0,13
+2024,Elon Phoenix,Matthew Downing,4379400,0,0,12
 2024,Florida A&M Rattlers,Daniel Richardson,4570259,0,4,37
 2024,Florida Atlantic Owls,Cam Fancher,4700135,0,2,20
 2024,Florida Gators,DJ Lagway,5079555,0,0,0
@@ -3988,7 +3988,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2024,Furman Paladins,Carson Jones,5085848,0,0,1
 2024,Gardner-Webb Runnin' Bulldogs,Tyler Ridell,4577478,0,2,3
 2024,Georgia Bulldogs,Carson Beck,4430841,1,1,23
-2024,Georgia Southern Eagles,JC French IV,4685345,0,0,6
+2024,Georgia Southern Eagles,JC French IV,4685345,0,0,5
 2024,Georgia State Panthers,Christian Veilleux,4432612,0,1,12
 2024,Georgia Tech Yellow Jackets,Haynes King,4428993,1,2,21
 2024,Grambling Tigers,Myles Crawley,4693861,1,2,3
@@ -4010,13 +4010,13 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2024,Kansas Jayhawks,Jalon Daniels,4596472,0,2,25
 2024,Kansas State Wildcats,Avery Johnson,4870857,0,0,7
 2024,Kennesaw State Owls,Davis Bryson,5083103,0,0,0
-2024,Kent State Golden Flashes,Tommy Ulatowski,5082965,0,0,8
-2024,Kentucky Wildcats,Brock Vandagriff,4432782,0,0,9
+2024,Kent State Golden Flashes,Tommy Ulatowski,5082965,0,0,7
+2024,Kentucky Wildcats,Brock Vandagriff,4432782,0,0,8
 2024,LSU Tigers,Garrett Nussmeier,4567747,0,0,17
 2024,Lafayette Leopards,Dean DeNobile,5083847,1,1,1
 2024,Lamar Cardinals,Robert Coleman,5154910,1,1,1
 2024,Lehigh Mountain Hawks,Dante Perri,4696371,0,0,0
-2024,Liberty Flames,Kaidon Salter,4432803,1,1,24
+2024,Liberty Flames,Kaidon Salter,4432803,1,1,23
 2024,Lindenwood Lions,Nate Glantz,5081856,0,1,1
 2024,Long Island University Sharks,Luca Stanzani,4837195,1,1,3
 2024,Louisiana Ragin' Cajuns,Ben Wooldridge,4373895,1,1,17
@@ -4025,7 +4025,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2024,Maine Black Bears,Carter Peevy,4692052,0,1,3
 2024,Marshall Thundering Herd,Braylon Braxton,4600403,0,0,15
 2024,Maryland Terrapins,Billy Edwards Jr.,4592532,0,0,8
-2024,Massachusetts Minutemen,Taisun Phommachanh,4426430,1,1,21
+2024,Massachusetts Minutemen,Taisun Phommachanh,4426430,1,1,20
 2024,McNeese Cowboys,Kamden Sixkiller,5154962,0,0,0
 2024,Memphis Tigers,Seth Henigan,4606194,1,3,37
 2024,Mercer Bears,Whitt Newbauer,5224237,0,0,0
@@ -4054,7 +4054,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2024,Nicholls Colonels,Pat McQuaide,4875733,1,1,2
 2024,Norfolk State Spartans,Jalen Daniels,5227486,0,0,0
 2024,North Alabama Lions,Ari Patu,4592531,0,0,6
-2024,North Carolina A&T Aggies,Kevin White,5164567,0,0,1
+2024,North Carolina A&T Aggies,Kevin White,5164567,0,0,0
 2024,North Carolina Central Eagles,Walker Harris,4696880,1,1,1
 2024,North Carolina Tar Heels,Jacolby Criswell,4429463,0,0,11
 2024,North Dakota Fighting Hawks,Simon Romfo,4879225,0,0,0
@@ -4065,7 +4065,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2024,Northern Illinois Huskies,Ethan Hampton,4618083,0,1,7
 2024,Northern Iowa Panthers,Matthew Schecklman,5085754,0,0,0
 2024,Northwestern State Demons,J.T. Fayard,5156255,0,0,0
-2024,Northwestern Wildcats,Jack Lausch,4911961,0,0,4
+2024,Northwestern Wildcats,Jack Lausch,4911961,0,0,3
 2024,Notre Dame Fighting Irish,Riley Leonard,4683423,0,2,25
 2024,Ohio Bobcats,Parker Navarro,4610131,0,0,6
 2024,Ohio State Buckeyes,Will Howard,4429955,0,3,33
@@ -4103,9 +4103,9 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2024,Southeast Missouri State Redhawks,Paxton DeLaurent,5083757,1,2,2
 2024,Southern Illinois Salukis,Jake Curry,5227786,0,0,0
 2024,Southern Miss Golden Eagles,Tate Rodemaker,4433886,0,0,18
-2024,Southern Utah Thunderbirds,Jackson Berry,4876330,0,0,2
+2024,Southern Utah Thunderbirds,Jackson Berry,4876330,0,0,1
 2024,St. Francis (PA) Red Flash,Adrian Mejia,5088339,0,0,0
-2024,Stanford Cardinal,Ashton Daniels,4838679,1,1,16
+2024,Stanford Cardinal,Ashton Daniels,4838679,1,1,15
 2024,Stephen F. Austin Lumberjacks,Sam Vidlak,4683311,0,0,3
 2024,Stony Brook Seawolves,Malachi Marshall,5226895,0,0,0
 2024,Syracuse Orange,Kyle McCord,4433971,0,1,23
@@ -4120,17 +4120,17 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2024,Texas Southern Tigers,Jordon Davis,5168808,0,0,1
 2024,Texas State Bobcats,Jordan McCloud,4360890,0,3,35
 2024,Texas Tech Red Raiders,Behren Morton,4431465,1,1,18
-2024,The Citadel Bulldogs,Johnathan Bennett,4426687,0,1,27
-2024,Toledo Rockets,Tucker Gleason,4429801,0,0,14
+2024,The Citadel Bulldogs,Johnathan Bennett,4426687,0,1,26
+2024,Toledo Rockets,Tucker Gleason,4429801,0,0,13
 2024,Towson Tigers,Carlos Davis,4731981,0,1,6
 2024,Troy Trojans,Matthew Caldwell,4877717,0,1,3
 2024,Tulane Green Wave,Darian Mensah,5121169,0,0,0
 2024,Tulsa Golden Hurricane,Kirk Francis,5151618,0,0,4
 2024,UAB Blazers,Jalen Kitna,4565187,0,0,2
-2024,UAlbany Great Danes,Myles Burkett,4714009,0,0,2
+2024,UAlbany Great Danes,Myles Burkett,4714009,0,0,1
 2024,UC Davis Aggies,Miles Hastings,4571293,1,2,2
 2024,UCF Knights,Dylan Rizk,4920156,0,0,1
-2024,UCLA Bruins,Ethan Garbers,4429068,1,0,16
+2024,UCLA Bruins,Ethan Garbers,4429068,1,0,15
 2024,UConn Huskies,Joe Fagnano,4429582,1,2,6
 2024,UL Monroe Warhawks,Aidan Armenta,5122054,0,0,0
 2024,UNLV Rebels,Hajj-Malik Williams,4571364,0,5,8
@@ -4139,9 +4139,9 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2024,UTEP Miners,Skyler Locklear,5083042,0,0,0
 2024,UTSA Roadrunners,Owen McCown,4775136,0,0,10
 2024,Utah State Aggies,Spencer Petras,4360480,0,3,35
-2024,Utah Tech Trailblazers,Deacon Hill,4565552,0,1,14
+2024,Utah Tech Trailblazers,Deacon Hill,4565552,0,1,13
 2024,Utah Utes,Isaac Wilson,5079771,0,0,0
-2024,VMI Keydets,Chandler Wilson,5168665,0,0,1
+2024,VMI Keydets,Chandler Wilson,5168665,0,0,0
 2024,Vanderbilt Commodores,Diego Pavia,5084180,0,2,26
 2024,Villanova Wildcats,Connor Watkins,4428805,1,2,2
 2024,Virginia Cavaliers,Anthony Colandrea,5044387,1,1,8
@@ -4159,7 +4159,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2024,William & Mary Tribe,Darius Wilson,4878151,1,3,3
 2024,Wisconsin Badgers,Braedyn Locke,4702829,0,0,5
 2024,Wofford Terriers,Amari Odom,5153782,0,0,0
-2024,Wyoming Cowboys,Evan Svoboda,5082633,0,0,6
+2024,Wyoming Cowboys,Evan Svoboda,5082633,0,0,5
 2024,Youngstown State Penguins,Beau Brungard,5109518,0,0,1
 2025,Abilene Christian Wildcats,Stone Earle,4691272,0,1,15
 2025,Air Force Falcons,Liam Szarka,5238868,0,0,0
@@ -4171,7 +4171,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2025,App State Mountaineers,AJ Swann,5081405,0,2,16
 2025,Arizona State Sun Devils,Sam Leavitt,5078810,1,1,16
 2025,Arizona Wildcats,Noah Fifita,4801717,1,2,27
-2025,Arkansas Razorbacks,Taylen Green,4431325,1,3,36
+2025,Arkansas Razorbacks,Taylen Green,4431325,1,3,35
 2025,Arkansas State Red Wolves,Jaylen Raynor,5080403,1,2,24
 2025,Arkansas-Pine Bluff Golden Lions,Christian Peters,5303362,0,0,0
 2025,Army Black Knights,Cale Hellums,5150297,0,0,0
@@ -4200,7 +4200,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2025,Clemson Tigers,Cade Klubnik,4685413,1,2,35
 2025,Coastal Carolina Chanticleers,Tad Hudson,4870793,0,0,1
 2025,Colgate Raiders,Zach Osborne,5085941,0,0,1
-2025,Colorado Buffaloes,Kaidon Salter,4432803,0,2,35
+2025,Colorado Buffaloes,Kaidon Salter,4432803,0,2,34
 2025,Colorado State Rams,Jackson Brousseau,5054036,0,0,2
 2025,Delaware Blue Hens,Nick Minicucci,5153846,0,0,6
 2025,Delaware State Hornets,Kaiden Bennett,4426688,0,0,3
@@ -4210,7 +4210,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2025,East Tennessee State Buccaneers,Cade McNamara,4427455,0,2,33
 2025,East Texas A&M Lions,Eric Rodriguez,5093929,1,1,2
 2025,Eastern Illinois Panthers,Connor Wolf,5225271,0,0,0
-2025,Eastern Kentucky Colonels,Myles Burkett,4714009,0,1,4
+2025,Eastern Kentucky Colonels,Jordyn Potts,5153754,0,1,2
 2025,Eastern Michigan Eagles,Noah Kim,4690158,0,0,15
 2025,Eastern Washington Eagles,Jake Schakel,5146672,0,0,0
 2025,Elon Phoenix,Landen Clark,5224789,0,0,0
@@ -4224,8 +4224,8 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2025,Furman Paladins,Trey Hedden,5224084,0,0,1
 2025,Gardner-Webb Runnin' Bulldogs,Nate Hampton,4602968,0,0,6
 2025,Georgia Bulldogs,Gunner Stockton,4685578,0,0,8
-2025,Georgia Southern Eagles,JC French IV,4685345,1,1,19
-2025,Georgia State Panthers,TJ Finley,4431948,0,1,34
+2025,Georgia Southern Eagles,JC French IV,4685345,1,1,18
+2025,Georgia State Panthers,TJ Finley,4431948,0,1,33
 2025,Georgia Tech Yellow Jackets,Haynes King,4428993,1,3,32
 2025,Grambling Tigers,C'zavian Teasett,5156292,0,0,0
 2025,Hawai'i Rainbow Warriors,Micah Alejado,5101124,0,0,3
@@ -4276,7 +4276,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2025,Minnesota Golden Gophers,Drake Lindsey,5144959,0,0,2
 2025,Mississippi State Bulldogs,Blake Shapen,4565315,1,2,30
 2025,Missouri State Bears,Jacob Clark,4569535,1,2,14
-2025,Missouri Tigers,Beau Pribula,4685696,0,0,15
+2025,Missouri Tigers,Beau Pribula,4685696,0,0,14
 2025,Monmouth Hawks,Derek Robertson,4696065,1,2,4
 2025,Montana Grizzlies,Keali'i Ah Yat,5153708,1,1,1
 2025,Montana State Bobcats,Justin Lamson,4684502,0,0,14
@@ -4301,7 +4301,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2025,Northern Arizona Lumberjacks,Ty Pennington,5225414,1,1,1
 2025,Northern Colorado Bears,Eric Gibson Jr.,5300801,0,0,0
 2025,Northern Illinois Huskies,Josh Holst,5151506,0,0,7
-2025,Northern Iowa Panthers,Jaxon Dailey,4826635,0,0,5
+2025,Northern Iowa Panthers,Matthew Schecklman,5085754,1,1,4
 2025,Northwestern State Demons,Abram Johnston,5226585,0,0,0
 2025,Northwestern Wildcats,Preston Stone,4432767,0,1,26
 2025,Notre Dame Fighting Irish,CJ Carr,5079369,0,0,0
@@ -4358,7 +4358,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2025,Texas State Bobcats,Brad Jackson,5148803,0,0,2
 2025,Texas Tech Red Raiders,Behren Morton,4431465,1,2,30
 2025,The Citadel Bulldogs,Cobey Thompkins,5230073,0,0,0
-2025,Toledo Rockets,Tucker Gleason,4429801,1,1,26
+2025,Toledo Rockets,Tucker Gleason,4429801,1,1,25
 2025,Towson Tigers,Andrew Indorf,5301657,0,0,0
 2025,Troy Trojans,Tucker Kilcrease,4912119,0,0,4
 2025,Tulane Green Wave,Jake Retzlaff,5150611,0,1,17
@@ -4377,7 +4377,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2025,UTSA Roadrunners,Owen McCown,4775136,1,1,22
 2025,Utah State Aggies,Bryson Barnes,4695600,1,1,22
 2025,Utah Utes,Devon Dampier,5105849,0,1,19
-2025,VMI Keydets,Collin Shannon,5083941,0,1,2
+2025,VMI Keydets,Collin Shannon,5083941,0,1,1
 2025,Vanderbilt Commodores,Diego Pavia,5084180,1,3,39
 2025,Villanova Wildcats,Pat McQuaide,4875733,0,2,5
 2025,Virginia Cavaliers,Chandler Morris,4692530,0,1,27
@@ -4391,7 +4391,7 @@ season,team,qb_name,athlete_id,returning_qb,qb_starter_years,qb_games
 2025,Western Carolina Catamounts,Bennett Judy,5159361,0,0,0
 2025,Western Illinois Leathernecks,Chris Irvin,4880758,0,0,1
 2025,Western Kentucky Hilltoppers,Maverick McIvor,4427966,0,2,4
-2025,Western Michigan Broncos,Broc Lowry,5074245,0,0,5
+2025,Western Michigan Broncos,Broc Lowry,5074245,0,0,4
 2025,William & Mary Tribe,Noah Brannock,5154019,0,0,0
 2025,Wisconsin Badgers,Hunter Simmons,4878912,0,0,1
 2025,Wofford Terriers,Jayden Whitaker,5301990,0,0,0

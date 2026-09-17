@@ -1437,7 +1437,7 @@ season,school_mascot,oc_cont,dc_cont,source
 2014,Virginia Tech Hokies,1,1,imported
 2014,Wake Forest Demon Deacons,0,0,imported
 2014,Washington Huskies,0,0,imported
-2014,Washington State Cougars,1,1,imported
+2014,Washington State Cougars,0,1,imported
 2014,West Virginia Mountaineers,1,0,imported
 2014,Western Kentucky Hilltoppers,0,1,imported
 2014,Western Michigan Broncos,1,1,imported
@@ -1550,7 +1550,7 @@ season,school_mascot,oc_cont,dc_cont,source
 2015,Troy Trojans,1,0,imported
 2015,Tulane Green Wave,1,1,imported
 2015,Tulsa Golden Hurricane,0,0,imported
-2015,UAB Blazers,0,1,imported
+2015,UAB Blazers,0,0,imported
 2015,UCF Knights,0,0,imported
 2015,UCLA Bruins,1,0,imported
 2015,UConn Huskies,0,1,imported
@@ -2611,7 +2611,7 @@ season,school_mascot,oc_cont,dc_cont,source
 2023,Washington Huskies,1,1,imported
 2023,Washington State Cougars,0,0,imported
 2023,West Virginia Mountaineers,0,1,imported
-2023,Western Kentucky Hilltoppers,0,1,imported
+2023,Western Kentucky Hilltoppers,1,1,imported
 2023,Western Michigan Broncos,0,1,imported
 2023,Wisconsin Badgers,0,0,imported
 2023,Wyoming Cowboys,1,1,imported
@@ -2979,7 +2979,7 @@ season,school_mascot,oc_cont,dc_cont,source
 2026,Purdue Boilermakers,1,0,imported
 2026,Rice Owls,1,1,imported
 2026,Rutgers Scarlet Knights,1,0,imported
-2026,SMU Mustangs,0,0,imported
+2026,SMU Mustangs,1,0,imported
 2026,Sacramento State Hornets,0,0,imported
 2026,Sam Houston Bearkats,1,1,imported
 2026,San Diego State Aztecs,1,0,imported

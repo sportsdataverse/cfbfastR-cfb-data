@@ -130,19 +130,29 @@ def resolve_names(
     The rank is the candidate position that matched: 0 means the name's own
     key, larger means it only matched through a shorthand or alias.
     """
-    lookup: dict[str, str] = {}
+    # every school that produces a key, with the candidate rank it produced it
+    # at: "michigan" is Michigan's OWN key (rank 0) but only a shorthand of
+    # Michigan State's, so Michigan must win regardless of the order of schools
+    index: dict[str, list[tuple[int, str]]] = {}
     for school in schools:
-        for c in _candidates(school, aliases=aliases):
-            lookup.setdefault(c, school)
+        for rank, c in enumerate(_candidates(school, aliases=aliases)):
+            index.setdefault(c, []).append((rank, school))
     resolved: dict[str, tuple[str, int]] = {}
     missing: list[str] = []
     for name in sorted(set(names)):
         cands = _candidates(name, aliases=aliases)
-        rank = next((i for i, c in enumerate(cands) if c in lookup), None)
-        if rank is None:
+        hit = next(((i, c) for i, c in enumerate(cands) if c in index), None)
+        if hit is None:
             missing.append(name)
-        else:
-            resolved[name] = (lookup[cands[rank]], rank)
+            continue
+        i, key = hit
+        top = min(r for r, _ in index[key])
+        winners = sorted({school for r, school in index[key] if r == top})
+        if len(winners) > 1:
+            raise ValueError(
+                f"{name!r} is ambiguous: key {key!r} names {winners} at the same rank"
+            )
+        resolved[name] = (winners[0], i)
     return resolved, missing
 
 
@@ -202,10 +212,15 @@ def match_team_names(
     return out, missing
 
 
+#: source placeholders for an unfilled post; a vacancy is not a coordinator, so
+#: two vacant seasons in a row must not read as a retained one
+_VACANT = ("vacant", "tbd", "tba", "none")
+
+
 def _norm_coach(expr: pl.Expr) -> pl.Expr:
-    """Coordinator name normalized for EQUALITY only; blank becomes null."""
+    """Coordinator name normalized for EQUALITY only; blank or a placeholder becomes null."""
     k = expr.str.to_lowercase().str.replace_all(r"[^a-z0-9]", "")
-    return pl.when(expr.is_null() | (k == "")).then(None).otherwise(k)
+    return pl.when(expr.is_null() | (k == "") | k.is_in(_VACANT)).then(None).otherwise(k)
 
 
 def coach_continuity(coordinators: pl.DataFrame) -> pl.DataFrame:
@@ -218,33 +233,36 @@ def coach_continuity(coordinators: pl.DataFrame) -> pl.DataFrame:
     so a model never sees a null continuity. The first season of the source
     table has no predecessor and is dropped.
     """
+    # every name on each side, normalized; a list, so a three-way co-coordinator
+    # staff is compared in full rather than truncated to its first two names
     parts = coordinators.with_columns(
         [
-            _norm_coach(
-                pl.col(f"{side}_coordinators")
-                .str.split("/")
-                .list.get(i, null_on_oob=True)
-            ).alias(f"{abbr}{i + 1}")
+            pl.col(f"{side}_coordinators")
+            .str.split("/")
+            .list.eval(_norm_coach(pl.element()))
+            .list.drop_nulls()
+            .alias(abbr)
             for side, abbr in (("offensive", "oc"), ("defensive", "dc"))
-            for i in (0, 1)
         ]
     ).sort(["school_mascot", "season"])
     lagged = parts.with_columns(
         [
             pl.col(c).shift(1).over("school_mascot").alias(f"lag_{c}")
-            for c in ("oc1", "oc2", "dc1", "dc2", "season")
+            for c in ("oc", "dc", "season")
         ]
     )
     # a school that skipped a season (or joined late) must not have this
     # season's staff compared with one from two years ago
     consecutive = pl.col("lag_season") == pl.col("season") - 1
-    flags = []
-    for abbr in ("oc", "dc"):
-        hit = pl.lit(False)  # noqa: FBT003 - polars literal, not a flag argument
-        for a in (f"{abbr}1", f"{abbr}2"):
-            for b in (f"lag_{abbr}1", f"lag_{abbr}2"):
-                hit = hit | (pl.col(a) == pl.col(b)).fill_null(False)  # noqa: FBT003
-        flags.append((hit & consecutive).cast(pl.Int64).alias(f"{abbr}_cont"))
+    flags = [
+        (
+            (pl.col(abbr).list.set_intersection(pl.col(f"lag_{abbr}")).list.len() > 0).fill_null(False)  # noqa: FBT003
+            & consecutive.fill_null(False)  # noqa: FBT003
+        )
+        .cast(pl.Int64)
+        .alias(f"{abbr}_cont")
+        for abbr in ("oc", "dc")
+    ]
     first = coordinators["season"].min()
     return (
         lagged.with_columns(flags)
@@ -257,13 +275,14 @@ def coach_continuity(coordinators: pl.DataFrame) -> pl.DataFrame:
 def starters_from_pbp(pbp: pl.DataFrame) -> pl.DataFrame:
     """Per (season, team): the season's starting quarterback, from the pbp release.
 
-    The starter is the passer with the most pass plays. The ESPN play-by-play
+    The starter is the passer with the most pass ATTEMPTS (``pass_attempt``, which
+    excludes sacks, as the team summaries count them). The ESPN play-by-play
     release carries ``passer_player_id`` on essentially every pass play from
     2004 -- further back than CFBD ``/player/usage`` (2013), and in the same
     athlete-id namespace the line already uses.
     """
     return (
-        pbp.filter((pl.col("pass") == 1) & pl.col("passer_player_id").is_not_null())
+        pbp.filter((pl.col("pass_attempt") == True) & pl.col("passer_player_id").is_not_null())
         .select(
             pl.col("season").cast(pl.Int64),
             pl.col("pos_team").alias("team"),
@@ -293,7 +312,7 @@ def game_starters(pbp: pl.DataFrame) -> pl.DataFrame:
     game is the closest faithful stand-in.
     """
     return (
-        pbp.filter((pl.col("pass") == 1) & pl.col("passer_player_id").is_not_null())
+        pbp.filter((pl.col("pass_attempt") == True) & pl.col("passer_player_id").is_not_null())
         .select(
             pl.col("season").cast(pl.Int64),
             pl.col("week").cast(pl.Int64),
@@ -339,9 +358,9 @@ def prior_season_starters(starts: pl.DataFrame) -> pl.DataFrame:
 
 
 def qb_game_counts(pbp: pl.DataFrame) -> pl.DataFrame:
-    """Per (season, athlete): distinct games in which the athlete threw a pass."""
+    """Per (season, athlete): distinct games in which the athlete attempted a pass."""
     return (
-        pbp.filter((pl.col("pass") == 1) & pl.col("passer_player_id").is_not_null())
+        pbp.filter((pl.col("pass_attempt") == True) & pl.col("passer_player_id").is_not_null())
         .select(
             pl.col("season").cast(pl.Int64),
             pl.col("game_id"),
@@ -638,14 +657,25 @@ def _load_pbp_columns(season: int) -> pl.DataFrame:
     """Only the columns the QB derivation reads, from the ESPN pbp release."""
     from sportsdataverse.cfb import load_cfb_pbp
 
-    return load_cfb_pbp([season]).select(
-        "season",
-        "game_id",
-        "pos_team",
-        "week",
-        "pass",
-        "passer_player_name",
-        "passer_player_id",
+    # Deduplicated on the ESPN release's own play key. The matchup pipeline's
+    # dedupe_plays keys the cfbfastR release (id_play), which this table must not
+    # read: its athlete ids are not the ESPN ids the line joins on. The ESPN
+    # release measured 0 duplicate (game_id, id) rows in 2004/2014/2023/2025; the
+    # dedup keeps a future duplicate from inflating an attempts leader.
+    return (
+        load_cfb_pbp([season])
+        .select(
+            "season",
+            "game_id",
+            "id",
+            "pos_team",
+            "week",
+            "pass_attempt",
+            "passer_player_name",
+            "passer_player_id",
+        )
+        .unique(subset=["game_id", "id"], keep="first", maintain_order=True)
+        .drop("id")
     )
 
 

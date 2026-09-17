@@ -456,9 +456,13 @@ def main(argv: list[str] | None = None) -> int:
         )
     new = pl.concat(frames, how="vertical")
     if TABLE.exists():
-        # a partial backfill replaces only its own seasons
-        keep = load_table().filter(
-            ~pl.col("season").is_in(new["season"].unique().to_list())
+        # replace at the (season, school_mascot) key, never a whole season: a school
+        # whose article did not resolve this run (a transient MediaWiki miss lands
+        # in `unresolved`, not in `rows`) keeps the row it already has
+        keep = load_table().join(
+            new.select("season", "school_mascot"),
+            on=["season", "school_mascot"],
+            how="anti",
         )
         new = pl.concat([keep, new], how="vertical")
     new.sort(["season", "school_mascot"]).write_csv(TABLE)

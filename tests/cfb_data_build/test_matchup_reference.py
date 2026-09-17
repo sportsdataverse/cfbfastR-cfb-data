@@ -286,6 +286,17 @@ def test_every_imported_table_is_unique_on_its_key() -> None:
         (load_qb_starters(), ["season", "team"]),
     ):
         assert frame.unique(subset=keys).height == frame.height
+        # the exact key cannot see a second spelling that differs only in case or
+        # punctuation ("UMass" / "Umass" in 2026), which match_team_names then
+        # refuses mid-build; compare the contracted key a build resolves on
+        from cfb_data_build.matchup_reference import _contract
+
+        name = keys[1]
+        contracted = frame.with_columns(
+            pl.col(name).map_elements(_contract, return_dtype=pl.Utf8).alias("_key")
+        )
+        clash = contracted.filter(pl.len().over(["season", "_key"]) > 1)
+        assert clash.height == 0, clash.select("season", name).to_dicts()
 
 
 def test_a_partial_qb_refresh_is_refused() -> None:

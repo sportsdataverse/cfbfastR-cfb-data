@@ -5,7 +5,8 @@ game (bowls dropped, CFP kept), 268 columns: the home / away as-of features of
 stage 41 (week 1 from the prior season's full-season values), the prior-season
 ``prev_*`` block, pace, CFBD pregame ELO with the opponent-ELO rolls, consensus
 betting lines, game meta, weather, team / venue meta, talent and the head
-coach with tenure (the source's proprietary side inputs stay null). Reads TWO
+coach with tenure, plus roster talent, returning production, coach
+continuity and the QB block from the versioned reference tables. Reads TWO
 seasons of the ``cfbfastR_cfb_pbp`` release (the prior season feeds ``prev_*``),
 CFBD ``/games`` for both, and CFBD ``/lines``, ``/games/weather``, ``/teams``,
 ``/talent``, ``/coaches`` for the season (needs ``CFBD_API_KEY``).

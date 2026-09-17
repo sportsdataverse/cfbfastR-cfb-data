@@ -1,4 +1,124 @@
 season,coach,school,conference,games,wins,losses,clean_attribution
+2003,Fisher DeBerry,Air Force,Mountain West,12,7,5,true
+2003,Lee Owens,Akron,Mid-American,12,7,5,true
+2003,Mike Shula,Alabama,SEC,13,4,9,true
+2003,John Mackovic,Arizona,Pac-10,5,1,4,true
+2003,Dirk Koetter,Arizona State,Pac-10,12,5,7,true
+2003,Houston Nutt,Arkansas,SEC,13,9,4,true
+2003,Steve Roberts,Arkansas State,Sun Belt,12,5,7,true
+2003,John Mumford,Army,Conference USA,7,0,7,false
+2003,Todd Berry,Army,Conference USA,6,0,6,false
+2003,Tommy Tuberville,Auburn,SEC,13,8,5,true
+2003,Gary Crowton,BYU,Mountain West,12,4,8,true
+2003,Brady Hoke,Ball State,Mid-American,12,4,8,true
+2003,Guy Morriss,Baylor,Big 12,12,3,9,true
+2003,Dan Hawkins,Boise State,Western Athletic,14,13,1,true
+2003,Tom O'Brien,Boston College,Big East,13,8,5,true
+2003,Gregg Brandon,Bowling Green,Mid-American,14,11,3,true
+2003,Jim Hofher,Buffalo,Mid-American,12,1,11,true
+2003,Jeff Tedford,California,Pac-10,14,8,6,true
+2003,Mike DeBord,Central Michigan,Mid-American,12,3,9,true
+2003,Rick Minter,Cincinnati,Conference USA,12,5,7,true
+2003,Tommy Bowden,Clemson,ACC,13,9,4,true
+2003,Gary Barnett,Colorado,Big 12,12,5,7,true
+2003,Sonny Lubick,Colorado State,Mountain West,13,7,6,true
+2003,Carl Franks,Duke,ACC,7,2,5,false
+2003,Ted Roof,Duke,ACC,5,2,3,false
+2003,John Thompson,East Carolina,Conference USA,12,1,11,true
+2003,Jeff Woodruff,Eastern Michigan,Mid-American,12,3,9,true
+2003,Ron Zook,Florida,SEC,13,8,5,true
+2003,Bobby Bowden,Florida State,ACC,13,10,3,true
+2003,Pat Hill,Fresno State,Western Athletic,14,9,5,true
+2003,Mark Richt,Georgia,SEC,14,11,3,true
+2003,Chan Gailey,Georgia Tech,ACC,13,7,6,true
+2003,June Jones,Hawai'i,Western Athletic,14,9,5,true
+2003,Art Briles,Houston,Conference USA,13,7,6,true
+2003,Ron Turner,Illinois,Big Ten,12,1,11,true
+2003,Gerry DiNardo,Indiana,Big Ten,12,2,10,true
+2003,Kirk Ferentz,Iowa,Big Ten,13,10,3,true
+2003,Dan McCarney,Iowa State,Big 12,12,2,10,true
+2003,Mark Mangino,Kansas,Big 12,13,6,7,true
+2003,Bill Snyder,Kansas State,Big 12,15,11,4,true
+2003,Dean Pees,Kent State,Mid-American,12,5,7,true
+2003,Rich Brooks,Kentucky,SEC,12,4,8,true
+2003,Nick Saban,LSU,SEC,14,13,1,true
+2003,Rickey Bustle,Louisiana,Sun Belt,12,4,8,true
+2003,Jack Bicknell,Louisiana Tech,Western Athletic,12,5,7,true
+2003,Bobby Petrino,Louisville,Conference USA,13,9,4,true
+2003,Bob Pruett,Marshall,Mid-American,12,8,4,true
+2003,Ralph Friedgen,Maryland,ACC,13,10,3,true
+2003,Tommy West,Memphis,Conference USA,13,9,4,true
+2003,Larry Coker,Miami,Big East,13,11,2,true
+2003,Terry Hoeppner,Miami (OH),Mid-American,14,13,1,true
+2003,Lloyd Carr,Michigan,Big Ten,13,10,3,true
+2003,John Smith,Michigan State,Big Ten,13,8,5,true
+2003,Andy McCollum,Middle Tennessee,Sun Belt,12,4,8,true
+2003,Glen Mason,Minnesota,Big Ten,13,10,3,true
+2003,Jackie Sherrill,Mississippi State,SEC,12,2,10,true
+2003,Gary Pinkel,Missouri,Big 12,13,8,5,true
+2003,Chuck Amato,NC State,ACC,13,8,5,true
+2003,Paul Johnson,Navy,FBS Independents,13,8,5,true
+2003,Bo Pelini,Nebraska,Big 12,1,1,0,false
+2003,Frank Solich,Nebraska,Big 12,12,9,3,true
+2003,Chris Tormey,Nevada,Western Athletic,12,6,6,true
+2003,Rocky Long,New Mexico,Mountain West,13,8,5,true
+2003,Tony Samuel,New Mexico State,Sun Belt,12,3,9,true
+2003,John Bunting,North Carolina,ACC,12,2,10,true
+2003,Darrell Dickey,North Texas,Sun Belt,13,9,4,true
+2003,Joe Novak,Northern Illinois,Mid-American,12,10,2,true
+2003,Randy Walker,Northwestern,Big Ten,13,6,7,true
+2003,Tyrone Willingham,Notre Dame,FBS Independents,12,5,7,true
+2003,Brian Knorr,Ohio,Mid-American,12,2,10,true
+2003,Jim Tressel,Ohio State,Big Ten,13,11,2,true
+2003,Bob Stoops,Oklahoma,Big 12,14,12,2,true
+2003,Les Miles,Oklahoma State,Big 12,13,9,4,true
+2003,David Cutcliffe,Ole Miss,SEC,13,10,3,true
+2003,Mike Bellotti,Oregon,Pac-10,13,8,5,true
+2003,Mike Riley,Oregon State,Pac-10,13,8,5,true
+2003,Joe Paterno,Penn State,Big Ten,12,3,9,true
+2003,Walt Harris,Pittsburgh,Big East,13,8,5,true
+2003,Joe Tiller,Purdue,Big Ten,13,9,4,true
+2003,Ken Hatfield,Rice,Western Athletic,12,5,7,true
+2003,Greg Schiano,Rutgers,Big East,12,5,7,true
+2003,Phil Bennett,SMU,Western Athletic,12,0,12,true
+2003,Tom Craft,San Diego State,Mountain West,12,6,6,true
+2003,Fitz Hill,San José State,Western Athletic,11,3,8,true
+2003,Lou Holtz,South Carolina,SEC,12,5,7,true
+2003,Jim Leavitt,South Florida,Conference USA,11,7,4,true
+2003,Jeff Bower,Southern Miss,Conference USA,13,9,4,true
+2003,Buddy Teevens,Stanford,Pac-10,11,4,7,true
+2003,Paul Pasqualoni,Syracuse,Big East,12,6,6,true
+2003,Gary Patterson,TCU,Conference USA,13,11,2,true
+2003,Bobby Wallace,Temple,Big East,12,1,11,true
+2003,Phillip Fulmer,Tennessee,SEC,13,10,3,true
+2003,Mack Brown,Texas,Big 12,13,10,3,true
+2003,Dennis Franchione,Texas A&M,Big 12,12,4,8,true
+2003,Mike Leach,Texas Tech,Big 12,13,8,5,true
+2003,Tom Amstutz,Toledo,Mid-American,12,8,4,true
+2003,Larry Blakeney,Troy,FBS Independents,12,6,6,true
+2003,Chris Scelfo,Tulane,Conference USA,12,5,7,true
+2003,Steve Kragthorpe,Tulsa,Western Athletic,13,8,5,true
+2003,Watson Brown,UAB,Conference USA,12,5,7,true
+2003,Alan Gooch,UCF,Mid-American,2,0,2,false
+2003,Mike Kruczek,UCF,Mid-American,10,3,7,true
+2003,Karl Dorrell,UCLA,Pac-10,13,6,7,true
+2003,Randy Edsall,UConn,FBS Independents,12,9,3,true
+2003,Charlie Weatherbie,UL Monroe,Sun Belt,12,1,11,true
+2003,John Robinson,UNLV,Mountain West,12,6,6,true
+2003,Pete Carroll,USC,Pac-10,13,12,1,true
+2003,Gary Nord,UTEP,Western Athletic,13,2,11,true
+2003,Urban Meyer,Utah,Mountain West,12,10,2,true
+2003,Mick Dennehy,Utah State,Sun Belt,12,3,9,true
+2003,Bobby Johnson,Vanderbilt,SEC,12,2,10,true
+2003,Al Groh,Virginia,ACC,13,8,5,true
+2003,Frank Beamer,Virginia Tech,Big East,13,8,5,true
+2003,Jim Grobe,Wake Forest,ACC,12,5,7,true
+2003,Keith Gilbertson,Washington,Pac-10,12,6,6,true
+2003,Bill Doba,Washington State,Pac-10,13,10,3,true
+2003,Rich Rodriguez,West Virginia,Big East,13,8,5,true
+2003,Gary Darnell,Western Michigan,Mid-American,12,5,7,true
+2003,Barry Alvarez,Wisconsin,Big Ten,13,7,6,true
+2003,Joe Glenn,Wyoming,Mountain West,12,4,8,true
 2004,Fisher DeBerry,Air Force,Mountain West,11,5,6,true
 2004,J.D. Brookhart,Akron,Mid-American,11,6,5,true
 2004,Mike Shula,Alabama,SEC,12,6,6,true

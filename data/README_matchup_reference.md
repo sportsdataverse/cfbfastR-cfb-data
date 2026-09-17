@@ -6,9 +6,11 @@ values (see `cfb_data_build.matchup_reference` for what they are and are not).
 ## Rows removed at import, with the evidence
 
 The returning-production source carried four superseded rows: a team-season
-appeared twice, once under a second spelling, with different values. The
-delivered lines settle each one, so the stale row was dropped rather than
-resolved by sort order:
+appeared twice, once under a second spelling, with different values. Each stale
+row was dropped rather than resolved by sort order. The delivered lines settle the
+first three directly; the fourth (2026 UMass) has no delivered line, so it is
+decided by the source's own spelling history and the precedence the first three
+establish -- a weaker basis, recorded as such:
 
 | row dropped | kept | evidence |
 |---|---|---|

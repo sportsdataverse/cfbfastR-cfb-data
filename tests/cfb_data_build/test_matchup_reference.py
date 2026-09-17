@@ -321,17 +321,18 @@ def test_every_imported_table_is_unique_on_its_key() -> None:
         load_roster_talent,
     )
 
-    for frame, keys in (
-        (load_returning_production(), ["season", "team"]),
-        (load_roster_talent(), ["season", "team"]),
-        (load_coordinators(), ["season", "school_mascot"]),
-        (load_qb_starters(), ["season", "team"]),
+    # each table with the alias table the build resolves it with (season_reference):
+    # the QB table's `team` holds mascot-style names and resolves via MASCOT_ALIASES
+    for frame, keys, aliases in (
+        (load_returning_production(), ["season", "team"], TEAM_ALIASES),
+        (load_roster_talent(), ["season", "team"], TEAM_ALIASES),
+        (load_coordinators(), ["season", "school_mascot"], MASCOT_ALIASES),
+        (load_qb_starters(), ["season", "team"], MASCOT_ALIASES),
     ):
         assert frame.unique(subset=keys).height == frame.height
         # the exact key cannot see a second spelling of the same school
         # ("UMass" / "Umass" in 2026, or "Connecticut" / "UConn" through an alias),
         # which match_team_names then refuses mid-build when the values differ
-        aliases = MASCOT_ALIASES if keys[1] == "school_mascot" else TEAM_ALIASES
         clash = _conflicting_spellings(frame, keys[1], aliases)
         assert clash.height == 0, clash.to_dicts()
 
@@ -540,4 +541,13 @@ def test_the_qb_pbp_loader_drops_duplicate_plays(monkeypatch: pytest.MonkeyPatch
     monkeypatch.setattr(sdv_cfb, "load_cfb_pbp", lambda seasons: raw)
     out = mr._load_pbp_columns(2020)
     assert out.height == 2 and "id" not in out.columns
+
+
+def test_the_spelling_guard_uses_mascot_aliases_for_mascot_names() -> None:
+    """The QB table resolves with MASCOT_ALIASES: UMass Minutemen and Massachusetts Minutemen are one school."""
+    clash = pl.DataFrame(
+        {"season": [2026, 2026], "team": ["UMass Minutemen", "Massachusetts Minutemen"], "qb_games": [3, 9]}
+    )
+    assert _conflicting_spellings(clash, "team", MASCOT_ALIASES).height == 1
+    assert _conflicting_spellings(clash, "team", TEAM_ALIASES).height == 0  # why the table's own alias set matters
 

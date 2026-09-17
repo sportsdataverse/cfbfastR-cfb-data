@@ -5,16 +5,19 @@ values (see `cfb_data_build.matchup_reference` for what they are and are not).
 
 ## Rows removed at import, with the evidence
 
-The returning-production source carried three superseded rows: a team-season
-appeared twice, once under a second spelling, with different values. The
-delivered lines settle each one, so the stale row was dropped rather than
-resolved by sort order:
+The returning-production source carried four superseded rows: a team-season
+appeared twice, once under a second spelling, with different values. Each stale
+row was dropped rather than resolved by sort order. The delivered lines settle the
+first three directly; the fourth (2026 UMass) has no delivered line, so it is
+decided by the source's own spelling history and the precedence the first three
+establish -- a weaker basis, recorded as such:
 
 | row dropped | kept | evidence |
 |---|---|---|
 | `2024,Western Kentucky,0.72,0.54` | `0.59,0.64` | both delivered snapshots carry 0.59 / 0.64 for every 2024 Western Kentucky game |
 | `2025,Uconn,0.68,0.46` | `2025,Connecticut,0.68,0.42` | the final delivered line (week 17) carries 0.42; an earlier run (week 3) still carried 0.46, so the `Connecticut` row supersedes the `Uconn` one |
 | `2026,Uconn,0.61,0.55` | `2026,Connecticut,0.25,0.37` | same pair, same precedence |
+| `2026,Umass,0.26,0.33` | `2026,UMass,0.49,0.43` | same precedence: no delivered 2026 line exists, but `UMass` is the source's spelling in every season 2015-2025 and in the delivered 2025 line, and the source's odd-cased duplicate (`Uconn`) is the superseded row wherever a delivered line settles it. `matchup_line` 2026 refused to build on this pair |
 
 `match_team_names` now raises when two spellings of one school carry different
 values, so a future import cannot reintroduce this silently.

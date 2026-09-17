@@ -52,6 +52,8 @@ import pytest
 
 from cfb_data_build.matchup_features import to_display_names
 from cfb_data_build.matchup_reference import (
+    MASCOT_ALIASES,
+    TEAM_ALIASES,
     coach_continuity,
     load_coach_continuity,
     load_qb_starters,
@@ -271,6 +273,46 @@ def test_conflicting_spellings_for_one_school_raise() -> None:
     assert out.height == 1
 
 
+def _conflicting_spellings(frame: pl.DataFrame, name: str, aliases: dict[str, str]) -> pl.DataFrame:
+    """Same-season spellings that resolve to one school key but carry different values.
+
+    The key is the one ``match_team_names`` collapses on without a school list:
+    the contracted name through the alias table. Spellings that agree are allowed,
+    as the build allows them; the state-stripping shorthands are left out because
+    without a school list they would merge Michigan into Michigan State.
+    """
+    from cfb_data_build.matchup_reference import _contract
+
+    def canonical(value: str) -> str:
+        k = _contract(value)
+        return aliases.get(k, k)
+
+    values = [c for c in frame.columns if c not in ("season", name)]
+    keyed = frame.with_columns(pl.col(name).map_elements(canonical, return_dtype=pl.Utf8).alias("_key"))
+    return (
+        keyed.group_by("season", "_key")
+        .agg(pl.col(name).unique().alias("spellings"), pl.struct(values).n_unique().alias("versions"))
+        .filter(pl.col("versions") > 1)
+        .sort("season", "_key")
+    )
+
+
+def test_the_spelling_guard_sees_aliases_and_allows_agreement() -> None:
+    conflict = pl.DataFrame(
+        {"season": [2026, 2026], "team": ["Connecticut", "UConn"], "off_rtprod": [0.25, 0.61]}
+    )
+    assert _conflicting_spellings(conflict, "team", TEAM_ALIASES).height == 1
+    case_only = pl.DataFrame({"season": [2026, 2026], "team": ["UMass", "Umass"], "off_rtprod": [0.49, 0.26]})
+    assert _conflicting_spellings(case_only, "team", TEAM_ALIASES).height == 1
+    agree = conflict.with_columns(pl.lit(0.25).alias("off_rtprod"))
+    assert _conflicting_spellings(agree, "team", TEAM_ALIASES).height == 0
+    # different schools and different seasons are never a clash
+    fine = pl.DataFrame(
+        {"season": [2025, 2026, 2026], "team": ["UMass", "UMass", "Michigan State"], "off_rtprod": [0.1, 0.2, 0.3]}
+    )
+    assert _conflicting_spellings(fine, "team", TEAM_ALIASES).height == 0
+
+
 def test_every_imported_table_is_unique_on_its_key() -> None:
     """A duplicated team-season would raise mid-build; catch it at rest instead."""
     from cfb_data_build.matchup_reference import (
@@ -279,13 +321,20 @@ def test_every_imported_table_is_unique_on_its_key() -> None:
         load_roster_talent,
     )
 
-    for frame, keys in (
-        (load_returning_production(), ["season", "team"]),
-        (load_roster_talent(), ["season", "team"]),
-        (load_coordinators(), ["season", "school_mascot"]),
-        (load_qb_starters(), ["season", "team"]),
+    # each table with the alias table the build resolves it with (season_reference):
+    # the QB table's `team` holds mascot-style names and resolves via MASCOT_ALIASES
+    for frame, keys, aliases in (
+        (load_returning_production(), ["season", "team"], TEAM_ALIASES),
+        (load_roster_talent(), ["season", "team"], TEAM_ALIASES),
+        (load_coordinators(), ["season", "school_mascot"], MASCOT_ALIASES),
+        (load_qb_starters(), ["season", "team"], MASCOT_ALIASES),
     ):
         assert frame.unique(subset=keys).height == frame.height
+        # the exact key cannot see a second spelling of the same school
+        # ("UMass" / "Umass" in 2026, or "Connecticut" / "UConn" through an alias),
+        # which match_team_names then refuses mid-build when the values differ
+        clash = _conflicting_spellings(frame, keys[1], aliases)
+        assert clash.height == 0, clash.to_dicts()
 
 
 def test_a_partial_qb_refresh_is_refused() -> None:
@@ -492,4 +541,13 @@ def test_the_qb_pbp_loader_drops_duplicate_plays(monkeypatch: pytest.MonkeyPatch
     monkeypatch.setattr(sdv_cfb, "load_cfb_pbp", lambda seasons: raw)
     out = mr._load_pbp_columns(2020)
     assert out.height == 2 and "id" not in out.columns
+
+
+def test_the_spelling_guard_uses_mascot_aliases_for_mascot_names() -> None:
+    """The QB table resolves with MASCOT_ALIASES: UMass Minutemen and Massachusetts Minutemen are one school."""
+    clash = pl.DataFrame(
+        {"season": [2026, 2026], "team": ["UMass Minutemen", "Massachusetts Minutemen"], "qb_games": [3, 9]}
+    )
+    assert _conflicting_spellings(clash, "team", MASCOT_ALIASES).height == 1
+    assert _conflicting_spellings(clash, "team", TEAM_ALIASES).height == 0  # why the table's own alias set matters
 

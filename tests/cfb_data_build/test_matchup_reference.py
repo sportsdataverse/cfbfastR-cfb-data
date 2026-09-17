@@ -52,6 +52,8 @@ import pytest
 
 from cfb_data_build.matchup_features import to_display_names
 from cfb_data_build.matchup_reference import (
+    MASCOT_ALIASES,
+    TEAM_ALIASES,
     coach_continuity,
     load_coach_continuity,
     load_qb_starters,
@@ -271,6 +273,46 @@ def test_conflicting_spellings_for_one_school_raise() -> None:
     assert out.height == 1
 
 
+def _conflicting_spellings(frame: pl.DataFrame, name: str, aliases: dict[str, str]) -> pl.DataFrame:
+    """Same-season spellings that resolve to one school key but carry different values.
+
+    The key is the one ``match_team_names`` collapses on without a school list:
+    the contracted name through the alias table. Spellings that agree are allowed,
+    as the build allows them; the state-stripping shorthands are left out because
+    without a school list they would merge Michigan into Michigan State.
+    """
+    from cfb_data_build.matchup_reference import _contract
+
+    def canonical(value: str) -> str:
+        k = _contract(value)
+        return aliases.get(k, k)
+
+    values = [c for c in frame.columns if c not in ("season", name)]
+    keyed = frame.with_columns(pl.col(name).map_elements(canonical, return_dtype=pl.Utf8).alias("_key"))
+    return (
+        keyed.group_by("season", "_key")
+        .agg(pl.col(name).unique().alias("spellings"), pl.struct(values).n_unique().alias("versions"))
+        .filter(pl.col("versions") > 1)
+        .sort("season", "_key")
+    )
+
+
+def test_the_spelling_guard_sees_aliases_and_allows_agreement() -> None:
+    conflict = pl.DataFrame(
+        {"season": [2026, 2026], "team": ["Connecticut", "UConn"], "off_rtprod": [0.25, 0.61]}
+    )
+    assert _conflicting_spellings(conflict, "team", TEAM_ALIASES).height == 1
+    case_only = pl.DataFrame({"season": [2026, 2026], "team": ["UMass", "Umass"], "off_rtprod": [0.49, 0.26]})
+    assert _conflicting_spellings(case_only, "team", TEAM_ALIASES).height == 1
+    agree = conflict.with_columns(pl.lit(0.25).alias("off_rtprod"))
+    assert _conflicting_spellings(agree, "team", TEAM_ALIASES).height == 0
+    # different schools and different seasons are never a clash
+    fine = pl.DataFrame(
+        {"season": [2025, 2026, 2026], "team": ["UMass", "UMass", "Michigan State"], "off_rtprod": [0.1, 0.2, 0.3]}
+    )
+    assert _conflicting_spellings(fine, "team", TEAM_ALIASES).height == 0
+
+
 def test_every_imported_table_is_unique_on_its_key() -> None:
     """A duplicated team-season would raise mid-build; catch it at rest instead."""
     from cfb_data_build.matchup_reference import (
@@ -286,17 +328,12 @@ def test_every_imported_table_is_unique_on_its_key() -> None:
         (load_qb_starters(), ["season", "team"]),
     ):
         assert frame.unique(subset=keys).height == frame.height
-        # the exact key cannot see a second spelling that differs only in case or
-        # punctuation ("UMass" / "Umass" in 2026), which match_team_names then
-        # refuses mid-build; compare the contracted key a build resolves on
-        from cfb_data_build.matchup_reference import _contract
-
-        name = keys[1]
-        contracted = frame.with_columns(
-            pl.col(name).map_elements(_contract, return_dtype=pl.Utf8).alias("_key")
-        )
-        clash = contracted.filter(pl.len().over(["season", "_key"]) > 1)
-        assert clash.height == 0, clash.select("season", name).to_dicts()
+        # the exact key cannot see a second spelling of the same school
+        # ("UMass" / "Umass" in 2026, or "Connecticut" / "UConn" through an alias),
+        # which match_team_names then refuses mid-build when the values differ
+        aliases = MASCOT_ALIASES if keys[1] == "school_mascot" else TEAM_ALIASES
+        clash = _conflicting_spellings(frame, keys[1], aliases)
+        assert clash.height == 0, clash.to_dicts()
 
 
 def test_a_partial_qb_refresh_is_refused() -> None:

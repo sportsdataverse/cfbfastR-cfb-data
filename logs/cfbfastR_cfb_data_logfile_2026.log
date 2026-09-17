@@ -1,3 +1,39 @@
+From https://github.com/sportsdataverse/cfbfastR-cfb-data
+ * [new branch]        AE/update-air-yards-model -> origin/AE/update-air-yards-model
+ * [new branch]        chore/readme-repository-layout -> origin/chore/readme-repository-layout
+ * [new branch]        docs/automation-status -> origin/docs/automation-status
+ * [new branch]        docs/model-registry-out-of-claude -> origin/docs/model-registry-out-of-claude
+ * [new branch]        feat/adv-missing-datasets -> origin/feat/adv-missing-datasets
+ * [new branch]        feat/cfb-era-vars-spread-backfill -> origin/feat/cfb-era-vars-spread-backfill
+ * [new branch]        feat/cfb-model-suite-completion -> origin/feat/cfb-model-suite-completion
+ * [new branch]        feat/cfb-ratings-builder -> origin/feat/cfb-ratings-builder
+ * [new branch]        feat/cfb-ratings-cron  -> origin/feat/cfb-ratings-cron
+ * [new branch]        feat/era-contract-in-model-cards -> origin/feat/era-contract-in-model-cards
+ * [new branch]        feat/rosters-cfbd-enrich -> origin/feat/rosters-cfbd-enrich
+ * [new branch]        fix/bowl-season-cron   -> origin/fix/bowl-season-cron
+ * [new branch]        fix/cfb-recruiting-guard -> origin/fix/cfb-recruiting-guard
+ * [new branch]        fix/cfb-weekly-raw-store -> origin/fix/cfb-weekly-raw-store
+ * [new branch]        fix/preseason-missing-sources -> origin/fix/preseason-missing-sources
+ * [new branch]        fix/preseason-zero-rosters -> origin/fix/preseason-zero-rosters
+ * [new tag]           espn_cfb_adv_defensive -> espn_cfb_adv_defensive
+ * [new tag]           espn_cfb_adv_drives    -> espn_cfb_adv_drives
+ * [new tag]           espn_cfb_adv_passing   -> espn_cfb_adv_passing
+ * [new tag]           espn_cfb_adv_receiving -> espn_cfb_adv_receiving
+ * [new tag]           espn_cfb_adv_rushing   -> espn_cfb_adv_rushing
+ * [new tag]           espn_cfb_adv_situational -> espn_cfb_adv_situational
+ * [new tag]           espn_cfb_adv_team      -> espn_cfb_adv_team
+ * [new tag]           espn_cfb_adv_turnover  -> espn_cfb_adv_turnover
+ * [new tag]           espn_cfb_betting       -> espn_cfb_betting
+ * [new tag]           espn_cfb_drives        -> espn_cfb_drives
+ * [new tag]           espn_cfb_injuries      -> espn_cfb_injuries
+ * [new tag]           espn_cfb_linescores    -> espn_cfb_linescores
+ * [new tag]           espn_cfb_pbp           -> espn_cfb_pbp
+ * [new tag]           espn_cfb_play_participants -> espn_cfb_play_participants
+ * [new tag]           espn_cfb_player_box    -> espn_cfb_player_box
+ * [new tag]           espn_cfb_power_index   -> espn_cfb_power_index
+ * [new tag]           espn_cfb_rosters       -> espn_cfb_rosters
+ * [new tag]           espn_cfb_schedules     -> espn_cfb_schedules
+ * [new tag]           espn_cfb_team_box      -> espn_cfb_team_box
   pos_team: 100.0% of rows resolved to a team name
   def_pos_team: 100.0% of rows resolved to a team name
 pbp 2026: 20118 rows from 948 games
@@ -133,12 +169,10 @@ adv_specialists 2026: 1602 rows from 948 games
 adv_player_usage 2026: 3585 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
 adv_position_group_usage 2026: 630 rows from 948 games
-https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_adv_position_group_usage
   def_pos_team: 100.0% of rows resolved to a team name
 adv_tackles 2026: 6063 rows from 948 games
   def_pos_team: 100.0% of rows resolved to a team name
 adv_position_group_tackles 2026: 590 rows from 948 games
-https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_adv_position_group_tackles
   pos_team: 100.0% of rows resolved to a team name
 adv_team_usage 2026: 355 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
@@ -186,7 +220,7 @@ coach_tendencies 2026: 138 rows from 948 games
   cfb_schedules 2026: 3679 rows, 41 cols, fbs_game=761, fbs_participant=888, unplayed=0
 
 === cfb_schedules: 0 failures ===
-cfb_rosters 2026: 476 rows from 948/948 games | position 100.0% | division 100.0% | cfbd_recruit_ids 98.7% of 29305 cfbd athletes
+cfb_rosters 2026: 13814 rows from 948/948 games | position 100.0% | division 100.0% | cfbd_recruit_ids 94.4% of 29305 cfbd athletes
 
 === cfb_rosters: 0 failures ===
   !! 2026: 5 of 95 games have an implausible mean EPA/play (|mean| > 0.5) -- suspect corrupt end-state yardlines; worst -0.80 in game 401856674
@@ -293,17 +327,12 @@ cfb_rosters 2026: 476 rows from 948/948 games | position 100.0% | division 100.0
   cfb_matchup_features 2026: 1649 rows, 45 cols
 
 === matchup_features: 0 failures ===
-/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/matchup_features.py:507: UserWarning: Comparisons with None always result in null. Consider using `.is_null()` or `.is_not_null()`.
+/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/matchup_features.py:507: UserWarning: Comparisons with None always result in null. Consider using `.is_null()` or `.is_not_null()`.
   prior = secs.filter(pl.col("play_date") < date)["sec_since_prev"]
   cfb_matchup_line 2026: 761 rows, 268 cols
 
 === matchup_line: 0 failures ===
-  cfb_recruits 2026: 4453 rows
-
-=== recruits: 0 failures ===
-  cfb_team_talent 2026: 312 rows
-
-=== team_talent: 0 failures ===
+::warning::no 247 recruits store at /home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-raw/cfb/recruits/json; skipping recruiting datasets
   cfb_returning_production 2026: 236 rows
 
 === returning_production: 0 failures ===

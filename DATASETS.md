@@ -78,7 +78,7 @@ One row per play (one row per enriched ESPN play dict in `g["plays"]`, bound acr
 | type.text | character | ESPN play-type label (e.g. "Rush", "Pass Reception", "Field Goal Good"). |
 | type.abbreviation | character | ESPN play-type abbreviation (sparse/null on many plays). |
 | period.number | integer | Quarter/period number of the play. |
-| clock.displayValue | character | Game clock at play start, MM:SS display string. |
+| clock.displayValue | character | ESPN's clock stamp for this play, MM:SS display string — the end-of-play time in 2005 and 2007+, the snap time in 2004 and most of 2006. |
 | start.down | integer | Down at the start of the play. |
 | start.distance | integer | Yards to go for a first down at play start. |
 | start.yardLine | integer | Yard line (ESPN 0-100 field) at play start. |
@@ -144,13 +144,13 @@ One row per play (one row per enriched ESPN play dict in `g["plays"]`, bound acr
 | gameSpreadAvailable | logical | TRUE if a spread was available for the game. |
 | overUnder | double | Pregame over/under total. |
 | homeTeamSpread | double | Spread expressed from the home team's perspective. |
-| clock.minutes | integer | Minutes component of the game clock at play start. |
-| clock.seconds | integer | Seconds component of the game clock at play start. |
+| clock.minutes | integer | Minutes component of ESPN's clock stamp for this play (see `clock.displayValue` for what the stamp means by era). |
+| clock.seconds | integer | Seconds component of ESPN's clock stamp for this play (see `clock.displayValue` for what the stamp means by era). |
 | half | integer | Half of play (1 or 2; OT continues numbering). |
 | lag_half | integer | Half value of the previous play; null on first play. |
 | lead_half | integer | Half value of the next play. |
-| start.TimeSecsRem | integer | Seconds remaining in the half at play start. |
-| start.adj_TimeSecsRem | integer | Adjusted seconds remaining in game at play start (EPA model input). |
+| start.TimeSecsRem | integer | Seconds remaining in the half from ESPN's clock stamp for this play — the end-of-play time in 2005 and 2007+, the snap time in 2004 and most of 2006; tops out at 1800. |
+| start.adj_TimeSecsRem | integer | `start.TimeSecsRem` adjusted to seconds remaining in the game (EPA model input); same clock stamp, so the same per-era meaning. |
 | orig_play_type | character | Original ESPN play-type label before any mid-pipeline reclassification. |
 | lead_text | character | Description text of the next play. |
 | lead_start_team | character | Possessing team text on the next play. |
@@ -175,8 +175,8 @@ One row per play (one row per enriched ESPN play dict in `g["plays"]`, bound acr
 | end.awayTeamTimeouts | integer | Away timeouts remaining at play end. |
 | start.homeTeamTimeouts | integer | Home timeouts remaining at play start. |
 | start.awayTeamTimeouts | integer | Away timeouts remaining at play start. |
-| end.TimeSecsRem | integer | Seconds remaining in the half at play end. |
-| end.adj_TimeSecsRem | integer | Adjusted seconds remaining in game at play end. |
+| end.TimeSecsRem | integer | Seconds remaining in the half carried as this play's end state; currently the preceding row's clock stamp. |
+| end.adj_TimeSecsRem | integer | `end.TimeSecsRem` adjusted to seconds remaining in the game; same caveat — currently the preceding row's clock stamp. |
 | start.posTeamTimeouts | integer | Offensive team timeouts remaining at play start. |
 | start.defPosTeamTimeouts | integer | Defensive team timeouts remaining at play start. |
 | end.posTeamTimeouts | integer | Offensive team timeouts remaining at play end. |

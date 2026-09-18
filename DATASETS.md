@@ -8,7 +8,7 @@ Expected `col_name | col_type | col_description` for each per-game-compiled **se
 
 | dataset | grain | n_cols | release tag |
 | --- | --- | --- | --- |
-| [play_by_play](#play-by-play) | one row per play | 380 | `espn_cfb_pbp` |
+| [play_by_play](#play-by-play) | one row per play | 383 | `espn_cfb_pbp` |
 | [team_box](#team-box) | one row per team (2 per game) | 21 | `espn_cfb_team_box` |
 | [player_box](#player-box) | one row per player per stat category | 56 | `espn_cfb_player_box` |
 | [adv_team](#adv-team) | one row per team | 77 | `espn_cfb_adv_team` |
@@ -297,6 +297,9 @@ One row per play (one row per enriched ESPN play dict in `g["plays"]`, bound acr
 | yds_kickoff | integer | Kickoff distance in yards; null when not a kickoff. |
 | yds_kickoff_return | integer | Kickoff return yards; null when no return. |
 | yds_punt_return | integer | Punt return yards; null when no return. |
+| yds_punted_source | character | Provenance of `yds_punted`: `text` (stated in the play text, including a flag convention such as a blocked punt's 0), `derived` (filled from field position by the upstream special-teams derivation), or null when there is no value. |
+| yds_kickoff_source | character | Provenance of `yds_kickoff`, same values as `yds_punted_source`. |
+| yds_punt_return_source | character | Provenance of `yds_punt_return`, same values as `yds_punted_source`; `derived` covers a punt whose text states no outcome, or only a returner stepping out of bounds with no yardage. |
 | yds_fumble_return | character | Fumble return yards; null in this fixture (no fumble return). |
 | yds_sacked | integer | Yards lost on a sack; null when not a sack. |
 | sack_players | character | Names of players credited with the sack; null when not a sack. |

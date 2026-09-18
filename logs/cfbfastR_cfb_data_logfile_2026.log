@@ -1,5 +1,4 @@
 From https://github.com/sportsdataverse/cfbfastR-cfb-data
-   365541c9..9189beea  main                   -> origin/main
  * [new branch]        AE/update-air-yards-model -> origin/AE/update-air-yards-model
  * [new branch]        chore/readme-repository-layout -> origin/chore/readme-repository-layout
  * [new branch]        docs/automation-status -> origin/docs/automation-status
@@ -37,80 +36,320 @@ From https://github.com/sportsdataverse/cfbfastR-cfb-data
  * [new tag]           espn_cfb_team_box      -> espn_cfb_team_box
   pos_team: 100.0% of rows resolved to a team name
   def_pos_team: 100.0% of rows resolved to a team name
-pbp 2026: 31620 rows from 948 games
+pbp 2026: 31843 rows from 948 games
 2026: 138 coach-seasons, 138 cleanly attributed
-play_participants 2026: 29506 rows from 948 games
-team_box 2026: 370 rows from 948 games
-player_box 2026: 16958 rows from 948 games
-drives 2026: 4369 rows from 948 games
-game_rosters 2026: 40075 rows from 948 games
-betting 2026: 185 rows from 948 games
-schedules 2026: 185 rows from 948 games
-linescores 2026: 1498 rows from 948 games
-  power_index 2026: 1776 rows, 7 cols
+play_participants 2026: 29669 rows from 948 games
+team_box 2026: 372 rows from 948 games
+player_box 2026: 17042 rows from 948 games
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 371, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 254, in build_season
+    ids = season_game_ids(schedule, [season])
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_ingest/schedule.py", line 18, in season_game_ids
+    return lf.collect().get_column("game_id").cast(pl.Int64).to_list()
+           ^^^^^^^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/.venv/lib/python3.12/site-packages/polars/_utils/deprecation.py", line 97, in wrapper
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/.venv/lib/python3.12/site-packages/polars/lazyframe/opt_flags.py", line 343, in wrapper
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/.venv/lib/python3.12/site-packages/polars/lazyframe/frame.py", line 2630, in collect
+    return wrap_df(ldf.collect(engine, callback))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+polars.exceptions.ComputeError: parquet: File out of specification: Invalid thrift: protocol error
+::warning ::cfb_data_build drives for season 2026 exited with code 1
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 371, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 254, in build_season
+    ids = season_game_ids(schedule, [season])
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_ingest/schedule.py", line 18, in season_game_ids
+    return lf.collect().get_column("game_id").cast(pl.Int64).to_list()
+           ^^^^^^^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/.venv/lib/python3.12/site-packages/polars/_utils/deprecation.py", line 97, in wrapper
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/.venv/lib/python3.12/site-packages/polars/lazyframe/opt_flags.py", line 343, in wrapper
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/.venv/lib/python3.12/site-packages/polars/lazyframe/frame.py", line 2630, in collect
+    return wrap_df(ldf.collect(engine, callback))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+polars.exceptions.ComputeError: parquet: File out of specification: Invalid thrift: transport error
+::warning ::cfb_data_build game_rosters for season 2026 exited with code 1
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 371, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 254, in build_season
+    ids = season_game_ids(schedule, [season])
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_ingest/schedule.py", line 18, in season_game_ids
+    return lf.collect().get_column("game_id").cast(pl.Int64).to_list()
+           ^^^^^^^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/.venv/lib/python3.12/site-packages/polars/_utils/deprecation.py", line 97, in wrapper
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/.venv/lib/python3.12/site-packages/polars/lazyframe/opt_flags.py", line 343, in wrapper
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/.venv/lib/python3.12/site-packages/polars/lazyframe/frame.py", line 2630, in collect
+    return wrap_df(ldf.collect(engine, callback))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+polars.exceptions.ComputeError: parquet: File out of specification: Invalid thrift: transport error
+::warning ::cfb_data_build betting for season 2026 exited with code 1
+schedules 2026: 186 rows from 948 games
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 371, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 254, in build_season
+    ids = season_game_ids(schedule, [season])
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_ingest/schedule.py", line 18, in season_game_ids
+    return lf.collect().get_column("game_id").cast(pl.Int64).to_list()
+           ^^^^^^^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/.venv/lib/python3.12/site-packages/polars/_utils/deprecation.py", line 97, in wrapper
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/.venv/lib/python3.12/site-packages/polars/lazyframe/opt_flags.py", line 343, in wrapper
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/.venv/lib/python3.12/site-packages/polars/lazyframe/frame.py", line 2630, in collect
+    return wrap_df(ldf.collect(engine, callback))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+polars.exceptions.ComputeError: parquet: File out of specification: Invalid thrift: protocol error
+::warning ::cfb_data_build linescores for season 2026 exited with code 1
+  FAILED 2026: ComputeError: parquet: File out of specification: Invalid thrift: protocol error
 
-=== power_index: 0 failures ===
+=== power_index: 1 failures ===
+  2026: ComputeError
+::warning ::cfb_data_build power_index for season 2026 exited with code 1
 injuries 2026: 0 rows from 948 games
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 371, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 282, in build_season
+    df = _resolve_team_names(df, season, schedule)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 85, in _resolve_team_names
+    names = _team_names(schedule, season)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 67, in _team_names
+    names = pl.concat(sides).drop_nulls("team_id").unique(subset=["team_id"]).collect()
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/.venv/lib/python3.12/site-packages/polars/_utils/deprecation.py", line 97, in wrapper
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/.venv/lib/python3.12/site-packages/polars/lazyframe/opt_flags.py", line 343, in wrapper
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/.venv/lib/python3.12/site-packages/polars/lazyframe/frame.py", line 2630, in collect
+    return wrap_df(ldf.collect(engine, callback))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+polars.exceptions.ComputeError: parquet: File out of specification: Invalid thrift: transport error
+::warning ::cfb_data_build adv_team for season 2026 exited with code 1
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 371, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 282, in build_season
+    df = _resolve_team_names(df, season, schedule)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 85, in _resolve_team_names
+    names = _team_names(schedule, season)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 67, in _team_names
+    names = pl.concat(sides).drop_nulls("team_id").unique(subset=["team_id"]).collect()
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/.venv/lib/python3.12/site-packages/polars/_utils/deprecation.py", line 97, in wrapper
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/.venv/lib/python3.12/site-packages/polars/lazyframe/opt_flags.py", line 343, in wrapper
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/.venv/lib/python3.12/site-packages/polars/lazyframe/frame.py", line 2630, in collect
+    return wrap_df(ldf.collect(engine, callback))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+polars.exceptions.ComputeError: parquet: File out of specification: Invalid thrift: protocol error
+::warning ::cfb_data_build adv_passing for season 2026 exited with code 1
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 371, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 282, in build_season
+    df = _resolve_team_names(df, season, schedule)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 85, in _resolve_team_names
+    names = _team_names(schedule, season)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 67, in _team_names
+    names = pl.concat(sides).drop_nulls("team_id").unique(subset=["team_id"]).collect()
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/.venv/lib/python3.12/site-packages/polars/_utils/deprecation.py", line 97, in wrapper
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/.venv/lib/python3.12/site-packages/polars/lazyframe/opt_flags.py", line 343, in wrapper
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/.venv/lib/python3.12/site-packages/polars/lazyframe/frame.py", line 2630, in collect
+    return wrap_df(ldf.collect(engine, callback))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+polars.exceptions.ComputeError: parquet: File out of specification: Invalid thrift: transport error
+::warning ::cfb_data_build adv_rushing for season 2026 exited with code 1
   pos_team: 100.0% of rows resolved to a team name
-adv_team 2026: 370 rows from 948 games
+adv_receiving 2026: 3849 rows from 948 games
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 371, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 254, in build_season
+    ids = season_game_ids(schedule, [season])
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_ingest/schedule.py", line 18, in season_game_ids
+    return lf.collect().get_column("game_id").cast(pl.Int64).to_list()
+           ^^^^^^^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/.venv/lib/python3.12/site-packages/polars/_utils/deprecation.py", line 97, in wrapper
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/.venv/lib/python3.12/site-packages/polars/lazyframe/opt_flags.py", line 343, in wrapper
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/.venv/lib/python3.12/site-packages/polars/lazyframe/frame.py", line 2630, in collect
+    return wrap_df(ldf.collect(engine, callback))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+polars.exceptions.ComputeError: parquet: File out of specification: Invalid thrift: transport error
+::warning ::cfb_data_build adv_defensive for season 2026 exited with code 1
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 371, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 254, in build_season
+    ids = season_game_ids(schedule, [season])
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_ingest/schedule.py", line 18, in season_game_ids
+    return lf.collect().get_column("game_id").cast(pl.Int64).to_list()
+           ^^^^^^^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/.venv/lib/python3.12/site-packages/polars/_utils/deprecation.py", line 97, in wrapper
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/.venv/lib/python3.12/site-packages/polars/lazyframe/opt_flags.py", line 343, in wrapper
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/.venv/lib/python3.12/site-packages/polars/lazyframe/frame.py", line 2630, in collect
+    return wrap_df(ldf.collect(engine, callback))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+polars.exceptions.ComputeError: parquet: File out of specification: Invalid thrift: protocol error
+::warning ::cfb_data_build adv_turnover for season 2026 exited with code 1
   pos_team: 100.0% of rows resolved to a team name
-adv_passing 2026: 698 rows from 948 games
+adv_drives 2026: 372 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
-adv_rushing 2026: 2240 rows from 948 games
-  pos_team: 100.0% of rows resolved to a team name
-adv_receiving 2026: 3821 rows from 948 games
+adv_situational 2026: 372 rows from 948 games
   def_pos_team: 100.0% of rows resolved to a team name
-adv_defensive 2026: 370 rows from 948 games
+adv_defensive_players 2026: 2238 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
-adv_turnover 2026: 370 rows from 948 games
+adv_specialists 2026: 2130 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
-adv_drives 2026: 370 rows from 948 games
+adv_player_usage 2026: 4820 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
-adv_situational 2026: 370 rows from 948 games
+adv_position_group_usage 2026: 1454 rows from 948 games
   def_pos_team: 100.0% of rows resolved to a team name
-adv_defensive_players 2026: 2088 rows from 948 games
-  pos_team: 100.0% of rows resolved to a team name
-adv_specialists 2026: 2111 rows from 948 games
-  pos_team: 100.0% of rows resolved to a team name
-adv_player_usage 2026: 4794 rows from 948 games
-  pos_team: 100.0% of rows resolved to a team name
-adv_position_group_usage 2026: 1446 rows from 948 games
+adv_tackles 2026: 8429 rows from 948 games
   def_pos_team: 100.0% of rows resolved to a team name
-adv_tackles 2026: 8383 rows from 948 games
-  def_pos_team: 100.0% of rows resolved to a team name
-adv_position_group_tackles 2026: 1363 rows from 948 games
+adv_position_group_tackles 2026: 1373 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
-adv_team_usage 2026: 370 rows from 948 games
+adv_team_usage 2026: 372 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
-adv_drive_scripting 2026: 740 rows from 948 games
+adv_drive_scripting 2026: 744 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
-usage_players 2026: 3420 rows from 948 games
+usage_players 2026: 3421 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
 usage_position_groups 2026: 892 rows from 948 games
   def_pos_team: 100.0% of rows resolved to a team name
-usage_tackles 2026: 6355 rows from 948 games
+usage_tackles 2026: 6367 rows from 948 games
   def_pos_team: 100.0% of rows resolved to a team name
-usage_position_group_tackles 2026: 918 rows from 948 games
+usage_position_group_tackles 2026: 920 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
 usage_teams 2026: 218 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
 usage_drive_scripting 2026: 436 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
-adv_st_kickers 2026: 1006 rows from 948 games
+adv_st_kickers 2026: 1011 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
-adv_st_punters 2026: 408 rows from 948 games
+adv_st_punters 2026: 409 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
-adv_st_returners 2026: 558 rows from 948 games
+adv_st_returners 2026: 573 rows from 948 games
   def_pos_team: 100.0% of rows resolved to a team name
 adv_st_blocks 2026: 26 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
-adv_st_team 2026: 370 rows from 948 games
+adv_st_team 2026: 372 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
-usage_st_kickers 2026: 706 rows from 948 games
+usage_st_kickers 2026: 704 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
-usage_st_punters 2026: 264 rows from 948 games
+usage_st_punters 2026: 263 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
-usage_st_returners 2026: 438 rows from 948 games
+usage_st_returners 2026: 447 rows from 948 games
   def_pos_team: 100.0% of rows resolved to a team name
 usage_st_blocks 2026: 26 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
@@ -132,86 +371,86 @@ cfb_rosters 2026: 24008 rows from 948/948 games | position 100.0% | division 100
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 137 rows
 [summaries 2026] passing: 250 rows
-[summaries 2026] rushing: 806 rows
-[summaries 2026] receiving: 1387 rows
+[summaries 2026] rushing: 808 rows
+[summaries 2026] receiving: 1394 rows
   cfb_ratings_weekly 2026: 2007 rows, 16 cols, 15 weekly snapshots
 
 === ratings_weekly: 0 failures ===
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 94 rows
-[summaries 2026] passing: 154 rows
+[summaries 2026] passing: 153 rows
 [summaries 2026] rushing: 514 rows
-[summaries 2026] receiving: 863 rows
+[summaries 2026] receiving: 864 rows
+[summaries 2026] percentiles: 99 rows
+[summaries 2026] team_summaries: 137 rows
+[summaries 2026] passing: 249 rows
+[summaries 2026] rushing: 806 rows
+[summaries 2026] receiving: 1389 rows
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 137 rows
 [summaries 2026] passing: 250 rows
-[summaries 2026] rushing: 806 rows
-[summaries 2026] receiving: 1387 rows
+[summaries 2026] rushing: 808 rows
+[summaries 2026] receiving: 1394 rows
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 137 rows
 [summaries 2026] passing: 250 rows
-[summaries 2026] rushing: 806 rows
-[summaries 2026] receiving: 1387 rows
+[summaries 2026] rushing: 808 rows
+[summaries 2026] receiving: 1394 rows
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 137 rows
 [summaries 2026] passing: 250 rows
-[summaries 2026] rushing: 806 rows
-[summaries 2026] receiving: 1387 rows
+[summaries 2026] rushing: 808 rows
+[summaries 2026] receiving: 1394 rows
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 137 rows
 [summaries 2026] passing: 250 rows
-[summaries 2026] rushing: 806 rows
-[summaries 2026] receiving: 1387 rows
+[summaries 2026] rushing: 808 rows
+[summaries 2026] receiving: 1394 rows
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 137 rows
 [summaries 2026] passing: 250 rows
-[summaries 2026] rushing: 806 rows
-[summaries 2026] receiving: 1387 rows
+[summaries 2026] rushing: 808 rows
+[summaries 2026] receiving: 1394 rows
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 137 rows
 [summaries 2026] passing: 250 rows
-[summaries 2026] rushing: 806 rows
-[summaries 2026] receiving: 1387 rows
+[summaries 2026] rushing: 808 rows
+[summaries 2026] receiving: 1394 rows
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 137 rows
 [summaries 2026] passing: 250 rows
-[summaries 2026] rushing: 806 rows
-[summaries 2026] receiving: 1387 rows
+[summaries 2026] rushing: 808 rows
+[summaries 2026] receiving: 1394 rows
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 137 rows
 [summaries 2026] passing: 250 rows
-[summaries 2026] rushing: 806 rows
-[summaries 2026] receiving: 1387 rows
+[summaries 2026] rushing: 808 rows
+[summaries 2026] receiving: 1394 rows
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 137 rows
 [summaries 2026] passing: 250 rows
-[summaries 2026] rushing: 806 rows
-[summaries 2026] receiving: 1387 rows
+[summaries 2026] rushing: 808 rows
+[summaries 2026] receiving: 1394 rows
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 137 rows
 [summaries 2026] passing: 250 rows
-[summaries 2026] rushing: 806 rows
-[summaries 2026] receiving: 1387 rows
+[summaries 2026] rushing: 808 rows
+[summaries 2026] receiving: 1394 rows
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 137 rows
 [summaries 2026] passing: 250 rows
-[summaries 2026] rushing: 806 rows
-[summaries 2026] receiving: 1387 rows
+[summaries 2026] rushing: 808 rows
+[summaries 2026] receiving: 1394 rows
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 137 rows
 [summaries 2026] passing: 250 rows
-[summaries 2026] rushing: 806 rows
-[summaries 2026] receiving: 1387 rows
+[summaries 2026] rushing: 808 rows
+[summaries 2026] receiving: 1394 rows
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 137 rows
 [summaries 2026] passing: 250 rows
-[summaries 2026] rushing: 806 rows
-[summaries 2026] receiving: 1387 rows
-[summaries 2026] percentiles: 99 rows
-[summaries 2026] team_summaries: 137 rows
-[summaries 2026] passing: 250 rows
-[summaries 2026] rushing: 806 rows
-[summaries 2026] receiving: 1387 rows
+[summaries 2026] rushing: 808 rows
+[summaries 2026] receiving: 1394 rows
   cfb_team_summaries_weekly 2026: 2012 rows, 384 cols, 15 weekly snapshots
 
 === team_summaries_weekly: 0 failures ===

@@ -1,4 +1,5 @@
 From https://github.com/sportsdataverse/cfbfastR-cfb-data
+   272c1d49..f5c227e7  main                   -> origin/main
  * [new branch]        AE/update-air-yards-model -> origin/AE/update-air-yards-model
  * [new branch]        chore/readme-repository-layout -> origin/chore/readme-repository-layout
  * [new branch]        docs/automation-status -> origin/docs/automation-status
@@ -64,36 +65,415 @@ adv_defensive 2026: 372 rows from 948 games
 adv_turnover 2026: 372 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
 adv_drives 2026: 372 rows from 948 games
+HTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID D008:FBEB1:33E1A7:4C63FC:6AAE3DEB and timestamp 2026-09-19 07:46:51 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/334089566/assets?label=&name=timestamp.json)
   pos_team: 100.0% of rows resolved to a team name
 adv_situational 2026: 372 rows from 948 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID D008:FBEB1:33E2F2:4C6606:6AAE3DF1 and timestamp 2026-09-19 07:46:57 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/334089566/assets?label=&name=timestamp.json)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID D008:FBEB1:33E653:4C6AF8:6AAE3DFB and timestamp 2026-09-19 07:47:07 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/334089566/assets?label=&name=timestamp.json)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 409, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 324, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 168, in publish_dataset
+    _stamp(spec.tag, run, repo)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 122, in _stamp
+    upload_release_sidecars(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/.venv/lib/python3.12/site-packages/sportsdataverse/release.py", line 464, in upload_release_sidecars
+    runner(["release", "upload", tag, str(sidecar), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_adv_situational', '/tmp/sdv_sidecars_w8uj1bwg/timestamp.json', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build adv_situational for season 2026 exited with code 1
+HTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID D009:867B9:3127562:A5E1B88:6AAE3E03 and timestamp 2026-09-19 07:47:15 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/574286678)
   def_pos_team: 100.0% of rows resolved to a team name
 adv_defensive_players 2026: 2238 rows from 948 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID D008:1583AE:28C4E9B:88062B8:6AAE3E08 and timestamp 2026-09-19 07:47:20 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/574286678)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID D008:1583AE:28C7276:880DC53:6AAE3E13 and timestamp 2026-09-19 07:47:31 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/574286678)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 409, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 324, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_adv_defensive_players', '../cfb/adv_defensive_players/parquet/adv_defensive_players_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build adv_defensive_players for season 2026 exited with code 1
+HTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID D00C:E8DFB:28E835B:8852EE4:6AAE3E1B and timestamp 2026-09-19 07:47:39 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/574287054)
   pos_team: 100.0% of rows resolved to a team name
 adv_specialists 2026: 2130 rows from 948 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID D009:1230EA:2514073:7C45E7B:6AAE3E20 and timestamp 2026-09-19 07:47:44 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/574287054)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID D008:1583AE:28CBB34:881D5E6:6AAE3E2A and timestamp 2026-09-19 07:47:54 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/574287054)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 409, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 324, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_adv_specialists', '../cfb/adv_specialists/parquet/adv_specialists_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build adv_specialists for season 2026 exited with code 1
+HTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID D009:1230EA:251CEF5:7C63D13:6AAE3E4F and timestamp 2026-09-19 07:48:31 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/574288365)
   pos_team: 100.0% of rows resolved to a team name
 adv_player_usage 2026: 4820 rows from 948 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID D00A:338FF0:249F912:7A79677:6AAE3E55 and timestamp 2026-09-19 07:48:37 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/574288365)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID D009:1230EA:251FB3F:7C6D2ED:6AAE3E5F and timestamp 2026-09-19 07:48:47 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/574288365)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 409, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 324, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_adv_player_usage', '../cfb/adv_player_usage/parquet/adv_player_usage_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build adv_player_usage for season 2026 exited with code 1
+HTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID D00C:E8DFB:28FD7FD:889B83F:6AAE3E83 and timestamp 2026-09-19 07:49:23 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/574289417)
   pos_team: 100.0% of rows resolved to a team name
 adv_position_group_usage 2026: 1454 rows from 948 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID D00A:338FF0:24A86DD:7A97AA2:6AAE3E88 and timestamp 2026-09-19 07:49:28 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/574289417)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID D009:20DE0D:2AB6D9C:91D6D41:6AAE3E93 and timestamp 2026-09-19 07:49:39 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/574289417)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 409, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 324, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_adv_position_group_usage', '../cfb/adv_position_group_usage/parquet/adv_position_group_usage_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build adv_position_group_usage for season 2026 exited with code 1
+HTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID D009:1230EA:252F6C3:7CA331F:6AAE3EB7 and timestamp 2026-09-19 07:50:15 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/574290379)
   def_pos_team: 100.0% of rows resolved to a team name
 adv_tackles 2026: 8429 rows from 948 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID D00A:338FF0:24B22F4:7AB8D19:6AAE3EBC and timestamp 2026-09-19 07:50:20 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/574290379)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID D008:1583AE:28EDB84:88905B3:6AAE3EC7 and timestamp 2026-09-19 07:50:31 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/574290379)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 409, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 324, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_adv_tackles', '../cfb/adv_tackles/parquet/adv_tackles_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build adv_tackles for season 2026 exited with code 1
+HTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID D00C:1B052B:25D523A:7F8860E:6AAE3EEB and timestamp 2026-09-19 07:51:07 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/574291269)
   def_pos_team: 100.0% of rows resolved to a team name
 adv_position_group_tackles 2026: 1373 rows from 948 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID D00A:31033:27AD38A:866FFC2:6AAE3EF0 and timestamp 2026-09-19 07:51:12 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/574291269)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID D009:20DE0D:2ACE6DD:9228AAA:6AAE3EFA and timestamp 2026-09-19 07:51:22 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/574291269)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 409, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 324, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_adv_position_group_tackles', '../cfb/adv_position_group_tackles/parquet/adv_position_group_tackles_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build adv_position_group_tackles for season 2026 exited with code 1
+HTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID D009:20DE0D:2AD6482:9243EC9:6AAE3F1E and timestamp 2026-09-19 07:51:58 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/574292285)
   pos_team: 100.0% of rows resolved to a team name
 adv_team_usage 2026: 372 rows from 948 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID D00A:31033:27B72B0:8692CA3:6AAE3F24 and timestamp 2026-09-19 07:52:04 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/574292285)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID D009:20DE0D:2ADA2BC:9251545:6AAE3F2E and timestamp 2026-09-19 07:52:14 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/574292285)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 409, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 324, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_adv_team_usage', '../cfb/adv_team_usage/parquet/adv_team_usage_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build adv_team_usage for season 2026 exited with code 1
+HTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID D009:867B9:317D1DF:A70AE7C:6AAE3F52 and timestamp 2026-09-19 07:52:50 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/574293341)
   pos_team: 100.0% of rows resolved to a team name
 adv_drive_scripting 2026: 744 rows from 948 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID D009:1230EA:254D974:7D09FAA:6AAE3F57 and timestamp 2026-09-19 07:52:55 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/574293341)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID D008:1583AE:290E6E5:88FE805:6AAE3F62 and timestamp 2026-09-19 07:53:06 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/574293341)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 409, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 324, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_adv_drive_scripting', '../cfb/adv_drive_scripting/parquet/adv_drive_scripting_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build adv_drive_scripting for season 2026 exited with code 1
+HTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID D00C:E8DFB:2934424:8954C1D:6AAE3F86 and timestamp 2026-09-19 07:53:42 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/574294220)
   pos_team: 100.0% of rows resolved to a team name
 usage_players 2026: 3421 rows from 948 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID D009:1230EA:2557950:7D2BDC3:6AAE3F8C and timestamp 2026-09-19 07:53:48 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/574294220)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID D009:1230EA:2559503:7D31D37:6AAE3F96 and timestamp 2026-09-19 07:53:58 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/574294220)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 409, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 324, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_usage_players', '../cfb/usage_players/parquet/usage_players_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build usage_players for season 2026 exited with code 1
+HTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID D00C:E8DFB:293EFC7:89796FC:6AAE3FBA and timestamp 2026-09-19 07:54:34 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/574295124)
   pos_team: 100.0% of rows resolved to a team name
 usage_position_groups 2026: 892 rows from 948 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID D00A:338FF0:24E1A80:7B5A2CE:6AAE3FBF and timestamp 2026-09-19 07:54:39 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/574295124)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID D009:1230EA:2562974:7D516C8:6AAE3FCA and timestamp 2026-09-19 07:54:50 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/574295124)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 409, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 324, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_usage_position_groups', '../cfb/usage_position_groups/parquet/usage_position_groups_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build usage_position_groups for season 2026 exited with code 1
+HTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID D009:1230EA:25696D4:7D6868F:6AAE3FEE and timestamp 2026-09-19 07:55:26 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/574296120)
   def_pos_team: 100.0% of rows resolved to a team name
 usage_tackles 2026: 6367 rows from 948 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID D00A:338FF0:24EB6F1:7B7B4D6:6AAE3FF4 and timestamp 2026-09-19 07:55:32 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/574296120)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID D008:1583AE:293008A:896F747:6AAE3FFE and timestamp 2026-09-19 07:55:42 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/574296120)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 409, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 324, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_usage_tackles', '../cfb/usage_tackles/parquet/usage_tackles_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build usage_tackles for season 2026 exited with code 1
+HTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID D009:1230EA:2572BFC:7D884E4:6AAE4022 and timestamp 2026-09-19 07:56:18 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/574296994)
   def_pos_team: 100.0% of rows resolved to a team name
 usage_position_group_tackles 2026: 920 rows from 948 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID D00B:3D9066:2635BFB:7FE043B:6AAE4027 and timestamp 2026-09-19 07:56:23 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/574296994)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID D009:20DE0D:2B142AB:931A12D:6AAE4031 and timestamp 2026-09-19 07:56:33 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/574296994)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 409, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 324, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_usage_position_group_tackles', '../cfb/usage_position_group_tackles/parquet/usage_position_group_tackles_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build usage_position_group_tackles for season 2026 exited with code 1
+HTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID D00C:1B052B:261C061:807BD71:6AAE4056 and timestamp 2026-09-19 07:57:10 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/574297906)
   pos_team: 100.0% of rows resolved to a team name
 usage_teams 2026: 218 rows from 948 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID D00A:31033:27F3E8F:8762C30:6AAE405B and timestamp 2026-09-19 07:57:15 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/574297906)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID D009:20DE0D:2B1F7E1:934142D:6AAE4065 and timestamp 2026-09-19 07:57:25 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/574297906)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 409, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 324, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_usage_teams', '../cfb/usage_teams/parquet/usage_teams_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build usage_teams for season 2026 exited with code 1
+HTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID D00C:1B052B:2626403:809F0A7:6AAE4089 and timestamp 2026-09-19 07:58:01 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/574298917)
   pos_team: 100.0% of rows resolved to a team name
 usage_drive_scripting 2026: 436 rows from 948 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID D00A:31033:27FE765:8787026:6AAE408E and timestamp 2026-09-19 07:58:06 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/574298917)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID D009:1230EA:2588890:7DD238E:6AAE4098 and timestamp 2026-09-19 07:58:16 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/574298917)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 409, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 324, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_usage_drive_scripting', '../cfb/usage_drive_scripting/parquet/usage_drive_scripting_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build usage_drive_scripting for season 2026 exited with code 1
   pos_team: 100.0% of rows resolved to a team name
 adv_st_kickers 2026: 1011 rows from 948 games
   pos_team: 100.0% of rows resolved to a team name
@@ -122,7 +502,6 @@ coach_tendencies 2026: 138 rows from 948 games
   adv_team_gamelog 2026: 372 rows, 90 cols
 
 === gamelog: 0 failures ===
-https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_qa
 qa 2026: 186 rows from 948 games
   cfb_schedules 2026: 3679 rows, 41 cols, fbs_game=761, fbs_participant=888, unplayed=0
 
@@ -228,5 +607,4 @@ cfb_rosters 2026: 24008 rows from 948/948 games | position 100.0% | division 100
   cfb_returning_production 2026: 236 rows
 
 === returning_production: 0 failures ===
-push rejected (attempt 1); syncing with origin
-pushed: CFB Data Updated (Start: 2026 End: 2026) (attempt 2)
+pushed: CFB Data Updated (Start: 2026 End: 2026) (attempt 1)

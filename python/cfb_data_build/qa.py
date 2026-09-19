@@ -43,10 +43,13 @@ SOURCE = "espn"
 #: entry as the open rules (``score.delta_value``, ``score.monotone``,
 #: ``timeouts.*``, ``ep.*_range``, ...) close.
 #:
-#: Measured here on 20 real 2026 finals from ``cfbfastR-cfb-raw``: 0/20
-#: error-free, dominated by ``timeouts.second_half_reset`` (20/20). Those
-#: finals were enriched at the raw repo's own sdv-py pin, which is older than
-#: the gate's -- the asset makes that lag visible, which is the point.
+#: **Re-seeded from the full 2026 season, and it holds at 0.53.** The published
+#: ``espn_cfb_qa_2026_summary.json`` (``0.1.4+c9215199.7``) reads 89/189 games
+#: error-free -- ``error_share`` 0.5291, ``threshold_exceeded`` false, with
+#: 0.0009 of headroom. The note that stood here measured 20 pre-R2 finals and
+#: read 0/20 dominated by ``timeouts.second_half_reset``; that sample does not
+#: reproduce (the rule fires on 2 games of the whole season) and is withdrawn.
+#: Ledger 2026-09-17 04:45 EDT, "V2 CFB side done".
 MAX_ERROR_SHARE = 0.53
 
 #: Report-only. The build logs the summary and publishes the asset; it never

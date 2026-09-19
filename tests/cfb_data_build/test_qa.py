@@ -14,6 +14,7 @@ import polars as pl
 
 from cfb_data_build import qa
 from cfb_data_build.build import build_dataset_frame, qa_sidecar
+from cfb_data_build.reshape import bind_games
 from cfb_data_build.config import REGISTRY
 
 FIX = Path(__file__).parent / "fixtures"
@@ -68,6 +69,24 @@ def test_season_summary_and_sidecar(tmp_path):
     for rule in filter(None, df.row(0, named=True)["failed_rule_ids"].split(",")):
         assert s["counts_by_rule"][rule] == 1
 
+
+
+def test_sidecar_survives_a_preseason_season_with_no_finished_games(tmp_path):
+    """0 games binds to a frame with no columns at all -- not an empty schema.
+
+    ``build_season`` hands ``qa_sidecar`` whatever ``bind_games`` returned, and
+    for a season no game has finished yet that is ``pl.DataFrame()``. Reading
+    ``processing_version`` off it used to raise ``ColumnNotFoundError`` and
+    abort the build; the sidecar is report-only, so it writes the empty summary.
+    """
+    empty = bind_games([])
+    assert empty.height == 0 and empty.columns == []
+    s = json.loads(qa_sidecar(empty, 2027, base=tmp_path).read_text())
+    assert s["games"] == 0 and s["games_error_free"] == 0
+    assert s["error_free_share"] is None and s["error_share"] is None
+    assert s["threshold_exceeded"] is None and s["blocking"] is False
+    assert s["counts_by_rule"] == {} and s["drift"] == []
+    assert s["processing_version"] == "unknown"
 
 def test_drift_gate_reports_schema_null_constant_and_mean_shift():
     new = build_dataset_frame(REGISTRY["pbp"], _game())

@@ -1,5 +1,4 @@
 From https://github.com/sportsdataverse/cfbfastR-cfb-data
-   6c75f787..cdce5bb6  main                   -> origin/main
  * [new branch]        AE/update-air-yards-model -> origin/AE/update-air-yards-model
  * [new branch]        chore/readme-repository-layout -> origin/chore/readme-repository-layout
  * [new branch]        docs/automation-status -> origin/docs/automation-status
@@ -123,6 +122,8 @@ coach_tendencies 2026: 138 rows from 948 games
   adv_team_gamelog 2026: 372 rows, 90 cols
 
 === gamelog: 0 failures ===
+https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/espn_cfb_qa
+qa 2026: 186 rows from 948 games
   cfb_schedules 2026: 3679 rows, 41 cols, fbs_game=761, fbs_participant=888, unplayed=0
 
 === cfb_schedules: 0 failures ===
@@ -227,4 +228,5 @@ cfb_rosters 2026: 24008 rows from 948/948 games | position 100.0% | division 100
   cfb_returning_production 2026: 236 rows
 
 === returning_production: 0 failures ===
-pushed: CFB Data Updated (Start: 2026 End: 2026) (attempt 1)
+push rejected (attempt 1); syncing with origin
+pushed: CFB Data Updated (Start: 2026 End: 2026) (attempt 2)

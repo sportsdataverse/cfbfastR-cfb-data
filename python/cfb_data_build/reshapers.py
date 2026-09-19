@@ -81,6 +81,20 @@ def _chr(v: Any) -> str | None:
 
 
 # --- team_box (R/espn_cfb_02) --------------------------------------------------
+def reshape_qa(game: dict[str, Any]) -> pl.DataFrame:
+    """One row: the game's report-only validation verdict (see :mod:`cfb_data_build.qa`).
+
+    The plays are already enriched -- ``cfbfastR-cfb-raw`` runs
+    ``CFBPlayProcess`` -- so the gate judges exactly what ``espn_cfb_pbp``
+    publishes, and the row records the final's own ``processing_version``.
+    """
+    from cfb_data_build.qa import QA_SCHEMA, game_qa_row
+
+    row = game_qa_row(game, processing_version=game.get("processing_version") or "unknown")
+    df = pl.DataFrame([{k: row.get(k) for k in QA_SCHEMA}], schema=QA_SCHEMA)
+    return stamp_identity(df, game, week=True)
+
+
 def reshape_team_box(game: dict[str, Any]) -> pl.DataFrame:
     """Pivot ``g$boxscore$teams[].statistics`` (name -> displayValue) per team."""
     teams = _dig(game, "boxscore", "teams")
@@ -334,6 +348,7 @@ def reshape_rosters(game: dict[str, Any]) -> pl.DataFrame:
 
 RESHAPERS: dict[str, Callable[[dict[str, Any]], pl.DataFrame]] = {
     "pbp": build_pbp_frame,
+    "qa": reshape_qa,
     "team_box": reshape_team_box,
     "player_box": reshape_player_box,
     "drives": reshape_drives,

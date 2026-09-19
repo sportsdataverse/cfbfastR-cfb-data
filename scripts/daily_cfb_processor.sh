@@ -32,9 +32,9 @@ PY_REST="play_participants team_box player_box drives game_rosters betting sched
 # matters: gamelog <- adv_team.
 PY_DERIVED="gamelog"
 # Report-only data-integrity gate (V2). Runs after pbp so its drift gate can
-# read the season parquet this run just wrote. NO --publish: the first
-# espn_cfb_qa publish is its own deliberate step, not something a cron run
-# creates a tag for. Add --publish there.
+# read the season parquet this run just wrote. Published since the deliberate
+# first espn_cfb_qa_2026 release; still report-only -- qa.BLOCKING is False, so
+# the tag records the verdict and never fails the build.
 PY_QA="qa"
 # The UNIFIED schedule published to the `cfb_schedules` tag (what sdv-py
 # `load_cfb_schedule` reads): the CFBD all-division superset UNIONed with the
@@ -138,7 +138,7 @@ for i in $(seq "${START_YEAR}" "${END_YEAR}"); do
     }
     for ds in $PY_REST; do run_py "$ds" --no-fetch --publish; done
     for ds in $PY_DERIVED; do run_py "$ds" --no-fetch --publish; done
-    for ds in $PY_QA; do run_py "$ds" --no-fetch; done
+    for ds in $PY_QA; do run_py "$ds" --no-fetch --publish; done
     for ds in $PY_UNIFIED_SCHEDULES; do run_py "$ds" --publish; done
     for ds in $PY_ROSTERS; do run_py "$ds" --publish; done
 

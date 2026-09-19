@@ -133,6 +133,8 @@ REGISTRY: dict[str, DatasetSpec] = {
     ),
     # --- bespoke per-game reshapers --------------------------------------
     "pbp": DatasetSpec("pbp", "play_by_play", "espn_cfb_pbp", reshaper="pbp"),
+    # report-only data-integrity gate (V2); one row per validated game
+    "qa": DatasetSpec("qa", "espn_cfb_qa", "espn_cfb_qa", reshaper="qa"),
     "team_box": DatasetSpec(
         "team_box", "team_box", "espn_cfb_team_box", reshaper="team_box"
     ),
@@ -393,6 +395,7 @@ PKG_FUNCTION: dict[str, str] = {
     "espn_cfb_game_rosters": "sportsdataverse.cfb.load_cfb_game_rosters()",
     "espn_cfb_linescores": "sportsdataverse.cfb.load_cfb_linescores()",
     "espn_cfb_pbp": "cfbfastR::load_cfb_pbp()",
+    "espn_cfb_qa": "python/espn_cfb_99_qa_creation.py",
     "espn_cfb_play_participants": "sportsdataverse.cfb.load_cfb_play_participants()",
     "espn_cfb_player_box": "sportsdataverse.cfb.load_cfb_player_box()",
     "espn_cfb_power_index": "sportsdataverse.cfb.load_cfb_power_index()",

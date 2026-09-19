@@ -9,6 +9,7 @@ Expected `col_name | col_type | col_description` for each per-game-compiled **se
 | dataset | grain | n_cols | release tag |
 | --- | --- | --- | --- |
 | [play_by_play](#play-by-play) | one row per play | 383 | `espn_cfb_pbp` |
+| [qa](#qa) | one row per validated game | 13 | `espn_cfb_qa` |
 | [team_box](#team-box) | one row per team (2 per game) | 21 | `espn_cfb_team_box` |
 | [player_box](#player-box) | one row per player per stat category | 56 | `espn_cfb_player_box` |
 | [adv_team](#adv-team) | one row per team | 77 | `espn_cfb_adv_team` |
@@ -447,6 +448,36 @@ One row per play (one row per enriched ESPN play dict in `g["plays"]`, bound acr
 _Release tag: `espn_cfb_pbp`_
 
 ---
+
+### qa
+
+Report-only data-integrity gate (V2). One row per game: the verdict of
+`sportsdataverse.validation.validate_game()` over the game's enriched plays, against the
+packaged invariant rule table. It judges the other datasets rather than describing a
+section of `final.json`, and **nothing in the build fails on it** — `blocking` is `false`
+in this revision, and the threshold is a ratchet target, not a gate.
+
+Each season's asset ships with a `espn_cfb_qa_{season}_summary.json` sidecar carrying the
+season aggregate (`games`, `games_error_free`, `error_free_share`, `max_error_share`,
+`threshold_exceeded`, `blocking`, `counts_by_rule`) and the pre-publish **drift** findings:
+`schema_contract`, `null_rate`, `constant_column` and `rate_anomaly` computed against the
+previously published `espn_cfb_pbp` season asset.
+
+| col_name | col_type | col_description |
+| --- | --- | --- |
+| game_id | integer | ESPN game id. |
+| league | character | Always `cfb`. |
+| source | character | Source the plays were processed from (`espn`). |
+| season | integer | Season (starting year). |
+| processing_version | character | The `processing_version` stamped on the `final.json` the row judged. |
+| n_rows | integer | Plays validated. |
+| ok | logical | `TRUE` when no rule fired at `error` severity. |
+| n_errors | integer | Rules that fired at `error` severity. |
+| n_warnings | integer | Rules that fired at `warn` severity. |
+| failed_rule_ids | character | Comma-joined `error` rule ids (flat string so parquet/csv/rds share one schema). |
+| warned_rule_ids | character | Comma-joined `warn` rule ids. |
+| built_at | character | UTC timestamp the row was produced. |
+| week | integer | Week, stamped like every other per-game dataset. |
 
 ### team_box
 

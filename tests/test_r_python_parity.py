@@ -95,6 +95,13 @@ KNOWN_UNPAIRED: dict[str, str] = {
 # scripting; shims 30-35 per game, 40-45 season leaderboards) is Python-only
 # for now: the metrics live in sdv-py's shared football layer and the R twin
 # stages are a tracked follow-up (port usage_box to R, then pair them here).
+KNOWN_UNPAIRED["qa"] = (
+    "Python-only report-only validation gate (V2): "
+    "sportsdataverse.validation.validate_game per game + the pre-publish drift "
+    "gate. It judges the datasets rather than being one of them, and the rules "
+    "ship in the Python wheel; an R twin would need the rule table ported."
+)
+
 KNOWN_UNPAIRED.update(
     {
         key: (
@@ -128,6 +135,13 @@ KNOWN_UNPAIRED.update(
         )
     }
 )
+KNOWN_UNPAIRED["qa"] = (
+    "Python-only report-only validation gate (V2): "
+    "sportsdataverse.validation.validate_game per game + the pre-publish drift "
+    "gate. It judges the datasets rather than being one of them, and the rules "
+    "ship in the Python wheel; an R twin would need the rule table ported."
+)
+
 KNOWN_UNPAIRED.update(
     {
         key: (

@@ -223,6 +223,40 @@ def _union_release_ids(
     return list(ids) + have
 
 
+def qa_sidecar(
+    qa_df: pl.DataFrame, season: int, *, base: str | Path = "cfb"
+) -> "Path":
+    """Write the season's QA ``_summary.json``: the aggregate + the drift gate.
+
+    Report-only, and best-effort about its inputs: with no season pbp parquet
+    on disk or no previous release to compare against, the drift list is simply
+    empty. Nothing here can fail a build.
+    """
+    from cfb_data_build import qa as _qa
+    from cfb_data_build.io import dataset_stem
+
+    pbp = REGISTRY["pbp"]
+    pbp_path = (
+        Path(base) / pbp.dataset / "parquet" / f"{dataset_stem(pbp.stem, season)}.parquet"
+    )
+    drift: list[dict[str, Any]] = []
+    if pbp_path.exists():
+        drift = _qa.drift_findings(
+            pl.read_parquet(pbp_path),
+            _qa.published_frame(_qa.published_url(pbp.tag, pbp.stem, season)),
+        )
+    version = (
+        qa_df.get_column("processing_version").drop_nulls().to_list()[:1] or ["unknown"]
+    )[0]
+    summary = _qa.season_summary(qa_df, season, processing_version=version, drift=drift)
+    _qa.log_summary(summary)
+    spec = REGISTRY["qa"]
+    out = (
+        Path(base) / spec.dataset / "parquet" / f"{dataset_stem(spec.stem, season)}.parquet"
+    )
+    return _qa.write_summary(summary, _qa.summary_path(out))
+
+
 def build_season(
     spec: DatasetSpec,
     season: int,
@@ -282,6 +316,8 @@ def build_season(
     df = _resolve_team_names(df, season, schedule)
     print(f"{spec.dataset} {season}: {df.height} rows from {len(ids)} games")
     write_dataset(df, spec.dataset, season, spec.stem, base=base)
+    if spec.dataset == "qa":
+        qa_sidecar(df, season, base=base)
     if publish and df.height > 0:
         from cfb_data_build.publish import publish_dataset
 
@@ -331,6 +367,8 @@ def build_rosters_season(
         f"rosters {season}: {df.height} athlete-team rows (from {gr.height} game-roster rows)"
     )
     write_dataset(df, spec.dataset, season, spec.stem, base=base)
+    if spec.dataset == "qa":
+        qa_sidecar(df, season, base=base)
     if publish and df.height > 0:
         from cfb_data_build.publish import publish_dataset
 

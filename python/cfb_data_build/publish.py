@@ -42,6 +42,9 @@ def _dataset_files(
         root / "rds" / f"{name}.rds",
         root / "csv" / f"{name}.csv",
         root / "csv" / f"{name}.csv.gz",
+        # the QA season summary (error-free share + drift findings) is part of
+        # the espn_cfb_qa asset, not a build artefact
+        root / "parquet" / f"{name}_summary.json",
     ]
     return [f for f in candidates if f.exists()]
 

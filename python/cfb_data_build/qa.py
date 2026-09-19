@@ -43,10 +43,13 @@ SOURCE = "espn"
 #: entry as the open rules (``score.delta_value``, ``score.monotone``,
 #: ``timeouts.*``, ``ep.*_range``, ...) close.
 #:
-#: Measured here on 20 real 2026 finals from ``cfbfastR-cfb-raw``: 0/20
-#: error-free, dominated by ``timeouts.second_half_reset`` (20/20). Those
-#: finals were enriched at the raw repo's own sdv-py pin, which is older than
-#: the gate's -- the asset makes that lag visible, which is the point.
+#: **Re-seeded from the full 2026 season, and it holds at 0.53.** The published
+#: ``espn_cfb_qa_2026_summary.json`` (``0.1.4+c9215199.7``) reads 89/189 games
+#: error-free -- ``error_share`` 0.5291, ``threshold_exceeded`` false, with
+#: 0.0009 of headroom. The note that stood here measured 20 pre-R2 finals and
+#: read 0/20 dominated by ``timeouts.second_half_reset``; that sample does not
+#: reproduce (the rule fires on 2 games of the whole season) and is withdrawn.
+#: Ledger 2026-09-17 04:45 EDT, "V2 CFB side done".
 MAX_ERROR_SHARE = 0.53
 
 #: Report-only. The build logs the summary and publishes the asset; it never
@@ -74,16 +77,6 @@ QA_SCHEMA: dict[str, pl.DataType] = {
 
 def _utc_now() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
-
-
-#: Drift tolerances, mirroring ``sportsdataverse/validation/thresholds.yaml``
-#: (``default.null_rate_warn`` / ``default.mean_shift_warn``). Constants rather
-#: than a read of the packaged file: the sdv-py wheel ships that YAML but not a
-#: YAML parser (``pyyaml`` is a dev-only dependency upstream), so reading it
-#: would apply in the repos that happen to have ``yaml`` installed and silently
-#: not in the others. Follow-up: have sdv-py expose these as constants.
-NULL_RATE_WARN = 0.50
-MEAN_SHIFT_WARN = 0.10
 
 
 def qa_row(
@@ -141,6 +134,11 @@ def drift_findings(new: pl.DataFrame, prev: pl.DataFrame | None) -> list[dict[st
     """
     if prev is None or new.height == 0:
         return []
+    # The tolerances are sdv-py's packaged ``validation/thresholds.yaml``, read
+    # through the constants #555 added so a caller needs no YAML parser. The
+    # import is deferred, as every other sportsdataverse import in this module is.
+    from sportsdataverse.validation.thresholds import MEAN_SHIFT_WARN, NULL_RATE_WARN
+
     null_warn, shift_warn = NULL_RATE_WARN, MEAN_SHIFT_WARN
     out: list[dict[str, Any]] = []
     new_s = {c: str(t) for c, t in new.schema.items()}

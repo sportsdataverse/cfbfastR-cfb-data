@@ -230,7 +230,10 @@ def qa_sidecar(
 
     Report-only, and best-effort about its inputs: with no season pbp parquet
     on disk or no previous release to compare against, the drift list is simply
-    empty. Nothing here can fail a build.
+    empty. A 0-row ``qa_df`` -- a preseason build, where no game has finished --
+    carries no columns at all, so the stamp is read defensively and the summary
+    is the empty one (``games`` 0, the shares ``null``, ``counts_by_rule`` {}).
+    Nothing here can fail a build.
     """
     from cfb_data_build import qa as _qa
     from cfb_data_build.io import dataset_stem
@@ -245,9 +248,12 @@ def qa_sidecar(
             pl.read_parquet(pbp_path),
             _qa.published_frame(_qa.published_url(pbp.tag, pbp.stem, season)),
         )
-    version = (
-        qa_df.get_column("processing_version").drop_nulls().to_list()[:1] or ["unknown"]
-    )[0]
+    stamps = (
+        qa_df.get_column("processing_version").drop_nulls().to_list()
+        if "processing_version" in qa_df.columns
+        else []
+    )
+    version = stamps[0] if stamps else "unknown"
     summary = _qa.season_summary(qa_df, season, processing_version=version, drift=drift)
     _qa.log_summary(summary)
     spec = REGISTRY["qa"]

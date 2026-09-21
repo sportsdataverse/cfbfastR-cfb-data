@@ -1,5 +1,4 @@
 From https://github.com/sportsdataverse/cfbfastR-cfb-data
-   eebc1fec..5ce010aa  main                   -> origin/main
  * [new branch]        AE/update-air-yards-model -> origin/AE/update-air-yards-model
  * [new branch]        chore/readme-repository-layout -> origin/chore/readme-repository-layout
  * [new branch]        docs/automation-status -> origin/docs/automation-status
@@ -47,7 +46,32 @@ game_rosters 2026: 56648 rows from 948 games
 betting 2026: 260 rows from 948 games
 schedules 2026: 260 rows from 948 games
 linescores 2026: 2100 rows from 948 games
-  power_index 2026: 1776 rows, 7 cols
+  power_index 401858428: HTTPError
+  power_index 401856665: HTTPError
+  power_index 401864496: HTTPError
+  power_index 401856659: ref fetch failed (HTTPError)
+  power_index 401862696: ref fetch failed (HTTPError)
+  power_index 401856635: HTTPError
+  power_index 401867973: ref fetch failed (HTTPError)
+  power_index 401862699: ref fetch failed (HTTPError)
+  power_index 401856678: ref fetch failed (HTTPError)
+  power_index 401858222: ref fetch failed (HTTPError)
+  power_index 401858222: ref fetch failed (HTTPError)
+  power_index 401856682: ref fetch failed (HTTPError)
+  power_index 401867796: ref fetch failed (HTTPError)
+  power_index 401856788: HTTPError
+  power_index 401856781: HTTPError
+  power_index 401856787: ref fetch failed (HTTPError)
+  power_index 401864571: HTTPError
+  power_index 401858224: ref fetch failed (HTTPError)
+  power_index 401867929: ref fetch failed (HTTPError)
+  power_index 401867929: ref fetch failed (HTTPError)
+  power_index 401865252: HTTPError
+  power_index 401860883: ref fetch failed (HTTPError)
+  power_index 401858457: ref fetch failed (HTTPError)
+  power_index 401858230: ref fetch failed (HTTPError)
+  power_index 401860889: HTTPError
+  power_index 2026: 1742 rows, 7 cols
 
 === power_index: 0 failures ===
 injuries 2026: 0 rows from 948 games

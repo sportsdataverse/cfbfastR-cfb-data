@@ -36,122 +36,97 @@ From https://github.com/sportsdataverse/cfbfastR-cfb-data
  * [new tag]           espn_cfb_team_box      -> espn_cfb_team_box
   pos_team: 100.0% of rows resolved to a team name
   def_pos_team: 100.0% of rows resolved to a team name
-pbp 2026: 44665 rows from 948 games
+pbp 2026: 44665 rows from 949 games
 2026: 138 coach-seasons, 138 cleanly attributed
-play_participants 2026: 41559 rows from 948 games
-team_box 2026: 520 rows from 948 games
-player_box 2026: 23464 rows from 948 games
-drives 2026: 6119 rows from 948 games
-game_rosters 2026: 56648 rows from 948 games
-betting 2026: 260 rows from 948 games
-schedules 2026: 260 rows from 948 games
-linescores 2026: 2100 rows from 948 games
-  power_index 401858428: HTTPError
-  power_index 401856665: HTTPError
-  power_index 401864496: HTTPError
-  power_index 401856659: ref fetch failed (HTTPError)
-  power_index 401862696: ref fetch failed (HTTPError)
-  power_index 401856635: HTTPError
-  power_index 401867973: ref fetch failed (HTTPError)
-  power_index 401862699: ref fetch failed (HTTPError)
-  power_index 401856678: ref fetch failed (HTTPError)
-  power_index 401858222: ref fetch failed (HTTPError)
-  power_index 401858222: ref fetch failed (HTTPError)
-  power_index 401856682: ref fetch failed (HTTPError)
-  power_index 401867796: ref fetch failed (HTTPError)
-  power_index 401856788: HTTPError
-  power_index 401856781: HTTPError
-  power_index 401856787: ref fetch failed (HTTPError)
-  power_index 401864571: HTTPError
-  power_index 401858224: ref fetch failed (HTTPError)
-  power_index 401867929: ref fetch failed (HTTPError)
-  power_index 401867929: ref fetch failed (HTTPError)
-  power_index 401865252: HTTPError
-  power_index 401860883: ref fetch failed (HTTPError)
-  power_index 401858457: ref fetch failed (HTTPError)
-  power_index 401858230: ref fetch failed (HTTPError)
-  power_index 401860889: HTTPError
-  power_index 2026: 1742 rows, 7 cols
+play_participants 2026: 41559 rows from 949 games
+team_box 2026: 520 rows from 949 games
+player_box 2026: 23464 rows from 949 games
+drives 2026: 6119 rows from 949 games
+game_rosters 2026: 56648 rows from 949 games
+betting 2026: 260 rows from 949 games
+schedules 2026: 260 rows from 949 games
+linescores 2026: 2100 rows from 949 games
+  power_index 2026: 1776 rows, 7 cols
 
 === power_index: 0 failures ===
-injuries 2026: 0 rows from 948 games
+injuries 2026: 0 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_team 2026: 520 rows from 948 games
+adv_team 2026: 520 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_passing 2026: 942 rows from 948 games
+adv_passing 2026: 942 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_rushing 2026: 3057 rows from 948 games
+adv_rushing 2026: 3057 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_receiving 2026: 5326 rows from 948 games
+adv_receiving 2026: 5326 rows from 949 games
   def_pos_team: 100.0% of rows resolved to a team name
-adv_defensive 2026: 520 rows from 948 games
+adv_defensive 2026: 520 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_turnover 2026: 520 rows from 948 games
+adv_turnover 2026: 520 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_drives 2026: 520 rows from 948 games
+adv_drives 2026: 520 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_situational 2026: 520 rows from 948 games
+adv_situational 2026: 520 rows from 949 games
   def_pos_team: 100.0% of rows resolved to a team name
-adv_defensive_players 2026: 3133 rows from 948 games
+adv_defensive_players 2026: 3133 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_specialists 2026: 2961 rows from 948 games
+adv_specialists 2026: 2961 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_player_usage 2026: 6579 rows from 948 games
+adv_player_usage 2026: 6579 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_position_group_usage 2026: 2042 rows from 948 games
+adv_position_group_usage 2026: 2042 rows from 949 games
   def_pos_team: 100.0% of rows resolved to a team name
-adv_tackles 2026: 11673 rows from 948 games
+adv_tackles 2026: 11673 rows from 949 games
   def_pos_team: 100.0% of rows resolved to a team name
-adv_position_group_tackles 2026: 1944 rows from 948 games
+adv_position_group_tackles 2026: 1944 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_team_usage 2026: 520 rows from 948 games
+adv_team_usage 2026: 520 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_drive_scripting 2026: 1040 rows from 948 games
+adv_drive_scripting 2026: 1040 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-usage_players 2026: 3777 rows from 948 games
+usage_players 2026: 3777 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-usage_position_groups 2026: 947 rows from 948 games
+usage_position_groups 2026: 947 rows from 949 games
   def_pos_team: 100.0% of rows resolved to a team name
-usage_tackles 2026: 7239 rows from 948 games
+usage_tackles 2026: 7239 rows from 949 games
   def_pos_team: 100.0% of rows resolved to a team name
-usage_position_group_tackles 2026: 1034 rows from 948 games
+usage_position_group_tackles 2026: 1034 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-usage_teams 2026: 228 rows from 948 games
+usage_teams 2026: 228 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-usage_drive_scripting 2026: 456 rows from 948 games
+usage_drive_scripting 2026: 456 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_st_kickers 2026: 1418 rows from 948 games
+adv_st_kickers 2026: 1418 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_st_punters 2026: 563 rows from 948 games
+adv_st_punters 2026: 563 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_st_returners 2026: 784 rows from 948 games
+adv_st_returners 2026: 784 rows from 949 games
   def_pos_team: 100.0% of rows resolved to a team name
-adv_st_blocks 2026: 34 rows from 948 games
+adv_st_blocks 2026: 34 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_st_team 2026: 520 rows from 948 games
+adv_st_team 2026: 520 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-usage_st_kickers 2026: 809 rows from 948 games
+usage_st_kickers 2026: 809 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-usage_st_punters 2026: 284 rows from 948 games
+usage_st_punters 2026: 284 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-usage_st_returners 2026: 525 rows from 948 games
+usage_st_returners 2026: 525 rows from 949 games
   def_pos_team: 100.0% of rows resolved to a team name
-usage_st_blocks 2026: 34 rows from 948 games
+usage_st_blocks 2026: 34 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-usage_st_team 2026: 228 rows from 948 games
+usage_st_team 2026: 228 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-team_tendencies 2026: 228 rows from 948 games
+team_tendencies 2026: 228 rows from 949 games
   coaches: 138 attributed team-seasons for 2026
   pos_team: 100.0% of rows resolved to a team name
-coach_tendencies 2026: 138 rows from 948 games
+coach_tendencies 2026: 138 rows from 949 games
   adv_team_gamelog 2026: 520 rows, 90 cols
 
 === gamelog: 0 failures ===
-qa 2026: 260 rows from 948 games
+qa 2026: 260 rows from 949 games
   cfb_schedules 2026: 3679 rows, 41 cols, fbs_game=761, fbs_participant=888, unplayed=0
 
 === cfb_schedules: 0 failures ===
-cfb_rosters 2026: 25197 rows from 948/948 games | position 100.0% | division 100.0% | cfbd_recruit_ids 92.4% of 29305 cfbd athletes
+cfb_rosters 2026: 25197 rows from 948/949 games | position 100.0% | division 100.0% | cfbd_recruit_ids 92.4% of 29305 cfbd athletes
 
 === cfb_rosters: 0 failures ===
 [summaries 2026] percentiles: 99 rows

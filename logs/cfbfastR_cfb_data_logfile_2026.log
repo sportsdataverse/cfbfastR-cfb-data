@@ -1,4 +1,5 @@
 From https://github.com/sportsdataverse/cfbfastR-cfb-data
+   c0d9161a..834b4d8d  main                   -> origin/main
  * [new branch]        AE/update-air-yards-model -> origin/AE/update-air-yards-model
  * [new branch]        chore/readme-repository-layout -> origin/chore/readme-repository-layout
  * [new branch]        docs/automation-status -> origin/docs/automation-status
@@ -34,109 +35,1267 @@ From https://github.com/sportsdataverse/cfbfastR-cfb-data
  * [new tag]           espn_cfb_rosters       -> espn_cfb_rosters
  * [new tag]           espn_cfb_schedules     -> espn_cfb_schedules
  * [new tag]           espn_cfb_team_box      -> espn_cfb_team_box
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581678811)
   pos_team: 100.0% of rows resolved to a team name
   def_pos_team: 100.0% of rows resolved to a team name
 pbp 2026: 44665 rows from 949 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581678811)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581678811)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 415, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 330, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_pbp', '../cfb/pbp/parquet/play_by_play_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build pbp for season 2026 exited with code 1
 2026: 138 coach-seasons, 138 cleanly attributed
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581679777)
 play_participants 2026: 41559 rows from 949 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581679777)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581679777)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 415, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 330, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_play_participants', '../cfb/play_participants/parquet/play_participants_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build play_participants for season 2026 exited with code 1
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581680442)
 team_box 2026: 520 rows from 949 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581680442)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581680442)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 415, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 330, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_team_box', '../cfb/team_box/parquet/team_box_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build team_box for season 2026 exited with code 1
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581681131)
 player_box 2026: 23464 rows from 949 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581681131)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581681131)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 415, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 330, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_player_box', '../cfb/player_box/parquet/player_box_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build player_box for season 2026 exited with code 1
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581681738)
 drives 2026: 6119 rows from 949 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581681738)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581681738)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 415, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 330, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_drives', '../cfb/drives/parquet/drives_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build drives for season 2026 exited with code 1
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581682687)
 game_rosters 2026: 56648 rows from 949 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581682687)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581682687)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 415, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 330, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_game_rosters', '../cfb/game_rosters/parquet/game_rosters_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build game_rosters for season 2026 exited with code 1
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581683452)
 betting 2026: 260 rows from 949 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581683452)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581683452)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 415, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 330, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_betting', '../cfb/betting/parquet/betting_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build betting for season 2026 exited with code 1
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581683995)
 schedules 2026: 260 rows from 949 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581683995)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581683995)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 415, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 330, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_schedules', '../cfb/schedules/parquet/cfb_schedule_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build schedules for season 2026 exited with code 1
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581684543)
 linescores 2026: 2100 rows from 949 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581684543)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581684543)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 415, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 330, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_linescores', '../cfb/linescores/parquet/linescores_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build linescores for season 2026 exited with code 1
   power_index 2026: 1776 rows, 7 cols
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581686424)
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581686424)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581686424)
+  FAILED 2026: CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_power_index', '../cfb/power_index/parquet/power_index_2026.parquet', '--repo', 'sportsdataverse/sportsd
 
-=== power_index: 0 failures ===
+=== power_index: 1 failures ===
+  2026: CalledProcessError
+::warning ::cfb_data_build power_index for season 2026 exited with code 1
 injuries 2026: 0 rows from 949 games
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581687308)
   pos_team: 100.0% of rows resolved to a team name
 adv_team 2026: 520 rows from 949 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581687308)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581687308)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 415, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 330, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_adv_team', '../cfb/adv_team/parquet/adv_team_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build adv_team for season 2026 exited with code 1
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581687942)
   pos_team: 100.0% of rows resolved to a team name
 adv_passing 2026: 942 rows from 949 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581687942)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581687942)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 415, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 330, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_adv_passing', '../cfb/adv_passing/parquet/adv_passing_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build adv_passing for season 2026 exited with code 1
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581688610)
   pos_team: 100.0% of rows resolved to a team name
 adv_rushing 2026: 3057 rows from 949 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581688610)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581688610)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 415, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 330, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_adv_rushing', '../cfb/adv_rushing/parquet/adv_rushing_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build adv_rushing for season 2026 exited with code 1
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581689138)
   pos_team: 100.0% of rows resolved to a team name
 adv_receiving 2026: 5326 rows from 949 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581689138)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581689138)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 415, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 330, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_adv_receiving', '../cfb/adv_receiving/parquet/adv_receiving_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build adv_receiving for season 2026 exited with code 1
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581689627)
   def_pos_team: 100.0% of rows resolved to a team name
 adv_defensive 2026: 520 rows from 949 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581689627)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581689627)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 415, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 330, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_adv_defensive', '../cfb/adv_defensive/parquet/adv_defensive_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build adv_defensive for season 2026 exited with code 1
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581690150)
   pos_team: 100.0% of rows resolved to a team name
 adv_turnover 2026: 520 rows from 949 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581690150)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581690150)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 415, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 330, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_adv_turnover', '../cfb/adv_turnover/parquet/adv_turnover_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build adv_turnover for season 2026 exited with code 1
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581690726)
   pos_team: 100.0% of rows resolved to a team name
 adv_drives 2026: 520 rows from 949 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581690726)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581690726)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 415, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 330, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_adv_drives', '../cfb/adv_drives/parquet/adv_drives_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build adv_drives for season 2026 exited with code 1
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581691381)
   pos_team: 100.0% of rows resolved to a team name
 adv_situational 2026: 520 rows from 949 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581691381)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581691381)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 415, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 330, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_adv_situational', '../cfb/adv_situational/parquet/adv_situational_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build adv_situational for season 2026 exited with code 1
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581692065)
   def_pos_team: 100.0% of rows resolved to a team name
 adv_defensive_players 2026: 3133 rows from 949 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581692065)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581692065)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 415, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 330, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_adv_defensive_players', '../cfb/adv_defensive_players/parquet/adv_defensive_players_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build adv_defensive_players for season 2026 exited with code 1
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581692630)
   pos_team: 100.0% of rows resolved to a team name
 adv_specialists 2026: 2961 rows from 949 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581692630)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581692630)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 415, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 330, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_adv_specialists', '../cfb/adv_specialists/parquet/adv_specialists_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build adv_specialists for season 2026 exited with code 1
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581694510)
   pos_team: 100.0% of rows resolved to a team name
 adv_player_usage 2026: 6579 rows from 949 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581694510)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581694510)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 415, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 330, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_adv_player_usage', '../cfb/adv_player_usage/parquet/adv_player_usage_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build adv_player_usage for season 2026 exited with code 1
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581696070)
   pos_team: 100.0% of rows resolved to a team name
 adv_position_group_usage 2026: 2042 rows from 949 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581696070)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581696070)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 415, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 330, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_adv_position_group_usage', '../cfb/adv_position_group_usage/parquet/adv_position_group_usage_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build adv_position_group_usage for season 2026 exited with code 1
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581697589)
   def_pos_team: 100.0% of rows resolved to a team name
 adv_tackles 2026: 11673 rows from 949 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581697589)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581697589)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 415, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 330, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_adv_tackles', '../cfb/adv_tackles/parquet/adv_tackles_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build adv_tackles for season 2026 exited with code 1
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581699277)
   def_pos_team: 100.0% of rows resolved to a team name
 adv_position_group_tackles 2026: 1944 rows from 949 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581699277)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581699277)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 415, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 330, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_adv_position_group_tackles', '../cfb/adv_position_group_tackles/parquet/adv_position_group_tackles_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build adv_position_group_tackles for season 2026 exited with code 1
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581701292)
   pos_team: 100.0% of rows resolved to a team name
 adv_team_usage 2026: 520 rows from 949 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581701292)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581701292)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 415, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 330, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_adv_team_usage', '../cfb/adv_team_usage/parquet/adv_team_usage_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build adv_team_usage for season 2026 exited with code 1
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581703098)
   pos_team: 100.0% of rows resolved to a team name
 adv_drive_scripting 2026: 1040 rows from 949 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581703098)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581703098)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 415, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 330, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_adv_drive_scripting', '../cfb/adv_drive_scripting/parquet/adv_drive_scripting_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build adv_drive_scripting for season 2026 exited with code 1
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581705129)
   pos_team: 100.0% of rows resolved to a team name
 usage_players 2026: 3777 rows from 949 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581705129)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581705129)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 415, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 330, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_usage_players', '../cfb/usage_players/parquet/usage_players_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build usage_players for season 2026 exited with code 1
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581707042)
   pos_team: 100.0% of rows resolved to a team name
 usage_position_groups 2026: 947 rows from 949 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581707042)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581707042)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 415, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 330, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_usage_position_groups', '../cfb/usage_position_groups/parquet/usage_position_groups_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build usage_position_groups for season 2026 exited with code 1
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581708982)
   def_pos_team: 100.0% of rows resolved to a team name
 usage_tackles 2026: 7239 rows from 949 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581708982)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581708982)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 415, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 330, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_usage_tackles', '../cfb/usage_tackles/parquet/usage_tackles_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build usage_tackles for season 2026 exited with code 1
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581710538)
   def_pos_team: 100.0% of rows resolved to a team name
 usage_position_group_tackles 2026: 1034 rows from 949 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581710538)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581710538)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 415, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 330, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_usage_position_group_tackles', '../cfb/usage_position_group_tackles/parquet/usage_position_group_tackles_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build usage_position_group_tackles for season 2026 exited with code 1
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581712405)
   pos_team: 100.0% of rows resolved to a team name
 usage_teams 2026: 228 rows from 949 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581712405)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581712405)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 415, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 330, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_usage_teams', '../cfb/usage_teams/parquet/usage_teams_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build usage_teams for season 2026 exited with code 1
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581713633)
   pos_team: 100.0% of rows resolved to a team name
 usage_drive_scripting 2026: 456 rows from 949 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581713633)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581713633)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 415, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 330, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_usage_drive_scripting', '../cfb/usage_drive_scripting/parquet/usage_drive_scripting_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build usage_drive_scripting for season 2026 exited with code 1
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581714949)
   pos_team: 100.0% of rows resolved to a team name
 adv_st_kickers 2026: 1418 rows from 949 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581714949)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581714949)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 415, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 330, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_adv_st_kickers', '../cfb/adv_st_kickers/parquet/adv_st_kickers_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build adv_st_kickers for season 2026 exited with code 1
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581716361)
   pos_team: 100.0% of rows resolved to a team name
 adv_st_punters 2026: 563 rows from 949 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581716361)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581716361)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 415, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 330, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_adv_st_punters', '../cfb/adv_st_punters/parquet/adv_st_punters_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build adv_st_punters for season 2026 exited with code 1
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581717640)
   pos_team: 100.0% of rows resolved to a team name
 adv_st_returners 2026: 784 rows from 949 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581717640)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581717640)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 415, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 330, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_adv_st_returners', '../cfb/adv_st_returners/parquet/adv_st_returners_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build adv_st_returners for season 2026 exited with code 1
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581718951)
   def_pos_team: 100.0% of rows resolved to a team name
 adv_st_blocks 2026: 34 rows from 949 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581718951)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581718951)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 415, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 330, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_adv_st_blocks', '../cfb/adv_st_blocks/parquet/adv_st_blocks_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build adv_st_blocks for season 2026 exited with code 1
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581720387)
   pos_team: 100.0% of rows resolved to a team name
 adv_st_team 2026: 520 rows from 949 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581720387)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581720387)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 415, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 330, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_adv_st_team', '../cfb/adv_st_team/parquet/adv_st_team_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build adv_st_team for season 2026 exited with code 1
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581721830)
   pos_team: 100.0% of rows resolved to a team name
 usage_st_kickers 2026: 809 rows from 949 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581721830)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581721830)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 415, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 330, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_usage_st_kickers', '../cfb/usage_st_kickers/parquet/usage_st_kickers_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build usage_st_kickers for season 2026 exited with code 1
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581723360)
   pos_team: 100.0% of rows resolved to a team name
 usage_st_punters 2026: 284 rows from 949 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581723360)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581723360)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 415, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 330, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_usage_st_punters', '../cfb/usage_st_punters/parquet/usage_st_punters_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build usage_st_punters for season 2026 exited with code 1
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581724798)
   pos_team: 100.0% of rows resolved to a team name
 usage_st_returners 2026: 525 rows from 949 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581724798)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581724798)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 415, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 330, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_usage_st_returners', '../cfb/usage_st_returners/parquet/usage_st_returners_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build usage_st_returners for season 2026 exited with code 1
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581726255)
   def_pos_team: 100.0% of rows resolved to a team name
 usage_st_blocks 2026: 34 rows from 949 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581726255)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581726255)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 415, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 330, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_usage_st_blocks', '../cfb/usage_st_blocks/parquet/usage_st_blocks_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build usage_st_blocks for season 2026 exited with code 1
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581727488)
   pos_team: 100.0% of rows resolved to a team name
 usage_st_team 2026: 228 rows from 949 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581727488)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581727488)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 415, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 330, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_usage_st_team', '../cfb/usage_st_team/parquet/usage_st_team_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build usage_st_team for season 2026 exited with code 1
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581728338)
   pos_team: 100.0% of rows resolved to a team name
 team_tendencies 2026: 228 rows from 949 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581728338)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581728338)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 415, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 330, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_team_tendencies', '../cfb/team_tendencies/parquet/team_tendencies_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build team_tendencies for season 2026 exited with code 1
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581729182)
   coaches: 138 attributed team-seasons for 2026
   pos_team: 100.0% of rows resolved to a team name
 coach_tendencies 2026: 138 rows from 949 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581729182)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581729182)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 415, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 330, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_coach_tendencies', '../cfb/coach_tendencies/parquet/coach_tendencies_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build coach_tendencies for season 2026 exited with code 1
   adv_team_gamelog 2026: 520 rows, 90 cols
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581729657)
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581729657)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581729657)
+  FAILED 2026: CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_adv_team_gamelog', '../cfb/adv_team_gamelog/parquet/adv_team_gamelog_2026.parquet', '--repo', 'sportsda
 
-=== gamelog: 0 failures ===
+=== gamelog: 1 failures ===
+  2026: CalledProcessError
+::warning ::cfb_data_build gamelog for season 2026 exited with code 1
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581731951)
 qa 2026: 260 rows from 949 games
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581731951)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581731951)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 249, in main
+    build_dataset(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 415, in build_dataset
+    build_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 330, in build_season
+    publish_dataset(spec, season, base=base)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_qa', '../cfb/qa/parquet/espn_cfb_qa_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build qa for season 2026 exited with code 1
   cfb_schedules 2026: 3679 rows, 41 cols, fbs_game=761, fbs_participant=888, unplayed=0
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581732424)
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581732424)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581732424)
+  cfb_schedules 2026: FAILED CalledProcessError: Command '['gh', 'release', 'upload', 'cfb_schedules', '../cfb/cfb_schedules/parquet/cfb_schedules_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
 
-=== cfb_schedules: 0 failures ===
+=== cfb_schedules: 1 failures ===
+  2026: CalledProcessError: Command '['gh', 'release', 'upload', 'cfb_schedules', '../cfb/cfb_schedules/parquet/cfb_schedules_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build cfb_schedules for season 2026 exited with code 1
 cfb_rosters 2026: 25197 rows from 948/949 games | position 100.0% | division 100.0% | cfbd_recruit_ids 92.4% of 29305 cfbd athletes
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581733724)
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581733724)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581733724)
+cfb_rosters 2026: FAILED CalledProcessError(1, ['gh', 'release', 'upload', 'espn_cfb_rosters', '../cfb/cfb_rosters/parquet/cfb_rosters_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber'])
 
-=== cfb_rosters: 0 failures ===
-[summaries 2026] percentiles: 99 rows
-[summaries 2026] team_summaries: 138 rows
-[summaries 2026] passing: 284 rows
-[summaries 2026] rushing: 937 rows
-[summaries 2026] receiving: 1605 rows
+=== cfb_rosters: 1 failures ===
+  2026: CalledProcessError(1, ['gh', 'release', 'upload', 'espn_cfb_rosters', '../cfb/cfb_rosters/parquet/cfb_rosters_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber'])
+::warning ::cfb_data_build cfb_rosters for season 2026 exited with code 1
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581734123)
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581734123)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581734123)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 156, in main
+    build_summaries_season(
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/summaries_build.py", line 89, in build_summaries_season
+    publish_dataset(spec, season, base=base, dry_run=dry_run)
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 165, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+  File "/home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 153, in _gh_runner
+    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_percentiles', '../cfb/percentiles/parquet/cfb_percentiles_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+::warning ::cfb_data_build summaries for season 2026 exited with code 1
   cfb_ratings_weekly 2026: 2020 rows, 16 cols, 15 weekly snapshots
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581736290)
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581736290)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581736290)
+  FAILED 2026: CalledProcessError: Command '['gh', 'release', 'upload', 'cfb_ratings_weekly', '../cfb/cfb_ratings_weekly/parquet/cfb_ratings_weekly_2026.parquet', '--repo', 'sportsdatav
 
-=== ratings_weekly: 0 failures ===
+=== ratings_weekly: 1 failures ===
+  2026: CalledProcessError
+::warning ::cfb_data_build ratings_weekly for season 2026 exited with code 1
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 94 rows
 [summaries 2026] passing: 153 rows
@@ -213,14 +1372,34 @@ cfb_rosters 2026: 25197 rows from 948/949 games | position 100.0% | division 100
 [summaries 2026] rushing: 937 rows
 [summaries 2026] receiving: 1605 rows
   cfb_team_summaries_weekly 2026: 2025 rows, 384 cols, 15 weekly snapshots
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581737692)
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581737692)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581737692)
+  FAILED 2026: CalledProcessError: Command '['gh', 'release', 'upload', 'cfb_team_summaries_weekly', '../cfb/cfb_team_summaries_weekly/parquet/cfb_team_summaries_weekly_2026.parquet', '
 
-=== team_summaries_weekly: 0 failures ===
+=== team_summaries_weekly: 1 failures ===
+  2026: CalledProcessError
+::warning ::cfb_data_build team_summaries_weekly for season 2026 exited with code 1
   cfb_matchup_features 2026: 1649 rows, 45 cols
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581739925)
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581739925)
+  gh release upload: exit 1 (attempt 2/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581739925)
+  FAILED 2026: CalledProcessError: Command '['gh', 'release', 'upload', 'cfb_matchup_features', '../cfb/cfb_matchup_features/parquet/cfb_matchup_features_2026.parquet', '--repo', 'sport
 
-=== matchup_features: 0 failures ===
+=== matchup_features: 1 failures ===
+  2026: CalledProcessError
+::warning ::cfb_data_build matchup_features for season 2026 exited with code 1
 /home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-data/python/cfb_data_build/matchup_features.py:507: UserWarning: Comparisons with None always result in null. Consider using `.is_null()` or `.is_not_null()`.
   prior = secs.filter(pl.col("play_date") < date)["sec_since_prev"]
   cfb_matchup_line 2026: 761 rows, 268 cols
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581743976)
+  gh release upload: exit 1 (attempt 1/3, retrying)
+HTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/581743976)
+  gh release upload: exit 1 (attempt 2/3, retrying)
 
 === matchup_line: 0 failures ===
 ::warning::no 247 recruits store at /home/runner/work/cfbfastR-cfb-data/cfbfastR-cfb-raw/cfb/recruits/json; skipping recruiting datasets

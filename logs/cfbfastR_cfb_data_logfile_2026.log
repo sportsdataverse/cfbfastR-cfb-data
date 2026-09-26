@@ -9,7 +9,9 @@ From https://github.com/sportsdataverse/cfbfastR-cfb-data
  * [new branch]        feat/cfb-ratings-builder -> origin/feat/cfb-ratings-builder
  * [new branch]        feat/cfb-ratings-cron  -> origin/feat/cfb-ratings-cron
  * [new branch]        feat/era-contract-in-model-cards -> origin/feat/era-contract-in-model-cards
+ * [new branch]        feat/league-averages   -> origin/feat/league-averages
  * [new branch]        feat/rosters-cfbd-enrich -> origin/feat/rosters-cfbd-enrich
+ * [new branch]        feat/sample-sizes      -> origin/feat/sample-sizes
  * [new branch]        fix/bowl-season-cron   -> origin/fix/bowl-season-cron
  * [new branch]        fix/cfb-recruiting-guard -> origin/fix/cfb-recruiting-guard
  * [new branch]        fix/cfb-weekly-raw-store -> origin/fix/cfb-weekly-raw-store
@@ -36,104 +38,130 @@ From https://github.com/sportsdataverse/cfbfastR-cfb-data
  * [new tag]           espn_cfb_team_box      -> espn_cfb_team_box
   pos_team: 100.0% of rows resolved to a team name
   def_pos_team: 100.0% of rows resolved to a team name
-pbp 2026: 45653 rows from 949 games
+pbp 2026: 48742 rows from 949 games
 2026: 138 coach-seasons, 138 cleanly attributed
-play_participants 2026: 42465 rows from 949 games
-team_box 2026: 532 rows from 949 games
-player_box 2026: 23954 rows from 949 games
-drives 2026: 6243 rows from 949 games
-game_rosters 2026: 58158 rows from 949 games
-betting 2026: 266 rows from 949 games
-schedules 2026: 266 rows from 949 games
-linescores 2026: 2148 rows from 949 games
+play_participants 2026: 45350 rows from 949 games
+team_box 2026: 594 rows from 949 games
+player_box 2026: 25777 rows from 949 games
+drives 401864576: can only concatenate list (not "dict") to list
+drives 401866427: can only concatenate list (not "dict") to list
+drives 401858462: can only concatenate list (not "dict") to list
+drives 401858467: can only concatenate list (not "dict") to list
+drives 401864511: can only concatenate list (not "dict") to list
+drives 401858237: can only concatenate list (not "dict") to list
+drives 401864510: can only concatenate list (not "dict") to list
+drives 401856700: can only concatenate list (not "dict") to list
+drives 401856699: can only concatenate list (not "dict") to list
+drives 401856816: can only concatenate list (not "dict") to list
+drives 401858463: can only concatenate list (not "dict") to list
+drives 401856815: can only concatenate list (not "dict") to list
+drives 401858244: can only concatenate list (not "dict") to list
+drives 401860897: can only concatenate list (not "dict") to list
+drives 401861970: can only concatenate list (not "dict") to list
+drives 401864579: can only concatenate list (not "dict") to list
+drives 401866426: can only concatenate list (not "dict") to list
+drives 401866428: can only concatenate list (not "dict") to list
+drives 401868188: can only concatenate list (not "dict") to list
+drives 401862781: can only concatenate list (not "dict") to list
+drives 2026: 6514 rows from 949 games
+game_rosters 2026: 60606 rows from 949 games
+betting 2026: 297 rows from 949 games
+schedules 2026: 297 rows from 949 games
+linescores 2026: 2304 rows from 949 games
   power_index 2026: 1776 rows, 7 cols
 
 === power_index: 0 failures ===
 injuries 2026: 0 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_team 2026: 532 rows from 949 games
+adv_team 2026: 592 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_passing 2026: 960 rows from 949 games
+adv_passing 2026: 1037 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_rushing 2026: 3117 rows from 949 games
+adv_rushing 2026: 3341 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_receiving 2026: 5426 rows from 949 games
+adv_receiving 2026: 5862 rows from 949 games
   def_pos_team: 100.0% of rows resolved to a team name
-adv_defensive 2026: 532 rows from 949 games
+adv_defensive 2026: 591 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_turnover 2026: 532 rows from 949 games
+adv_turnover 2026: 594 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_drives 2026: 532 rows from 949 games
+adv_drives 2026: 591 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_situational 2026: 532 rows from 949 games
+adv_situational 2026: 591 rows from 949 games
   def_pos_team: 100.0% of rows resolved to a team name
-adv_defensive_players 2026: 3196 rows from 949 games
+adv_defensive_players 2026: 3407 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_specialists 2026: 3038 rows from 949 games
+adv_specialists 2026: 3297 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_player_usage 2026: 6707 rows from 949 games
+adv_player_usage 2026: 7234 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_position_group_usage 2026: 2089 rows from 949 games
+adv_position_group_usage 2026: 2293 rows from 949 games
   def_pos_team: 100.0% of rows resolved to a team name
-adv_tackles 2026: 11926 rows from 949 games
+adv_tackles 2026: 12851 rows from 949 games
   def_pos_team: 100.0% of rows resolved to a team name
-adv_position_group_tackles 2026: 1986 rows from 949 games
+adv_position_group_tackles 2026: 2189 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_team_usage 2026: 532 rows from 949 games
+adv_team_usage 2026: 591 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_drive_scripting 2026: 1064 rows from 949 games
+adv_drive_scripting 2026: 1161 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-usage_players 2026: 3786 rows from 949 games
+usage_players 2026: 3880 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-usage_position_groups 2026: 947 rows from 949 games
+usage_position_groups 2026: 961 rows from 949 games
   def_pos_team: 100.0% of rows resolved to a team name
-usage_tackles 2026: 7289 rows from 949 games
+usage_tackles 2026: 7528 rows from 949 games
   def_pos_team: 100.0% of rows resolved to a team name
-usage_position_group_tackles 2026: 1037 rows from 949 games
+usage_position_group_tackles 2026: 1061 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-usage_teams 2026: 228 rows from 949 games
+usage_teams 2026: 231 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-usage_drive_scripting 2026: 456 rows from 949 games
+usage_drive_scripting 2026: 461 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_st_kickers 2026: 1452 rows from 949 games
+adv_st_kickers 2026: 1585 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_st_punters 2026: 576 rows from 949 games
+adv_st_punters 2026: 625 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_st_returners 2026: 804 rows from 949 games
+adv_st_returners 2026: 875 rows from 949 games
   def_pos_team: 100.0% of rows resolved to a team name
-adv_st_blocks 2026: 34 rows from 949 games
+adv_st_blocks 2026: 37 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_st_team 2026: 532 rows from 949 games
+adv_st_team 2026: 593 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-usage_st_kickers 2026: 813 rows from 949 games
+usage_st_kickers 2026: 839 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-usage_st_punters 2026: 284 rows from 949 games
+usage_st_punters 2026: 288 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-usage_st_returners 2026: 532 rows from 949 games
+usage_st_returners 2026: 557 rows from 949 games
   def_pos_team: 100.0% of rows resolved to a team name
-usage_st_blocks 2026: 34 rows from 949 games
+usage_st_blocks 2026: 37 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-usage_st_team 2026: 228 rows from 949 games
+usage_st_team 2026: 231 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-team_tendencies 2026: 228 rows from 949 games
+team_tendencies 2026: 231 rows from 949 games
   coaches: 138 attributed team-seasons for 2026
   pos_team: 100.0% of rows resolved to a team name
 coach_tendencies 2026: 138 rows from 949 games
-  adv_team_gamelog 2026: 532 rows, 90 cols
+  adv_team_gamelog 2026: 592 rows, 90 cols
 
 === gamelog: 0 failures ===
-qa 2026: 266 rows from 949 games
+qa 401862781: invalid series dtype: expected `String`, got `null` for series with name `start.downDistanceText`
+
+This error occurred in the following expression:
+	col("start.downDistanceText").str.extract_groups()
+
+qa 2026: 296 rows from 949 games
   cfb_schedules 2026: 3679 rows, 41 cols, fbs_game=761, fbs_participant=888, unplayed=0
 
 === cfb_schedules: 0 failures ===
-cfb_rosters 2026: 25197 rows from 948/949 games | position 100.0% | division 100.0% | cfbd_recruit_ids 92.4% of 29305 cfbd athletes
+cfb_rosters 2026: 25296 rows from 948/949 games | position 100.0% | division 100.0% | cfbd_recruit_ids 92.5% of 29305 cfbd athletes
 
 === cfb_rosters: 0 failures ===
+  !! 2026: 2 of 185 games have an implausible mean EPA/play (|mean| > 0.5) -- suspect corrupt end-state yardlines; worst +0.52 in game 401861970
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 138 rows
-[summaries 2026] passing: 287 rows
-[summaries 2026] rushing: 942 rows
-[summaries 2026] receiving: 1615 rows
+[summaries 2026] passing: 295 rows
+[summaries 2026] rushing: 967 rows
+[summaries 2026] receiving: 1645 rows
   cfb_ratings_weekly 2026: 2020 rows, 16 cols, 15 weekly snapshots
 
 === ratings_weekly: 0 failures ===
@@ -152,66 +180,78 @@ cfb_rosters 2026: 25197 rows from 948/949 games | position 100.0% | division 100
 [summaries 2026] passing: 284 rows
 [summaries 2026] rushing: 937 rows
 [summaries 2026] receiving: 1605 rows
+  !! 2026: 2 of 185 games have an implausible mean EPA/play (|mean| > 0.5) -- suspect corrupt end-state yardlines; worst +0.52 in game 401861970
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 138 rows
-[summaries 2026] passing: 287 rows
-[summaries 2026] rushing: 942 rows
-[summaries 2026] receiving: 1615 rows
+[summaries 2026] passing: 295 rows
+[summaries 2026] rushing: 967 rows
+[summaries 2026] receiving: 1645 rows
+  !! 2026: 2 of 185 games have an implausible mean EPA/play (|mean| > 0.5) -- suspect corrupt end-state yardlines; worst +0.52 in game 401861970
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 138 rows
-[summaries 2026] passing: 287 rows
-[summaries 2026] rushing: 942 rows
-[summaries 2026] receiving: 1615 rows
+[summaries 2026] passing: 295 rows
+[summaries 2026] rushing: 967 rows
+[summaries 2026] receiving: 1645 rows
+  !! 2026: 2 of 185 games have an implausible mean EPA/play (|mean| > 0.5) -- suspect corrupt end-state yardlines; worst +0.52 in game 401861970
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 138 rows
-[summaries 2026] passing: 287 rows
-[summaries 2026] rushing: 942 rows
-[summaries 2026] receiving: 1615 rows
+[summaries 2026] passing: 295 rows
+[summaries 2026] rushing: 967 rows
+[summaries 2026] receiving: 1645 rows
+  !! 2026: 2 of 185 games have an implausible mean EPA/play (|mean| > 0.5) -- suspect corrupt end-state yardlines; worst +0.52 in game 401861970
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 138 rows
-[summaries 2026] passing: 287 rows
-[summaries 2026] rushing: 942 rows
-[summaries 2026] receiving: 1615 rows
+[summaries 2026] passing: 295 rows
+[summaries 2026] rushing: 967 rows
+[summaries 2026] receiving: 1645 rows
+  !! 2026: 2 of 185 games have an implausible mean EPA/play (|mean| > 0.5) -- suspect corrupt end-state yardlines; worst +0.52 in game 401861970
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 138 rows
-[summaries 2026] passing: 287 rows
-[summaries 2026] rushing: 942 rows
-[summaries 2026] receiving: 1615 rows
+[summaries 2026] passing: 295 rows
+[summaries 2026] rushing: 967 rows
+[summaries 2026] receiving: 1645 rows
+  !! 2026: 2 of 185 games have an implausible mean EPA/play (|mean| > 0.5) -- suspect corrupt end-state yardlines; worst +0.52 in game 401861970
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 138 rows
-[summaries 2026] passing: 287 rows
-[summaries 2026] rushing: 942 rows
-[summaries 2026] receiving: 1615 rows
+[summaries 2026] passing: 295 rows
+[summaries 2026] rushing: 967 rows
+[summaries 2026] receiving: 1645 rows
+  !! 2026: 2 of 185 games have an implausible mean EPA/play (|mean| > 0.5) -- suspect corrupt end-state yardlines; worst +0.52 in game 401861970
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 138 rows
-[summaries 2026] passing: 287 rows
-[summaries 2026] rushing: 942 rows
-[summaries 2026] receiving: 1615 rows
+[summaries 2026] passing: 295 rows
+[summaries 2026] rushing: 967 rows
+[summaries 2026] receiving: 1645 rows
+  !! 2026: 2 of 185 games have an implausible mean EPA/play (|mean| > 0.5) -- suspect corrupt end-state yardlines; worst +0.52 in game 401861970
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 138 rows
-[summaries 2026] passing: 287 rows
-[summaries 2026] rushing: 942 rows
-[summaries 2026] receiving: 1615 rows
+[summaries 2026] passing: 295 rows
+[summaries 2026] rushing: 967 rows
+[summaries 2026] receiving: 1645 rows
+  !! 2026: 2 of 185 games have an implausible mean EPA/play (|mean| > 0.5) -- suspect corrupt end-state yardlines; worst +0.52 in game 401861970
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 138 rows
-[summaries 2026] passing: 287 rows
-[summaries 2026] rushing: 942 rows
-[summaries 2026] receiving: 1615 rows
+[summaries 2026] passing: 295 rows
+[summaries 2026] rushing: 967 rows
+[summaries 2026] receiving: 1645 rows
+  !! 2026: 2 of 185 games have an implausible mean EPA/play (|mean| > 0.5) -- suspect corrupt end-state yardlines; worst +0.52 in game 401861970
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 138 rows
-[summaries 2026] passing: 287 rows
-[summaries 2026] rushing: 942 rows
-[summaries 2026] receiving: 1615 rows
+[summaries 2026] passing: 295 rows
+[summaries 2026] rushing: 967 rows
+[summaries 2026] receiving: 1645 rows
+  !! 2026: 2 of 185 games have an implausible mean EPA/play (|mean| > 0.5) -- suspect corrupt end-state yardlines; worst +0.52 in game 401861970
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 138 rows
-[summaries 2026] passing: 287 rows
-[summaries 2026] rushing: 942 rows
-[summaries 2026] receiving: 1615 rows
+[summaries 2026] passing: 295 rows
+[summaries 2026] rushing: 967 rows
+[summaries 2026] receiving: 1645 rows
+  !! 2026: 2 of 185 games have an implausible mean EPA/play (|mean| > 0.5) -- suspect corrupt end-state yardlines; worst +0.52 in game 401861970
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 138 rows
-[summaries 2026] passing: 287 rows
-[summaries 2026] rushing: 942 rows
-[summaries 2026] receiving: 1615 rows
+[summaries 2026] passing: 295 rows
+[summaries 2026] rushing: 967 rows
+[summaries 2026] receiving: 1645 rows
   cfb_team_summaries_weekly 2026: 2025 rows, 384 cols, 15 weekly snapshots
 
 === team_summaries_weekly: 0 failures ===
@@ -227,4 +267,5 @@ cfb_rosters 2026: 25197 rows from 948/949 games | position 100.0% | division 100
   cfb_returning_production 2026: 236 rows
 
 === returning_production: 0 failures ===
-pushed: CFB Data Updated (Start: 2026 End: 2026) (attempt 1)
+push rejected (attempt 1); syncing with origin
+pushed: CFB Data Updated (Start: 2026 End: 2026) (attempt 2)

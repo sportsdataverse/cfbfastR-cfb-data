@@ -1,4 +1,5 @@
 From https://github.com/sportsdataverse/cfbfastR-cfb-data
+   1ec9c26a..6afb7492  main                   -> origin/main
  * [new branch]        AE/update-air-yards-model -> origin/AE/update-air-yards-model
  * [new branch]        chore/readme-repository-layout -> origin/chore/readme-repository-layout
  * [new branch]        docs/automation-status -> origin/docs/automation-status
@@ -157,11 +158,13 @@ cfb_rosters 2026: 25296 rows from 948/949 games | position 100.0% | division 100
 
 === cfb_rosters: 0 failures ===
   !! 2026: 2 of 185 games have an implausible mean EPA/play (|mean| > 0.5) -- suspect corrupt end-state yardlines; worst +0.52 in game 401861970
+https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/cfb_league_averages
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 138 rows
 [summaries 2026] passing: 295 rows
 [summaries 2026] rushing: 967 rows
 [summaries 2026] receiving: 1645 rows
+[summaries 2026] league_averages: 755 rows
   cfb_ratings_weekly 2026: 2020 rows, 16 cols, 15 weekly snapshots
 
 === ratings_weekly: 0 failures ===
@@ -170,88 +173,103 @@ cfb_rosters 2026: 25296 rows from 948/949 games | position 100.0% | division 100
 [summaries 2026] passing: 153 rows
 [summaries 2026] rushing: 514 rows
 [summaries 2026] receiving: 864 rows
+[summaries 2026] league_averages: 755 rows
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 137 rows
 [summaries 2026] passing: 249 rows
 [summaries 2026] rushing: 806 rows
 [summaries 2026] receiving: 1389 rows
+[summaries 2026] league_averages: 755 rows
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 138 rows
 [summaries 2026] passing: 284 rows
 [summaries 2026] rushing: 937 rows
 [summaries 2026] receiving: 1605 rows
+[summaries 2026] league_averages: 755 rows
   !! 2026: 2 of 185 games have an implausible mean EPA/play (|mean| > 0.5) -- suspect corrupt end-state yardlines; worst +0.52 in game 401861970
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 138 rows
 [summaries 2026] passing: 295 rows
 [summaries 2026] rushing: 967 rows
 [summaries 2026] receiving: 1645 rows
+[summaries 2026] league_averages: 755 rows
   !! 2026: 2 of 185 games have an implausible mean EPA/play (|mean| > 0.5) -- suspect corrupt end-state yardlines; worst +0.52 in game 401861970
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 138 rows
 [summaries 2026] passing: 295 rows
 [summaries 2026] rushing: 967 rows
 [summaries 2026] receiving: 1645 rows
+[summaries 2026] league_averages: 755 rows
   !! 2026: 2 of 185 games have an implausible mean EPA/play (|mean| > 0.5) -- suspect corrupt end-state yardlines; worst +0.52 in game 401861970
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 138 rows
 [summaries 2026] passing: 295 rows
 [summaries 2026] rushing: 967 rows
 [summaries 2026] receiving: 1645 rows
+[summaries 2026] league_averages: 755 rows
   !! 2026: 2 of 185 games have an implausible mean EPA/play (|mean| > 0.5) -- suspect corrupt end-state yardlines; worst +0.52 in game 401861970
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 138 rows
 [summaries 2026] passing: 295 rows
 [summaries 2026] rushing: 967 rows
 [summaries 2026] receiving: 1645 rows
+[summaries 2026] league_averages: 755 rows
   !! 2026: 2 of 185 games have an implausible mean EPA/play (|mean| > 0.5) -- suspect corrupt end-state yardlines; worst +0.52 in game 401861970
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 138 rows
 [summaries 2026] passing: 295 rows
 [summaries 2026] rushing: 967 rows
 [summaries 2026] receiving: 1645 rows
+[summaries 2026] league_averages: 755 rows
   !! 2026: 2 of 185 games have an implausible mean EPA/play (|mean| > 0.5) -- suspect corrupt end-state yardlines; worst +0.52 in game 401861970
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 138 rows
 [summaries 2026] passing: 295 rows
 [summaries 2026] rushing: 967 rows
 [summaries 2026] receiving: 1645 rows
+[summaries 2026] league_averages: 755 rows
   !! 2026: 2 of 185 games have an implausible mean EPA/play (|mean| > 0.5) -- suspect corrupt end-state yardlines; worst +0.52 in game 401861970
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 138 rows
 [summaries 2026] passing: 295 rows
 [summaries 2026] rushing: 967 rows
 [summaries 2026] receiving: 1645 rows
+[summaries 2026] league_averages: 755 rows
   !! 2026: 2 of 185 games have an implausible mean EPA/play (|mean| > 0.5) -- suspect corrupt end-state yardlines; worst +0.52 in game 401861970
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 138 rows
 [summaries 2026] passing: 295 rows
 [summaries 2026] rushing: 967 rows
 [summaries 2026] receiving: 1645 rows
+[summaries 2026] league_averages: 755 rows
   !! 2026: 2 of 185 games have an implausible mean EPA/play (|mean| > 0.5) -- suspect corrupt end-state yardlines; worst +0.52 in game 401861970
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 138 rows
 [summaries 2026] passing: 295 rows
 [summaries 2026] rushing: 967 rows
 [summaries 2026] receiving: 1645 rows
+[summaries 2026] league_averages: 755 rows
   !! 2026: 2 of 185 games have an implausible mean EPA/play (|mean| > 0.5) -- suspect corrupt end-state yardlines; worst +0.52 in game 401861970
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 138 rows
 [summaries 2026] passing: 295 rows
 [summaries 2026] rushing: 967 rows
 [summaries 2026] receiving: 1645 rows
+[summaries 2026] league_averages: 755 rows
   !! 2026: 2 of 185 games have an implausible mean EPA/play (|mean| > 0.5) -- suspect corrupt end-state yardlines; worst +0.52 in game 401861970
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 138 rows
 [summaries 2026] passing: 295 rows
 [summaries 2026] rushing: 967 rows
 [summaries 2026] receiving: 1645 rows
+[summaries 2026] league_averages: 755 rows
   !! 2026: 2 of 185 games have an implausible mean EPA/play (|mean| > 0.5) -- suspect corrupt end-state yardlines; worst +0.52 in game 401861970
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 138 rows
 [summaries 2026] passing: 295 rows
 [summaries 2026] rushing: 967 rows
 [summaries 2026] receiving: 1645 rows
+[summaries 2026] league_averages: 755 rows
   cfb_team_summaries_weekly 2026: 2025 rows, 384 cols, 15 weekly snapshots
 
 === team_summaries_weekly: 0 failures ===

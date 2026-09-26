@@ -96,3 +96,64 @@ def test_a_frame_without_the_level_column_only_reports_the_unfiltered_level():
     assert out["level"].to_list() == ["fbs"] and out["category"].to_list() == [
         "team_game"
     ]
+
+
+def test_league_averages_is_a_published_summaries_table():
+    from cfb_data_build.config import PKG_FUNCTION, SUMMARIES_REGISTRY
+
+    spec = SUMMARIES_REGISTRY["league_averages"]
+    assert (spec.dataset, spec.stem, spec.tag) == (
+        "league_averages",
+        "cfb_league_averages",
+        "cfb_league_averages",
+    )
+    assert (
+        PKG_FUNCTION["cfb_league_averages"]
+        == "python/cfb_data_build/league_averages.py"
+    )
+
+
+def test_player_qualifiers_are_the_leaderboard_gates():
+    from cfb_data_build.team_summaries import PLAYER_QUALIFIERS
+
+    assert {k: v[1] for k, v in PLAYER_QUALIFIERS.items()} == {
+        "passing": 14.0,
+        "rushing": 6.25,
+        "receiving": 1.875,
+    }
+
+
+def test_team_game_median_is_the_percentile_ladders_50th():
+    """The published percentiles table is the oracle for the team_game medians."""
+    from cfb_data_build.team_summaries import LEVELS as TS_LEVELS
+    from cfb_data_build.team_summaries import PERCENTILE_METRICS, _quantiles
+
+    n = 9
+    per_game = pl.DataFrame(
+        {
+            "game_id": [f"g{i}" for i in range(n)],
+            "pos_team": [f"t{i}" for i in range(n)],
+            **{
+                m: [float((i * (j + 3)) % 11) for i in range(n)]
+                for j, m in enumerate(PERCENTILE_METRICS)
+            },
+        }
+    ).with_columns(
+        pl.when(pl.col("game_id") == "g0")
+        .then(None)
+        .otherwise(pl.col("pass_success"))
+        .alias("pass_success")
+    )
+    la = build_league_averages(
+        {"team_game": per_game}, 2025, levels=TS_LEVELS, qualifiers={}
+    )
+    mid = (
+        _quantiles(per_game)
+        .filter((pl.col("pctile") - 0.5).abs() < 1e-9)
+        .row(0, named=True)
+    )
+    assert la["level"].unique().to_list() == ["fbs"]
+    assert sorted(la["metric"].to_list()) == sorted(PERCENTILE_METRICS)
+    for r in la.iter_rows(named=True):
+        assert r["median"] == pytest.approx(mid[r["metric"]], abs=1e-9), r["metric"]
+    assert la.filter(pl.col("metric") == "pass_success")["n"].item() == 8

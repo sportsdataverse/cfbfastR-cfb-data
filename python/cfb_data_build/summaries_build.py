@@ -7,7 +7,8 @@ plays frame (:mod:`cfb_data_build.summaries_input`), runs the R-script-15 port
 through the shared :func:`cfb_data_build.io.write_dataset` /
 :func:`cfb_data_build.publish.publish_dataset` path.
 
-``through_week`` filters plays to ``week <= W`` before the build — the
+``through_week`` keeps REGULAR-season games with ``week <= W`` (postseason
+week numbering restarts at 1, so it never enters a snapshot) — the
 builder-level cumulative snapshot contract (program plan P8).
 """
 
@@ -36,8 +37,9 @@ def build_summaries_season(
 
     Args:
         season: season to build.
-        through_week: keep plays with ``week <= through_week`` only
-            (``None`` = full season, what the release tags hold).
+        through_week: keep regular-season games with ``week <= through_week``
+            only (``None`` = full season incl. postseason, what the release
+            tags hold).
         base: output root directory.
         publish: upload parquet + rds + csv to each table's release tag.
         dry_run: print publish actions instead of running them.
@@ -78,7 +80,15 @@ def build_summaries_season(
 
     plays = prepare_plays_input(pbp, schedule, season)
     if through_week is not None:
-        plays = plays.filter(pl.col("week") <= through_week)
+        # REGULAR-season games through week W only. ESPN restarts postseason
+        # week numbering at 1, so a bare `week <= W` put every bowl and CFP
+        # game into every snapshot (2024 Notre Dame: valid_games 5 at
+        # through_week 1). The schedule decides, not pbp `seasonType`, which
+        # is null on some real pre-2013 regular-season games.
+        snapshot_ids = schedule.filter(
+            (pl.col("season_type_id") == 2) & (pl.col("week") <= through_week)
+        )["game_id"].cast(pl.Utf8)
+        plays = plays.filter(pl.col("game_id").is_in(snapshot_ids.implode()))
     tables = build_team_summaries(plays, season)
 
     counts: dict[str, int] = {}

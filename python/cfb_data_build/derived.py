@@ -77,6 +77,9 @@ SPECS: dict[str, DatasetSpec] = {
     "matchup_line": DatasetSpec(
         "cfb_matchup_line", "cfb_matchup_line", "cfb_matchup_line"
     ),
+    "rolling_windows": DatasetSpec(
+        "rolling_windows", "rolling_windows", "cfb_rolling_windows"
+    ),
 }
 
 
@@ -396,12 +399,87 @@ def _build_matchup_line(season: int, *, base: str = "cfb") -> pl.DataFrame:
     return build_matchup_line_season(season, base=base)
 
 
+#: first season the espn_cfb_pbp release covers; the career baseline starts here
+PBP_FLOOR = 2004
+
+
+def build_rolling_windows(season: int, *, base: str = "cfb") -> pl.DataFrame:
+    """``cfb_rolling_windows``: every entity's last-N-events form through ``season``.
+
+    Reads every committed pbp season from ``PBP_FLOOR`` to ``season`` (the career
+    history the baselines need) plus the unified schedule for kickoff dates.
+
+    Memory: `sportsdataverse.rolling_windows.rolling_windows` holds the whole
+    events history resident (~5-7 GB peak for the full 2004-2026 CFB run,
+    measured ~1.5 GB for 4 seasons). This builder keeps its own footprint down
+    by projecting to `FOOTBALL_PBP_COLUMNS` at read time rather than reading
+    each season's full pbp frame, so it doesn't add its own multiple on top.
+    """
+    from sportsdataverse.rolling_windows import (
+        FOOTBALL_PBP_COLUMNS,
+        football_events,
+        rolling_windows,
+    )
+
+    pbp_dir = Path(base) / "pbp" / "parquet"
+    seasons = [
+        s
+        for s in range(PBP_FLOOR, season + 1)
+        if (pbp_dir / f"play_by_play_{s}.parquet").is_file()
+    ]
+    if season not in seasons:
+        return pl.DataFrame()
+    pbp = pl.concat(
+        [
+            pl.read_parquet(
+                pbp_dir / f"play_by_play_{s}.parquet",
+                columns=[
+                    c
+                    for c in FOOTBALL_PBP_COLUMNS
+                    if c
+                    in pl.read_parquet_schema(pbp_dir / f"play_by_play_{s}.parquet")
+                ],
+            )
+            for s in seasons
+        ],
+        how="diagonal_relaxed",
+    )
+    dates = (
+        pl.concat(
+            [
+                pl.read_parquet(
+                    Path(base)
+                    / "cfb_schedules"
+                    / "parquet"
+                    / f"cfb_schedules_{s}.parquet",
+                    columns=["game_id", "start_date"],
+                )
+                for s in seasons
+            ],
+            how="vertical_relaxed",
+        )
+        .unique("game_id")
+        .select(
+            pl.col("game_id").cast(pl.Int64),
+            # start_date is a UTC instant; a late CFB kickoff is still the prior
+            # evening on the US East Coast, so convert before taking the date --
+            # otherwise a handful of late bowl games land on the wrong calendar day.
+            game_date=pl.col("start_date")
+            .str.to_datetime(time_zone="UTC")
+            .dt.convert_time_zone("America/New_York")
+            .dt.date(),
+        )
+    )
+    return rolling_windows(football_events(pbp, dates), season)
+
+
 BUILDERS = {
     "gamelog": build_gamelog,
     "ratings_weekly": build_ratings_weekly,
     "team_summaries_weekly": build_team_summaries_weekly,
     "matchup_features": _build_matchup_features,
     "matchup_line": _build_matchup_line,
+    "rolling_windows": build_rolling_windows,
 }
 
 

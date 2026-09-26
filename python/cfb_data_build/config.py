@@ -428,6 +428,7 @@ PKG_FUNCTION: dict[str, str] = {
     "cfb_team_summaries_weekly": "sportsdataverse.cfb.load_cfb_team_summaries_weekly()",
     "cfb_matchup_features": "python/espn_cfb_41_matchup_features_creation.py",
     "cfb_matchup_line": "python/espn_cfb_42_matchup_line_creation.py",
+    "cfb_rolling_windows": "python/espn_cfb_64_rolling_windows_creation.py",
     # no loader yet; consumers read sdv-db cfb.league_averages
     "cfb_league_averages": "python/cfb_data_build/league_averages.py",
 }

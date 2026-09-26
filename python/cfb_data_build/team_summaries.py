@@ -261,11 +261,49 @@ def add_derived_metrics(plays: pl.DataFrame) -> pl.DataFrame:
     return df.sort(["game_id", "game_play_number"])
 
 
+#: every MEAN-aggregated team metric -> the play-level column it averages. Its
+#: ``_n`` is that column's non-null count: the mean's actual denominator (a red-zone
+#: success rate is over red-zone plays, not all plays).
+_TEAM_MEAN_SOURCES: dict[str, str] = {
+    "passrate": "pass",
+    "rushrate": "rush",
+    "havoc": "havoc",
+    "explosive": "explosive",
+    "EPAplay": "EPA",
+    "yardsplay": "yards_gained",
+    "play_stuffed": "play_stuffed",
+    "success": "epa_success",
+    "red_zone_success": "red_zone_success",
+    "third_down_success": "third_down_success",
+    "third_down_distance": "third_down_distance",
+    "late_down_success": "late_down_success",
+    "early_down_EPA": "early_down_EPA",
+    "start_position": "drive_start_yards_to_goal",
+    "nonExplosiveEpaPerPlay": "nonExplosiveEpa",
+    "line_yards": "line_yards",
+    "opportunity_rate": "opportunity_run",
+}
+#: ratio metrics -> the count they divide by (read before n_games / n_drives are dropped)
+_TEAM_RATIO_DENOMINATORS: dict[str, str] = {
+    "playsgame": "n_games",
+    "EPAgame": "n_games",
+    "yardsgame": "n_games",
+    "drivesgame": "n_games",
+    "EPAdrive": "n_drives",
+    "yardsdrive": "n_drives",
+    "playsdrive": "n_drives",
+}
+
+
 def _summarize_team(
     df: pl.DataFrame, group: str, *, ascending: bool, remove_cols: tuple[str, ...] = ()
 ) -> pl.DataFrame:
     """Port of ``summarize_team_df`` (group already chosen via ``group``)."""
     g = df.group_by(group).agg(
+        *[
+            pl.col(src).is_not_null().sum().cast(pl.Int64).alias(f"{m}_n")
+            for m, src in _TEAM_MEAN_SOURCES.items()
+        ],
         plays=pl.len(),
         n_games=pl.col("game_id").n_unique(),
         n_drives=pl.col("drive_id").n_unique(),
@@ -298,6 +336,10 @@ def _summarize_team(
         drivesgame=pl.col("n_drives") / pl.col("n_games"),
         yardsdrive=pl.col("yards") / pl.col("n_drives"),
         playsdrive=pl.col("plays") / pl.col("n_drives"),
+        *[
+            pl.col(d).cast(pl.Int64).alias(f"{m}_n")
+            for m, d in _TEAM_RATIO_DENOMINATORS.items()
+        ],
     ).drop("n_games", "n_drives")
 
     g = g.sort(
@@ -605,7 +647,7 @@ def _build_schools(plays: pl.DataFrame) -> pl.DataFrame:
 
 
 def _clean_rank_columns(df: pl.DataFrame) -> pl.DataFrame:
-    """Port of ``clean_columns`` -- relocate the ``_rank`` suffix to the column END.
+    """Port of ``clean_columns`` -- relocate the ``_rank`` and ``_n`` suffixes to the column END.
 
     ``TEPA_rank_off`` -> ``TEPA_off_rank`` (after the join ``_off``/``_pass``
     suffixes land mid-name). No-op for plain ``X_rank`` leaderboard columns.
@@ -613,6 +655,8 @@ def _clean_rank_columns(df: pl.DataFrame) -> pl.DataFrame:
     renames = {
         c: c.replace("_rank", "", 1) + "_rank" for c in df.columns if "_rank" in c
     }
+    # ...and ``EPAplay_n_off_pass`` -> ``EPAplay_off_pass_n`` for the sample sizes
+    renames |= {c: c.replace("_n_", "_", 1) + "_n" for c in df.columns if "_n_" in c}
     renames = {k: v for k, v in renames.items() if k != v}
     return df.rename(renames) if renames else df
 
@@ -704,7 +748,7 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
         off.join(def_, left_on="pos_team_id", right_on="def_pos_team_id", how="left")
     )
 
-    rc = ("start_position", "start_position_rank")
+    rc = ("start_position", "start_position_rank", "start_position_n")
     off_pass = _suffix_nonkey(
         _summarize_team(
             team_off.filter(pl.col("pass") == 1),

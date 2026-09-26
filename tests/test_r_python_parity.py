@@ -87,7 +87,7 @@ KNOWN_UNPAIRED: dict[str, str] = {
 # Numbered shims that are NOT `REGISTRY` rows. `REGISTRY` describes datasets
 # reshaped out of a game's `final.json`; these three are built other ways.
 #   adv_box          orchestrator -- one R stage fans out to ten python datasets
-#   team_summaries   assembled from the 5-table summaries family
+#   team_summaries   assembled from the 6-table summaries family
 #   fpi_weekly       fetched from the core-v2 powerindex API, not final.json
 #                    (cfb_data_build.fpi, dispatched via cli.FPI)
 # The usage / situational box (sportsdataverse.football.usage_box: player and

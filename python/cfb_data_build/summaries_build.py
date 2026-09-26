@@ -1,4 +1,4 @@
-"""Season driver for the team-summaries family (5 tables from released pbp).
+"""Season driver for the team-summaries family (6 tables from released pbp).
 
 Unlike the ``final.json`` datasets, this family reads the RELEASED
 ``espn_cfb_pbp`` + ``espn_cfb_schedule`` via the sdv-py loaders, preps the
@@ -32,7 +32,7 @@ def build_summaries_season(
     pbp: pl.DataFrame | None = None,
     schedule: pl.DataFrame | None = None,
 ) -> dict[str, int]:
-    """Build (and optionally publish) the 5-table family for one season.
+    """Build (and optionally publish) the 6-table family for one season.
 
     Args:
         season: season to build.

@@ -36,10 +36,12 @@ Expected `col_name | col_type | col_description` for each per-game-compiled **se
 | [rushing](#rushing) † | one row per (team, rusher) per season | 28 | `espn_cfb_rushing` |
 | [receiving](#receiving) † | one row per (team, receiver) per season | 32 | `espn_cfb_receiving` |
 | [percentiles](#percentiles) † | one row per percentile (1–99) | 27 | `espn_cfb_percentiles` |
+| [cfb_league_averages](#cfb_league_averages) † | one row per (season, level, entity, category, metric) | 10 | `cfb_league_averages` |
 
 > † **Season-level summary datasets.** Unlike every table above (per-game `final`
-> JSON reshaped into a compiled season), these five are produced by
-> `R/espn_cfb_15_team_summaries_creation.R`, which aggregates a *full season* of
+> JSON reshaped into a compiled season), these six are produced by
+> `R/espn_cfb_15_team_summaries_creation.R` (`cfb_league_averages` is Python-only,
+> `python/cfb_data_build/league_averages.py`), which aggregates a *full season* of
 > enriched play-by-play (`cfbfastR::load_cfb_pbp()`) into season-grained,
 > opponent-adjusted team and player summaries (the "Binion Box Score"). See the
 > [Season-level summary datasets](#season-level-summary-datasets) section at the end
@@ -1435,14 +1437,19 @@ _Release tag: `espn_cfb_teams`_
 
 ## Season-level summary datasets
 
-The five datasets below are **not** reshaped per-game `final` JSON like every table
-above. They are produced by `R/espn_cfb_15_team_summaries_creation.R`, which loads a
+The six datasets below are **not** reshaped per-game `final` JSON like every table
+above. Five of them (`team_summaries`, `passing`, `rushing`, `receiving`,
+`percentiles`) are produced by `R/espn_cfb_15_team_summaries_creation.R`, which loads a
 full season of enriched play-by-play via `cfbfastR::load_cfb_pbp()` and aggregates it
 into season-grained, opponent-adjusted team and player summaries (the "Binion Box
 Score", ported from game-on-paper's `cfb-team-summaries`). Garbage-time plays are
-filtered before aggregation. Schemas are season-invariant; column counts shown are
-from the 2025 season. Because the repo's `cfb/` tree is gitignored, these live only
-in the `sportsdataverse-data` releases.
+filtered before aggregation. The sixth, `cfb_league_averages`, is Python-only
+(`python/cfb_data_build/league_averages.py`): it summarizes `team_summaries`,
+`passing`, `rushing`, `receiving`, and the per-game frame that also feeds
+`percentiles` (not `percentiles` itself) into per-level baselines, and has no R
+counterpart. Schemas are season-invariant; column counts shown are from the 2025
+season. Because the repo's `cfb/` tree is gitignored, these live only in the
+`sportsdataverse-data` releases.
 
 **Shared identity columns** — present on `team_summaries`, `passing`, `rushing`, and
 `receiving` (the player tables add `player_id` + a `{type}_player_name`):
@@ -1694,6 +1701,34 @@ team's number against the FBS field. No team identity columns.
 | third_down_distance | double | Third-down distance to go. |
 
 _Release tag: `espn_cfb_percentiles`_
+
+---
+
+### cfb_league_averages
+
+One row per `(season, level, entity, category, metric)` — the mean / median / sd / n
+league baseline for every published metric column, split by tier. The statistics
+describe the DISTRIBUTION OF ENTITY ROWS (teams, qualified players, or team-games) —
+the same population the `_rank` / `_pct` columns and the `percentiles` ladder are cut
+over — not a pooled per-play rate. A null or non-finite metric value is skipped and
+does not count toward `n`. Python-only (`python/cfb_data_build/league_averages.py`),
+built from the finished `team_summaries` / `passing` / `rushing` / `receiving` tables
+plus the per-game frame that also feeds `percentiles`; no R counterpart.
+
+| col_name | col_type | col_description |
+| --- | --- | --- |
+| season | integer | Season year (e.g. 2025). |
+| level | character | Tier the row is scoped to: `fbs` (all FBS), `p4` (Power 4/5 — the Power 5 including the Pac-12 for seasons 2023 and earlier, Power 4 from 2024), or `g5` (Group of 5/6, same season cutover). No `fcs` level: this family is built from FBS-vs-FBS games only. |
+| entity | character | Population the row's rows are drawn from: `team` (`team_summaries`, `team_game`) or `player` (`passing`, `rushing`, `receiving`). |
+| category | character | Source table the metric comes from: `team_summaries`, `passing`, `rushing`, `receiving`, or `team_game` (the per-game frame behind `percentiles`). |
+| metric | character | Name of the summarized column (e.g. `EPAplay`, `TEPA`). Ids, ranks, percentiles (incl. `_pos_pct`/`_conf_pct`) and sample-size columns are never metrics. |
+| mean | double | Unweighted mean of `metric` across qualifying, finite rows. |
+| median | double | Median of `metric` across qualifying, finite rows. |
+| sd | double | Sample standard deviation (`ddof=1`); null when `n == 1` (no spread from a single value). |
+| n | integer | Count of finite, qualifying rows the statistics are computed over — the same denominator as the matching `_pct` column. |
+| qualifier_min | double | The per-team-game leaderboard gate applied before summarizing a player category (14.0 dropbacks for `passing`, 6.25 carries for `rushing`, 1.875 targets for `receiving`); null for the team categories (`team_summaries`, `team_game`), which have no qualifier. |
+
+_Release tag: `cfb_league_averages`_
 
 ---
 

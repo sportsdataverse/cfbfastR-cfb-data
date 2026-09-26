@@ -3,8 +3,9 @@
 
 Unlike the other datasets this is a **season-level aggregation off a full
 cfbfastR-schema season pbp** (``cfbfastR::load_cfb_pbp`` in R; the analogous
-``sportsdataverse.cfb.load_cfb_pbp`` in Python). It produces 5 released tables:
-``percentiles``, ``team_summaries``, ``passing``, ``rushing``, ``receiving``.
+``sportsdataverse.cfb.load_cfb_pbp`` in Python). It produces 6 released tables:
+``percentiles``, ``team_summaries``, ``passing``, ``rushing``, ``receiving``,
+``league_averages``.
 
 This module IS the live producer. R's ``espn_cfb_15`` was retired once the P2
 pbp rebuild made the Python season-pbp source current -- ``scripts/
@@ -33,6 +34,7 @@ import polars as pl
 from sportsdataverse.cfb import cfb_adjusted_epa
 
 from .checks import assert_adjustment_is_real, assert_passer_epa_includes_sacks
+from .league_averages import build_league_averages
 
 # Explosive-play EPA thresholds (R build lines 604-608).
 _EXPLOSIVE_PASS_EPA = 2.4
@@ -47,6 +49,55 @@ _EXPLOSIVE_RUSH_EPA = 1.8
 # site and say why.
 # GEI normalization constant (R build line 664).
 _GEI_NORM = 179.01777401608126
+
+#: leaderboard qualifier gates, per team game (Pro-Football-Reference's three
+#: minimums; nfl-data's grid uses the same). ONE definition feeds the rank /
+#: percentile attach and the league baselines, so a baseline is never taken over a
+#: different population than the ``_pct`` beside it. (gate, minimum per team game)
+PLAYER_QUALIFIERS: dict[str, tuple[pl.Expr, float]] = {
+    "passing": (pl.col("dropbacks") >= 14.0 * pl.col("team_games"), 14.0),
+    "rushing": (pl.col("plays") >= 6.25 * pl.col("team_games"), 6.25),
+    "receiving": (pl.col("plays") >= 1.875 * pl.col("team_games"), 1.875),
+}
+
+#: league-baseline levels over the published ``fbs_class``: P5/G5 through 2023,
+#: P4/G6 from 2024. A null class (an independent other than Notre Dame) is in
+#: ``fbs`` only. No ``fcs`` level: this family is built from FBS-vs-FBS games.
+LEVELS: dict[str, pl.Expr | None] = {
+    "fbs": None,
+    "p4": pl.col("fbs_class").is_in(["P4", "P5"]),
+    "g5": pl.col("fbs_class").is_in(["G5", "G6"]),
+}
+
+#: the per-(game, team) metrics the percentile ladder is cut on, in R ``reframe`` order
+PERCENTILE_METRICS: list[str] = [
+    "GEI",
+    "EPAplay",
+    "pass_success",
+    "rush_success",
+    "early_down_success",
+    "early_down_EPA",
+    "late_down_success",
+    "success",
+    "yardsplay",
+    "dropbacks",
+    "rushes",
+    "EPAdropback",
+    "EPArush",
+    "yardsdropback",
+    "pass_explosive",
+    "rush_explosive",
+    "explosive",
+    "third_down_success",
+    "red_zone_success",
+    "play_stuffed",
+    "nonExplosiveEpaPerPlay",
+    "havoc",
+    "yardsrush",
+    "lineyards",
+    "opportunity_run",
+    "third_down_distance",
+]
 
 
 def _rank(col: str, *, descending: bool) -> pl.Expr:
@@ -413,8 +464,10 @@ def summarize_receiver(df: pl.DataFrame, by: list[str]) -> pl.DataFrame:
     )
 
 
-def prepare_percentiles(df: pl.DataFrame) -> pl.DataFrame:
-    """Port of ``prepare_percentiles`` -- per-(game,team) metrics then 1..99 quantiles."""
+def per_game_metrics(df: pl.DataFrame) -> pl.DataFrame:
+    """One row per (game_id, pos_team): the team-game metrics both the percentile
+    ladder and the ``team_game`` league baselines are cut over.
+    """
     per_game = df.group_by(["game_id", "pos_team"]).agg(
         GEI=pl.col("GEI").drop_nulls().first(),
         EPAplay=pl.col("EPA").mean(),
@@ -482,41 +535,15 @@ def prepare_percentiles(df: pl.DataFrame) -> pl.DataFrame:
     ).drop(
         "sum_pos_EPA_pass", "sum_pos_EPA_rush", "sum_yds_receiving", "sum_yds_sacked"
     )
+    return per_game.select("game_id", "pos_team", *PERCENTILE_METRICS)
 
-    # metric columns in the R `reframe` order (everything except game_id/pos_team)
-    metric_cols = [
-        "GEI",
-        "EPAplay",
-        "pass_success",
-        "rush_success",
-        "early_down_success",
-        "early_down_EPA",
-        "late_down_success",
-        "success",
-        "yardsplay",
-        "dropbacks",
-        "rushes",
-        "EPAdropback",
-        "EPArush",
-        "yardsdropback",
-        "pass_explosive",
-        "rush_explosive",
-        "explosive",
-        "third_down_success",
-        "red_zone_success",
-        "play_stuffed",
-        "nonExplosiveEpaPerPlay",
-        "havoc",
-        "yardsrush",
-        "lineyards",
-        "opportunity_run",
-        "third_down_distance",
-    ]
+
+def _quantiles(per_game: pl.DataFrame) -> pl.DataFrame:
+    """The 1..99 ladder over :func:`per_game_metrics` (R quantile type 7 == numpy 'linear')."""
     pctiles = [round(0.01 * i, 2) for i in range(1, 100)]
     rows = {"pctile": pctiles}
-    for c in metric_cols:
+    for c in PERCENTILE_METRICS:
         vals = per_game[c].to_numpy().astype(float)
-        # R quantile type 7 (default) == numpy 'linear'
         rows[c] = [float(np.nanquantile(vals, p, method="linear")) for p in pctiles]
     return pl.DataFrame(rows)
 
@@ -647,7 +674,7 @@ def _prepare_for_write(
 
 
 def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.DataFrame]:
-    """Build the 5 season tables from a cleaned cfbfastR pbp frame (R build lines 554-958)."""
+    """Build the 6 season tables from a cleaned cfbfastR pbp frame (R build lines 554-958)."""
     plays = add_derived_metrics(plays_input)
     warn_implausible_epa_games(plays, yr)
     team_off = plays.filter(
@@ -661,7 +688,8 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
         GEI=(pl.col("wpa").abs().sum().over("game_id"))
         * (_GEI_NORM / pl.len().over("game_id"))
     )
-    percentiles = prepare_percentiles(pctls)
+    per_game = per_game_metrics(pctls)
+    percentiles = _quantiles(per_game)
 
     # team off/def overall + pass + rush + drives
     off = _suffix_nonkey(
@@ -1048,7 +1076,7 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
     qb_data = _attach_leader_ranks(
         qb_data,
         keys=["pos_team_id", "passer_player_id"],
-        min_expr=pl.col("dropbacks") >= (14 * pl.col("team_games")),
+        min_expr=PLAYER_QUALIFIERS["passing"][0],
         rank_cols=[
             "TEPA",
             "EPAgame",
@@ -1078,7 +1106,7 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
     rb_data = _attach_leader_ranks(
         rb_data,
         keys=["pos_team_id", "rush_player_id"],
-        min_expr=pl.col("plays") >= (6.25 * pl.col("team_games")),
+        min_expr=PLAYER_QUALIFIERS["rushing"][0],
         rank_cols=[
             "TEPA",
             "EPAgame",
@@ -1114,7 +1142,7 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
     wr_data = _attach_leader_ranks(
         wr_data,
         keys=["pos_team_id", "receiver_player_id"],
-        min_expr=pl.col("plays") >= (1.875 * pl.col("team_games")),
+        min_expr=PLAYER_QUALIFIERS["receiving"][0],
         rank_cols=[
             "TEPA",
             "EPAgame",
@@ -1158,13 +1186,20 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
         {"receiver_player_id": "player_id"}
     )
 
-    return {
+    tables = {
         "percentiles": percentiles,
         "team_summaries": team_data,
         "passing": qb_out,
         "rushing": rb_out,
         "receiving": wr_out,
     }
+    tables["league_averages"] = build_league_averages(
+        {**tables, "team_game": per_game},
+        yr,
+        levels=LEVELS,
+        qualifiers=PLAYER_QUALIFIERS,
+    )
+    return tables
 
 
 def _add_team_games(df: pl.DataFrame) -> pl.DataFrame:

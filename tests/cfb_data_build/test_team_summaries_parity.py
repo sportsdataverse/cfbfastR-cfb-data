@@ -202,6 +202,8 @@ def test_team_summaries_parity(
     yr, out = built
     oracle = pl.read_parquet(FIX / f"oracle_ts_{ds}_{yr}.parquet")
     got = out[ds]
+    # _n sample sizes are Python-only and unit-tested in test_sample_sizes.py
+    got = got.drop([c for c in got.columns if c.endswith("_n")])
     if ds == "passing":
         # #31 keeps sack- and interception-only passers the oracle never had
         only_py = got.join(oracle.select(keys), on=keys, how="anti")

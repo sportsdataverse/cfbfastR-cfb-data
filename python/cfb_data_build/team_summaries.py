@@ -261,11 +261,49 @@ def add_derived_metrics(plays: pl.DataFrame) -> pl.DataFrame:
     return df.sort(["game_id", "game_play_number"])
 
 
+#: every MEAN-aggregated team metric -> the play-level column it averages. Its
+#: ``_n`` is that column's non-null count: the mean's actual denominator (a red-zone
+#: success rate is over red-zone plays, not all plays).
+_TEAM_MEAN_SOURCES: dict[str, str] = {
+    "passrate": "pass",
+    "rushrate": "rush",
+    "havoc": "havoc",
+    "explosive": "explosive",
+    "EPAplay": "EPA",
+    "yardsplay": "yards_gained",
+    "play_stuffed": "play_stuffed",
+    "success": "epa_success",
+    "red_zone_success": "red_zone_success",
+    "third_down_success": "third_down_success",
+    "third_down_distance": "third_down_distance",
+    "late_down_success": "late_down_success",
+    "early_down_EPA": "early_down_EPA",
+    "start_position": "drive_start_yards_to_goal",
+    "nonExplosiveEpaPerPlay": "nonExplosiveEpa",
+    "line_yards": "line_yards",
+    "opportunity_rate": "opportunity_run",
+}
+#: ratio metrics -> the count they divide by (read before n_games / n_drives are dropped)
+_TEAM_RATIO_DENOMINATORS: dict[str, str] = {
+    "playsgame": "n_games",
+    "EPAgame": "n_games",
+    "yardsgame": "n_games",
+    "drivesgame": "n_games",
+    "EPAdrive": "n_drives",
+    "yardsdrive": "n_drives",
+    "playsdrive": "n_drives",
+}
+
+
 def _summarize_team(
     df: pl.DataFrame, group: str, *, ascending: bool, remove_cols: tuple[str, ...] = ()
 ) -> pl.DataFrame:
     """Port of ``summarize_team_df`` (group already chosen via ``group``)."""
     g = df.group_by(group).agg(
+        *[
+            pl.col(src).is_not_null().sum().cast(pl.Int64).alias(f"{m}_n")
+            for m, src in _TEAM_MEAN_SOURCES.items()
+        ],
         plays=pl.len(),
         n_games=pl.col("game_id").n_unique(),
         n_drives=pl.col("drive_id").n_unique(),
@@ -298,6 +336,10 @@ def _summarize_team(
         drivesgame=pl.col("n_drives") / pl.col("n_games"),
         yardsdrive=pl.col("yards") / pl.col("n_drives"),
         playsdrive=pl.col("plays") / pl.col("n_drives"),
+        *[
+            pl.col(d).cast(pl.Int64).alias(f"{m}_n")
+            for m, d in _TEAM_RATIO_DENOMINATORS.items()
+        ],
     ).drop("n_games", "n_drives")
 
     g = g.sort(
@@ -605,14 +647,21 @@ def _build_schools(plays: pl.DataFrame) -> pl.DataFrame:
 
 
 def _clean_rank_columns(df: pl.DataFrame) -> pl.DataFrame:
-    """Port of ``clean_columns`` -- relocate the ``_rank`` suffix to the column END.
+    """Port of ``clean_columns`` -- relocate the ``_rank`` and ``_n`` suffixes to the column END.
 
     ``TEPA_rank_off`` -> ``TEPA_off_rank`` (after the join ``_off``/``_pass``
     suffixes land mid-name). No-op for plain ``X_rank`` leaderboard columns.
     """
-    renames = {
+    rank_renames = {
         c: c.replace("_rank", "", 1) + "_rank" for c in df.columns if "_rank" in c
     }
+    # ...and ``EPAplay_n_off_pass`` -> ``EPAplay_off_pass_n`` for the sample sizes
+    n_renames = {c: c.replace("_n_", "_", 1) + "_n" for c in df.columns if "_n_" in c}
+    assert not (rank_renames.keys() & n_renames.keys()), (
+        "a column needs both a _rank and a _n_ mid-name relocation -- "
+        "the two rename dicts must stay disjoint"
+    )
+    renames = rank_renames | n_renames
     renames = {k: v for k, v in renames.items() if k != v}
     return df.rename(renames) if renames else df
 
@@ -704,7 +753,7 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
         off.join(def_, left_on="pos_team_id", right_on="def_pos_team_id", how="left")
     )
 
-    rc = ("start_position", "start_position_rank")
+    rc = ("start_position", "start_position_rank", "start_position_n")
     off_pass = _suffix_nonkey(
         _summarize_team(
             team_off.filter(pl.col("pass") == 1),
@@ -1096,6 +1145,7 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
         ],
         asc_cols=["pass_int", "sacked"],
     )
+    qb_data = _attach_sample_sizes(qb_data, PLAYER_SAMPLE_SIZES["passing"])
 
     rb_data = summarize_rusher(
         team_off.filter(
@@ -1121,6 +1171,7 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
         ],
         asc_cols=["fumbles"],
     )
+    rb_data = _attach_sample_sizes(rb_data, PLAYER_SAMPLE_SIZES["rushing"])
 
     wr_data = summarize_receiver(
         team_off.with_columns(
@@ -1159,6 +1210,7 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
         ],
         asc_cols=["fumbles"],
     )
+    wr_data = _attach_sample_sizes(wr_data, PLAYER_SAMPLE_SIZES["receiving"])
 
     schools = _build_schools(plays)
     # Opponent-adjusted EPA via the shared sdv-py primitive (was a local copy;
@@ -1200,6 +1252,49 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
         qualifiers=PLAYER_QUALIFIERS,
     )
     return tables
+
+
+_PER_GAME_N = {m: pl.col("games") for m in ("EPAgame", "yardsgame", "playsgame")}
+#: player rate -> the count it is a rate over, so ``{rate}_n`` is the real sample.
+#: Transcribed from summarize_passer/rusher/receiver and the QB pipeline in
+#: build_team_summaries: a rate whose denominator changes there changes here.
+PLAYER_SAMPLE_SIZES: dict[str, dict[str, pl.Expr]] = {
+    "passing": {
+        "EPAplay": pl.col(
+            "dropbacks"
+        ),  # TEPA / dropbacks (sacks + INTs folded in, #30)
+        "yardsdropback": pl.col("dropbacks"),
+        "comppct": pl.col("att") + pl.col("pass_int"),
+        "success": pl.col("plays"),  # mean over attempts
+        "yardsplay": pl.col("plays"),
+        "detmer": pl.col("games"),
+        "detmergame": pl.col("games"),
+        **_PER_GAME_N,
+    },
+    "rushing": {
+        "EPAplay": pl.col("plays"),
+        "success": pl.col("plays"),
+        "yardsplay": pl.col("plays"),
+        **_PER_GAME_N,
+    },
+    "receiving": {
+        "EPAplay": pl.col("plays"),
+        "success": pl.col("plays"),
+        "yardsplay": pl.col("plays"),
+        "catchpct": pl.col("targets"),
+        **_PER_GAME_N,
+    },
+}
+
+
+def _attach_sample_sizes(
+    df: pl.DataFrame, denominators: dict[str, pl.Expr]
+) -> pl.DataFrame:
+    """Add ``{rate}_n`` beside every rate ``df`` carries: the count it is a rate over (0 when null)."""
+    present = {m: e for m, e in denominators.items() if m in df.columns}
+    return df.with_columns(
+        *[e.fill_null(0).cast(pl.Int64).alias(f"{m}_n") for m, e in present.items()]
+    )
 
 
 def _add_team_games(df: pl.DataFrame) -> pl.DataFrame:

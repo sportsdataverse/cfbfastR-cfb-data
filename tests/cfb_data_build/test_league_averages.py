@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import polars as pl
 import pytest
+from polars.testing import assert_frame_equal
 
 from cfb_data_build.league_averages import SCHEMA, build_league_averages, summarize
 
@@ -47,6 +48,30 @@ def test_summarize_counts_only_finite_metric_values():
         and epa["qualifier_min"] is None
     )
     assert ypp["n"] == 3 and ypp["mean"] == pytest.approx(3.0)
+
+
+def test_summarize_is_bit_stable_across_row_order():
+    """mean/sd must not depend on the unordered group_by feed's row order.
+
+    ``1e16 + -1e16`` cancels exactly, but ``1e16 + 0.1`` loses the 0.1 to
+    float64 precision -- so summing this set in a different order lands on a
+    different total (0.0 vs 0.6) unless the values are sorted before the
+    reduction. That is a real bug class, not a manufactured edge case: polars'
+    parallel group_by does not guarantee a row order, so an unsorted mean/std
+    churns the published parquet byte-for-byte between identical rebuilds.
+    """
+    values = [0.1, 0.2, 0.3, 1e16, -1e16]
+    order_a = pl.DataFrame({"team_id": list(range(len(values))), "v": values})
+    order_b = pl.DataFrame(
+        {
+            "team_id": list(range(len(values))),
+            "v": [1e16, -1e16, 0.1, 0.2, 0.3],
+        }
+    )
+    kwargs = dict(season=2025, level="fbs", entity="team", category="team_summaries")
+    out_a = summarize(order_a, **kwargs)
+    out_b = summarize(order_b, **kwargs)
+    assert_frame_equal(out_a, out_b, check_exact=True)
 
 
 def test_summarize_empty_frame_keeps_the_schema():

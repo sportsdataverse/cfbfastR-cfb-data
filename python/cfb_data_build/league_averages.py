@@ -79,10 +79,16 @@ def summarize(
         # is_finite() is null on a null, and filter keeps only True
         .filter(pl.col("v").is_finite())
     )
+    # group_by's per-group row order is not guaranteed, and float sum/variance
+    # are not associative -- summing the same values in a different order can
+    # land on a different last bit. Sort each group's values first so the
+    # aggregation is a pure function of the value multiset, not of whatever
+    # order the parallel group_by happened to hand it this run (else the
+    # published parquet churns byte-for-byte between identical rebuilds).
     out = long.group_by("metric", maintain_order=True).agg(
-        mean=pl.col("v").mean(),
-        median=pl.col("v").median(),
-        sd=pl.col("v").std(),
+        mean=pl.col("v").sort().mean(),
+        median=pl.col("v").sort().median(),
+        sd=pl.col("v").sort().std(),
         n=pl.len(),
     )
     return (

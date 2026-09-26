@@ -548,11 +548,6 @@ def _quantiles(per_game: pl.DataFrame) -> pl.DataFrame:
     return pl.DataFrame(rows)
 
 
-def prepare_percentiles(df: pl.DataFrame) -> pl.DataFrame:
-    """Port of ``prepare_percentiles`` -- per-(game,team) metrics then 1..99 quantiles."""
-    return _quantiles(per_game_metrics(df))
-
-
 def warn_implausible_epa_games(plays: pl.DataFrame, yr: int) -> pl.DataFrame:
     """Report games whose mean EPA/play is impossible, before they poison the tables.
 

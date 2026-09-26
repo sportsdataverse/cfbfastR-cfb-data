@@ -354,7 +354,9 @@ SUMMARIES_REGISTRY: dict[str, DatasetSpec] = {
     "passing": DatasetSpec("passing", "cfb_passing", "espn_cfb_passing"),
     "rushing": DatasetSpec("rushing", "cfb_rushing", "espn_cfb_rushing"),
     "receiving": DatasetSpec("receiving", "cfb_receiving", "espn_cfb_receiving"),
-    # per-level baselines over the five tables above (league_averages.py)
+    # per-level baselines over team_summaries/passing/rushing/receiving plus
+    # the per-game frame that feeds "percentiles" (not percentiles itself);
+    # see league_averages.py
     "league_averages": DatasetSpec(
         "league_averages", "cfb_league_averages", "cfb_league_averages"
     ),

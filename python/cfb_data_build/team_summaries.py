@@ -674,7 +674,7 @@ def _prepare_for_write(
 
 
 def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.DataFrame]:
-    """Build the 5 season tables from a cleaned cfbfastR pbp frame (R build lines 554-958)."""
+    """Build the 6 season tables from a cleaned cfbfastR pbp frame (R build lines 554-958)."""
     plays = add_derived_metrics(plays_input)
     warn_implausible_epa_games(plays, yr)
     team_off = plays.filter(

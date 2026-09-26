@@ -142,10 +142,10 @@ for i in $(seq "${START_YEAR}" "${END_YEAR}"); do
     for ds in $PY_UNIFIED_SCHEDULES; do run_py "$ds" --publish; done
     for ds in $PY_ROSTERS; do run_py "$ds" --publish; done
 
-    # The 5-table summaries family. This ran on R (espn_cfb_15) because the
+    # The 6-table summaries family. This ran on R (espn_cfb_15) because the
     # Python season-pbp source was stale for the current season; the P2 pbp
     # rebuild fixed that -- load_cfb_pbp(2025) now returns 165,850 rows / 956
-    # games and the Python driver builds all 5 tables for 2025. R retired here.
+    # games and the Python driver builds all 6 tables for 2025. R retired here.
     run_py summaries --publish
 
     for ds in $PY_WEEKLY; do run_py "$ds" --no-fetch --publish; done

@@ -5,6 +5,8 @@ from __future__ import annotations
 import polars as pl
 
 from cfb_data_build.team_summaries import (
+    PLAYER_SAMPLE_SIZES,
+    _attach_sample_sizes,
     _TEAM_MEAN_SOURCES,
     _TEAM_RATIO_DENOMINATORS,
     _clean_rank_columns,
@@ -69,3 +71,43 @@ def test_n_suffix_moves_to_the_end_like_rank():
         "TEPA_off_rank",
         "plays_off",
     ]
+
+
+def test_player_rate_n_is_its_real_denominator():
+    # row 2: a sack-only passer -- no attempts, two dropbacks
+    qb = pl.DataFrame(
+        {
+            "dropbacks": [30.0, 2.0],
+            "plays": [25, 0],
+            "att": [24.0, 0.0],
+            "pass_int": [1, 0],
+            "games": [3, 1],
+            "EPAplay": [0.2, -1.5],
+            "comppct": [0.6, None],
+            "success": [0.5, None],
+            "yardsplay": [7.0, None],
+            "yardsdropback": [6.0, -3.0],
+            "EPAgame": [2.0, -3.0],
+            "yardsgame": [60.0, 0.0],
+            "playsgame": [8.3, 0.0],
+            "detmer": [0.1, 0.0],
+            "detmergame": [0.1, 0.0],
+        }
+    )
+    out = _attach_sample_sizes(qb, PLAYER_SAMPLE_SIZES["passing"])
+    assert out["EPAplay_n"].to_list() == [30, 2]  # per DROPBACK: sacks + picks included
+    assert out["comppct_n"].to_list() == [
+        25,
+        0,
+    ]  # att + pass_int; 0 where comppct is null
+    assert out["success_n"].to_list() == [25, 0]
+    assert out["EPAgame_n"].to_list() == [3, 1]
+    assert all(out.schema[c] == pl.Int64 for c in out.columns if c.endswith("_n"))
+
+
+def test_a_rate_the_table_lacks_gets_no_n_column():
+    out = _attach_sample_sizes(
+        pl.DataFrame({"plays": [5], "EPAplay": [0.1]}),
+        {"EPAplay": pl.col("plays"), "catchpct": pl.col("targets")},
+    )
+    assert "catchpct_n" not in out.columns and out["EPAplay_n"].to_list() == [5]

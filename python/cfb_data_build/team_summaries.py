@@ -652,11 +652,16 @@ def _clean_rank_columns(df: pl.DataFrame) -> pl.DataFrame:
     ``TEPA_rank_off`` -> ``TEPA_off_rank`` (after the join ``_off``/``_pass``
     suffixes land mid-name). No-op for plain ``X_rank`` leaderboard columns.
     """
-    renames = {
+    rank_renames = {
         c: c.replace("_rank", "", 1) + "_rank" for c in df.columns if "_rank" in c
     }
     # ...and ``EPAplay_n_off_pass`` -> ``EPAplay_off_pass_n`` for the sample sizes
-    renames |= {c: c.replace("_n_", "_", 1) + "_n" for c in df.columns if "_n_" in c}
+    n_renames = {c: c.replace("_n_", "_", 1) + "_n" for c in df.columns if "_n_" in c}
+    assert not (rank_renames.keys() & n_renames.keys()), (
+        "a column needs both a _rank and a _n_ mid-name relocation -- "
+        "the two rename dicts must stay disjoint"
+    )
+    renames = rank_renames | n_renames
     renames = {k: v for k, v in renames.items() if k != v}
     return df.rename(renames) if renames else df
 
@@ -1140,6 +1145,7 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
         ],
         asc_cols=["pass_int", "sacked"],
     )
+    qb_data = _attach_sample_sizes(qb_data, PLAYER_SAMPLE_SIZES["passing"])
 
     rb_data = summarize_rusher(
         team_off.filter(
@@ -1165,6 +1171,7 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
         ],
         asc_cols=["fumbles"],
     )
+    rb_data = _attach_sample_sizes(rb_data, PLAYER_SAMPLE_SIZES["rushing"])
 
     wr_data = summarize_receiver(
         team_off.with_columns(
@@ -1203,6 +1210,7 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
         ],
         asc_cols=["fumbles"],
     )
+    wr_data = _attach_sample_sizes(wr_data, PLAYER_SAMPLE_SIZES["receiving"])
 
     schools = _build_schools(plays)
     # Opponent-adjusted EPA via the shared sdv-py primitive (was a local copy;
@@ -1244,6 +1252,49 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
         qualifiers=PLAYER_QUALIFIERS,
     )
     return tables
+
+
+_PER_GAME_N = {m: pl.col("games") for m in ("EPAgame", "yardsgame", "playsgame")}
+#: player rate -> the count it is a rate over, so ``{rate}_n`` is the real sample.
+#: Transcribed from summarize_passer/rusher/receiver and the QB pipeline in
+#: build_team_summaries: a rate whose denominator changes there changes here.
+PLAYER_SAMPLE_SIZES: dict[str, dict[str, pl.Expr]] = {
+    "passing": {
+        "EPAplay": pl.col(
+            "dropbacks"
+        ),  # TEPA / dropbacks (sacks + INTs folded in, #30)
+        "yardsdropback": pl.col("dropbacks"),
+        "comppct": pl.col("att") + pl.col("pass_int"),
+        "success": pl.col("plays"),  # mean over attempts
+        "yardsplay": pl.col("plays"),
+        "detmer": pl.col("games"),
+        "detmergame": pl.col("games"),
+        **_PER_GAME_N,
+    },
+    "rushing": {
+        "EPAplay": pl.col("plays"),
+        "success": pl.col("plays"),
+        "yardsplay": pl.col("plays"),
+        **_PER_GAME_N,
+    },
+    "receiving": {
+        "EPAplay": pl.col("plays"),
+        "success": pl.col("plays"),
+        "yardsplay": pl.col("plays"),
+        "catchpct": pl.col("targets"),
+        **_PER_GAME_N,
+    },
+}
+
+
+def _attach_sample_sizes(
+    df: pl.DataFrame, denominators: dict[str, pl.Expr]
+) -> pl.DataFrame:
+    """Add ``{rate}_n`` beside every rate ``df`` carries: the count it is a rate over (0 when null)."""
+    present = {m: e for m, e in denominators.items() if m in df.columns}
+    return df.with_columns(
+        *[e.fill_null(0).cast(pl.Int64).alias(f"{m}_n") for m, e in present.items()]
+    )
 
 
 def _add_team_games(df: pl.DataFrame) -> pl.DataFrame:

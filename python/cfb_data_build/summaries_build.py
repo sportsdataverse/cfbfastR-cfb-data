@@ -89,7 +89,7 @@ def build_summaries_season(
             (pl.col("season_type_id") == 2) & (pl.col("week") <= through_week)
         )["game_id"].cast(pl.Utf8)
         plays = plays.filter(pl.col("game_id").is_in(snapshot_ids.implode()))
-    tables = build_team_summaries(plays, season)
+    tables = build_team_summaries(plays, season, through_week=through_week)
 
     counts: dict[str, int] = {}
     for key, spec in SUMMARIES_REGISTRY.items():

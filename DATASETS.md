@@ -1543,6 +1543,35 @@ overall/pass/rush where applicable.
 | total_gained_yards_{side} | integer | Sum of net yards gained across drives. |
 | available_yards_pct_{side} | double | `total_gained / total_available` (drive-efficiency rate). |
 
+**Five Factors columns** (whole-team only, no `_pass` / `_rush` split). The 7 values are
+double, each with a double `_rank` (1 = best: most points per opportunity on offense,
+fewest allowed on defense, fewest giveaways, most takeaways, highest margin). The 4
+`_n` counts are integer. That is 18 columns:
+
+| col_name | col_type | col_description |
+| --- | --- | --- |
+| explosive_margin | double | `explosive_off - explosive_def`. |
+| pts_per_opp_off | double | Points per scoring opportunity: a drive with a run or pass snap at or inside the opponent 40, scored from ESPN's `drive.result` (TD = 7, FG = 3). A drive counts only for its owner (ESPN's drive team), so a stray snap by the other team in the same drive id (a two-point try after a pick-six) is nobody's opportunity. |
+| pts_per_opp_def | double | The same, allowed by the defense. |
+| pts_per_opp_margin | double | `pts_per_opp_off - pts_per_opp_def`. |
+| pts_per_opp_off_n / pts_per_opp_def_n | integer | Scoring opportunities, the denominator. |
+| turnovers_off | double | Giveaways per game: interceptions and lost fumbles on EVERY play, special teams included (a muffed punt counts against the return team). |
+| turnovers_def | double | Takeaways per game, the same count for the opponent. |
+| turnovers_off_n / turnovers_def_n | integer | Games, the denominator. |
+| turnover_margin | double | `turnovers_def - turnovers_off` (takeaways minus giveaways, per game). |
+
+- A null `pts_per_opp_*` means that side had no scoring opportunity, and its `_rank` is
+  null too: unranked, not last. `pts_per_opp_margin` is null when either side is null.
+- `turnover_margin` does not follow the `{metric}_{side}` grammar above. It is the margin
+  of `turnovers`, but spelled singular, without `turnovers_margin`.
+- Known ceilings:
+  - Points come from `drive.result`, so a drive whose result is a clock or data label
+    scores 0 even when it ended in a field goal. Over 2004–2025 that is 618 "END OF
+    HALF", 444 "Not provided" and 127 "END OF GAME" drives.
+  - Turnovers follow the ESPN play-by-play, which disagrees with ESPN's own box score
+    on about 14% of 2025 team-games (see `adv_turnover`'s `turnovers` vs
+    `turnovers_pbp`).
+
 **Opponent-adjusted (ridge-regression) columns** — the headline EPA numbers, fit with a
 ridge model over team/opponent indicators (home-field-aware) then averaged per season:
 

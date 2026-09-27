@@ -48,6 +48,11 @@ _SCORING_OPP_YARDS_TO_GOAL = 40
 #: "FG GOOD", "MADE FG", and 2004 has no plain "TD"/"FG" drive at all -- so a
 #: "TD"/"FG"-only match scores those seasons at zero. Return TDs ("INT TD",
 #: "PUNT RETURN TD", ...) are the other team's points: 0 here.
+#:
+#: Known ceiling: a drive whose result is a clock or data label rather than an
+#: outcome scores 0 even when it ended in a field goal -- over 2004-2025 that is
+#: 618 "END OF HALF", 444 "Not provided" and 127 "END OF GAME" drives. Scoring
+#: them needs the drive's plays, not its label.
 _DRIVE_POINTS: dict[str, float] = {
     "TD": 7.0,
     "RUSHING TD": 7.0,
@@ -470,15 +475,65 @@ def _mutate_summary_margins(df: pl.DataFrame) -> pl.DataFrame:
     return out
 
 
+def _drive_owners(plays: pl.DataFrame) -> pl.DataFrame:
+    """One row per ``drive_id``: ``_drive_owner``, the team whose drive it is.
+
+    An ESPN drive id can hold snaps from BOTH teams -- a two-point try after a
+    pick-six filed under the passer's drive, say -- so a drive belongs to its
+    team, not to every team with a snap in it. ESPN's own drive team
+    (``drive.team.abbreviation`` against the home / away abbreviations) decides
+    when it names a team that has a snap in the drive; a label contradicted by
+    every snap (a shifted drive header) falls back to the team with the most
+    snaps, the first snap breaking a tie.
+    """
+    snaps = plays.filter(pl.col("drive_id").is_not_null()).with_row_index("_i")
+    espn = pl.lit(None, dtype=pl.Utf8)
+    if {"drive.team.abbreviation", "homeTeamAbbrev", "awayTeamAbbrev"} <= set(
+        plays.columns
+    ):
+        abbr, home, away = (
+            pl.col("drive.team.abbreviation"),
+            pl.col("homeTeamAbbrev"),
+            pl.col("awayTeamAbbrev"),
+        )
+        espn = (
+            pl.when(home == away)
+            .then(None)
+            .when(abbr == home)
+            .then(pl.col("home_id"))
+            .when(abbr == away)
+            .then(pl.col("away_id"))
+        )
+    per_team = (
+        snaps.with_columns(_espn=(pl.col("pos_team_id") == espn).fill_null(False))
+        .group_by("drive_id", "pos_team_id")
+        .agg(espn=pl.col("_espn").any(), n=pl.len(), first=pl.col("_i").min())
+    )
+    return per_team.group_by("drive_id").agg(
+        _drive_owner=pl.col("pos_team_id")
+        .sort_by(["espn", "n", "first"], descending=[True, True, False])
+        .first()
+    )
+
+
 def _drives(plays: pl.DataFrame, group: str, *, ascending: bool) -> pl.DataFrame:
-    """One side's drive totals (``group`` = the offense or the defense team id)."""
+    """One side's drive totals (``group`` = the offense or the defense team id).
+
+    ``plays`` carries ``_drive_owner`` (:func:`_drive_owners`). The yardage
+    totals keep R's per-(team, drive) grouping; scoring opportunities and their
+    points count only the owner's snaps, so a stray snap in someone else's drive
+    is nobody's opportunity.
+    """
+    own = pl.col("pos_team_id") == pl.col("_drive_owner")
     per_drive = (
         plays.filter(pl.col("drive_id").is_not_null())
         .group_by([group, "drive_id"])
         .agg(
             total_available_yards=pl.col("drive_start_yards_to_goal").first(),
             total_gained_yards=pl.col("drive_yards").last(),
-            scoring_opp=(pl.col("yards_to_goal") <= _SCORING_OPP_YARDS_TO_GOAL).any(),
+            scoring_opp=(
+                own & (pl.col("yards_to_goal") <= _SCORING_OPP_YARDS_TO_GOAL)
+            ).any(),
             points=pl.col("drive.result")
             .first()
             .replace_strict(_DRIVE_POINTS, default=0.0, return_dtype=pl.Float64),
@@ -487,7 +542,7 @@ def _drives(plays: pl.DataFrame, group: str, *, ascending: bool) -> pl.DataFrame
     agg = per_drive.group_by(group).agg(
         total_available_yards=pl.col("total_available_yards").sum(),
         total_gained_yards=pl.col("total_gained_yards").sum(),
-        opp_points=pl.col("points").filter(pl.col("scoring_opp")).sum(),
+        opp_points=pl.col("points").filter(pl.col("scoring_opp") == True).sum(),  # noqa: E712
         pts_per_opp_n=pl.col("scoring_opp").sum().cast(pl.Int64),
     )
     agg = (
@@ -511,6 +566,7 @@ def _drives(plays: pl.DataFrame, group: str, *, ascending: bool) -> pl.DataFrame
 
 def _summarize_drives(plays: pl.DataFrame) -> pl.DataFrame:
     """Offense and defense :func:`_drives` joined on the team, plus their margins."""
+    plays = plays.join(_drive_owners(plays), on="drive_id", how="left")
     off_dr = _suffix_nonkey(
         _drives(plays, "pos_team_id", ascending=False), "pos_team_id", "_off"
     )

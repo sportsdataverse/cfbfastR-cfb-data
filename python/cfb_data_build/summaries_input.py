@@ -207,7 +207,7 @@ def prepare_plays_input(
         game_giveaways(df),
         on=["game_id", "pos_team_id"],
         how="left",
-        maintain_order="left",
+        validate="m:1",
     )
 
     # --- scrimmage + FBS/FBS + bad games ---

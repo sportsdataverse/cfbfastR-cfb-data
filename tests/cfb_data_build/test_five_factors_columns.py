@@ -2,9 +2,9 @@
 
 Synthetic two-team, two-game frame. Team "1" (A) and team "2" (B) meet twice:
 
-* A has 3 drives: a TD after a snap at the 35, a FG after a snap at the 30,
-  and an interception that never gets inside the 40. Two scoring
-  opportunities worth 10 points.
+* A has 3 drives: a TD after a snap at the 35, a FG whose only snap inside
+  the opponent 40 is exactly at the 40, and an interception that never gets
+  inside it. Two scoring opportunities worth 10 points.
 * A's second giveaway is on special teams: it muffs a B punt in game 2. The
   builder never sees that play (it keeps runs and passes only), but it is a
   turnover, so it counts.
@@ -20,6 +20,7 @@ import pytest
 from cfb_data_build.summaries_input import game_giveaways, prepare_plays_input
 from cfb_data_build.team_summaries import (
     _clean_rank_columns,
+    _drive_owners,
     _mutate_summary_margins,
     _suffix_nonkey,
     _summarize_drives,
@@ -33,7 +34,7 @@ _PLAYS = [
     ("g1", "1", "2", "dA1", "TD", 50, False, True),
     ("g1", "1", "2", "dA1", "TD", 35, False, False),
     ("g1", "1", "2", "dA2", "FG", 60, False, False),
-    ("g1", "1", "2", "dA2", "FG", 30, False, False),
+    ("g1", "1", "2", "dA2", "FG", 40, False, False),  # the 40 itself counts
     ("g1", "2", "1", "dB1", "TD", 70, False, True),
     ("g1", "2", "1", "dB1", "TD", 25, False, False),
     ("g2", "1", "2", "dA3", "INT", 80, False, False),
@@ -143,13 +144,72 @@ def test_points_per_scoring_opportunity():
 
 @pytest.mark.parametrize(
     ("td", "fg"),
-    [("PASSING TD", "FG GOOD"), ("RUSHING TD", "MADE FG")],
+    [
+        ("PASSING TD", "FG GOOD"),
+        ("RUSHING TD", "MADE FG"),
+        ("PASSING TD TD", "FG GOOD"),
+        ("RUSHING TD TD", "MADE FG"),
+    ],
 )
 def test_pre_2014_drive_results_still_score(td: str, fg: str):
     # 2004-2013 releases spell the outcomes out; matching only "TD"/"FG"
     # scored every one of those seasons at zero points per opportunity
     old = [(*r[:4], {"TD": td, "FG": fg}.get(r[4], r[4]), *r[5:]) for r in _PLAYS]
     assert _team(_drives(_plays(old)), "1")["pts_per_opp_off"] == 5.0
+
+
+def test_a_stray_snap_in_the_other_teams_drive_is_nobodys_opportunity():
+    # ESPN drive 40175280229 (2025): MSU's drive ends in a pick-six that ESPN
+    # labels "TD", and WMU's two-point try after it is filed under MSU's
+    # drive. Grouped by (team, drive), the try at the 3 hands WMU a phantom
+    # 7-point opportunity and charges it to MSU's defense.
+    rows = [
+        ("g1", "1", "2", "d1", "FG", 30, False, False),  # team 1: a real FG
+        ("g1", "2", "1", "d2", "TD", 77, False, False),  # team 2 drives...
+        ("g1", "2", "1", "d2", "TD", 71, True, False),  # ...and throws a pick-six
+        ("g1", "1", "2", "d2", "TD", 3, False, False),  # team 1's try, filed in d2
+    ]
+    d = _drives(_plays(rows, special=[]))
+    one, two = _team(d, "1"), _team(d, "2")
+    assert (one["pts_per_opp_off"], one["pts_per_opp_off_n"]) == (3.0, 1)
+    assert (two["pts_per_opp_def"], two["pts_per_opp_def_n"]) == (3.0, 1)
+    assert two["pts_per_opp_off_n"] == 0 and one["pts_per_opp_def_n"] == 0
+    # the yardage totals keep R's per-(team, drive) grouping: the stray
+    # (team 1, d2) row still adds d2's start, the 77
+    assert one["total_available_yards_off"] == 30 + 77
+
+
+def test_drive_owner_is_espns_drive_team_when_it_has_a_snap():
+    rows = [
+        # x: ESPN names team 1, which ran 1 of the 3 snaps -- ESPN decides
+        ("x", "1", "ONE"),
+        ("x", "2", "ONE"),
+        ("x", "2", "ONE"),
+        # y: ESPN names team 1, which ran none of them -- the snaps decide
+        ("y", "2", "ONE"),
+        ("y", "2", "ONE"),
+        # z: no ESPN label, one snap each -- the first snap decides
+        ("z", "2", None),
+        ("z", "1", None),
+    ]
+    plays = pl.DataFrame(
+        rows,
+        schema=["drive_id", "pos_team_id", "drive.team.abbreviation"],
+        orient="row",
+    ).with_columns(
+        home_id=pl.lit("1"),
+        away_id=pl.lit("2"),
+        homeTeamAbbrev=pl.lit("ONE"),
+        awayTeamAbbrev=pl.lit("TWO"),
+    )
+    got = dict(_drive_owners(plays).iter_rows())
+    assert got == {"x": "1", "y": "2", "z": "2"}
+    # without ESPN's drive team, the most snaps decide
+    assert dict(_drive_owners(plays.drop("drive.team.abbreviation")).iter_rows()) == {
+        "x": "2",
+        "y": "2",
+        "z": "2",
+    }
 
 
 def test_no_scoring_opportunity_is_null_and_unranked():
@@ -225,9 +285,9 @@ def test_game_giveaways_count_each_side_of_every_play():
 
 
 def test_special_teams_turnovers_survive_the_scrimmage_filter():
-    # an interception by team 1, a punt team 1 muffs, a run by team 2
+    # game 1: an interception by team 1, a punt team 1 muffs, a run by team 2;
+    # game 2: a run by team 1, an interception by team 2
     base = {
-        "game_id": "g1",
         "home_id": "1",
         "away_id": "2",
         "home": "One",
@@ -248,19 +308,31 @@ def test_special_teams_turnovers_survive_the_scrimmage_filter():
         "drive_start_yards_to_goal": 75.0,
     }
     rows = [
-        (1, "1", True, False, True, False),
-        (2, "2", False, False, False, True),
-        (3, "2", False, True, False, False),
+        ("g1", 1, "1", True, False, True, False),
+        ("g1", 2, "2", False, False, False, True),
+        ("g1", 3, "2", False, True, False, False),
+        ("g2", 1, "1", False, True, False, False),
+        ("g2", 2, "2", True, False, True, False),
     ]
-    keys = ["game_play_number", "pos_team_id", "pass", "rush", *_LOST]
+    keys = ["game_id", "game_play_number", "pos_team_id", "pass", "rush", *_LOST]
     pbp = pl.DataFrame(
-        [{**base, **dict(zip(keys, r)), "int": r[4]} for r in rows],
+        [{**base, **dict(zip(keys, r)), "int": r[5]} for r in rows],
         infer_schema_length=None,
     )
     sched = pl.DataFrame(
-        {"game_id": ["g1"], "home_division": ["fbs"], "away_division": ["fbs"]}
+        {
+            "game_id": ["g1", "g2"],
+            "home_division": ["fbs", "fbs"],
+            "away_division": ["fbs", "fbs"],
+        }
     )
     out = prepare_plays_input(pbp, sched, 2025)
-    assert out["game_play_number"].to_list() == [1, 3]  # the punt is gone...
-    # ...but its muff is still one of team 1's two giveaways
-    assert out["pos_team_game_giveaways"].to_list() == [2, 0]
+    assert out.select("game_id", "game_play_number").rows() == [
+        ("g1", 1),
+        ("g1", 3),  # the punt is gone...
+        ("g2", 1),
+        ("g2", 2),
+    ]
+    # ...but its muff is still one of team 1's two game-1 giveaways, and each
+    # team's count is per GAME: team 1 had none in game 2
+    assert out["pos_team_game_giveaways"].to_list() == [2, 0, 0, 1]

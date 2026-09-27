@@ -98,6 +98,33 @@ def test_next_week_caps_the_bound():
     assert _cuts(2020, moved)[14] == last14
 
 
+def test_cancelled_game_does_not_cap_the_bound():
+    """A cancelled row keeps its original date; it must not end a week early.
+
+    2020's first week-15 game, marked cancelled and moved onto week 14's last
+    date, leaves week 14's bound alone.
+    """
+    fit = _fit(2020)
+    last14 = fit.filter(pl.col("week") == 14)["d"].max()
+    first15 = fit.filter(pl.col("week") == 15).sort("start_date")["game_id"][0]
+    moved = GAMES.with_columns(
+        pl.when(pl.col("game_id") == first15)
+        .then(pl.lit(f"{last14}T23:00Z"))
+        .otherwise(pl.col("start_date"))
+        .alias("start_date"),
+        pl.when(pl.col("game_id") == first15)
+        .then(pl.lit("STATUS_CANCELED"))
+        .otherwise(pl.col("status"))
+        .alias("status"),
+    )
+    assert _cuts(2020, moved)[14] == _cuts(2020)[14]
+
+
+def test_no_schedule_bounds_nothing():
+    """Preseason (no cfb_schedules asset yet): every week unbounded, none rated."""
+    assert all(c is None for _, c in week_cutoffs(2026, MASTER, games=pl.DataFrame()))
+
+
 def test_postseason_caps_the_final_bound():
     """A bowl on the last regular-season day stays out of the final snapshot.
 
@@ -113,15 +140,15 @@ def test_postseason_caps_the_final_bound():
     assert _cuts(2020, moved)[15] == last
 
 
-def test_build_ratings_weekly_fits_each_week_at_its_bound(monkeypatch, tmp_path):
-    """The builder hands every bound, unchanged, to ``cfb_ratings``."""
+def _build(monkeypatch, tmp_path, games: pl.DataFrame):
+    """Run ``build_ratings_weekly(2026)``; return (as_of_dates seen, output)."""
     (tmp_path / "cfb").mkdir()
     shutil.copy(MASTER, tmp_path / "cfb" / "cfb_schedule_master.parquet")
     monkeypatch.setenv("CFB_RAW_ROOT", str(tmp_path))
 
     import sportsdataverse.cfb as sdv_cfb
 
-    seen: list[dt.date] = []
+    seen: list = []
 
     def fake_ratings(season, *, as_of_date):
         seen.append(as_of_date)
@@ -131,10 +158,28 @@ def test_build_ratings_weekly_fits_each_week_at_its_bound(monkeypatch, tmp_path)
     monkeypatch.setattr(
         sdv_cfb,
         "load_cfb_schedule",
-        lambda seasons: GAMES.filter(pl.col("season").is_in(seasons)),
+        lambda seasons: games.filter(pl.col("season").is_in(seasons)),
     )
+    return seen, derived.build_ratings_weekly(2026)
 
-    out = derived.build_ratings_weekly(2026)
+
+def test_build_ratings_weekly_fits_each_week_at_its_bound(monkeypatch, tmp_path):
+    """The builder hands every bound, unchanged, to ``cfb_ratings``."""
+    seen, out = _build(monkeypatch, tmp_path, GAMES)
 
     assert seen == list(_cuts(2026).values())
     assert out["through_week"].to_list() == list(_cuts(2026))
+
+
+def test_week_without_a_bound_is_not_rated(monkeypatch, tmp_path):
+    """No FBS game at or before week 3: no bound, and never ``as_of_date=None``.
+
+    None would fit the WHOLE season and label it through_week 3.
+    """
+    games = GAMES.filter(~((pl.col("season") == 2026) & (pl.col("week") == 3)))
+    assert dict(week_cutoffs(2026, MASTER, games=games))[3] is None
+
+    seen, out = _build(monkeypatch, tmp_path, games)
+
+    assert None not in seen and len(seen) == 5
+    assert 3 not in out["through_week"].to_list()

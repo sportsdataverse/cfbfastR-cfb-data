@@ -168,7 +168,13 @@ def week_cutoffs(
     if games is None:
         from sportsdataverse.cfb import load_cfb_schedule
 
-        games = load_cfb_schedule(seasons=[season])
+        games = _retry(
+            lambda: load_cfb_schedule(seasons=[season]), what=f"cfb_schedules {season}"
+        )
+    if games is None or "season" not in games.columns:
+        # No published schedule yet (preseason) or the fetch gave up: no week
+        # can be bounded, so none is rated and _report_gaps says so.
+        return [(w, None) for w in weeks]
     fit = (
         games.filter(
             (pl.col("season") == season)
@@ -199,7 +205,8 @@ def week_cutoffs(
             "week",
             pl.min_horizontal(
                 pl.col("last") + pl.duration(days=1),
-                pl.col("first").shift(-1),
+                # earliest kickoff of ANY later week, not just the next one
+                pl.col("first").reverse().cum_min().reverse().shift(-1),
                 pl.lit(post_first, dtype=pl.Date),
             ).alias("cutoff"),
         )

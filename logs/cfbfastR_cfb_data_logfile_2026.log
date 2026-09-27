@@ -1,4 +1,5 @@
 From https://github.com/sportsdataverse/cfbfastR-cfb-data
+   84b08667a..815936283  main                   -> origin/main
  * [new branch]          AE/update-air-yards-model -> origin/AE/update-air-yards-model
  * [new branch]          chore/readme-repository-layout -> origin/chore/readme-repository-layout
  * [new branch]          docs/automation-status -> origin/docs/automation-status
@@ -13,6 +14,7 @@ From https://github.com/sportsdataverse/cfbfastR-cfb-data
  * [new branch]          feat/rolling-windows   -> origin/feat/rolling-windows
  * [new branch]          feat/rosters-cfbd-enrich -> origin/feat/rosters-cfbd-enrich
  * [new branch]          feat/sample-sizes      -> origin/feat/sample-sizes
+ * [new branch]          fix/adjepa-noop-guard  -> origin/fix/adjepa-noop-guard
  * [new branch]          fix/bowl-season-cron   -> origin/fix/bowl-season-cron
  * [new branch]          fix/cfb-recruiting-guard -> origin/fix/cfb-recruiting-guard
  * [new branch]          fix/cfb-weekly-raw-store -> origin/fix/cfb-weekly-raw-store

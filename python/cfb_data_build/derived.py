@@ -114,10 +114,11 @@ def schedule_master_available(schedule_path: "Path | None" = None) -> bool:
     return True
 
 
-def week_cutoffs(
-    season: int, schedule_path: "Path | None" = None
-) -> list[tuple[int, str]]:
-    """(week, last-kickoff-date) for the season's REGULAR-season weeks, ascending.
+def schedule_weeks(season: int, schedule_path: "Path | None" = None) -> list[int]:
+    """The season's REGULAR-season weeks, ascending, from the raw schedule master.
+
+    The master lists a week before its matchups exist (2026 week 14's
+    championship TBDs), so the weekly assets carry the whole calendar.
 
     Regular season only: the postseason restarts week numbering at 1 (ESPN's own
     convention -- the schedule master agrees), so including it would collide the
@@ -129,17 +130,94 @@ def week_cutoffs(
     )
     if s.height == 0 or "start_date" not in s.columns:
         return []
-    g = (
-        s.select(["week", "start_date"])
-        .drop_nulls()
-        .group_by("week")
-        .agg(pl.col("start_date").max().alias("cutoff"))
-        .sort("week")
+    return sorted(
+        s.select("week", "start_date").drop_nulls()["week"].unique().to_list()
     )
-    return [
-        (int(w), str(c)[:10])
-        for w, c in zip(g["week"].to_list(), g["cutoff"].to_list())
-    ]
+
+
+def week_cutoffs(
+    season: int,
+    schedule_path: "Path | None" = None,
+    games: "pl.DataFrame | None" = None,
+) -> list[tuple[int, str | None]]:
+    """(week, as-of bound) for each of :func:`schedule_weeks`.
+
+    The bound is EXCLUSIVE, like sdv-py's ``cfb_ratings(as_of_date=)``
+    (``date < as_of_date``), and comes from ``games`` -- ``load_cfb_schedule``,
+    the schedule ``cfb_ratings`` dates plays by and the as-of consumers label
+    weeks by -- over the FBS-vs-FBS games ``cfb_ratings`` fits, cancelled and
+    postponed ones dropped. Bound = the day after week W's last kickoff, capped
+    at the first kickoff of week W+1 and of the FBS postseason. Dates are UTC on
+    both sides.
+
+    Why each piece:
+
+    - the last kickoff date itself dropped every game on it (2026 through_week
+      4 held 412 of 430 team-games);
+    - the master's own labels leaked 2005 Ohio-Miami (OH) -- master week 12,
+      week 13 to the consumer -- into through_week 12, and its cancelled Dec 6
+      week-15 row cut 14 real 2020 week-14 games;
+    - cancelled and postponed rows keep their original date, so one can cap a
+      week early (a guard: no FBS-vs-FBS row does today, 2004-2026);
+    - the first bowl sits on the final bound's exact date in 2020, 2024 and
+      2025; the postseason cap keeps a same-day bowl out.
+
+    A week with no FBS game of its own (2019 week 16, 2026 week 14) reuses the
+    previous week's bound. One before any FBS game gets None and is not rated.
+    """
+    weeks = schedule_weeks(season, schedule_path)
+    if not weeks:
+        return []
+    if games is None:
+        from sportsdataverse.cfb import load_cfb_schedule
+
+        games = _retry(
+            lambda: load_cfb_schedule(seasons=[season]), what=f"cfb_schedules {season}"
+        )
+    if games is None or "season" not in games.columns:
+        # No published schedule yet (preseason) or the fetch gave up: no week
+        # can be bounded, so none is rated and _report_gaps says so.
+        return [(w, None) for w in weeks]
+    fit = (
+        games.filter(
+            (pl.col("season") == season)
+            & (pl.col("home_division") == "fbs")
+            & (pl.col("away_division") == "fbs")
+            & ~pl.col("status")
+            .is_in(["STATUS_CANCELED", "STATUS_POSTPONED"])
+            .fill_null(False)
+        )
+        .select(
+            "season_type_id",
+            pl.col("week").cast(pl.Int64),
+            pl.col("start_date")
+            .cast(pl.Utf8)
+            .str.slice(0, 10)
+            .str.to_date()
+            .alias("d"),
+        )
+        .drop_nulls()
+    )
+    post_first = fit.filter(pl.col("season_type_id") == 3)["d"].min()
+    bounds = (
+        fit.filter(pl.col("season_type_id") == 2)
+        .group_by("week")
+        .agg(pl.col("d").min().alias("first"), pl.col("d").max().alias("last"))
+        .sort("week")
+        .select(
+            "week",
+            pl.min_horizontal(
+                pl.col("last") + pl.duration(days=1),
+                # earliest kickoff of ANY later week, not just the next one
+                pl.col("first").reverse().cum_min().reverse().shift(-1),
+                pl.lit(post_first, dtype=pl.Date),
+            ).alias("cutoff"),
+        )
+    )
+    g = pl.DataFrame({"week": weeks}, schema={"week": pl.Int64}).join_asof(
+        bounds, on="week", strategy="backward"
+    )
+    return [(int(w), None if c is None else str(c)) for w, c in g.iter_rows()]
 
 
 def build_gamelog(
@@ -282,7 +360,10 @@ def build_ratings_weekly(season: int, *, base: str = "cfb") -> pl.DataFrame:
 
     frames = []
     built: list[int] = []
-    for week, cutoff in week_cutoffs(season):
+    cuts = week_cutoffs(season)
+    for week, cutoff in cuts:
+        if cutoff is None:
+            continue  # no FBS game yet; as_of_date=None would fit the whole season
         d = _retry(
             lambda c=cutoff: cfb_ratings(season, as_of_date=dt.date.fromisoformat(c)),
             what=f"ratings_weekly {season} week {week}",
@@ -290,7 +371,7 @@ def build_ratings_weekly(season: int, *, base: str = "cfb") -> pl.DataFrame:
         if d is not None and d.height:
             frames.append(d.with_columns(through_week=pl.lit(week, dtype=pl.Int32)))
             built.append(week)
-    _report_gaps(season, built, [w for w, _ in week_cutoffs(season)], "ratings_weekly")
+    _report_gaps(season, built, [w for w, _ in cuts], "ratings_weekly")
     return pl.concat(frames, how="diagonal_relaxed") if frames else pl.DataFrame()
 
 
@@ -307,7 +388,8 @@ def build_team_summaries_weekly(season: int, *, base: str = "cfb") -> pl.DataFra
     spec = SUMMARIES_REGISTRY["team_summaries"]
     frames = []
     built: list[int] = []
-    for week, _cutoff in week_cutoffs(season):
+    weeks = schedule_weeks(season)
+    for week in weeks:
         if (
             _retry(
                 lambda w=week: (
@@ -340,9 +422,7 @@ def build_team_summaries_weekly(season: int, *, base: str = "cfb") -> pl.DataFra
                 )
             )
             built.append(week)
-    _report_gaps(
-        season, built, [w for w, _ in week_cutoffs(season)], "team_summaries_weekly"
-    )
+    _report_gaps(season, built, weeks, "team_summaries_weekly")
     return pl.concat(frames, how="diagonal_relaxed") if frames else pl.DataFrame()
 
 

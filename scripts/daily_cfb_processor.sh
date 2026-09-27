@@ -48,8 +48,12 @@ PY_UNIFIED_SCHEDULES="cfb_schedules"
 # same tag; neither runs from a driver any more.
 PY_ROSTERS="cfb_rosters"
 # Weekly long-format snapshots read the summaries/ratings output, so they run
-# last of all.
-PY_WEEKLY="ratings_weekly team_summaries_weekly"
+# last of all. rolling_windows lives in this group too (not conceptually
+# weekly, but order matters the same way): it reads the `cfb_schedules` tag
+# PY_UNIFIED_SCHEDULES just published for kickoff dates, so it must run after
+# that -- running it from PY_DERIVED read the PRIOR run's schedule instead of
+# this season's, since PY_UNIFIED_SCHEDULES hadn't published yet.
+PY_WEEKLY="rolling_windows ratings_weekly team_summaries_weekly"
 # The matchup datasets (stages 41/42) read the cfbfastR_cfb_pbp release the R
 # chain published above plus CFBD /games + /lines (needs CFBD_API_KEY); the line
 # also reads the PRIOR season's release for its prev_* block. No final.json.

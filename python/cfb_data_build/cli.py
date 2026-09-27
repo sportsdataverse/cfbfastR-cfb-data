@@ -19,12 +19,14 @@ from cfb_data_build.config import REGISTRY
 #   team_summaries_weekly    summaries at each week's end, long format
 #   matchup_features         per FBS team-game as-of matchup features (stage 41)
 #   matchup_line             per FBS-vs-FBS game, the 268-col matchup line (stage 42)
+#   rolling_windows          cfb_rolling_windows -- last-N-events form (sdv-py rolling_windows), stage 64
 DERIVED = (
     "gamelog",
     "ratings_weekly",
     "team_summaries_weekly",
     "matchup_features",
     "matchup_line",
+    "rolling_windows",
 )
 
 # ESPN Football Power Index. Separate from DERIVED because these are fetched from

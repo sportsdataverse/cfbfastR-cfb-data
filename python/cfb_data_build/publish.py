@@ -101,6 +101,13 @@ RELEASE_NOTES: dict[str, str] = {
         "under data/ (the QB identity is the realized usage leader, post-hoc "
         "for the season it describes)."
     ),
+    "cfb_rolling_windows": (
+        "College Football rolling event-count windows: per player (dropbacks, "
+        "targets, carries) and team (plays), EPA/play and success rate over the "
+        "last N events vs the previous N, the season start and the career "
+        "baseline (2004+ history), with delta ranks and sample sizes. One asset "
+        "per season, as of the season's last game."
+    ),
 }
 
 

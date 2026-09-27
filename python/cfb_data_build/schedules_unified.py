@@ -109,7 +109,7 @@ import polars as pl
 
 from cfb_data_build.config import DatasetSpec
 from cfb_data_build.derived import _schedule_master, schedule_master_available
-from cfb_data_build.io import gzip_csv, write_dataset
+from cfb_data_build.io import dataset_stem, gzip_csv, write_dataset
 
 CFBD_GAMES = "https://api.collegefootballdata.com/games"
 ESPN_RELEASE = (
@@ -473,25 +473,53 @@ def unify(cfbd: pl.DataFrame, espn: pl.DataFrame, season: int) -> pl.DataFrame:
     return df.select([pl.col(c).cast(t) for c, t in SCHEMA.items()]).sort("game_id")
 
 
-def load_master_ranks() -> pl.DataFrame | None:
-    """The raw schedule master's rank slice, or None (warning once) when it is absent."""
+def load_master_ranks(season: int, base: str | Path = "cfb") -> pl.DataFrame | None:
+    """The rank slice ``attach_ranks`` joins: ``game_id`` + the master's rank columns.
+
+    Read from cfbfastR-cfb-raw's schedule master. Without it (a failed CI
+    fetch, no sibling checkout) the ranks are CARRIED FORWARD from this
+    season's last build -- the parquet the builder writes under ``base``, which
+    the repo tracks -- because a reprocess or backfill of a past season may
+    never be rebuilt again, and nulling it would stick. Only games added since
+    that build go null. A missing last build, or one from before the rank
+    columns existed, returns None (all-null ranks). Warns once either way.
+    """
     path = _schedule_master()
-    if not schedule_master_available(path):
-        warnings.warn(
-            f"cfb_schedules: no cfbfastR-cfb-raw schedule master at {path} "
-            "(set CFB_RAW_ROOT); home_rank/away_rank ship all-null",
-            stacklevel=2,
-        )
+    if schedule_master_available(path):
+        return pl.read_parquet(path, columns=["game_id", *_RANKS])
+    prior = (
+        Path(base)
+        / SPEC.dataset
+        / "parquet"
+        / f"{dataset_stem(SPEC.stem, season)}.parquet"
+    )
+    carried = prior.is_file() and set(_RANKS.values()) <= set(
+        pl.read_parquet_schema(prior)
+    )
+    warnings.warn(
+        f"cfb_schedules {season}: no cfbfastR-cfb-raw schedule master at {path} "
+        "(set CFB_RAW_ROOT); "
+        + (
+            f"home_rank/away_rank carried forward from the last build at {prior}"
+            if carried
+            else f"no last build at {prior} carries home_rank/away_rank, so they ship all-null"
+        ),
+        stacklevel=2,
+    )
+    if not carried:
         return None
-    return pl.read_parquet(path, columns=["game_id", *_RANKS])
+    return pl.read_parquet(prior, columns=["game_id", *_RANKS.values()]).rename(
+        {dst: src for src, dst in _RANKS.items()}
+    )
 
 
 def attach_ranks(df: pl.DataFrame, master: pl.DataFrame | None) -> pl.DataFrame:
     """Left-join ESPN's displayed rank onto the unified frame. Pure.
 
     ``master`` holds ``game_id`` + ``home_current_rank`` / ``away_current_rank``
-    (the raw schedule master), or is None when the raw store is absent. Either
-    way both rank columns ship as Int64 (null when unranked or unknown).
+    (the raw schedule master, or the last build's ranks under those names), or
+    is None when neither exists. Either way both rank columns ship as Int64
+    (null when unranked or unknown), and the unified row order is kept.
     """
     if master is None:
         master = pl.DataFrame(
@@ -515,7 +543,7 @@ def attach_ranks(df: pl.DataFrame, master: pl.DataFrame | None) -> pl.DataFrame:
     )
     # m:1 -- a duplicated master game_id would fan out a one-row-per-game dataset
     return df.drop(list(_RANKS.values()), strict=False).join(
-        ranks, on="game_id", how="left", validate="m:1"
+        ranks, on="game_id", how="left", validate="m:1", maintain_order="left"
     )
 
 
@@ -532,7 +560,7 @@ def build_schedules(
             load_espn(season, base=base),
             season,
         ),
-        load_master_ranks(),
+        load_master_ranks(season, base=base),
     )
 
 

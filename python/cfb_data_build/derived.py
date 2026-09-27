@@ -86,16 +86,19 @@ SPECS: dict[str, DatasetSpec] = {
 def schedule_master_available(schedule_path: "Path | None" = None) -> bool:
     """Whether cfbfastR-cfb-raw's schedule master is reachable.
 
-    `ratings_weekly` and `team_summaries_weekly` are the only datasets in this
-    builder that read the raw store, and CI does not check that repo out -- so
-    they raised FileNotFoundError on every scheduled run and turned an
-    otherwise-clean preseason build RED. With CFB week 1 days away, a job that
+    Four datasets in this builder read the master -- `ratings_weekly`,
+    `team_summaries_weekly`, `adv_team_gamelog` and `cfb_schedules` (its
+    `home_rank` / `away_rank`; see `schedules_unified.load_master_ranks`) --
+    and CI does not check that repo out. The weekly pair raised
+    FileNotFoundError on every scheduled run and turned an otherwise-clean
+    preseason build RED. With CFB week 1 days away, a job that
     is permanently red cannot signal a real failure.
 
     A missing raw store is an ABSENT INPUT, not a defect: the recruiting
     datasets already treat it that way (`daily_cfb_processor.sh` skips them
     with a warning when CFB_RAW_ROOT is unset). This is the same contract for
-    the weekly pair.
+    the weekly pair and the gamelog, which skip; `cfb_schedules` instead
+    carries its ranks forward from its last build.
     """
     path = schedule_path if schedule_path is not None else _schedule_master()
     if not path.is_file() or path.stat().st_size == 0:

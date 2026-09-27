@@ -181,7 +181,9 @@ def _ranks(df):
 
 
 def test_rank_at_kickoff_joins_the_master_and_99_reads_unranked():
-    out = attach_ranks(_three_games(), _master([(1, 3, 1), (2, 99, 12)]))
+    # master rows deliberately out of order: the output keeps the unified order
+    out = attach_ranks(_three_games(), _master([(2, 99, 12), (1, 3, 1)]))
+    assert out["game_id"].to_list() == [1, 2, 3]
     assert list(out.columns) == list(SCHEMA)
     assert out.schema["home_rank"] == pl.Int64
     assert out.schema["away_rank"] == pl.Int64
@@ -200,6 +202,12 @@ def test_string_master_game_id_raises_before_the_join():
     """A Utf8 id would join nothing (or cast silently); fail loudly instead."""
     with pytest.raises(AssertionError, match="game_id"):
         attach_ranks(_three_games(), _master([("1", 3, 1)], game_id_dtype=pl.Utf8))
+
+
+def test_duplicate_master_game_id_raises_instead_of_fanning_out():
+    """One row per game: a master listing a game twice must not duplicate it."""
+    with pytest.raises(pl.exceptions.ComputeError, match="m:1"):
+        attach_ranks(_three_games(), _master([(1, 3, 1), (1, 4, 2)]))
 
 
 def _offline(monkeypatch):
@@ -225,19 +233,65 @@ def test_build_joins_an_int32_master_found_via_cfb_raw_root(tmp_path, monkeypatc
     assert _ranks(out) == {1: (3, 1), 2: (None, 12), 3: (None, None)}
 
 
-def test_missing_master_ships_all_null_int64_ranks_and_warns_once(
-    tmp_path, monkeypatch
-):
-    """No raw store (CI fetch failed, no sibling checkout) is an absent input:
-    the columns still ship, all null, and the build says so once."""
+def _no_master(tmp_path, monkeypatch):
+    """No raw store (CI fetch failed, no sibling checkout): CFB_RAW_ROOT points
+    at an empty dir. Unsetting it would fall back to the sibling checkout, which
+    exists on the droplet. Returns an empty build base (no prior build)."""
     _offline(monkeypatch)
-    monkeypatch.setenv("CFB_RAW_ROOT", str(tmp_path))  # no master under it
-    with pytest.warns(UserWarning, match="schedule master") as caught:
-        out = build_schedules(2023)
-    assert len(caught) == 1
+    monkeypatch.setenv("CFB_RAW_ROOT", str(tmp_path / "raw"))
+    return tmp_path / "base"
+
+
+def _prior_build(base, frame):
+    """The season's last build, where the builder writes it (the tracked parquet)."""
+    path = base / "cfb_schedules" / "parquet" / "cfb_schedules_2023.parquet"
+    path.parent.mkdir(parents=True)
+    frame.write_parquet(path)
+
+
+def _assert_all_null_ranks(out):
     assert list(out.columns) == list(SCHEMA)
     assert out.schema["home_rank"] == pl.Int64
     assert out.schema["away_rank"] == pl.Int64
     assert out.height == 3
     assert out["home_rank"].null_count() == 3
     assert out["away_rank"].null_count() == 3
+
+
+def test_missing_master_and_no_prior_build_ships_all_null_int64_ranks_and_warns_once(
+    tmp_path, monkeypatch
+):
+    base = _no_master(tmp_path, monkeypatch)
+    with pytest.warns(UserWarning, match="schedule master") as caught:
+        out = build_schedules(2023, base=base)
+    assert len(caught) == 1
+    _assert_all_null_ranks(out)
+
+
+def test_missing_master_carries_ranks_forward_from_the_last_build(
+    tmp_path, monkeypatch
+):
+    """A failed master fetch must not overwrite good ranks with nulls: a
+    reprocess or backfill of a past season may never be rebuilt again."""
+    base = _no_master(tmp_path, monkeypatch)
+    last = attach_ranks(_three_games(), _master([(1, 3, 1), (2, 99, 12)]))
+    _prior_build(base, last.filter(pl.col("game_id") != 3))  # game 3 is new since
+    with pytest.warns(UserWarning, match="carried forward") as caught:
+        out = build_schedules(2023, base=base)
+    assert len(caught) == 1
+    assert list(out.columns) == list(SCHEMA)
+    assert out.schema["home_rank"] == pl.Int64
+    assert out["game_id"].to_list() == [1, 2, 3]
+    assert _ranks(out) == {1: (3, 1), 2: (None, 12), 3: (None, None)}
+
+
+def test_missing_master_and_a_prior_build_without_ranks_ships_all_null(
+    tmp_path, monkeypatch
+):
+    """A prior build from before the rank columns existed carries nothing."""
+    base = _no_master(tmp_path, monkeypatch)
+    _prior_build(base, _three_games().drop("home_rank", "away_rank"))
+    with pytest.warns(UserWarning, match="schedule master") as caught:
+        out = build_schedules(2023, base=base)
+    assert len(caught) == 1
+    _assert_all_null_ranks(out)

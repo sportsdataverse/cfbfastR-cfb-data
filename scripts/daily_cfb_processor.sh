@@ -40,6 +40,9 @@ PY_QA="qa"
 # `load_cfb_schedule` reads): the CFBD all-division superset UNIONed with the
 # ESPN-only rows, enriched with the ESPN-native fields. It reads the `schedules`
 # artifact this run just wrote, so it must follow PY_REST. Needs CFBD_API_KEY.
+# Its home_rank/away_rank come from the cfbfastR-cfb-raw schedule master
+# (CFB_RAW_ROOT, exported below); without it they are carried forward from the
+# season's last build, the tracked cfb/cfb_schedules parquet.
 PY_UNIFIED_SCHEDULES="cfb_schedules"
 # ESPN-native season rosters. Compiled straight from the raw per-game roster
 # blocks over HTTP (not from an earlier step), with a REAL resolved position.

@@ -66,8 +66,9 @@ _RELEASE_BODY = {
         "College Football team season summaries as of the END OF EACH "
         "REGULAR-SEASON WEEK, 2004-2025. LONG FORMAT: one asset per season "
         "with a `through_week` column stacking every week's cumulative "
-        "state. Built by re-running the season aggregation with plays "
-        "filtered to `week <= W`."
+        "state. Built by re-running the season aggregation on "
+        "regular-season games with `week <= W`; postseason games (whose "
+        "week numbering restarts at 1) are in no snapshot."
     ),
     "cfb_recruiting_proj": (
         "College Football preseason team projections, one row per team per "

@@ -26,7 +26,7 @@ Expected `col_name | col_type | col_description` for each per-game-compiled **se
 | [rosters](#rosters) | one row per rostered athlete per season (deduped) | ~63 | `espn_cfb_rosters` |
 | [betting](#betting) | one row per game | 9 | `espn_cfb_betting` |
 | [schedules](#schedules) | one row per game | 34 | `espn_cfb_schedules` |
-| [cfb_schedules](#cfb_schedules) ‡ | one row per game (all divisions) | 41 | `cfb_schedules` |
+| [cfb_schedules](#cfb_schedules) ‡ | one row per game (all divisions) | 43 | `cfb_schedules` |
 | [linescores](#linescores) | one row per (team, period) | 5 | `espn_cfb_linescores` |
 | [power_index](#power_index) | one row per team (or per game) | 22 | `espn_cfb_power_index` |
 | [injuries](#injuries) | one row per injury entry | 12 | `espn_cfb_injuries` |
@@ -1249,6 +1249,14 @@ outputs, and those are excluded (see Columns).
   against `home_division` / `away_division`: those are NA for teams outside the
   `fbs`/`fcs`/`ii`/`iii` classification (2023: 21 NA home, 61 NA away) and an NA
   must read FALSE, not NULL.
+* **Rank** (`home_rank` / `away_rank`) is the Top-25 rank ESPN displayed for
+  each team: the AP poll (preseason AP in week 1) until that season's BCS
+  standings (through 2013) or CFP rankings (2014 on) are out, then that
+  ranking. It is joined on `game_id` from cfbfastR-cfb-raw's schedule master
+  (`CFB_RAW_ROOT`). Each value is the rank as of the last raw capture. For a
+  completed game that is the rank at kickoff (every completed-game side in 2012
+  and 2025 weeks 8-12 and 2026 weeks 1-4 matched ESPN's weekly ranking). A game
+  not yet played can lag a poll released since its last capture.
 
 `espn_cfb_schedules` is **retained**, unchanged, as the ESPN-native schedule
 (FBS-scoped, straight off `final.json`) -- it is one of this dataset's two
@@ -1302,6 +1310,8 @@ Built by `python -m cfb_data_build --dataset cfb_schedules` (needs
 | playoff_home_seed | integer | Home team's playoff seed. |
 | playoff_away_seed | integer | Away team's playoff seed. |
 | playoff_bowl_name | character | Bowl hosting the playoff game (e.g. "Rose Bowl"). |
+| home_rank | integer | Home team's Top-25 rank as ESPN displayed it for this game (AP, then BCS/CFP once released), 1-25. NA when unranked (ESPN's 99), and for games the raw schedule master lacks (FCS-only games, pre-2004). The rank as of the last raw capture: at kickoff for a completed game, possibly a poll behind for one not yet played. |
+| away_rank | integer | Away team's Top-25 rank -- see `home_rank`. |
 
 _Release tag: `cfb_schedules`_
 

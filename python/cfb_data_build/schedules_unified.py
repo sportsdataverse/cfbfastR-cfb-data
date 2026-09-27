@@ -59,6 +59,22 @@ is ESPN's integer and ``season_type`` its label; the two are a strict 1:1
 mapping (see ``_SEASON_TYPES``, taken verbatim from ESPN's own
 ``/seasons/{year}/types`` resource).
 
+**Rank.** ``home_rank`` / ``away_rank`` are the Top-25 rank ESPN displayed next
+to each team for the game. That is the AP poll (the preseason AP poll in week 1)
+until that season's BCS standings (through 2013) or CFP rankings (2014 on) come
+out, and that ranking after them. They come from
+cfbfastR-cfb-raw's schedule master (``home_current_rank`` /
+``away_current_rank``, located by ``derived._schedule_master()``, which honours
+``CFB_RAW_ROOT``), joined on ``game_id``. ESPN's ``99`` ("unranked"), any value
+outside 1-25, and any game the master lacks (FCS-only games, seasons before
+2004) ship null. Each value is the rank as of the last raw capture. For a
+completed game that is the rank at kickoff: every completed-game side in 2012
+and 2025 weeks 8-12 and in 2026 weeks 1-4 matched ESPN's ranking for that week.
+A game not yet
+played carries the poll that was current when it was last captured, so it can
+lag a poll released since. Without the raw master (for example, a failed CI
+fetch) both columns still ship, all null, and the build warns once.
+
 **FBS filterability.** ``home_division``/``away_division`` are kept and two
 booleans are derived. The division values are ``fbs``/``fcs``/``ii``/``iii``
 **and null** (2023: 21 null home, 61 null away) -- a null is a genuinely
@@ -85,12 +101,14 @@ import json
 import os
 import urllib.error
 import urllib.request
+import warnings
 from pathlib import Path
 from typing import Any
 
 import polars as pl
 
 from cfb_data_build.config import DatasetSpec
+from cfb_data_build.derived import _schedule_master, schedule_master_available
 from cfb_data_build.io import gzip_csv, write_dataset
 
 CFBD_GAMES = "https://api.collegefootballdata.com/games"
@@ -217,7 +235,13 @@ SCHEMA: dict[str, pl.DataType] = {
     "playoff_home_seed": pl.Int64,
     "playoff_away_seed": pl.Int64,
     "playoff_bowl_name": pl.Utf8,
+    "home_rank": pl.Int64,
+    "away_rank": pl.Int64,
 }
+
+#: Raw schedule-master rank column -> unified column. ESPN writes 99 for
+#: "unranked"; that and anything else outside 1-25 ships null.
+_RANKS = {"home_current_rank": "home_rank", "away_current_rank": "away_rank"}
 
 #: Columns whose ESPN value is only a FALLBACK for the CFBD one (never a
 #: second shipped column).
@@ -449,6 +473,52 @@ def unify(cfbd: pl.DataFrame, espn: pl.DataFrame, season: int) -> pl.DataFrame:
     return df.select([pl.col(c).cast(t) for c, t in SCHEMA.items()]).sort("game_id")
 
 
+def load_master_ranks() -> pl.DataFrame | None:
+    """The raw schedule master's rank slice, or None (warning once) when it is absent."""
+    path = _schedule_master()
+    if not schedule_master_available(path):
+        warnings.warn(
+            f"cfb_schedules: no cfbfastR-cfb-raw schedule master at {path} "
+            "(set CFB_RAW_ROOT); home_rank/away_rank ship all-null",
+            stacklevel=2,
+        )
+        return None
+    return pl.read_parquet(path, columns=["game_id", *_RANKS])
+
+
+def attach_ranks(df: pl.DataFrame, master: pl.DataFrame | None) -> pl.DataFrame:
+    """Left-join ESPN's displayed rank onto the unified frame. Pure.
+
+    ``master`` holds ``game_id`` + ``home_current_rank`` / ``away_current_rank``
+    (the raw schedule master), or is None when the raw store is absent. Either
+    way both rank columns ship as Int64 (null when unranked or unknown).
+    """
+    if master is None:
+        master = pl.DataFrame(
+            schema={"game_id": pl.Int64, **dict.fromkeys(_RANKS, pl.Int64)}
+        )
+    key = master.schema["game_id"]
+    ranks = master.select(
+        # The master stores Int32. Widen an integer id; leave anything else
+        # (a Utf8 id) as-is so the assert below fails instead of a silent cast.
+        pl.col("game_id").cast(pl.Int64) if key.is_integer() else pl.col("game_id"),
+        *[
+            pl.when(pl.col(src).is_between(1, 25))
+            .then(pl.col(src))
+            .cast(pl.Int64)
+            .alias(dst)
+            for src, dst in _RANKS.items()
+        ],
+    )
+    assert df.schema["game_id"] == ranks.schema["game_id"], (
+        f"game_id dtype disagrees: unified {df.schema['game_id']} vs schedule master {key}"
+    )
+    # m:1 -- a duplicated master game_id would fan out a one-row-per-game dataset
+    return df.drop(list(_RANKS.values()), strict=False).join(
+        ranks, on="game_id", how="left", validate="m:1"
+    )
+
+
 def build_schedules(
     season: int,
     *,
@@ -456,10 +526,13 @@ def build_schedules(
     api_key: str | None = None,
     **_: Any,
 ) -> pl.DataFrame:
-    return unify(
-        tidy_cfbd(fetch_cfbd_games(season, api_key=api_key)),
-        load_espn(season, base=base),
-        season,
+    return attach_ranks(
+        unify(
+            tidy_cfbd(fetch_cfbd_games(season, api_key=api_key)),
+            load_espn(season, base=base),
+            season,
+        ),
+        load_master_ranks(),
     )
 
 
@@ -484,7 +557,8 @@ def build(
             print(
                 f"  {SPEC.dataset} {season}: {df.height} rows, {df.width} cols, "
                 f"fbs_game={df['fbs_game'].sum()}, fbs_participant={df['fbs_participant'].sum()}, "
-                f"unplayed={df.filter(pl.col('status').is_in(['STATUS_POSTPONED', 'STATUS_CANCELED'])).height}",
+                f"unplayed={df.filter(pl.col('status').is_in(['STATUS_POSTPONED', 'STATUS_CANCELED'])).height}, "
+                f"ranked_sides={df['home_rank'].count() + df['away_rank'].count()}",
                 flush=True,
             )
             if dry_run:

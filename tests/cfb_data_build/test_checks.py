@@ -183,3 +183,15 @@ def test_full_season_noop_still_fails() -> None:
     """The 2026-08-01 incident: adj_off_epa at 0.993 against its own raw EPA."""
     with pytest.raises(ValueError, match="NO-OP"):
         assert_adjustment_is_real(_adjusted(0.993), season=2025)
+
+
+def test_2004_full_season_is_exempt() -> None:
+    """The earliest season: a real adjustment measured 0.9550 under #598 (owner decision 2026-09-27)."""
+    assert assert_adjustment_is_real(_adjusted(0.955), season=2004)
+
+
+@pytest.mark.parametrize("season", [2004, 2020])
+def test_exempt_seasons_still_catch_a_real_noop(season: int) -> None:
+    """Exempt means a looser cutoff, not no check: the 0.993 no-op signature still fails."""
+    with pytest.raises(ValueError, match="NO-OP"):
+        assert_adjustment_is_real(_adjusted(0.993), season=season)

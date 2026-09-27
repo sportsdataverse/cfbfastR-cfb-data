@@ -34,18 +34,22 @@ import polars as pl
 #: sdv-py #598 (naive-WP 5-95 fit band, play-count shrinkage) moves real
 #: adjustments closer to raw. Full seasons 2004-2025 under it land at
 #: 0.907-0.955, and the no-op (lambda 325) at 0.993 or higher. Two land above 0.95:
-#: 2020 (0.9517, exempt below) and 2004 (0.9550, not exempt: rebuilding 2004
-#: under #598 will trip this gate).
+#: 2020 (0.9517) and 2004 (0.9550), both exempt below.
 NOOP_CORR_THRESHOLD = 0.95
 
-#: Seasons whose FULL-SEASON build skips the no-op gate. Keep this short.
+#: Seasons whose FULL-SEASON build is gated at NOOP_EXEMPT_THRESHOLD instead of
+#: NOOP_CORR_THRESHOLD. Keep this short.
 #: 2020 (COVID) was a short season in which conferences played among
 #: themselves: 58 cross-conference FBS-vs-FBS regular-season games against 203
 #: in 2019, so the schedule barely links the conferences and a real
 #: adjustment measured 0.9517 under #598. Owner decision 2026-09-27: exempt
 #: 2020, full-season check only -- its through-week snapshots are exempt
 #: anyway (see assert_adjustment_is_real).
-NOOP_EXEMPT_SEASONS = frozenset({2020})
+#: 2004, the earliest season in the data, measured 0.9550 under #598. Owner
+#: decision 2026-09-27: exempt it too.
+NOOP_EXEMPT_SEASONS = frozenset({2004, 2020})
+#: An exempt season still fails at the no-op signature (0.993+ in the incident).
+NOOP_EXEMPT_THRESHOLD = 0.98
 
 #: (adjusted column, the raw column it is derived from)
 ADJUSTMENT_PAIRS = (
@@ -86,8 +90,8 @@ def assert_adjustment_is_real(
 
     Args:
         df: team frame carrying the ``ADJUSTMENT_PAIRS`` columns.
-        season: the season built; a season in ``NOOP_EXEMPT_SEASONS`` is not
-            gated.
+        season: the season built; a season in ``NOOP_EXEMPT_SEASONS`` is
+            gated at ``NOOP_EXEMPT_THRESHOLD`` instead of ``threshold``.
         through_week: set for a through-week snapshot, which is not gated;
             ``None`` for a full season.
         threshold: raise above this correlation.
@@ -106,8 +110,10 @@ def assert_adjustment_is_real(
     # real adjustment near raw: up to 0.9623 (2017 through week 2), and 14 of
     # 300 gated regular-season snapshots 2004-2025 land above 0.95. The
     # full-season build of the same season stays gated.
-    if through_week is not None or season in NOOP_EXEMPT_SEASONS:
+    if through_week is not None:
         return rep
+    if season in NOOP_EXEMPT_SEASONS:
+        threshold = max(threshold, NOOP_EXEMPT_THRESHOLD)
     bad = {k: v for k, v in rep.items() if v == v and v > threshold}
     if bad:
         detail = ", ".join(f"{k} vs raw corr={v:.4f}" for k, v in bad.items())

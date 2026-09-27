@@ -31,10 +31,11 @@ def _snapshot_ids(monkeypatch, tmp_path, season: int, through_week: int | None):
     games = pl.read_parquet(FIX).filter(pl.col("season") == season)
     pbp = games.select("game_id", "week", "seasonType")
     schedule = games.select("game_id", "week", "season_type", "season_type_id")
-    seen: dict[str, set[str]] = {}
+    seen: dict = {}
 
-    def fake_build(plays, _season):
+    def fake_build(plays, _season, *, through_week=None):
         seen["ids"] = set(plays["game_id"].to_list())
+        seen["through_week"] = through_week
         return {k: None for k in SUMMARIES_REGISTRY}
 
     # prepare_plays_input needs ~60 pbp columns; its only effect the snapshot
@@ -53,6 +54,9 @@ def _snapshot_ids(monkeypatch, tmp_path, season: int, through_week: int | None):
         pbp=pbp,
         schedule=schedule,
     )
+    # the snapshot must reach the builder AS a snapshot: that is what exempts it
+    # from the full-season no-op gate (checks.assert_adjustment_is_real)
+    assert seen["through_week"] == through_week
     return seen["ids"]
 
 

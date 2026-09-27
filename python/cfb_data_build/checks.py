@@ -30,7 +30,26 @@ import polars as pl
 #: cfb_ratings_weekly: 0.628); the no-op measured 0.993. 0.95 sits in the
 #: empty space between, so it catches the failure without tripping on a season
 #: that genuinely had little schedule variance.
+#:
+#: sdv-py #598 (naive-WP 5-95 fit band, play-count shrinkage) moves real
+#: adjustments closer to raw. Full seasons 2004-2025 under it land at
+#: 0.907-0.955, and the no-op (lambda 325) at 0.993 or higher. Two land above 0.95:
+#: 2020 (0.9517) and 2004 (0.9550), both exempt below.
 NOOP_CORR_THRESHOLD = 0.95
+
+#: Seasons whose FULL-SEASON build is gated at NOOP_EXEMPT_THRESHOLD instead of
+#: NOOP_CORR_THRESHOLD. Keep this short.
+#: 2020 (COVID) was a short season in which conferences played among
+#: themselves: 58 cross-conference FBS-vs-FBS regular-season games against 203
+#: in 2019, so the schedule barely links the conferences and a real
+#: adjustment measured 0.9517 under #598. Owner decision 2026-09-27: exempt
+#: 2020, full-season check only -- its through-week snapshots are exempt
+#: anyway (see assert_adjustment_is_real).
+#: 2004, the earliest season in the data, measured 0.9550 under #598. Owner
+#: decision 2026-09-27: exempt it too.
+NOOP_EXEMPT_SEASONS = frozenset({2004, 2020})
+#: An exempt season still fails at the no-op signature (0.993+ in the incident).
+NOOP_EXEMPT_THRESHOLD = 0.98
 
 #: (adjusted column, the raw column it is derived from)
 ADJUSTMENT_PAIRS = (
@@ -57,18 +76,44 @@ def adjustment_report(df: pl.DataFrame, pairs=ADJUSTMENT_PAIRS) -> dict[str, flo
 
 
 def assert_adjustment_is_real(
-    df: pl.DataFrame, *, threshold: float = NOOP_CORR_THRESHOLD, label: str = ""
+    df: pl.DataFrame,
+    *,
+    season: int | None = None,
+    through_week: int | None = None,
+    threshold: float = NOOP_CORR_THRESHOLD,
+    label: str = "",
 ) -> dict[str, float]:
     """Raise if an opponent-adjusted column is ~identical to its raw input.
 
     Call this on any frame carrying ``adj_*`` columns before writing or
     publishing it.
 
+    Args:
+        df: team frame carrying the ``ADJUSTMENT_PAIRS`` columns.
+        season: the season built; a season in ``NOOP_EXEMPT_SEASONS`` is
+            gated at ``NOOP_EXEMPT_THRESHOLD`` instead of ``threshold``.
+        through_week: set for a through-week snapshot, which is not gated;
+            ``None`` for a full season.
+        threshold: raise above this correlation.
+        label: names the build in the error message.
+
+    Returns:
+        ``adjustment_report(df)``, whether or not the gate applied.
+
     Raises:
         ValueError: if any adjusted column correlates above ``threshold`` with
             its raw source, i.e. the adjustment did not happen.
     """
     rep = adjustment_report(df)
+    # Through-week snapshots are exempt by owner decision (2026-09-27): with
+    # few games per team, #598's play-count shrinkage legitimately holds a
+    # real adjustment near raw: up to 0.9623 (2017 through week 2), and 14 of
+    # 300 gated regular-season snapshots 2004-2025 land above 0.95. The
+    # full-season build of the same season stays gated.
+    if through_week is not None:
+        return rep
+    if season in NOOP_EXEMPT_SEASONS:
+        threshold = max(threshold, NOOP_EXEMPT_THRESHOLD)
     bad = {k: v for k, v in rep.items() if v == v and v > threshold}
     if bad:
         detail = ", ".join(f"{k} vs raw corr={v:.4f}" for k, v in bad.items())
@@ -77,8 +122,9 @@ def assert_adjustment_is_real(
             f"{detail} (threshold {threshold}). The ridge penalty is almost "
             f"certainly on the wrong scale -- sklearn uses alpha = lambda * n, "
             f"so a glmnet-scale lambda (e.g. 325) shrinks every team effect to "
-            f"zero. Check sportsdataverse.cfb.cfb_adjusted_epa._RIDGE_LAMBDA "
-            f"(expected ~0.035) and that no caller overrides it."
+            f"zero. Check the penalty in sportsdataverse.cfb.cfb_adjusted_epa "
+            f"(_ADJ_EPA_LAMBDA ~0.075 since sdv-py #598, _RIDGE_LAMBDA ~0.035 "
+            f"before it) and that no caller overrides it."
         )
     return rep
 

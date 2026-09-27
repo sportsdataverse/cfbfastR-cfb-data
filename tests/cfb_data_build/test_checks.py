@@ -12,10 +12,14 @@ running the gate against real seasons.
 
 from __future__ import annotations
 
+import numpy as np
 import polars as pl
 import pytest
 
-from cfb_data_build.checks import assert_passer_epa_includes_sacks
+from cfb_data_build.checks import (
+    assert_adjustment_is_real,
+    assert_passer_epa_includes_sacks,
+)
 
 #: Dylan Raiola, Nebraska, 2025 -- the reference case from cfbfastR-cfb-data#30,
 #: post-fix, taken from the rebuilt release.
@@ -125,3 +129,69 @@ def test_raises_on_empty_and_on_missing_columns() -> None:
     ):
         with pytest.raises(ValueError, match="missing"):
             assert_passer_epa_includes_sacks(_passers().drop(col))
+
+
+# --- assert_adjustment_is_real: where the no-op gate applies ----------------
+#
+# Correlations are `adjustment_report`'s own statistic (Pearson, adjusted vs
+# raw), measured under sdv-py #598's adjusted-EPA fit on the released pbp.
+
+
+def _adjusted(r_off: float, r_def: float = 0.6, n: int = 130) -> pl.DataFrame:
+    """A team frame whose adjusted/raw pairs correlate at exactly ``r_off`` / ``r_def``."""
+    rng = np.random.default_rng(598)
+
+    def pair(r: float) -> tuple[np.ndarray, np.ndarray]:
+        x = rng.standard_normal(n)
+        x = (x - x.mean()) / x.std()
+        e = rng.standard_normal(n)
+        e -= e.mean() + (e @ x) / (x @ x) * x
+        e /= e.std()
+        return x, r * x + np.sqrt(1 - r * r) * e
+
+    raw_off, adj_off = pair(r_off)
+    raw_def, adj_def = pair(r_def)
+    df = pl.DataFrame(
+        {
+            "EPAplay_off": raw_off,
+            "adj_off_epa": adj_off,
+            "EPAplay_def": raw_def,
+            "adj_def_epa": adj_def,
+        }
+    )
+    got = df.select(pl.corr("adj_off_epa", "EPAplay_off")).item()
+    assert abs(got - r_off) < 1e-9, got
+    return df
+
+
+def test_2020_full_season_is_exempt() -> None:
+    """The short COVID season: a real adjustment measured 0.9517 under #598."""
+    assert assert_adjustment_is_real(_adjusted(0.952), season=2020)
+
+
+def test_2020_exemption_does_not_reach_other_full_seasons() -> None:
+    with pytest.raises(ValueError, match="NO-OP"):
+        assert_adjustment_is_real(_adjusted(0.952), season=2019)
+
+
+def test_weekly_snapshot_skips_the_check() -> None:
+    """Owner decision: through-week snapshots are not gated, even at 0.99."""
+    assert assert_adjustment_is_real(_adjusted(0.99), season=2023, through_week=2)
+
+
+def test_full_season_noop_still_fails() -> None:
+    """The 2026-08-01 incident: adj_off_epa at 0.993 against its own raw EPA."""
+    with pytest.raises(ValueError, match="NO-OP"):
+        assert_adjustment_is_real(_adjusted(0.993), season=2025)
+
+
+def test_2004_full_season_is_exempt() -> None:
+    """The earliest season: a real adjustment measured 0.9550 under #598 (owner decision 2026-09-27)."""
+    assert assert_adjustment_is_real(_adjusted(0.955), season=2004)
+
+
+@pytest.mark.parametrize("season", [2004, 2020])
+def test_exempt_seasons_still_catch_a_real_noop(season: int) -> None:
+    """Exempt means a looser cutoff, not no check: the 0.993 no-op signature still fails."""
+    with pytest.raises(ValueError, match="NO-OP"):
+        assert_adjustment_is_real(_adjusted(0.993), season=season)

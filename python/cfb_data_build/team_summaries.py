@@ -722,8 +722,15 @@ def _prepare_for_write(
     return out.select(lead + rest)
 
 
-def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.DataFrame]:
-    """Build the 6 season tables from a cleaned cfbfastR pbp frame (R build lines 554-958)."""
+def build_team_summaries(
+    plays_input: pl.DataFrame, yr: int, *, through_week: int | None = None
+) -> dict[str, pl.DataFrame]:
+    """Build the 6 season tables from a cleaned cfbfastR pbp frame (R build lines 554-958).
+
+    ``through_week`` marks a through-week snapshot (``None`` = full season). It
+    filters nothing -- the caller has -- it only exempts the snapshot from the
+    no-op gate.
+    """
     plays = add_derived_metrics(plays_input)
     warn_implausible_epa_games(plays, yr)
     team_off = plays.filter(
@@ -1224,7 +1231,9 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
     # alpha = lambda * n, shrinks every team effect to zero. Nothing errored;
     # the columns were present and plausible; it sat live for two days. Check
     # the output, not the config.
-    assert_adjustment_is_real(team_data, label=f"team_summaries {yr}")
+    assert_adjustment_is_real(
+        team_data, season=yr, through_week=through_week, label=f"team_summaries {yr}"
+    )
     # A passer's TEPA must carry his sacks and interceptions -- see #30, where
     # it did not and every column still looked individually plausible.
     assert_passer_epa_includes_sacks(qb_data, label=f"passing {yr}")

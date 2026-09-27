@@ -152,8 +152,7 @@ def prepare_plays_input(
         )
 
     # --- cfbfastR pos_team/home/away are SCHOOL NAMES; the release pbp ships
-    # pos_team as an id. homeTeamName matches R's namespace 100% (2024 check),
-    # and _prepare_for_write's fbs_class needs pos_team == "Notre Dame". ---
+    # pos_team as an id. homeTeamName matches R's namespace 100% (2024 check). ---
     df = df.with_columns(
         pl.col("pos_team_id").cast(pl.Utf8),
         pl.col("home_id").cast(pl.Utf8),

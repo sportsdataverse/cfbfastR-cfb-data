@@ -31,7 +31,7 @@ from __future__ import annotations
 
 import numpy as np
 import polars as pl
-from sportsdataverse.cfb import cfb_adjusted_epa
+from sportsdataverse.cfb import cfb_adjusted_epa, load_cfb_team_group_seasons
 
 from .checks import assert_adjustment_is_real, assert_passer_epa_includes_sacks
 from .league_averages import build_league_averages
@@ -84,9 +84,20 @@ PLAYER_QUALIFIERS: dict[str, tuple[pl.Expr, float]] = {
     "receiving": (pl.col("plays") >= 1.875 * pl.col("team_games"), 1.875),
 }
 
+#: SDV conference group ids (``cfb_groups`` release) of the power conferences,
+#: under the label each era used: P5 through 2023, P4 from 2024, after ten
+#: members left the Pac-12. The Pac-10 (2004-2010) carries ``cfb:pac-12``.
+_POWER_CONFERENCES: dict[str, list[str]] = {
+    "P5": ["cfb:acc", "cfb:big-ten", "cfb:big-12", "cfb:pac-12", "cfb:sec"],
+    "P4": ["cfb:acc", "cfb:big-ten", "cfb:big-12", "cfb:sec"],
+}
+#: Notre Dame's ESPN id: an FBS independent classed with the power conferences.
+_NOTRE_DAME_ID = "87"
+
 #: league-baseline levels over the published ``fbs_class``: P5/G5 through 2023,
-#: P4/G6 from 2024. A null class (an independent other than Notre Dame) is in
-#: ``fbs`` only. No ``fcs`` level: this family is built from FBS-vs-FBS games.
+#: P4/G6 from 2024. A null class (a team ``cfb_groups`` puts outside FBS that
+#: season) is in ``fbs`` only. No ``fcs`` level: this family is built from
+#: FBS-vs-FBS games.
 LEVELS: dict[str, pl.Expr | None] = {
     "fbs": None,
     "p4": pl.col("fbs_class").is_in(["P4", "P5"]),
@@ -812,10 +823,16 @@ def warn_implausible_epa_games(plays: pl.DataFrame, yr: int) -> pl.DataFrame:
     return bad
 
 
-def _build_schools(plays: pl.DataFrame) -> pl.DataFrame:
-    """Distinct team -> (pos_team, division, conference) lookup (R build lines 916-923)."""
+def _build_schools(plays: pl.DataFrame, yr: int, groups: pl.DataFrame) -> pl.DataFrame:
+    """Distinct team -> (pos_team, division, conference, fbs_class) lookup (R build lines 916-923).
+
+    ``fbs_class`` comes from the team's SDV group ids that season in ``groups``
+    (``cfb_team_group_seasons``), not from the schedule's conference NAME. The
+    name lists this replaced had "Pac-12" but not "Pac-10", so every 2004-2010
+    Pac-10 team published as G5.
+    """
     is_home = pl.col("home_team_id").cast(pl.Utf8) == pl.col("pos_team_id")
-    return (
+    schools = (
         plays.with_columns(
             pos_team_division=pl.when(is_home)
             .then(pl.col("home_team_division"))
@@ -827,6 +844,38 @@ def _build_schools(plays: pl.DataFrame) -> pl.DataFrame:
         .unique(subset=["pos_team_id"], keep="first")
         .select("pos_team_id", "pos_team", "pos_team_division", "pos_team_conference")
         .sort("pos_team_id")
+    )
+    # team_id is the ESPN id only where team_id_source == "espn"; a CFBD id
+    # must never match an ESPN one.
+    ids = groups.filter(
+        (pl.col("season") == yr) & (pl.col("team_id_source") == "espn")
+    ).select("team_id", "subdivision_id", "conference_id")
+    assert schools.schema["pos_team_id"] == ids.schema["team_id"], (
+        f"team id dtypes differ: {schools.schema['pos_team_id']} vs "
+        f"{ids.schema['team_id']}"
+    )
+    missing = schools.join(ids, left_on="pos_team_id", right_on="team_id", how="anti")
+    if missing.height:
+        # a silent null here drops the team from the p4/g5 baselines
+        raise ValueError(
+            f"{yr}: {missing.height} team(s) missing from cfb_groups: "
+            f"{missing.select('pos_team_id', 'pos_team').rows()}"
+        )
+    power, rest = ("P4", "G6") if yr >= 2024 else ("P5", "G5")
+    return (
+        schools.join(
+            ids, left_on="pos_team_id", right_on="team_id", how="left", validate="1:1"
+        )
+        .with_columns(
+            fbs_class=pl.when(
+                (pl.col("pos_team_id") == _NOTRE_DAME_ID)
+                | pl.col("conference_id").is_in(_POWER_CONFERENCES[power])
+            )
+            .then(pl.lit(power))
+            .when(pl.col("subdivision_id") == "cfb:fbs")
+            .then(pl.lit(rest))
+        )
+        .drop("subdivision_id", "conference_id")
     )
 
 
@@ -853,9 +902,8 @@ def _clean_rank_columns(df: pl.DataFrame) -> pl.DataFrame:
 def _prepare_for_write(
     df: pl.DataFrame, yr: int, schools: pl.DataFrame
 ) -> pl.DataFrame:
-    """Port of ``prepare_for_write`` -- clean rank cols, join schools, identity-first, fbs_class."""
+    """Port of ``prepare_for_write`` -- clean rank cols, join schools (with fbs_class), identity-first."""
     df = _clean_rank_columns(df)
-    # R computes fbs_class AFTER the select-rename, so reference the renamed cols.
     out = (
         # season is a JOIN KEY across the ecosystem and must be an integer. This
         # emitted Float64 (mirroring R's double numerics), publishing season as
@@ -872,48 +920,24 @@ def _prepare_for_write(
             }
         )
     )
-    p4 = ["SEC", "Big 12", "ACC", "Big Ten"]
-    p5 = ["SEC", "Big 12", "ACC", "Big Ten", "Pac-12"]
-    conf = pl.col("conference")
-    tid = pl.col("team_id")
-    fbs_class = (
-        pl.when(
-            (pl.col("season") >= 2024)
-            & conf.is_not_null()
-            & (conf.is_in(p4) | (pl.col("pos_team") == "Notre Dame"))
-        )
-        .then(pl.lit("P4"))
-        .when(
-            (pl.col("season") >= 2024) & (conf.is_not_null() | tid.is_in(["41", "113"]))
-        )
-        .then(pl.lit("G6"))
-        .when(
-            (pl.col("season") <= 2023)
-            & conf.is_not_null()
-            & (conf.is_in(p5) | (pl.col("pos_team") == "Notre Dame"))
-        )
-        .then(pl.lit("P5"))
-        .when(
-            (pl.col("season") <= 2023)
-            & (conf.is_not_null() | tid.is_in(["349", "41", "113"]))
-        )
-        .then(pl.lit("G5"))
-        .otherwise(None)
-    )
-    out = out.with_columns(fbs_class=fbs_class)
     lead = ["team_id", "pos_team", "division", "conference", "season"]
     rest = [c for c in out.columns if c not in lead]
     return out.select(lead + rest)
 
 
 def build_team_summaries(
-    plays_input: pl.DataFrame, yr: int, *, through_week: int | None = None
+    plays_input: pl.DataFrame,
+    yr: int,
+    *,
+    through_week: int | None = None,
+    groups: pl.DataFrame | None = None,
 ) -> dict[str, pl.DataFrame]:
     """Build the 6 season tables from a cleaned cfbfastR pbp frame (R build lines 554-958).
 
     ``through_week`` marks a through-week snapshot (``None`` = full season). It
     filters nothing -- the caller has -- it only exempts the snapshot from the
-    no-op gate.
+    no-op gate. ``groups`` is the season's ``cfb_team_group_seasons`` frame
+    that ``fbs_class`` is read from (loaded from the release when ``None``).
     """
     plays = add_derived_metrics(plays_input)
     warn_implausible_epa_games(plays, yr)
@@ -1363,7 +1387,9 @@ def build_team_summaries(
     )
     wr_data = _attach_sample_sizes(wr_data, PLAYER_SAMPLE_SIZES["receiving"])
 
-    schools = _build_schools(plays)
+    if groups is None:
+        groups = load_cfb_team_group_seasons(seasons=yr)
+    schools = _build_schools(plays, yr, groups)
     # Opponent-adjusted EPA via the shared sdv-py primitive (was a local copy;
     # sportsdataverse.cfb.cfb_adjusted_epa is the single owner as of sdv-py 0.0.71).
     team_data = _prepare_for_write(team_data, yr, schools).join(

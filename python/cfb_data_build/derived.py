@@ -433,12 +433,7 @@ def build_rolling_windows(season: int, *, base: str = "cfb") -> pl.DataFrame:
         [
             pl.read_parquet(
                 pbp_dir / f"play_by_play_{s}.parquet",
-                columns=[
-                    c
-                    for c in FOOTBALL_PBP_COLUMNS
-                    if c
-                    in pl.read_parquet_schema(pbp_dir / f"play_by_play_{s}.parquet")
-                ],
+                columns=list(FOOTBALL_PBP_COLUMNS),
             )
             for s in seasons
         ],
@@ -458,7 +453,10 @@ def build_rolling_windows(season: int, *, base: str = "cfb") -> pl.DataFrame:
             ],
             how="vertical_relaxed",
         )
-        .unique("game_id")
+        # whole-row (not "game_id" alone): two rows for the same game_id with
+        # DIFFERING start_date must stay duplicated so football_events's own
+        # duplicate-game_id check raises, instead of silently picking one.
+        .unique()
         .select(
             pl.col("game_id").cast(pl.Int64),
             # start_date is a UTC instant; a late CFB kickoff is still the prior

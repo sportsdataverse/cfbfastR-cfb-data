@@ -30,7 +30,7 @@ PY_FIRST="pbp"
 PY_REST="play_participants team_box player_box drives game_rosters betting schedules linescores power_index injuries adv_team adv_passing adv_rushing adv_receiving adv_defensive adv_turnover adv_drives adv_situational adv_defensive_players adv_specialists adv_player_usage adv_position_group_usage adv_tackles adv_position_group_tackles adv_team_usage adv_drive_scripting usage_players usage_position_groups usage_tackles usage_position_group_tackles usage_teams usage_drive_scripting adv_st_kickers adv_st_punters adv_st_returners adv_st_blocks adv_st_team usage_st_kickers usage_st_punters usage_st_returners usage_st_blocks usage_st_team team_tendencies coach_tendencies"
 # Derived datasets -- each reads an artifact an earlier step produced, so order
 # matters: gamelog <- adv_team.
-PY_DERIVED="gamelog rolling_windows"
+PY_DERIVED="gamelog"
 # Report-only data-integrity gate (V2). Runs after pbp so its drift gate can
 # read the season parquet this run just wrote. Published since the deliberate
 # first espn_cfb_qa_2026 release; still report-only -- qa.BLOCKING is False, so
@@ -48,8 +48,12 @@ PY_UNIFIED_SCHEDULES="cfb_schedules"
 # same tag; neither runs from a driver any more.
 PY_ROSTERS="cfb_rosters"
 # Weekly long-format snapshots read the summaries/ratings output, so they run
-# last of all.
-PY_WEEKLY="ratings_weekly team_summaries_weekly"
+# last of all. rolling_windows lives in this group too (not conceptually
+# weekly, but order matters the same way): it reads the `cfb_schedules` tag
+# PY_UNIFIED_SCHEDULES just published for kickoff dates, so it must run after
+# that -- running it from PY_DERIVED read the PRIOR run's schedule instead of
+# this season's, since PY_UNIFIED_SCHEDULES hadn't published yet.
+PY_WEEKLY="rolling_windows ratings_weekly team_summaries_weekly"
 # The matchup datasets (stages 41/42) read the cfbfastR_cfb_pbp release the R
 # chain published above plus CFBD /games + /lines (needs CFBD_API_KEY); the line
 # also reads the PRIOR season's release for its prev_* block. No final.json.

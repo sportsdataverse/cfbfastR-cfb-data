@@ -114,7 +114,16 @@ def schedule_master_available(schedule_path: "Path | None" = None) -> bool:
 def week_cutoffs(
     season: int, schedule_path: "Path | None" = None
 ) -> list[tuple[int, str]]:
-    """(week, last-kickoff-date) for the season's REGULAR-season weeks, ascending.
+    """(week, as-of bound) for the season's REGULAR-season weeks, ascending.
+
+    The bound is EXCLUSIVE, matching sdv-py's ``cfb_ratings(as_of_date=)``
+    (``date < as_of_date``): the day after the week's last kickoff, so the
+    snapshot holds the whole week. Passing the last kickoff date itself dropped
+    every game on that date -- 9 of week 4's games in 2026 (412 of 430
+    team-games). Dates are UTC, the same basis ``cfb_ratings`` uses.
+
+    Capped at the next week's first kickoff: 2020 week 14 ran to Dec 7 while
+    week 15 opened Dec 6, and ``through_week == W`` must never see week W+1.
 
     Regular season only: the postseason restarts week numbering at 1 (ESPN's own
     convention -- the schedule master agrees), so including it would collide the
@@ -127,11 +136,24 @@ def week_cutoffs(
     if s.height == 0 or "start_date" not in s.columns:
         return []
     g = (
-        s.select(["week", "start_date"])
+        s.select(
+            "week",
+            pl.col("start_date")
+            .cast(pl.Utf8)
+            .str.slice(0, 10)
+            .str.to_date()
+            .alias("d"),
+        )
         .drop_nulls()
         .group_by("week")
-        .agg(pl.col("start_date").max().alias("cutoff"))
+        .agg(pl.col("d").min().alias("first"), pl.col("d").max().alias("last"))
         .sort("week")
+        .select(
+            "week",
+            pl.min_horizontal(
+                pl.col("last") + pl.duration(days=1), pl.col("first").shift(-1)
+            ).alias("cutoff"),
+        )
     )
     return [
         (int(w), str(c)[:10])

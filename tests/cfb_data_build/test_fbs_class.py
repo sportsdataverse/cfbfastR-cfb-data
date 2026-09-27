@@ -1,9 +1,10 @@
 """``fbs_class`` comes from SDV conference group ids, not conference names.
 
 The fixture is a slice of the real ``cfb_groups`` release
-(``cfb_team_group_seasons_{2010,2023,2024}.parquet``, fetched 2026-09-27). The
-schedule conference names below are the ones the published team summaries carry.
-Under the old name lists, every Pac-10 team (2004-2010) published as G5.
+(``cfb_team_group_seasons_{2010..2013,2023,2024}.parquet``, fetched 2026-09-27).
+The schedule conference names below are the ones the published team summaries
+carry. Under the old name lists, every Pac-10 (2004-2010) and Big East
+(2004-2012) team published as G5.
 """
 
 from __future__ import annotations
@@ -23,8 +24,13 @@ CASES = {
     2010: [
         ("2483", "Oregon", "Pac-10", "P5"),
         ("87", "Notre Dame", "FBS Independents", "P5"),
-        ("97", "Louisville", "Big East", "G5"),
+        ("97", "Louisville", "Big East", "P5"),
     ],
+    # the football Big East is P5 through its last season (owner decision, #104)
+    2011: [("277", "West Virginia", "Big East", "P5")],
+    2012: [("97", "Louisville", "Big East", "P5")],
+    # ...and the 2013 American, which held its BCS bid, is not
+    2013: [("97", "Louisville", "American Athletic", "G5")],
     2023: [
         ("264", "Washington", "Pac-12", "P5"),
         ("87", "Notre Dame", "FBS Independents", "P5"),

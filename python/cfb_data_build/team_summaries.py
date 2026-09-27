@@ -91,6 +91,10 @@ _POWER_CONFERENCES: dict[str, list[str]] = {
     "P5": ["cfb:acc", "cfb:big-ten", "cfb:big-12", "cfb:pac-12", "cfb:sec"],
     "P4": ["cfb:acc", "cfb:big-ten", "cfb:big-12", "cfb:sec"],
 }
+#: The football Big East (``cfb:big-east``, 1991-2012; a separate lineage from
+#: ``cfb:american``) was a BCS automatic qualifier, so it is P5 through its last
+#: season, 2012. Owner decision on cfbfastR-cfb-data#104.
+_BIG_EAST_P5_THROUGH = 2012
 #: Notre Dame's ESPN id: an FBS independent classed with the power conferences.
 _NOTRE_DAME_ID = "87"
 
@@ -829,7 +833,7 @@ def _build_schools(plays: pl.DataFrame, yr: int, groups: pl.DataFrame) -> pl.Dat
     ``fbs_class`` comes from the team's SDV group ids that season in ``groups``
     (``cfb_team_group_seasons``), not from the schedule's conference NAME. The
     name lists this replaced had "Pac-12" but not "Pac-10", so every 2004-2010
-    Pac-10 team published as G5.
+    Pac-10 team published as G5, and they left out the Big East (2004-2012).
     """
     is_home = pl.col("home_team_id").cast(pl.Utf8) == pl.col("pos_team_id")
     schools = (
@@ -862,6 +866,9 @@ def _build_schools(plays: pl.DataFrame, yr: int, groups: pl.DataFrame) -> pl.Dat
             f"{missing.select('pos_team_id', 'pos_team').rows()}"
         )
     power, rest = ("P4", "G6") if yr >= 2024 else ("P5", "G5")
+    power_ids = _POWER_CONFERENCES[power] + (
+        ["cfb:big-east"] if yr <= _BIG_EAST_P5_THROUGH else []
+    )
     return (
         schools.join(
             ids, left_on="pos_team_id", right_on="team_id", how="left", validate="1:1"
@@ -869,7 +876,7 @@ def _build_schools(plays: pl.DataFrame, yr: int, groups: pl.DataFrame) -> pl.Dat
         .with_columns(
             fbs_class=pl.when(
                 (pl.col("pos_team_id") == _NOTRE_DAME_ID)
-                | pl.col("conference_id").is_in(_POWER_CONFERENCES[power])
+                | pl.col("conference_id").is_in(power_ids)
             )
             .then(pl.lit(power))
             .when(pl.col("subdivision_id") == "cfb:fbs")

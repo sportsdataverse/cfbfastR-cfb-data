@@ -39,6 +39,25 @@ from .league_averages import build_league_averages
 # Explosive-play EPA thresholds (R build lines 604-608).
 _EXPLOSIVE_PASS_EPA = 2.4
 _EXPLOSIVE_RUSH_EPA = 1.8
+#: A scoring opportunity is a drive with a snap at or inside the opponent 40:
+#: sdv-py's per-play ``scoring_opp`` (``start.yardsToEndzone <= 40``), the flag
+#: the shared ``tendencies`` producer reads. ``yards_to_goal`` is that column here.
+_SCORING_OPP_YARDS_TO_GOAL = 40
+#: Offensive points by ESPN ``drive.result`` (7 per TD, as ``tendencies`` scores
+#: it). 2004-2013 spell the outcomes out -- "RUSHING TD", "PASSING TD",
+#: "FG GOOD", "MADE FG", and 2004 has no plain "TD"/"FG" drive at all -- so a
+#: "TD"/"FG"-only match scores those seasons at zero. Return TDs ("INT TD",
+#: "PUNT RETURN TD", ...) are the other team's points: 0 here.
+_DRIVE_POINTS: dict[str, float] = {
+    "TD": 7.0,
+    "RUSHING TD": 7.0,
+    "PASSING TD": 7.0,
+    "RUSHING TD TD": 7.0,
+    "PASSING TD TD": 7.0,
+    "FG": 3.0,
+    "FG GOOD": 3.0,
+    "MADE FG": 3.0,
+}
 # NOTE: there is deliberately no _RIDGE_LAMBDA here. The penalty is owned by
 # `sportsdataverse.cfb.cfb_adjusted_epa` (0.035 as of the 2026-08 audit) and
 # this module calls it without an override. A local `_RIDGE_LAMBDA = 325.0`
@@ -113,6 +132,15 @@ def _rank(col: str, *, descending: bool) -> pl.Expr:
     n_nonnull = c.is_not_null().sum()
     null_trail = (n_nonnull + c.is_null().cum_sum()).cast(pl.Float64)
     return pl.when(c.is_null()).then(null_trail).otherwise(base)
+
+
+def _rank_known(col: str, *, descending: bool) -> pl.Expr:
+    """:func:`_rank`, but a null metric stays unranked (null) instead of trailing.
+
+    For a metric that is undefined rather than bad when null: points per
+    scoring opportunity for a side that never had one.
+    """
+    return pl.when(pl.col(col).is_not_null()).then(_rank(col, descending=descending))
 
 
 def _pct(col: str) -> pl.Expr:
@@ -292,6 +320,7 @@ _TEAM_RATIO_DENOMINATORS: dict[str, str] = {
     "EPAdrive": "n_drives",
     "yardsdrive": "n_drives",
     "playsdrive": "n_drives",
+    "turnovers": "n_games",
 }
 
 
@@ -327,7 +356,18 @@ def _summarize_team(
         line_yards=pl.col("line_yards").mean(),
         opportunity_rate=pl.col("opportunity_run").mean(),
     )
+    # Turnovers come per game, counted over every play including special teams
+    # (summaries_input.game_giveaways), so take one value per (team, game): the
+    # offense's giveaways, or -- grouped by the defense -- its opponent's, which
+    # are its takeaways.
+    tov = (
+        df.unique(subset=[group, "game_id"])
+        .group_by(group)
+        .agg(n_turnovers=pl.col("pos_team_game_giveaways").sum())
+    )
+    g = g.join(tov, on=group, how="left")
     g = g.with_columns(
+        turnovers=pl.col("n_turnovers") / pl.col("n_games"),
         playsgame=pl.col("plays") / pl.col("n_games"),
         EPAdrive=pl.col("TEPA") / pl.col("n_drives"),
         EPAgame=pl.col("TEPA") / pl.col("n_games"),
@@ -340,7 +380,7 @@ def _summarize_team(
             pl.col(d).cast(pl.Int64).alias(f"{m}_n")
             for m, d in _TEAM_RATIO_DENOMINATORS.items()
         ],
-    ).drop("n_games", "n_drives")
+    ).drop("n_games", "n_drives", "n_turnovers")
 
     g = g.sort(
         group
@@ -370,6 +410,8 @@ def _summarize_team(
         start_position_rank=_rank("start_position", descending=d),
         # havoc: asc -> rank(-x); off -> rank(x)
         havoc_rank=_rank("havoc", descending=d),
+        # turnovers: fewer giveaways (off) / more takeaways (def) rank first
+        turnovers_rank=_rank("turnovers", descending=d),
         explosive_rank=_rank("explosive", descending=not d),
         passrate_rank=_rank("passrate", descending=True),
         rushrate_rank=_rank("rushrate", descending=True),
@@ -414,7 +456,93 @@ def _mutate_summary_margins(df: pl.DataFrame) -> pl.DataFrame:
         out = out.with_columns(
             start_position_margin_rank=_rank("start_position_margin", descending=True)
         )
+    # Five Factors margins: whole-team table only (the pass/rush splits drop
+    # turnovers, so they skip this)
+    if "turnovers_off" in df.columns:
+        out = out.with_columns(
+            explosive_margin=pl.col("explosive_off") - pl.col("explosive_def"),
+            # takeaways minus giveaways, so positive is good
+            turnover_margin=pl.col("turnovers_def") - pl.col("turnovers_off"),
+        ).with_columns(
+            explosive_margin_rank=_rank("explosive_margin", descending=True),
+            turnover_margin_rank=_rank("turnover_margin", descending=True),
+        )
     return out
+
+
+def _drives(plays: pl.DataFrame, group: str, *, ascending: bool) -> pl.DataFrame:
+    """One side's drive totals (``group`` = the offense or the defense team id)."""
+    per_drive = (
+        plays.filter(pl.col("drive_id").is_not_null())
+        .group_by([group, "drive_id"])
+        .agg(
+            total_available_yards=pl.col("drive_start_yards_to_goal").first(),
+            total_gained_yards=pl.col("drive_yards").last(),
+            scoring_opp=(pl.col("yards_to_goal") <= _SCORING_OPP_YARDS_TO_GOAL).any(),
+            points=pl.col("drive.result")
+            .first()
+            .replace_strict(_DRIVE_POINTS, default=0.0, return_dtype=pl.Float64),
+        )
+    )
+    agg = per_drive.group_by(group).agg(
+        total_available_yards=pl.col("total_available_yards").sum(),
+        total_gained_yards=pl.col("total_gained_yards").sum(),
+        opp_points=pl.col("points").filter(pl.col("scoring_opp")).sum(),
+        pts_per_opp_n=pl.col("scoring_opp").sum().cast(pl.Int64),
+    )
+    agg = (
+        agg.with_columns(
+            available_yards_pct=pl.col("total_gained_yards")
+            / pl.col("total_available_yards"),
+            # null, not 0/0 = NaN, for a side that never reached the 40
+            pts_per_opp=pl.when(pl.col("pts_per_opp_n") > 0).then(
+                pl.col("opp_points") / pl.col("pts_per_opp_n")
+            ),
+        )
+        .drop("opp_points")
+        .sort(group)
+    )
+    return agg.with_columns(
+        available_yards_pct_rank=_rank("available_yards_pct", descending=not ascending),
+        # more points per trip is better on offense, fewer allowed on defense
+        pts_per_opp_rank=_rank_known("pts_per_opp", descending=not ascending),
+    )
+
+
+def _summarize_drives(plays: pl.DataFrame) -> pl.DataFrame:
+    """Offense and defense :func:`_drives` joined on the team, plus their margins."""
+    off_dr = _suffix_nonkey(
+        _drives(plays, "pos_team_id", ascending=False), "pos_team_id", "_off"
+    )
+    def_dr = _suffix_nonkey(
+        _drives(plays, "def_pos_team_id", ascending=True), "def_pos_team_id", "_def"
+    )
+    return (
+        off_dr.join(
+            def_dr, left_on="pos_team_id", right_on="def_pos_team_id", how="left"
+        )
+        .with_columns(
+            total_available_yards_margin=pl.col("total_available_yards_off")
+            - pl.col("total_available_yards_def"),
+            total_gained_yards_margin=pl.col("total_gained_yards_off")
+            - pl.col("total_gained_yards_def"),
+            available_yards_pct_margin=pl.col("available_yards_pct_off")
+            - pl.col("available_yards_pct_def"),
+            pts_per_opp_margin=pl.col("pts_per_opp_off") - pl.col("pts_per_opp_def"),
+        )
+        .with_columns(
+            total_available_yards_margin_rank=_rank(
+                "total_available_yards_margin", descending=True
+            ),
+            total_gained_yards_margin_rank=_rank(
+                "total_gained_yards_margin", descending=True
+            ),
+            available_yards_pct_margin_rank=_rank(
+                "available_yards_pct_margin", descending=True
+            ),
+            pts_per_opp_margin_rank=_rank_known("pts_per_opp_margin", descending=True),
+        )
+    )
 
 
 def _suffix_nonkey(df: pl.DataFrame, key: str, suffix: str) -> pl.DataFrame:
@@ -753,7 +881,15 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
         off.join(def_, left_on="pos_team_id", right_on="def_pos_team_id", how="left")
     )
 
-    rc = ("start_position", "start_position_rank", "start_position_n")
+    # field position and turnovers are whole-team figures: no pass/rush split
+    rc = (
+        "start_position",
+        "start_position_rank",
+        "start_position_n",
+        "turnovers",
+        "turnovers_rank",
+        "turnovers_n",
+    )
     off_pass = _suffix_nonkey(
         _summarize_team(
             team_off.filter(pl.col("pass") == 1),
@@ -805,55 +941,7 @@ def build_team_summaries(plays_input: pl.DataFrame, yr: int) -> dict[str, pl.Dat
         )
     )
 
-    def _drives(group: str, ascending: bool) -> pl.DataFrame:
-        per_drive = (
-            plays.filter(pl.col("drive_id").is_not_null())
-            .group_by([group, "drive_id"])
-            .agg(
-                total_available_yards=pl.col("drive_start_yards_to_goal").first(),
-                total_gained_yards=pl.col("drive_yards").last(),
-            )
-        )
-        agg = per_drive.group_by(group).agg(
-            total_available_yards=pl.col("total_available_yards").sum(),
-            total_gained_yards=pl.col("total_gained_yards").sum(),
-        )
-        agg = agg.with_columns(
-            available_yards_pct=pl.col("total_gained_yards")
-            / pl.col("total_available_yards")
-        ).sort(group)
-        return agg.with_columns(
-            available_yards_pct_rank=_rank(
-                "available_yards_pct", descending=not ascending
-            )
-        )
-
-    off_dr = _suffix_nonkey(_drives("pos_team_id", False), "pos_team_id", "_off")
-    def_dr = _suffix_nonkey(_drives("def_pos_team_id", True), "def_pos_team_id", "_def")
-    drives_data = (
-        off_dr.join(
-            def_dr, left_on="pos_team_id", right_on="def_pos_team_id", how="left"
-        )
-        .with_columns(
-            total_available_yards_margin=pl.col("total_available_yards_off")
-            - pl.col("total_available_yards_def"),
-            total_gained_yards_margin=pl.col("total_gained_yards_off")
-            - pl.col("total_gained_yards_def"),
-            available_yards_pct_margin=pl.col("available_yards_pct_off")
-            - pl.col("available_yards_pct_def"),
-        )
-        .with_columns(
-            total_available_yards_margin_rank=_rank(
-                "total_available_yards_margin", descending=True
-            ),
-            total_gained_yards_margin_rank=_rank(
-                "total_gained_yards_margin", descending=True
-            ),
-            available_yards_pct_margin_rank=_rank(
-                "available_yards_pct_margin", descending=True
-            ),
-        )
-    )
+    drives_data = _summarize_drives(plays)
 
     team_data = (
         overall.join(drives_data, on="pos_team_id", how="left", suffix="_drive")

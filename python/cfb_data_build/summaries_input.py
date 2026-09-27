@@ -47,6 +47,39 @@ _ALIASES: dict[str, str] = {
 }
 
 
+def game_giveaways(df: pl.DataFrame) -> pl.DataFrame:
+    """Giveaways per ``(game_id, pos_team_id)`` over EVERY play, special teams included.
+
+    Per side, as sdv-py flags them: the offense loses ``is_pos_team_turnover``
+    (an interception, a fumble it lost -- on a kickoff the receiving team is
+    the offense) and the defense ``is_def_pos_team_turnover`` (a fumble on the
+    return, including a muffed punt, where the return team is the defense).
+    A scrimmage-only count misses the special-teams ones and drifts from the
+    official margin. The defense is the other of home / away, as
+    ``team_summaries.add_derived_metrics`` derives it.
+    """
+    pos = pl.col("pos_team_id")
+    def_ = (
+        pl.when(pos == pl.col("home_id"))
+        .then(pl.col("away_id"))
+        .when(pos == pl.col("away_id"))
+        .then(pl.col("home_id"))
+    )
+    flag = lambda c: pl.col(c).fill_null(False).cast(pl.Int64)  # noqa: E731
+    return (
+        pl.concat(
+            [
+                df.select("game_id", team=pos, n=flag("is_pos_team_turnover")),
+                df.select("game_id", team=def_, n=flag("is_def_pos_team_turnover")),
+            ]
+        )
+        .drop_nulls("team")
+        .group_by("game_id", "team")
+        .agg(pos_team_game_giveaways=pl.col("n").sum())
+        .rename({"team": "pos_team_id"})
+    )
+
+
 def prepare_plays_input(
     pbp: pl.DataFrame, schedule: pl.DataFrame, season: int
 ) -> pl.DataFrame:
@@ -165,6 +198,16 @@ def prepare_plays_input(
             for c in _FLAGS
             if c in df.columns and df.schema[c] != pl.Float64
         ]
+    )
+
+    # --- turnovers are counted over every play of the game, so this comes
+    # before the scrimmage filter drops the special-teams ones. Each play then
+    # carries its offense's giveaways for that game. ---
+    df = df.join(
+        game_giveaways(df),
+        on=["game_id", "pos_team_id"],
+        how="left",
+        maintain_order="left",
     )
 
     # --- scrimmage + FBS/FBS + bad games ---

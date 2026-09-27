@@ -126,7 +126,18 @@ _LEADER_PCT = {
     "yardsgame_pct",
     "yardsplay_pct",
 }
+#: IF-2 Five Factors columns (test_five_factors_columns.py): R never built them
+_FIVE_FACTORS = {
+    "explosive_margin",
+    "pts_per_opp_off",
+    "pts_per_opp_def",
+    "pts_per_opp_margin",
+    "turnovers_off",
+    "turnovers_def",
+    "turnover_margin",
+}
 PYTHON_ONLY = {
+    "team_summaries": _FIVE_FACTORS | {f"{c}_rank" for c in _FIVE_FACTORS},
     "passing": _LEADER_PCT
     | {
         "comppct_pct",

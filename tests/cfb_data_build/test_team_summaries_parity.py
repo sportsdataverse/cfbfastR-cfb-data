@@ -126,7 +126,23 @@ _LEADER_PCT = {
     "yardsgame_pct",
     "yardsplay_pct",
 }
+#: IF-2 Five Factors columns (test_five_factors_columns.py): R never built them.
+#: They also need inputs an R ``load_cfb_pbp`` capture does not carry --
+#: ``drive.result``, and ``pos_team_game_giveaways`` from
+#: ``summaries_input.game_giveaways`` (over sdv-py's ``is_pos_team_turnover`` /
+#: ``is_def_pos_team_turnover``). A re-captured R ``plays_input`` must add them,
+#: or ``build_team_summaries`` raises ColumnNotFoundError before any comparison.
+_FIVE_FACTORS = {
+    "explosive_margin",
+    "pts_per_opp_off",
+    "pts_per_opp_def",
+    "pts_per_opp_margin",
+    "turnovers_off",
+    "turnovers_def",
+    "turnover_margin",
+}
 PYTHON_ONLY = {
+    "team_summaries": _FIVE_FACTORS | {f"{c}_rank" for c in _FIVE_FACTORS},
     "passing": _LEADER_PCT
     | {
         "comppct_pct",

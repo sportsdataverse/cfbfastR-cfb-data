@@ -39,6 +39,7 @@ def _plays() -> pl.DataFrame:
             "nonExplosiveEpa": [0.5, -0.2, None, 0.1],
             "line_yards": [None, -1.2, None, None],
             "opportunity_run": [False, False, False, False],
+            "pos_team_game_giveaways": [0, 0, 1, 1],
         }
     )
 

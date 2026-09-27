@@ -23,7 +23,16 @@ from .data import build_game_frame, diff_features, paired_features
 
 # Column-name fragments that define a feature family. Used for ablation: which
 # part of the play-level substrate actually carries pregame signal?
+#
+# A summaries column matching no fragment falls into "other", which is LEAN
+# (see LEAN_FAMILIES) -- so every new team_summaries column must be given a
+# family here, or it silently joins the recommended model's inputs at the next
+# republish. tests/test_higher_models_families.py enforces that.
 FAMILIES: dict[str, tuple[str, ...]] = {
+    # IF-2 Five Factors columns. Deliberately NOT lean: they enter a model only
+    # through a reviewed change to LEAN_FAMILIES. First, so "explosive_margin"
+    # is not filed under "explosive".
+    "five_factors": ("turnover", "pts_per_opp", "explosive_margin"),
     "rating": ("adj_off_epa", "adj_def_epa", "net_adj_epa", "strength_faced"),
     "efficiency": (
         "success",

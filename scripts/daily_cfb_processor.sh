@@ -27,7 +27,7 @@ done
 END_YEAR=${END_YEAR:-$START_YEAR}
 
 PY_FIRST="pbp"
-PY_REST="play_participants team_box player_box drives game_rosters betting schedules linescores power_index injuries adv_team adv_passing adv_rushing adv_receiving adv_defensive adv_turnover adv_drives adv_situational adv_defensive_players adv_specialists adv_player_usage adv_position_group_usage adv_tackles adv_position_group_tackles adv_team_usage adv_drive_scripting usage_players usage_position_groups usage_tackles usage_position_group_tackles usage_teams usage_drive_scripting adv_st_kickers adv_st_punters adv_st_returners adv_st_blocks adv_st_team usage_st_kickers usage_st_punters usage_st_returners usage_st_blocks usage_st_team team_tendencies coach_tendencies"
+PY_REST="play_participants team_box player_box drives game_rosters betting schedules linescores power_index injuries adv_team adv_passing adv_rushing adv_receiving adv_defensive adv_turnover adv_drives adv_situational adv_defensive_players adv_specialists adv_player_usage adv_position_group_usage adv_tackles adv_position_group_tackles adv_team_usage adv_drive_scripting usage_players usage_position_groups usage_tackles usage_position_group_tackles usage_teams usage_drive_scripting adv_st_kickers adv_st_punters adv_st_returners adv_st_blocks adv_st_team usage_st_kickers usage_st_punters usage_st_returners usage_st_blocks usage_st_team"
 # Derived datasets -- each reads an artifact an earlier step produced, so order
 # matters: gamelog <- adv_team.
 PY_DERIVED="gamelog"
@@ -44,6 +44,11 @@ PY_QA="qa"
 # (CFB_RAW_ROOT, exported below); without it they are carried forward from the
 # season's last build, the tracked cfb/cfb_schedules parquet.
 PY_UNIFIED_SCHEDULES="cfb_schedules"
+# Tendencies join the unified schedule onto the plays for their game-context
+# splits (home/away/neutral, vs ranked, after bye, wins), reading the tracked
+# cfb/cfb_schedules parquet, so they follow PY_UNIFIED_SCHEDULES: built before
+# it, the newest games would carry the previous run's unscored rows and no wins.
+PY_TENDENCIES="team_tendencies coach_tendencies"
 # ESPN-native season rosters. Compiled straight from the raw per-game roster
 # blocks over HTTP (not from an earlier step), with a REAL resolved position.
 # Supersedes the legacy `rosters` dataset and R/espn_cfb_08_rosters_creation.R,
@@ -147,6 +152,7 @@ for i in $(seq "${START_YEAR}" "${END_YEAR}"); do
     for ds in $PY_DERIVED; do run_py "$ds" --no-fetch --publish; done
     for ds in $PY_QA; do run_py "$ds" --no-fetch --publish; done
     for ds in $PY_UNIFIED_SCHEDULES; do run_py "$ds" --publish; done
+    for ds in $PY_TENDENCIES; do run_py "$ds" --no-fetch --publish; done
     for ds in $PY_ROSTERS; do run_py "$ds" --publish; done
 
     # The 6-table summaries family. This ran on R (espn_cfb_15) because the

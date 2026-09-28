@@ -182,3 +182,23 @@ Do not treat the published asset as current.
 ---
 
 <!-- RESULTS APPENDED BELOW ONLY AFTER THE GATES IN §3 ARE READ -->
+
+## 6. Re-measurement on leak-free weekly summaries (2026-09-27)
+
+`cfb_team_summaries_weekly` carried every bowl and CFP game in every through-week snapshot
+(cfbfastR-cfb-data #100; ESPN restarts postseason weeks at 1). That touches this study in two
+places only: the scoring set (`build_game_frame(require_rating=True)` keys on the summaries'
+ratings) and the `shipped` arm's rated rows. The `hier-eb` predictions read final scores and
+are identical across vintages. Re-scored with identical code, games, ratings and predictions:
+
+| gate (§3 / `assert_hierarchical_gate`) | threshold | leaked (6,505 games) | leak-free (6,200) |
+|---|---|---|---|
+| MAE | <= 13.09 | 12.837 | 12.839 |
+| beat shipped | >= 1.85 | 2.105 | 1.918 (1.937 vs the 2026-09-27 constants) |
+| calibration slope | 0.80-1.10 | 0.919 | 0.921 |
+| max calibration error | <= 0.10 | 0.029 | 0.025 |
+| seasons won | >= 0.80 | 11/11 | 11/11 |
+| season-clustered p | < 0.05 | < 0.0001 | < 0.0001 |
+
+Closing line on the same games: 12.29 / 12.30. Every gate passes on both; none was moved.
+

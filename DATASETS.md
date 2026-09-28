@@ -1559,7 +1559,7 @@ overall/pass/rush where applicable.
 | total_available_yards_{side} | double | Sum of yards-to-goal available at each drive start. |
 | total_gained_yards_{side} | integer | Sum of net yards gained across drives. |
 | available_yards_pct_{side} | double | `total_gained / total_available` (drive-efficiency rate). |
-| pts_per_drive_{side} | double | Points per drive: `off` on the team's own drives (ESPN's drive team) with at least one non-kneel run or pass snap, scored from `drive.result` like `pts_per_opp` (TD = 7, FG = 3, else 0; a return TD is the other team's); `def` the same for the opponents' drives against this defense; `margin` is `off - def`. Rank 1 = most scored, fewest allowed, highest margin. |
+| pts_per_drive_{side} | double | Points per drive: `off` on the team's own drives (ESPN's drive team) with at least one non-kneel run or pass snap, scored from `drive.result` like `pts_per_opp` (TD = 7, FG = 3, else 0). A drive ESPN labels as a return TD ("INT TD", "PUNT RETURN TD") scores 0, but one it labels plain "TD" is credited to the drive's owner even when the touchdown was the other team's return (see Known ceilings below); `def` the same for the opponents' drives against this defense; `margin` is `off - def`. Rank 1 = most scored, fewest allowed, highest margin. |
 | pts_per_drive_off_n / pts_per_drive_def_n | integer | Drives, the denominator. |
 
 A null `pts_per_drive_*` means that side owned no drive (its only snaps sat in the other
@@ -1591,6 +1591,14 @@ fewest allowed on defense, fewest giveaways, most takeaways, highest margin). Th
   - Points come from `drive.result`, so a drive whose result is a clock or data label
     scores 0 even when it ended in a field goal. Over 2004–2025 that is 618 "END OF
     HALF", 444 "Not provided" and 127 "END OF GAME" drives.
+  - A return or defensive touchdown on a drive ESPN labels plain "TD" is credited to
+    the drive's owner, so the offense that gave it up gains 7 and its opponent's
+    defense is charged 7. In the 2025 FBS population that is 15 drives (6
+    interception-return, 5 punt-return and 4 blocked-punt TDs): 105 points, +0.0057
+    per drive pooled. It moves 14 offenses and 15 defenses, by up to 0.115 points per
+    drive or 8 rank places. `pts_per_drive` and `pts_per_opp` share it. `_drives`
+    cannot fix it, because the punt and return plays are filtered out before it runs;
+    the fix is scoring drives from their plays, before the scrimmage filter.
   - Turnovers follow the ESPN play-by-play, which disagrees with ESPN's own box score
     on about 14% of 2025 team-games (see `adv_turnover`'s `turnovers` vs
     `turnovers_pbp`).

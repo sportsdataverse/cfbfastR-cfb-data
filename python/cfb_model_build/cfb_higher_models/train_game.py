@@ -33,6 +33,8 @@ FAMILIES: dict[str, tuple[str, ...]] = {
     # through a reviewed change to LEAN_FAMILIES. First, so "explosive_margin"
     # is not filed under "explosive".
     "five_factors": ("turnover", "pts_per_opp", "explosive_margin"),
+    # CFBE-1d points per drive: likewise not lean until a reviewed change.
+    "drive_efficiency": ("pts_per_drive",),
     "rating": ("adj_off_epa", "adj_def_epa", "net_adj_epa", "strength_faced"),
     "efficiency": (
         "success",

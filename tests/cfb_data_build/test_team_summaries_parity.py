@@ -141,8 +141,15 @@ _FIVE_FACTORS = {
     "turnovers_def",
     "turnover_margin",
 }
+#: CFBE-1d drive-efficiency columns, also Python-only (they read ``drive.result``
+#: too). The ``pts_per_drive_{off,def}_n`` counts are not listed: the test drops
+#: every ``_n`` column before this check.
+_DRIVE_EFFICIENCY = {"pts_per_drive_off", "pts_per_drive_def", "pts_per_drive_margin"}
 PYTHON_ONLY = {
-    "team_summaries": _FIVE_FACTORS | {f"{c}_rank" for c in _FIVE_FACTORS},
+    "team_summaries": _FIVE_FACTORS
+    | _DRIVE_EFFICIENCY
+    | {f"{c}_rank" for c in _FIVE_FACTORS | _DRIVE_EFFICIENCY}
+    | {"off_strength_faced_rank", "def_strength_faced_rank"},
     "passing": _LEADER_PCT
     | {
         "comppct_pct",

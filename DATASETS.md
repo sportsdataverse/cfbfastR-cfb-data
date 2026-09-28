@@ -1559,6 +1559,12 @@ overall/pass/rush where applicable.
 | total_available_yards_{side} | double | Sum of yards-to-goal available at each drive start. |
 | total_gained_yards_{side} | integer | Sum of net yards gained across drives. |
 | available_yards_pct_{side} | double | `total_gained / total_available` (drive-efficiency rate). |
+| pts_per_drive_{side} | double | Points per drive: `off` on the team's own drives (ESPN's drive team) with at least one non-kneel run or pass snap, scored from `drive.result` like `pts_per_opp` (TD = 7, FG = 3, else 0; a return TD is the other team's); `def` the same for the opponents' drives against this defense; `margin` is `off - def`. Rank 1 = most scored, fewest allowed, highest margin. |
+| pts_per_drive_off_n / pts_per_drive_def_n | integer | Drives, the denominator. |
+
+A null `pts_per_drive_*` means that side owned no drive (its only snaps sat in the other
+team's drives), and its `_rank` is null too: unranked, not last. Kneel-only drives and
+drives with no snap (a kickoff or punt return TD) are not drives here; overtime drives are.
 
 **Five Factors columns** (whole-team only, no `_pass` / `_rush` split). The 7 values are
 double, each with a double `_rank` (1 = best: most points per opportunity on offense,
@@ -1602,6 +1608,8 @@ ridge model over team/opponent indicators (home-field-aware) then averaged per s
 | adj_off_epa_rank | double | National rank of `adj_off_epa` (1 = best). |
 | adj_def_epa_rank | double | National rank of `adj_def_epa` (1 = best). |
 | net_adj_epa_rank | double | National rank of `net_adj_epa` (1 = best). |
+| off_strength_faced_rank | double | Rank of `off_strength_faced`, 1 = the toughest opposing offenses (highest). Null when the strength is null. |
+| def_strength_faced_rank | double | Rank of `def_strength_faced`, 1 = the toughest opposing defenses (lowest EPA/play allowed). Null when the strength is null. |
 
 _Release tag: `espn_cfb_team_summaries`_
 

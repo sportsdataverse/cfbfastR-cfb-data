@@ -13,6 +13,11 @@
 Each is computed at BUILD time from the season's full-tier pbp frames, so the
 installed sdv-py defines every metric. Coordinators are not attributed (no
 source), so ``role`` is always ``"HC"`` and exists for a later OC / DC row.
+
+The game-context splits (home / away / neutral site / vs ranked / after bye /
+opener / one-score game, each with games and wins) come from
+:func:`attach_context`, which joins the season's ``cfb_schedules`` onto the
+plays as the ``ctx_*`` / ``def_ctx_*`` columns sdv-py reads.
 """
 
 from __future__ import annotations
@@ -27,6 +32,113 @@ COUNTED_SEASON_TYPES = (2, 3)
 TEAM_GROUP = ("season", "pos_team")
 COACH_GROUP = ("season", "pos_team", "coach")
 COACH_DEF_GROUP = ("season", "def_pos_team", "def_coach")
+#: rest before a game, in days (rounded), that makes it "after a bye"
+BYE_REST_DAYS = 13
+#: final margin within which a game is a one-score game
+ONE_SCORE_MARGIN = 8
+#: games that were scheduled but never played: never a team's previous game or opener
+NOT_PLAYED = ("STATUS_CANCELED", "STATUS_POSTPONED")
+_KEYS = ("game_id", "pos_team", "def_pos_team")
+
+
+def game_context(schedule: pl.DataFrame) -> pl.DataFrame:
+    """One row per (``game_id``, ``team_id``) of the team's Boolean context flags.
+
+    ``schedule`` is one season of ``cfb_schedules``, every division, so a rest
+    or an opener counts games against any opponent. The flags:
+
+    * ``home`` / ``away`` / ``neutral_site`` -- exactly one per game;
+    * ``vs_ranked`` -- the OPPONENT carried a 1-25 rank at kickoff. Emitted only
+      when the schedule has ``home_rank`` / ``away_rank`` with at least one value:
+      a pre-IF-0 release, or a season whose ranks are unknown, must not read as
+      "never played a ranked team";
+    * ``after_bye`` -- at least :data:`BYE_REST_DAYS` days since the team's
+      previous played game. Kickoffs are UTC instants, so the rest is rounded to
+      the nearest day (a Saturday-night game to a Friday-night one 13 days later
+      is 12.9 days). The season's first game is NEVER after a bye: it has no
+      previous game in the season, and last season's schedule is not read;
+    * ``opener`` -- the team's first played regular-season game;
+    * ``one_score_game`` -- final margin within :data:`ONE_SCORE_MARGIN`;
+    * ``win`` -- points for > points against, so a tie is not a win.
+
+    Unscored games carry null ``win`` / ``one_score_game`` (null is not true).
+    """
+    played = schedule.filter(~pl.col("status").is_in(NOT_PLAYED).fill_null(False))
+    ranked = {"home_rank", "away_rank"} <= set(schedule.columns) and bool(
+        schedule.select(
+            pl.any_horizontal(pl.col("home_rank", "away_rank").is_not_null()).any()
+        ).item()
+    )
+    neutral = pl.col("neutral_site").fill_null(False)
+    sides = [
+        played.select(
+            pl.col("game_id").cast(pl.Int64),
+            pl.col(f"{me}_id").cast(pl.Int64).alias("team_id"),
+            # "…T19:30:00.000Z" and the ESPN-only "…T19:30Z" share the first 16 chars
+            pl.col("start_date")
+            .str.slice(0, 16)
+            .str.to_datetime("%Y-%m-%dT%H:%M")
+            .alias("kickoff"),
+            (pl.col("season_type_id") == 2).alias("regular"),
+            (pl.lit(me == "home") & ~neutral).alias("home"),
+            (pl.lit(me == "away") & ~neutral).alias("away"),
+            neutral.alias("neutral_site"),
+            *(
+                [pl.col(f"{opp}_rank").is_between(1, 25).alias("vs_ranked")]
+                if ranked
+                else []
+            ),
+            (
+                (pl.col("home_points") - pl.col("away_points")).abs()
+                <= ONE_SCORE_MARGIN
+            ).alias("one_score_game"),
+            (pl.col(f"{me}_points") > pl.col(f"{opp}_points")).alias("win"),
+        )
+        for me, opp in (("home", "away"), ("away", "home"))
+    ]
+    rest = (pl.col("kickoff") - pl.col("kickoff").shift(1)).dt.total_minutes() / 1440
+    return (
+        pl.concat(sides)
+        .drop_nulls(["game_id", "team_id", "kickoff"])
+        .sort("team_id", "kickoff")
+        .with_columns(
+            (rest.round(0) >= BYE_REST_DAYS)
+            .over("team_id")
+            .fill_null(False)
+            .alias("after_bye"),
+            (
+                pl.col("regular") & (pl.col("regular").cum_sum().over("team_id") == 1)
+            ).alias("opener"),
+        )
+        .drop("kickoff", "regular")
+    )
+
+
+def attach_context(plays: pl.DataFrame, schedule: pl.DataFrame | None) -> pl.DataFrame:
+    """``ctx_*`` (the offense's context) and ``def_ctx_*`` (the defense's) on every play.
+
+    Joined from :func:`game_context` on (``game_id``, ``pos_team``) and on
+    (``game_id``, ``def_pos_team``). ``game_id`` and the team ids are cast to
+    Int64 on both sides here -- an integer parse that raises on a non-integer id
+    rather than nulling a join key -- and asserted equal before the join. A
+    ``None`` schedule returns the plays unchanged: no context columns, so sdv-py
+    emits no context splits.
+    """
+    if schedule is None:
+        return plays
+    ctx = game_context(schedule)
+    flags = [c for c in ctx.columns if c not in ("game_id", "team_id")]
+    df = plays.with_columns(pl.col(*_KEYS).cast(pl.Int64))
+    for side, prefix in (("pos_team", "ctx_"), ("def_pos_team", "def_ctx_")):
+        right = ctx.select(
+            "game_id",
+            pl.col("team_id").alias(side),
+            *(pl.col(f).alias(prefix + f) for f in flags),
+        )
+        for k in ("game_id", side):
+            assert df.schema[k] == right.schema[k] == pl.Int64, k
+        df = df.join(right, on=["game_id", side], how="left", validate="m:1")
+    return df
 
 
 def counted_plays(plays: pl.DataFrame) -> pl.DataFrame:
@@ -87,25 +199,35 @@ def require_coaches(coaches: pl.DataFrame, season: int) -> pl.DataFrame:
     return coaches
 
 
-def team_tendencies(plays: pl.DataFrame) -> pl.DataFrame:
-    """One row per (season, team)."""
+def team_tendencies(
+    plays: pl.DataFrame, schedule: pl.DataFrame | None = None
+) -> pl.DataFrame:
+    """One row per (season, team); ``schedule`` adds the game-context splits."""
     plays = counted_plays(plays)
     if plays.height == 0:
         return pl.DataFrame()
     from sportsdataverse.football.tendencies import tendencies
 
-    return tendencies(plays, league=LEAGUE, group_cols=TEAM_GROUP)
+    return tendencies(
+        attach_context(plays, schedule), league=LEAGUE, group_cols=TEAM_GROUP
+    )
 
 
-def coach_tendencies(plays: pl.DataFrame, coaches: pl.DataFrame) -> pl.DataFrame:
-    """One row per (season, team, head coach), ``role`` = ``"HC"``."""
+def coach_tendencies(
+    plays: pl.DataFrame, coaches: pl.DataFrame, schedule: pl.DataFrame | None = None
+) -> pl.DataFrame:
+    """One row per (season, team, head coach), ``role`` = ``"HC"``; ``schedule`` as in
+    :func:`team_tendencies`."""
     df = attach_coaches(counted_plays(plays), coaches)
     if df.height == 0:
         return pl.DataFrame()
     from sportsdataverse.football.tendencies import tendencies
 
     out = tendencies(
-        df, league=LEAGUE, group_cols=COACH_GROUP, def_group_cols=COACH_DEF_GROUP
+        attach_context(df, schedule),
+        league=LEAGUE,
+        group_cols=COACH_GROUP,
+        def_group_cols=COACH_DEF_GROUP,
     )
     out = out.filter(
         pl.col("coach").is_not_null()

@@ -103,6 +103,31 @@ def _resolve_team_names(
     return df.select(order)
 
 
+def _release_schedule(season: int) -> pl.DataFrame | None:
+    """The published ``cfb_schedules`` season (sdv-py ``load_cfb_schedule``), or ``None``."""
+    from cfb_data_build.derived import _retry
+    from sportsdataverse.cfb import load_cfb_schedule
+
+    return _retry(
+        lambda: load_cfb_schedule(seasons=[season]), what=f"cfb_schedules {season}"
+    )
+
+
+def _context_schedule(season: int, base: str | Path) -> pl.DataFrame | None:
+    """The season's ``cfb_schedules`` for the tendencies game-context splits.
+
+    The tracked ``{base}/cfb_schedules`` parquet first (the daily driver's own
+    last build), else the published release. Neither -> ``None`` and a warning:
+    the season still builds, without the context columns.
+    """
+    local = Path(base) / "cfb_schedules" / "parquet" / f"cfb_schedules_{season}.parquet"
+    sched = pl.read_parquet(local) if local.is_file() else _release_schedule(season)
+    if sched is None or sched.height == 0:
+        print(f"  context: no cfb_schedules for {season}; no game-context splits")
+        return None
+    return sched
+
+
 def _resolve_block(game: dict[str, Any], path: tuple[str, ...]) -> Any:
     """Navigate a nested key path to a block; ``None`` if any level is missing."""
     node: Any = game
@@ -311,14 +336,14 @@ def build_season(
 
         df = aggregate_usage_box(spec.usage_section, [df])  # type: ignore[arg-type]
     if spec.tendencies == "team":
-        df = team_tendencies(df)
+        df = team_tendencies(df, _context_schedule(season, base))
     elif spec.tendencies == "coach":
         coaches = require_coaches(
             team_coaches(season, schedule if schedule is not None else SCHEDULE_URL),
             season,
         )
         print(f"  coaches: {coaches.height} attributed team-seasons for {season}")
-        df = coach_tendencies(df, coaches)
+        df = coach_tendencies(df, coaches, _context_schedule(season, base))
     df = _resolve_team_names(df, season, schedule)
     print(f"{spec.dataset} {season}: {df.height} rows from {len(ids)} games")
     write_dataset(df, spec.dataset, season, spec.stem, base=base)

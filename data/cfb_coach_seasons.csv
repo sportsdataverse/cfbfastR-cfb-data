@@ -1760,11 +1760,16 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2017,David Cutcliffe,Duke,ACC,13,7,6,true
 2017,Scottie Montgomery,East Carolina,American Athletic,12,3,9,true
 2017,Chris Creighton,Eastern Michigan,Mid-American,12,5,7,true
+2017,Jim McElwain,Florida,SEC,7,3,4,false
+2017,Randy Shannon,Florida,SEC,4,1,3,false
 2017,Lane Kiffin,Florida Atlantic,Conference USA,14,11,3,true
 2017,Butch Davis,Florida International,Conference USA,13,8,5,true
 2017,Jimbo Fisher,Florida State,ACC,11,5,6,true
+2017,Odell Haggins,Florida State,ACC,2,2,0,false
 2017,Jeff Tedford,Fresno State,Mountain West,14,10,4,true
 2017,Kirby Smart,Georgia,SEC,15,13,2,true
+2017,Chad Lunsford,Georgia Southern,Sun Belt,6,2,4,false
+2017,Tyson Summers,Georgia Southern,Sun Belt,6,0,6,false
 2017,Shawn Elliott,Georgia State,Sun Belt,12,7,5,true
 2017,Paul Johnson,Georgia Tech,ACC,11,5,6,true
 2017,Nick Rolovich,Hawai'i,Mountain West,12,3,9,true
@@ -1793,6 +1798,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2017,Rick Stockstill,Middle Tennessee,Conference USA,13,7,6,true
 2017,P.J. Fleck,Minnesota,Big Ten,12,5,7,true
 2017,Dan Mullen,Mississippi State,SEC,12,8,4,true
+2017,Greg Knox,Mississippi State,SEC,1,1,0,false
 2017,Barry Odom,Missouri,SEC,13,7,6,true
 2017,Dave Doeren,NC State,ACC,13,9,4,true
 2017,Ken Niumatalolo,Navy,American Athletic,13,7,6,true
@@ -1812,6 +1818,8 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2017,Bobby Wilder,Old Dominion,Conference USA,12,5,7,true
 2017,Matt Luke,Ole Miss,SEC,12,6,6,true
 2017,Willie Taggart,Oregon,Pac-12,13,7,6,true
+2017,Cory Hall,Oregon State,Pac-12,6,0,6,false
+2017,Gary Andersen,Oregon State,Pac-12,6,1,5,false
 2017,James Franklin,Penn State,Big Ten,13,11,2,true
 2017,Pat Narduzzi,Pittsburgh,ACC,12,5,7,true
 2017,Jeff Brohm,Purdue,Big Ten,13,7,6,true
@@ -1828,8 +1836,10 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2017,Dino Babers,Syracuse,ACC,12,4,8,true
 2017,Gary Patterson,TCU,Big 12,14,11,3,true
 2017,Geoff Collins,Temple,American Athletic,13,7,6,true
+2017,Brady Hoke,Tennessee,SEC,2,0,2,false
 2017,Butch Jones,Tennessee,SEC,10,4,6,true
 2017,Tom Herman,Texas,Big 12,13,7,6,true
+2017,Jeff Banks,Texas A&M,SEC,1,0,1,false
 2017,Kevin Sumlin,Texas A&M,SEC,12,7,5,true
 2017,Everett Withers,Texas State,Sun Belt,12,2,10,true
 2017,Kliff Kingsbury,Texas Tech,Big 12,13,6,7,true
@@ -1839,11 +1849,14 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2017,Philip Montgomery,Tulsa,American Athletic,12,2,10,true
 2017,Bill Clark,UAB,Conference USA,13,8,5,true
 2017,Scott Frost,UCF,American Athletic,13,13,0,true
+2017,Jedd Fisch,UCLA,Pac-12,2,1,1,false
 2017,Jim Mora,UCLA,Pac-12,11,5,6,true
 2017,Randy Edsall,UConn,American Athletic,12,3,9,true
 2017,Matt Viator,UL Monroe,Sun Belt,12,4,8,true
 2017,Tony Sanchez,UNLV,Mountain West,12,5,7,true
 2017,Clay Helton,USC,Pac-12,14,11,3,true
+2017,Mike Price,UTEP,Conference USA,7,0,7,false
+2017,Sean Kugler,UTEP,Conference USA,5,0,5,false
 2017,Frank Wilson,UTSA,Conference USA,11,6,5,true
 2017,Kyle Whittingham,Utah,Pac-12,13,7,6,true
 2017,Matt Wells,Utah State,Mountain West,13,6,7,true

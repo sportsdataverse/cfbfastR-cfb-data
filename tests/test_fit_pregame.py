@@ -74,11 +74,38 @@ def test_walk_forward_prices_wp_with_the_training_sd() -> None:
     # The scored season is 4x noisier than training, so its own residual sd
     # (~40) is nowhere near what the training fold measured (~10).
     frame = _frame({2014: 10.0, 2015: 10.0, 2016: 40.0})
-    _rows, _flat, _curve, sds, scored = walk_forward_fit(frame, min_train=2)
+    _rows, _flat, _curve, sd_flat, sd_curve, scored = walk_forward_fit(
+        frame, min_train=2
+    )
     assert scored["season"].unique().to_list() == [2016]
-    train_sd = fit(frame.filter(pl.col("season") < 2016)).margin_sd
-    np.testing.assert_allclose(sds, train_sd)
-    assert train_sd < 15.0
+    train = fit(frame.filter(pl.col("season") < 2016))
+    np.testing.assert_allclose(sd_flat, train.margin_sd)
+    np.testing.assert_allclose(sd_curve, train.margin_sd_curve)
+    assert train.margin_sd < 15.0
+
+
+def test_margin_sd_curve_is_the_served_curves_residual_sd() -> None:
+    """sdv-py prices WP off the CURVE's margin, so its margin_sd is this one.
+
+    The slope here depends on games played, so the flat fit's residual sd is
+    visibly wider than the curve's.
+    """
+    rng = np.random.default_rng(11)
+    frame = _frame({2014: 3.0, 2015: 3.0}, n=2000)
+    games = frame["valid_games_home"].to_numpy()
+    diff = frame["rt_adj_net_home"].to_numpy()
+    frame = frame.with_columns(
+        pl.Series(
+            "margin",
+            np.where(games <= 3, 5.0, 60.0) * diff + rng.normal(0, 3.0, frame.height),
+        )
+    )
+    got = fit(frame)
+    want = float(
+        np.std(frame["margin"].to_numpy() - got.predict(frame, use_curve=True))
+    )
+    assert got.margin_sd_curve == pytest.approx(want)
+    assert got.margin_sd_curve < got.margin_sd - 1.0
 
 
 def test_from_constants_scores_the_serving_formula() -> None:
@@ -125,3 +152,9 @@ def test_fit_reads_the_rating_it_is_told_to() -> None:
     pred = got.predict(frame, use_curve=False)
     hfa = np.where(frame["neutral_site"].to_numpy(), 0.0, got.hfa_points)
     np.testing.assert_allclose(pred, got.net_points_scale * summ + hfa, atol=1e-9)
+
+
+def test_ship_fit_refuses_a_holdout_that_leaves_nothing_to_fit() -> None:
+    """Holding out every season would fit on zero games and write NaN constants."""
+    with pytest.raises(ValueError, match="no training"):
+        fit_for_ship(_frame({2014: 10.0, 2015: 10.0}), holdout=[2014, 2015])

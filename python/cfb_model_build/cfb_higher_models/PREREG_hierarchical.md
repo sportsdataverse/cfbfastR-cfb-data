@@ -194,11 +194,22 @@ are identical across vintages. Re-scored with identical code, games, ratings and
 | gate (§3 / `assert_hierarchical_gate`) | threshold | leaked (6,505 games) | leak-free (6,200) |
 |---|---|---|---|
 | MAE | <= 13.09 | 12.837 | 12.839 |
-| beat shipped | >= 1.85 | 2.105 | 1.918 (1.937 vs the 2026-09-27 constants) |
+| beat shipped (`backtest.shipped_margin`) | >= 1.85 | 2.105 | 1.918 |
 | calibration slope | 0.80-1.10 | 0.919 | 0.921 |
 | max calibration error | <= 0.10 | 0.029 | 0.025 |
 | seasons won | >= 0.80 | 11/11 | 11/11 |
 | season-clustered p | < 0.05 | < 0.0001 | < 0.0001 |
 
-Closing line on the same games: 12.29 / 12.30. Every gate passes on both; none was moved.
+Closing line on the same games: 12.29 / 12.30. No gate was moved.
+
+**Qualification: "beat shipped" passes only against a formula no surface serves.**
+`backtest.shipped_margin` still scores the pre-2026-08 closed form (flat
+`net_points_scale`, `2 * hfa_epa`). Scored against the formula sdv-py actually serves
+(games-played `slope_by_games` + `hfa_points`), the leak-free margin is **1.207** with the
+previous constants and **1.213** with the 2026-09-27 refit (baseline MAE 14.05 vs 12.84;
+11/11 seasons; season-clustered p < 0.0001). Both are **below the 1.85 gate**. The model
+still beats the served surface by a large, season-robust margin, but the gate's
+pre-registered baseline overstated that margin by about 0.7 MAE. Replacing the baseline
+(and re-deriving this gate against it) is a separate follow-up; this addendum does not
+move it.
 

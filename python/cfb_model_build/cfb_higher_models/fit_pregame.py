@@ -63,6 +63,10 @@ class PregameFit:
     n_train: int
     seasons: list[int]
     rating: str = _RATING
+    # Residual sd of the CURVE's margin, which is what sdv-py serves, so this
+    # (not the flat fit's ``margin_sd``) is its ``PredictConfig.margin_sd``.
+    # GOP's flat form keeps ``margin_sd``.
+    margin_sd_curve: float = float("nan")
 
     def predict(self, frame: pl.DataFrame, *, use_curve: bool = True) -> np.ndarray:
         diff = _diff(frame, self.rating)
@@ -132,7 +136,7 @@ def fit(frame: pl.DataFrame, rating: str = _RATING) -> PregameFit:
     Xt = np.column_stack([np.ones(len(total)), pace, off])
     ct, *_ = np.linalg.lstsq(Xt, total, rcond=None)
 
-    return PregameFit(
+    out = PregameFit(
         net_points_scale=slope,
         hfa_points=hfa,
         margin_sd=resid_sd,
@@ -144,6 +148,8 @@ def fit(frame: pl.DataFrame, rating: str = _RATING) -> PregameFit:
         seasons=sorted(int(s) for s in frame["season"].unique().to_list()),
         rating=rating,
     )
+    out.margin_sd_curve = float(np.std(margin - out.predict(frame, use_curve=True)))
+    return out
 
 
 def walk_forward_fit(frame: pl.DataFrame, *, min_train: int = 2, rating: str = _RATING):
@@ -153,7 +159,7 @@ def walk_forward_fit(frame: pl.DataFrame, *, min_train: int = 2, rating: str = _
     probability priced with the scored games' own residual sd would use the
     outcomes it is then graded against.
     """
-    rows, preds_flat, preds_curve, sds, tests = [], [], [], [], []
+    rows, preds_flat, preds_curve, sds, sds_curve, tests = [], [], [], [], [], []
     for train_seasons, test_season in season_splits(frame, min_train=min_train):
         tr = frame.filter(pl.col("season").is_in(train_seasons))
         te = frame.filter(pl.col("season") == test_season)
@@ -163,6 +169,7 @@ def walk_forward_fit(frame: pl.DataFrame, *, min_train: int = 2, rating: str = _
         preds_flat.append(f.predict(te, use_curve=False))
         preds_curve.append(f.predict(te, use_curve=True))
         sds.append(np.full(te.height, f.margin_sd))
+        sds_curve.append(np.full(te.height, f.margin_sd_curve))
         tests.append(te)
         rows.append((test_season, f.net_points_scale, f.hfa_points, f.margin_sd))
     # Return the scored rows themselves, not just targets: the incumbent has to
@@ -173,6 +180,7 @@ def walk_forward_fit(frame: pl.DataFrame, *, min_train: int = 2, rating: str = _
         np.concatenate(preds_flat),
         np.concatenate(preds_curve),
         np.concatenate(sds),
+        np.concatenate(sds_curve),
         pl.concat(tests),
     )
 
@@ -193,7 +201,10 @@ def fit_for_ship(
             f"holdout seasons {missing} are not in the frame; holding out a "
             "season that was never there tests nothing"
         )
-    return fit(frame.filter(~pl.col("season").is_in(holdout)), rating)
+    train = frame.filter(~pl.col("season").is_in(holdout))
+    if train.is_empty():
+        raise ValueError(f"holdout {sorted(holdout)} leaves no training seasons")
+    return fit(train, rating)
 
 
 def from_constants(cfg, rating: str = _RATING) -> PregameFit:
@@ -216,6 +227,7 @@ def from_constants(cfg, rating: str = _RATING) -> PregameFit:
         n_train=0,
         seasons=[],
         rating=rating,
+        margin_sd_curve=cfg.margin_sd,
     )
 
 
@@ -244,7 +256,7 @@ def main(
     frame = build_game_frame(seasons)
     print(f"as-of frame: {frame.height} games, seasons {min(seasons)}-{max(seasons)}\n")
 
-    rows, p_flat, p_curve, train_sd, scored = walk_forward_fit(frame)
+    rows, p_flat, p_curve, train_sd, train_sd_curve, scored = walk_forward_fit(frame)
     print("per-fold refit (train = all prior seasons):")
     print(f"  {'test':>6} {'slope':>8} {'hfa_pt':>8} {'resid_sd':>9}")
     for s, sl, h, sd in rows:
@@ -263,7 +275,7 @@ def main(
             shipped.margin_sd,
         ),
         ("refit (flat slope)", p_flat, train_sd),
-        ("refit (attenuation curve)", p_curve, train_sd),
+        ("refit (attenuation curve)", p_curve, train_sd_curve),
     ):
         print("\n" + _report(label, p, scored, sd))
         print(by_week(scored, p))
@@ -271,6 +283,9 @@ def main(
     final = fit_for_ship(frame, holdout)
     print(f"\nship fit on {final.seasons} ({final.n_train} games), holdout {holdout}")
     print(f"slope-by-games-played curve: {final.slope_by_games}")
+    print(
+        f"margin_sd flat {final.margin_sd:.4f}, curve (served) {final.margin_sd_curve:.4f}"
+    )
     train = frame.filter(pl.col("season").is_in(final.seasons))
     # The rating spread these constants assume -- sdv-py's
     # cfb_game_predict._FITTED_ADJ_NET_SD, which warns when ratings drift.
@@ -293,7 +308,8 @@ def main(
             for curve in (False, True):
                 p = f.predict(ho, use_curve=curve)
                 tag = f"{label} ({'curve' if curve else 'flat'})"
-                print("\n" + _report(tag, p, ho, f.margin_sd))
+                sd = f.margin_sd_curve if curve else f.margin_sd
+                print("\n" + _report(tag, p, ho, sd))
                 print(by_week(ho, p))
     # GOP's sdv.ts: the FLAT form on the summaries' net_adj_epa. Its own fit,
     # scored against the shipped slope applied to that rating (what sdv.ts runs).
@@ -306,7 +322,7 @@ def main(
         f"\nGOP arm (flat, net_adj_epa): scale {gop.net_points_scale:.4f} "
         f"hfa {gop.hfa_points:.4f} margin_sd {gop.margin_sd:.4f}"
     )
-    _r, g_flat, _c, g_sd, g_scored = walk_forward_fit(frame, rating="net_adj_epa")
+    _r, g_flat, _c, g_sd, _cs, g_scored = walk_forward_fit(frame, rating="net_adj_epa")
     print("\n" + _report("GOP arm walk-forward (flat)", g_flat, g_scored, g_sd))
     if holdout:
         gop_now = from_constants(get_constants("modern"), rating="net_adj_epa")

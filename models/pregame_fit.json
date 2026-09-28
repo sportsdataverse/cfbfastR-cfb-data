@@ -25,6 +25,7 @@
     2023
   ],
   "rating": "rt_adj_net",
+  "margin_sd_curve": 18.10427692290415,
   "holdout_seasons": [
     2024,
     2025

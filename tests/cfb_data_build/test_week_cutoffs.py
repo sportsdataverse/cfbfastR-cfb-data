@@ -245,6 +245,19 @@ def test_team_summaries_weekly_stops_at_the_same_week(
 ):
     """The summaries twin padded the same way (0 changes after 2026 week 4)."""
     _raw_root(monkeypatch, tmp_path, GAMES)
+    built = _fake_summaries(monkeypatch)
+
+    out = derived.build_team_summaries_weekly(
+        2026, base=str(tmp_path / "out"), today=today
+    )
+
+    assert built == weeks
+    assert out["through_week"].to_list() == weeks
+
+
+def _fake_summaries(monkeypatch) -> list[int]:
+    """Stub ``build_summaries_season`` to write a one-row snapshot; return the
+    ``through_week`` list it is called with."""
     from cfb_data_build import summaries_build
     from cfb_data_build.config import SUMMARIES_REGISTRY
 
@@ -265,10 +278,50 @@ def test_team_summaries_weekly_stops_at_the_same_week(
         pl.DataFrame({"team_id": [1]}).write_parquet(snap)
 
     monkeypatch.setattr(summaries_build, "build_summaries_season", fake_build)
+    return built
 
-    out = derived.build_team_summaries_weekly(
-        2026, base=str(tmp_path / "out"), today=today
+
+@pytest.mark.parametrize("today", [TODAY, AFTER_SEASON])
+def test_schedule_outage_builds_nothing(monkeypatch, tmp_path, capsys, today):
+    """``load_cfb_schedule`` gave up (or 2026's schedule is not published yet):
+    every week is unbounded. team_summaries_weekly builds by week number, so it
+    republished every one of them -- the whole season padded. Nothing is built,
+    and the fetch's GAVE UP line still says why.
+    """
+    sdv_cfb = _raw_root(monkeypatch, tmp_path, GAMES)
+
+    def down(seasons):
+        raise ConnectionError("cfb_schedules unreachable")
+
+    monkeypatch.setattr(sdv_cfb, "load_cfb_schedule", down)
+    monkeypatch.setattr(derived, "_RETRY_BACKOFF_S", 0)
+    built = _fake_summaries(monkeypatch)
+    rated: list = []
+    monkeypatch.setattr(
+        sdv_cfb, "cfb_ratings", lambda season, *, as_of_date: rated.append(as_of_date)
     )
 
-    assert built == weeks
-    assert out["through_week"].to_list() == weeks
+    summaries = derived.build_team_summaries_weekly(
+        2026, base=str(tmp_path / "out"), today=today
+    )
+    ratings = derived.build_ratings_weekly(2026, today=today)
+
+    assert built == [] and summaries.height == 0
+    assert rated == [] and ratings.height == 0
+    assert "GAVE UP" in capsys.readouterr().out
+
+
+@pytest.mark.parametrize(
+    "today, weeks",
+    [(dt.date(2026, 12, 1), [3, 4, 5, 13]), (dt.date(2026, 12, 4), [3, 4, 5, 13, 14])],
+)
+def test_week_not_kicked_off_is_not_built(monkeypatch, tmp_path, today, weeks):
+    """2026 week 14 has no FBS game until its championship matchups are set, so
+    it borrows week 13's bound (11-30); on the bound alone it passed from then
+    on as week 13 relabelled. The master dates its first kickoff (12-04 UTC),
+    and it waits for that.
+    """
+    _raw_root(monkeypatch, tmp_path, GAMES)
+    assert _cuts(2026)[14] == _cuts(2026)[13] < dt.date(2026, 12, 1)
+
+    assert [w for w, _ in derived.played_cutoffs(2026, today)] == weeks

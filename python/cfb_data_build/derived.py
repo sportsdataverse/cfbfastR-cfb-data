@@ -127,14 +127,31 @@ def schedule_weeks(season: int, schedule_path: "Path | None" = None) -> list[int
     convention -- the schedule master agrees), so including it would collide the
     week labels.
     """
+    return sorted(week_starts(season, schedule_path))
+
+
+def week_starts(season: int, schedule_path: "Path | None" = None) -> dict[int, dt.date]:
+    """Each of :func:`schedule_weeks`' first kickoff date (UTC) in the master.
+
+    The master dates a week before ``load_cfb_schedule`` has an FBS game in it
+    (2026 week 14's championship TBDs), so this says whether a week has begun
+    while :func:`week_cutoffs` still lends it the previous week's bound.
+    """
     schedule_path = schedule_path if schedule_path is not None else _schedule_master()
     s = pl.read_parquet(schedule_path).filter(
         (pl.col("season") == season) & (pl.col("season_type") == 2)
     )
     if s.height == 0 or "start_date" not in s.columns:
-        return []
-    return sorted(
-        s.select("week", "start_date").drop_nulls()["week"].unique().to_list()
+        return {}
+    return dict(
+        s.select(
+            "week",
+            pl.col("start_date").cast(pl.Utf8).str.slice(0, 10).str.to_date(),
+        )
+        .drop_nulls()
+        .group_by("week")
+        .agg(pl.col("start_date").min())
+        .iter_rows()
     )
 
 
@@ -179,7 +196,7 @@ def week_cutoffs(
         )
     if games is None or "season" not in games.columns:
         # No published schedule yet (preseason) or the fetch gave up: no week
-        # can be bounded, so none is rated and _report_gaps says so.
+        # can be bounded, so none is built -- played_cutoffs drops them all.
         return [(w, None) for w in weeks]
     fit = (
         games.filter(
@@ -240,18 +257,29 @@ def played_cutoffs(
     now.
 
     Bounds never decrease week to week (each is capped at every later week's
-    first kickoff), so the first future week ends the season's played part. A
-    week without a bound (``None``) cannot be dated and stays, for each builder
-    to treat as before. A week that borrows the previous week's bound passes
-    with it: 2026 week 14 would, if its championship matchups were still
-    unscheduled once week 13's bound arrived.
+    first kickoff), so the first future week ends the season's played part.
+
+    A week the master has not seen kick off (:func:`week_starts`) ends it too.
+    2026 week 14 has no FBS game until its championship matchups are set, so it
+    borrows week 13's bound (11-30) and, on the bound alone, shipped week 13
+    relabelled from then until ~12-06.
+
+    A week without a bound (``None``) stays when it leads the season, for each
+    builder to treat as before. Trailing, it is every week: the schedule is not
+    published yet or its fetch gave up, and team_summaries_weekly, which builds
+    by week number, republished the whole season padded. Those are dropped.
     """
-    today = today or dt.datetime.now(dt.timezone.utc).date()
+    today = today or dt.datetime.now(dt.UTC).date()
+    starts = week_starts(season)
     played: list[tuple[int, str | None]] = []
     for week, cutoff in week_cutoffs(season):
-        if cutoff is not None and dt.date.fromisoformat(cutoff) > today:
+        if starts[week] > today or (
+            cutoff is not None and dt.date.fromisoformat(cutoff) > today
+        ):
             break
         played.append((week, cutoff))
+    while played and played[-1][1] is None:
+        played.pop()
     return played
 
 

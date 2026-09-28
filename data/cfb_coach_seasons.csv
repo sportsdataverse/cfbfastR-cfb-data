@@ -2721,23 +2721,29 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2024,Jeff Monken,Army,American Athletic,14,12,2,true
 2024,Hugh Freeze,Auburn,SEC,12,5,7,true
 2024,Kalani Sitake,BYU,Big 12,13,11,2,true
+2024,Colin Johnson,Ball State,Mid-American,2,0,2,false
 2024,Mike Neu,Ball State,Mid-American,10,3,7,true
 2024,Dave Aranda,Baylor,Big 12,13,8,5,true
 2024,Spencer Danielson,Boise State,Mountain West,14,12,2,true
 2024,Bill O'Brien,Boston College,ACC,13,7,6,true
 2024,Scot Loeffler,Bowling Green,Mid-American,13,7,6,true
+2024,Maurice Linguist,Buffalo,Mid-American,0,0,0,false
 2024,Pete Lembo,Buffalo,Mid-American,13,9,4,true
 2024,Justin Wilcox,California,ACC,13,6,7,true
 2024,Jim McElwain,Central Michigan,Mid-American,12,4,8,true
 2024,Biff Poggi,Charlotte,American Athletic,10,3,7,true
+2024,Tim Brewster,Charlotte,American Athletic,2,2,0,false
 2024,Scott Satterfield,Cincinnati,Big 12,12,5,7,true
 2024,Dabo Swinney,Clemson,ACC,14,10,4,true
 2024,Tim Beck,Coastal Carolina,Sun Belt,13,6,7,true
 2024,Deion Sanders,Colorado,Big 12,13,9,4,true
 2024,Jay Norvell,Colorado State,Mountain West,13,8,5,true
 2024,Manny Diaz,Duke,ACC,13,9,4,true
+2024,Blake Harrell,East Carolina,American Athletic,6,5,1,false
+2024,Mike Houston,East Carolina,American Athletic,7,3,4,false
 2024,Chris Creighton,Eastern Michigan,Mid-American,12,5,7,true
 2024,Billy Napier,Florida,SEC,13,8,5,true
+2024,Chad Lunsford,Florida Atlantic,American Athletic,2,1,1,false
 2024,Tom Herman,Florida Atlantic,American Athletic,10,2,8,true
 2024,Mike MacIntyre,Florida International,Conference USA,12,4,8,true
 2024,Mike Norvell,Florida State,ACC,12,2,10,true
@@ -2745,8 +2751,10 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2024,Kirby Smart,Georgia,SEC,14,11,3,true
 2024,Clay Helton,Georgia Southern,Sun Belt,13,8,5,true
 2024,Dell McGee,Georgia State,Sun Belt,12,3,9,true
+2024,Shawn Elliott,Georgia State,Sun Belt,0,0,0,false
 2024,Brent Key,Georgia Tech,ACC,13,7,6,true
 2024,Timmy Chang,Hawai'i,Mountain West,12,5,7,true
+2024,Dana Holgorsen,Houston,Big 12,0,0,0,false
 2024,Willie Fritz,Houston,Big 12,12,4,8,true
 2024,Bret Bielema,Illinois,Big Ten,13,10,3,true
 2024,Curt Cignetti,Indiana,Big Ten,13,11,2,true
@@ -2756,6 +2764,8 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2024,Bob Chesney,James Madison,Sun Belt,13,9,4,true
 2024,Lance Leipold,Kansas,Big 12,12,5,7,true
 2024,Chris Klieman,Kansas State,Big 12,13,9,4,true
+2024,Brian Bohannon,Kennesaw State,Conference USA,9,1,8,false
+2024,Chandler Burks,Kennesaw State,Conference USA,3,1,2,false
 2024,Kenni Burns,Kent State,Mid-American,12,0,12,true
 2024,Mark Stoops,Kentucky,SEC,12,4,8,true
 2024,Brian Kelly,LSU,SEC,13,9,4,true
@@ -2766,6 +2776,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2024,Charles Huff,Marshall,Sun Belt,13,10,3,true
 2024,Mike Locksley,Maryland,Big Ten,12,4,8,true
 2024,Don Brown,Massachusetts,FBS Independents,10,2,8,true
+2024,Shane Montgomery,Massachusetts,FBS Independents,2,0,2,false
 2024,Ryan Silverfield,Memphis,American Athletic,13,11,2,true
 2024,Mario Cristobal,Miami,ACC,13,10,3,true
 2024,Chuck Martin,Miami (OH),Mid-American,14,9,5,true
@@ -2781,6 +2792,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2024,Jeff Choate,Nevada,Mountain West,13,3,10,true
 2024,Bronco Mendenhall,New Mexico,Mountain West,12,5,7,true
 2024,Tony Sanchez,New Mexico State,Conference USA,12,3,9,true
+2024,Freddie Kitchens,North Carolina,ACC,1,0,1,false
 2024,Mack Brown,North Carolina,ACC,12,6,6,true
 2024,Eric Morris,North Texas,American Athletic,13,6,7,true
 2024,Thomas Hammock,Northern Illinois,Mid-American,13,8,5,true
@@ -2797,17 +2809,23 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2024,James Franklin,Penn State,Big Ten,16,13,3,true
 2024,Pat Narduzzi,Pittsburgh,ACC,13,7,6,true
 2024,Ryan Walters,Purdue,Big Ten,12,1,11,true
+2024,Mike Bloomgren,Rice,American Athletic,8,2,6,false
+2024,Pete Alamar,Rice,American Athletic,4,2,2,false
 2024,Greg Schiano,Rutgers,Big Ten,13,7,6,true
 2024,Rhett Lashlee,SMU,ACC,14,11,3,true
+2024,Brad Cornelsen,Sam Houston,Conference USA,1,1,0,false
 2024,K.C. Keeler,Sam Houston,Conference USA,12,9,3,true
 2024,Sean Lewis,San Diego State,Mountain West,12,3,9,true
 2024,Ken Niumatalolo,San José State,Mountain West,13,7,6,true
 2024,Major Applewhite,South Alabama,Sun Belt,13,7,6,true
 2024,Shane Beamer,South Carolina,SEC,13,9,4,true
 2024,Alex Golesh,South Florida,American Athletic,13,7,6,true
+2024,Reed Stringer,Southern Miss,Sun Belt,5,0,5,false
+2024,Will Hall,Southern Miss,Sun Belt,7,1,6,false
 2024,Troy Taylor,Stanford,ACC,12,3,9,true
 2024,Fran Brown,Syracuse,ACC,13,10,3,true
 2024,Sonny Dykes,TCU,Big 12,13,9,4,true
+2024,Everett Withers,Temple,American Athletic,2,0,2,false
 2024,Stan Drayton,Temple,American Athletic,10,3,7,true
 2024,Josh Heupel,Tennessee,SEC,13,10,3,true
 2024,Steve Sarkisian,Texas,SEC,16,13,3,true
@@ -2818,6 +2836,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2024,Gerad Parker,Troy,Sun Belt,12,4,8,true
 2024,Jon Sumrall,Tulane,American Athletic,14,9,5,true
 2024,Kevin Wilson,Tulsa,American Athletic,11,3,8,true
+2024,Ryan Switzer,Tulsa,American Athletic,1,0,1,false
 2024,Trent Dilfer,UAB,American Athletic,12,3,9,true
 2024,Gus Malzahn,UCF,Big 12,12,4,8,true
 2024,Deshaun Foster,UCLA,Big Ten,12,5,7,true
@@ -2828,6 +2847,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2024,Scotty Walden,UTEP,Conference USA,12,3,9,true
 2024,Jeff Traylor,UTSA,American Athletic,13,7,6,true
 2024,Kyle Whittingham,Utah,Big 12,12,5,7,true
+2024,Blake Anderson,Utah State,Mountain West,0,0,0,false
 2024,Nate Dreiling,Utah State,Mountain West,12,4,8,true
 2024,Clark Lea,Vanderbilt,SEC,13,7,6,true
 2024,Tony Elliott,Virginia,ACC,12,5,7,true
@@ -2835,6 +2855,8 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2024,Dave Clawson,Wake Forest,ACC,12,4,8,true
 2024,Jedd Fisch,Washington,Big Ten,13,6,7,true
 2024,Jake Dickert,Washington State,Pac-12,12,8,4,true
+2024,Pete Kaligis,Washington State,Pac-12,1,0,1,false
+2024,Chad Scott,West Virginia,Big 12,1,0,1,false
 2024,Neal Brown,West Virginia,Big 12,12,6,6,true
 2024,Tyson Helton,Western Kentucky,Conference USA,14,8,6,true
 2024,Lance Taylor,Western Michigan,Mid-American,13,6,7,true

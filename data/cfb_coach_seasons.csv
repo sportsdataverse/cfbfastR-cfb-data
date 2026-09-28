@@ -961,6 +961,8 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2011,Troy Calhoun,Air Force,Mountain West,13,7,6,true
 2011,Rob Ianello,Akron,Mid-American,12,1,11,true
 2011,Nick Saban,Alabama,SEC,13,12,1,true
+2011,Mike Stoops,Arizona,Pac-12,6,1,5,false
+2011,Tim Kish,Arizona,Pac-12,6,3,3,false
 2011,Dennis Erickson,Arizona State,Pac-12,13,6,7,true
 2011,Bobby Petrino,Arkansas,SEC,13,11,2,true
 2011,Hugh Freeze,Arkansas State,Sun Belt,13,10,3,true
@@ -1018,6 +1020,8 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2011,Ken Niumatalolo,Navy,FBS Independents,12,5,7,true
 2011,Bo Pelini,Nebraska,Big Ten,13,9,4,true
 2011,Chris Ault,Nevada,Western Athletic,13,7,6,true
+2011,George Barlow,New Mexico,Mountain West,8,1,7,false
+2011,Mike Locksley,New Mexico,Mountain West,4,0,4,false
 2011,DeWayne Walker,New Mexico State,Western Athletic,13,4,9,true
 2011,Everett Withers,North Carolina,ACC,13,7,6,true
 2011,Dan McCarney,North Texas,Sun Belt,12,5,7,true
@@ -1049,6 +1053,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2011,Derek Dooley,Tennessee,SEC,12,5,7,true
 2011,Mack Brown,Texas,Big 12,13,8,5,true
 2011,Mike Sherman,Texas A&M,Big 12,12,6,6,true
+2011,Tim DeRuyter,Texas A&M,Big 12,1,1,0,false
 2011,Tommy Tuberville,Texas Tech,Big 12,12,5,7,true
 2011,Matt Campbell,Toledo,Mid-American,1,1,0,true
 2011,Larry Blakeney,Troy,Sun Belt,12,3,9,true

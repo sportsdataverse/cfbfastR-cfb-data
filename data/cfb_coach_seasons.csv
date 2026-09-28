@@ -891,10 +891,13 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2010,Ralph Friedgen,Maryland,ACC,13,9,4,true
 2010,Larry Porter,Memphis,Conference USA,12,1,11,true
 2010,Randy Shannon,Miami,ACC,12,7,5,true
+2010,Lance Guidry,Miami (OH),Mid-American,1,1,0,false
 2010,Michael Haywood,Miami (OH),Mid-American,13,9,4,true
 2010,Rich Rodriguez,Michigan,Big Ten,13,7,6,true
 2010,Mark Dantonio,Michigan State,Big Ten,13,11,2,true
 2010,Rick Stockstill,Middle Tennessee,Sun Belt,13,6,7,true
+2010,Jeff Horton,Minnesota,Big Ten,5,2,3,false
+2010,Tim Brewster,Minnesota,Big Ten,7,1,6,false
 2010,Dan Mullen,Mississippi State,SEC,13,9,4,true
 2010,Gary Pinkel,Missouri,Big 12,13,10,3,true
 2010,Tom O'Brien,NC State,ACC,13,9,4,true
@@ -904,6 +907,8 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2010,Mike Locksley,New Mexico,Mountain West,12,1,11,true
 2010,DeWayne Walker,New Mexico State,Western Athletic,12,2,10,true
 2010,Butch Davis,North Carolina,ACC,13,8,5,true
+2010,Mike Canales,North Texas,Sun Belt,5,2,3,false
+2010,Todd Dodge,North Texas,Sun Belt,7,1,6,false
 2010,Jerry Kill,Northern Illinois,Mid-American,13,10,3,true
 2010,Pat Fitzgerald,Northwestern,Big Ten,13,7,6,true
 2010,Brian Kelly,Notre Dame,FBS Independents,13,8,5,true
@@ -916,6 +921,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2010,Mike Riley,Oregon State,Pac-10,12,5,7,true
 2010,Joe Paterno,Penn State,Big Ten,13,7,6,true
 2010,Dave Wannstedt,Pittsburgh,Big East,12,7,5,true
+2010,Phil Bennett,Pittsburgh,Big East,1,1,0,false
 2010,Danny Hope,Purdue,Big Ten,12,4,8,true
 2010,David Bailiff,Rice,Conference USA,12,4,8,true
 2010,Greg Schiano,Rutgers,Big East,12,4,8,true

@@ -71,14 +71,16 @@ RELEASE_NOTES: dict[str, str] = {
     "cfb_team_summaries_weekly": (
         "College Football team summaries as of the END OF EACH REGULAR-SEASON "
         "WEEK. LONG FORMAT: one asset per season carrying a `through_week` "
-        "column with every week's cumulative snapshot stacked.\n" + _WEEKLY_ASOF_WARNING
+        "column with every week's cumulative snapshot stacked. The current "
+        "season carries only the weeks played so far.\n" + _WEEKLY_ASOF_WARNING
     ),
     "cfb_ratings_weekly": (
         "College Football opponent-adjusted team ratings as of the END OF EACH "
         "REGULAR-SEASON WEEK. LONG FORMAT: one asset per season carrying a "
         "`through_week` column with every week's cumulative snapshot stacked. "
         "The ridge is refit on everything up to week W, so this is NOT "
-        "derivable by summing per-game rows.\n" + _WEEKLY_ASOF_WARNING
+        "derivable by summing per-game rows. The current season carries only "
+        "the weeks played so far.\n" + _WEEKLY_ASOF_WARNING
     ),
     "cfb_matchup_features": (
         "College Football per-team, per-GAME matchup features (EPA / success / "

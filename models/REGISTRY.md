@@ -97,16 +97,15 @@ Evidence: `python -m cfb_model_build.cfb_higher_models hierarchical` prints the 
 **2026-09-27 — the 2026-09-02 figures above and below were measured on LEAKED features.**
 Every through-week `cfb_team_summaries_weekly` snapshot carried that season's bowl and CFP
 games (#100). Re-measured on the leak-free republish with identical code, games and
-`cfb_ratings_weekly` (the leaked arm reads the pre-#100 weekly assets from git `76f3b6b61`):
+`cfb_ratings_weekly` (the leaked arm reads the pre-#100 weekly assets from git `76f3b6b61`). Not a table:
+the registry tests parse every pipe row in this file as a model row.
 
-| figure | leaked | leak-free |
-|---|---|---|
-| hierarchical (`hier-eb`), walk-forward 2015-2025 | 12.84 (6,505 games) | 12.84 (6,200) |
-| `backtest.shipped_margin` on the same games | 14.94 | 14.76 |
-| closing line on the same games | 12.29 | 12.30 |
-| `experiments --quick` `gbm_all` (walk-forward, min_train 3) | 12.51 (5,408) | 12.77 (5,148) |
-| `experiments --quick` `ridge_all` | 12.54 | 13.10 |
-| shipped constants, serving formula, weeks 2-4 | 16.42 (689) | 16.33 (423); constant baseline 16.36 |
+- hierarchical (`hier-eb`), walk-forward 2015-2025: 12.84 on 6,505 games leaked, 12.84 on 6,200 leak-free.
+- `backtest.shipped_margin` on those games: 14.94 leaked, 14.76 leak-free.
+- closing line on those games: 12.29 leaked, 12.30 leak-free.
+- `experiments --quick` `gbm_all` (walk-forward, min_train 3): 12.51 on 5,408 leaked, 12.77 on 5,148 leak-free.
+- `experiments --quick` `ridge_all`: 12.54 leaked, 13.10 leak-free.
+- shipped constants through the serving formula, weeks 2-4: 16.42 on 689 leaked, 16.33 on 423 leak-free (constant baseline 16.36).
 
 The leak flattered the feature models by 0.26-0.56 MAE. The hierarchical model reads final
 scores only, so its predictions do not move, and every `assert_hierarchical_gate` threshold

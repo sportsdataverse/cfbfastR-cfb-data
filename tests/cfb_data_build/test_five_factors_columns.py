@@ -21,6 +21,7 @@ from cfb_data_build.summaries_input import game_giveaways, prepare_plays_input
 from cfb_data_build.team_summaries import (
     _clean_rank_columns,
     _drive_owners,
+    _join_adjusted_epa,
     _mutate_summary_margins,
     _strength_faced_ranks,
     _suffix_nonkey,
@@ -442,3 +443,19 @@ def test_strength_faced_ranks_put_the_toughest_slate_first():
     assert got["def_strength_faced_rank"].to_list() == [1.0, 2.0, None]
     assert got.schema["off_strength_faced_rank"] == pl.Float64
     assert got.schema["def_strength_faced_rank"] == pl.Float64
+
+
+def test_the_adjusted_epa_join_carries_the_strength_faced_ranks():
+    # the builder's one route to the strengths: they cannot ship unranked
+    team_data = pl.DataFrame({"team_id": ["1", "2"]})
+    adjusted = pl.DataFrame(
+        {
+            "team_id": ["1", "2"],
+            "pos_team": ["One", "Two"],
+            "off_strength_faced": [0.20, 0.10],
+            "def_strength_faced": [-0.05, 0.10],
+        }
+    )
+    got = _join_adjusted_epa(team_data, adjusted).sort("team_id")
+    assert got["off_strength_faced_rank"].to_list() == [1.0, 2.0]
+    assert got["def_strength_faced_rank"].to_list() == [1.0, 2.0]

@@ -44,10 +44,11 @@ _EXPLOSIVE_RUSH_EPA = 1.8
 #: the shared ``tendencies`` producer reads. ``yards_to_goal`` is that column here.
 _SCORING_OPP_YARDS_TO_GOAL = 40
 #: Offensive points by ESPN ``drive.result`` (7 per TD, as ``tendencies`` scores
-#: it), for both points per scoring opportunity and points per drive. 2004-2013 spell the outcomes out -- "RUSHING TD", "PASSING TD",
-#: "FG GOOD", "MADE FG", and 2004 has no plain "TD"/"FG" drive at all -- so a
-#: "TD"/"FG"-only match scores those seasons at zero. Return TDs ("INT TD",
-#: "PUNT RETURN TD", ...) are the other team's points: 0 here.
+#: it), for both points per scoring opportunity and points per drive. 2004-2013
+#: spell the outcomes out -- "RUSHING TD", "PASSING TD", "FG GOOD", "MADE FG",
+#: and 2004 has no plain "TD"/"FG" drive at all -- so a "TD"/"FG"-only match
+#: scores those seasons at zero. Return TDs ("INT TD", "PUNT RETURN TD", ...)
+#: are the other team's points: 0 here.
 #:
 #: Known ceiling: a drive whose result is a clock or data label rather than an
 #: outcome scores 0 even when it ended in a field goal -- over 2004-2025 that is
@@ -624,6 +625,16 @@ def _strength_faced_ranks(df: pl.DataFrame) -> pl.DataFrame:
     return df.with_columns(
         off_strength_faced_rank=_rank_known("off_strength_faced", descending=True),
         def_strength_faced_rank=_rank_known("def_strength_faced", descending=False),
+    )
+
+
+def _join_adjusted_epa(team_data: pl.DataFrame, adjusted: pl.DataFrame) -> pl.DataFrame:
+    """Left-join :func:`cfb_adjusted_epa` onto ``team_data``, strength ranks included.
+
+    One step, so the strengths of schedule can never ship without their ranks.
+    """
+    return _strength_faced_ranks(
+        team_data.join(adjusted.drop("pos_team"), on="team_id", how="left")
     )
 
 
@@ -1392,10 +1403,9 @@ def build_team_summaries(
     schools = _build_schools(plays)
     # Opponent-adjusted EPA via the shared sdv-py primitive (was a local copy;
     # sportsdataverse.cfb.cfb_adjusted_epa is the single owner as of sdv-py 0.0.71).
-    team_data = _prepare_for_write(team_data, yr, schools).join(
-        cfb_adjusted_epa(plays).drop("pos_team"), on="team_id", how="left"
+    team_data = _join_adjusted_epa(
+        _prepare_for_write(team_data, yr, schools), cfb_adjusted_epa(plays)
     )
-    team_data = _strength_faced_ranks(team_data)
     # Assert the adjustment ACTUALLY ADJUSTED. On 2026-08-01 this shipped with
     # adj_off_epa at corr 0.9928 against its own raw EPAplay_off -- the ridge
     # penalty was on the glmnet scale (325) which, under sklearn's

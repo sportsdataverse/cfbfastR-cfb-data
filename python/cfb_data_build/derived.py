@@ -183,11 +183,23 @@ def week_cutoffs(
       2025; the postseason cap keeps a same-day bowl out.
 
     A week with no FBS game of its own (2019 week 16, 2026 week 14) reuses the
-    previous week's bound. One before any FBS game gets None and is not rated.
+    previous week's bound; :func:`played_cutoffs` holds it back until the season
+    moves past it. One before any FBS game gets None and is not rated.
     """
+    return [(w, c) for w, c, _ in _week_bounds(season, schedule_path, games)[0]]
+
+
+def _week_bounds(
+    season: int,
+    schedule_path: "Path | None" = None,
+    games: "pl.DataFrame | None" = None,
+) -> tuple[list[tuple[int, str | None, bool]], dt.date | None]:
+    """:func:`week_cutoffs` with whether each bound is the week's OWN (False: no
+    FBS game of its own, so it borrows an earlier week's), plus the first FBS
+    postseason kickoff (None until one is scheduled)."""
     weeks = schedule_weeks(season, schedule_path)
     if not weeks:
-        return []
+        return [], None
     if games is None:
         from sportsdataverse.cfb import load_cfb_schedule
 
@@ -197,7 +209,7 @@ def week_cutoffs(
     if games is None or "season" not in games.columns:
         # No published schedule yet (preseason) or the fetch gave up: no week
         # can be bounded, so none is built -- played_cutoffs drops them all.
-        return [(w, None) for w in weeks]
+        return [(w, None, False) for w in weeks], None
     fit = (
         games.filter(
             (pl.col("season") == season)
@@ -235,9 +247,12 @@ def week_cutoffs(
         )
     )
     g = pl.DataFrame({"week": weeks}, schema={"week": pl.Int64}).join_asof(
-        bounds, on="week", strategy="backward"
+        bounds.with_columns(own=pl.col("week")), on="week", strategy="backward"
     )
-    return [(int(w), None if c is None else str(c)) for w, c in g.iter_rows()]
+    rows = [
+        (int(w), None if c is None else str(c), o == w) for w, c, o in g.iter_rows()
+    ]
+    return rows, post_first
 
 
 def played_cutoffs(
@@ -264,6 +279,12 @@ def played_cutoffs(
     borrows week 13's bound (11-30) and, on the bound alone, shipped week 13
     relabelled from then until ~12-06.
 
+    Kicking off is not enough for such a BORROWED bound either: on 12-04
+    ``load_cfb_schedule`` can still lack every week-14 game, and the snapshot is
+    week 13's. It waits until the season has moved past the week: a later week
+    is bounded by its own games, or the FBS postseason has started. The latter
+    keeps a completed season's borrowed final week (2019 week 16, Army-Navy).
+
     A week without a bound (``None``) stays when it leads the season, for each
     builder to treat as before. Trailing, it is every week: the schedule is not
     published yet or its fetch gave up, and team_summaries_weekly, which builds
@@ -271,12 +292,20 @@ def played_cutoffs(
     """
     today = today or dt.datetime.now(dt.UTC).date()
     starts = week_starts(season)
+    rows, post_first = _week_bounds(season)
+    started = post_first is not None and post_first <= today
+    own_played = [
+        w for w, c, own in rows if own and c and dt.date.fromisoformat(c) <= today
+    ]
     played: list[tuple[int, str | None]] = []
-    for week, cutoff in week_cutoffs(season):
+    for week, cutoff, own in rows:
         if starts[week] > today or (
             cutoff is not None and dt.date.fromisoformat(cutoff) > today
         ):
             break
+        if cutoff is not None and not own:
+            if not (started or any(w > week for w in own_played)):
+                break
         played.append((week, cutoff))
     while played and played[-1][1] is None:
         played.pop()

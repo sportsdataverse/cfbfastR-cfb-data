@@ -313,15 +313,65 @@ def test_schedule_outage_builds_nothing(monkeypatch, tmp_path, capsys, today):
 
 @pytest.mark.parametrize(
     "today, weeks",
-    [(dt.date(2026, 12, 1), [3, 4, 5, 13]), (dt.date(2026, 12, 4), [3, 4, 5, 13, 14])],
+    [
+        # week 14's master kickoff (12-04 UTC) is still ahead
+        (dt.date(2026, 12, 1), [3, 4, 5, 13]),
+        # it has passed, but load_cfb_schedule has no FBS week-14 game yet
+        (dt.date(2026, 12, 4), [3, 4, 5, 13]),
+        # week 15 has kicked off; its own bound (12-13) is still ahead
+        (dt.date(2026, 12, 12), [3, 4, 5, 13]),
+        # week 15's own bound: the season has moved past week 14
+        (dt.date(2026, 12, 13), [3, 4, 5, 13, 14, 15]),
+    ],
 )
-def test_week_not_kicked_off_is_not_built(monkeypatch, tmp_path, today, weeks):
+def test_borrowed_week_waits_until_the_season_moves_past_it(
+    monkeypatch, tmp_path, today, weeks
+):
     """2026 week 14 has no FBS game until its championship matchups are set, so
     it borrows week 13's bound (11-30); on the bound alone it passed from then
-    on as week 13 relabelled. The master dates its first kickoff (12-04 UTC),
-    and it waits for that.
+    on as week 13 relabelled. Its master kickoff (12-04 UTC) is not enough
+    either: load_cfb_schedule can still lack every week-14 game then, and the
+    snapshot is still week 13 relabelled. A borrowed bound waits until a later
+    week has its own bound, or the postseason has started.
     """
     _raw_root(monkeypatch, tmp_path, GAMES)
     assert _cuts(2026)[14] == _cuts(2026)[13] < dt.date(2026, 12, 1)
 
     assert [w for w, _ in derived.played_cutoffs(2026, today)] == weeks
+
+
+#: 2019's first FBS bowl, a real ``load_cfb_schedule`` row (the fixture has none).
+BOWL_2019 = pl.DataFrame(
+    {
+        "game_id": [401135260],
+        "season": [2019],
+        "week": [1],
+        "season_type_id": [3],
+        "start_date": ["2019-12-20T19:00:00.000Z"],
+        "status": ["STATUS_FINAL"],
+        "home_division": ["fbs"],
+        "away_division": ["fbs"],
+    },
+    schema=GAMES.schema,
+)
+
+
+@pytest.mark.parametrize(
+    "today, weeks",
+    [
+        (dt.date(2019, 12, 19), [15]),
+        (dt.date(2019, 12, 20), [15, 16]),
+        (None, [15, 16]),
+    ],
+)
+def test_borrowed_final_week_waits_for_the_postseason(
+    monkeypatch, tmp_path, today, weeks
+):
+    """2019 week 16 (Army-Navy, week 15 to load_cfb_schedule) borrows week 15's
+    bound and has no later week to move past. The first bowl moves the season
+    past it, so a completed season keeps it, as it always has.
+    """
+    _raw_root(monkeypatch, tmp_path, pl.concat([GAMES, BOWL_2019]))
+    assert _cuts(2019)[16] == _cuts(2019)[15]
+
+    assert [w for w, _ in derived.played_cutoffs(2019, today)] == weeks

@@ -417,6 +417,82 @@ def test_the_first_game_is_never_after_a_bye_and_the_opener_is_regular_season():
     assert ctx.filter(pl.col("opener"))["game_id"].unique().to_list() == [GAME_B]
 
 
+def _flags(ctx: pl.DataFrame, game: int, team: int = 194) -> dict:
+    return ctx.filter((pl.col("game_id") == game) & (pl.col("team_id") == team)).row(
+        0, named=True
+    )
+
+
+def test_after_bye_is_a_rounded_12_day_rest_before_a_regular_season_game():
+    # rests of 11.4, 11.6 and 12.6 days, then a bowl weeks later
+    starts = [
+        "2024-08-31T16:00",
+        "2024-09-12T01:36",  # +11.4 days: rounds to 11, not a bye
+        "2024-09-23T16:00",  # +11.6 days: rounds to 12, a bye (needs the rounding)
+        "2024-10-06T06:24",  # +12.6 days: rounds to 13, a bye
+        "2024-12-07T16:00",  # postseason, 63 days later: never after a bye
+    ]
+    sched = pl.DataFrame(
+        {
+            "game_id": [1, 2, 3, 4, 5],
+            "season_type_id": [2, 2, 2, 2, 3],
+            "start_date": [f"{d}:00.000Z" for d in starts],
+            "status": ["STATUS_FINAL"] * 5,
+            "neutral_site": [False] * 5,
+            "home_id": [194] * 5,
+            "away_id": [2006] * 5,
+            "home_points": [24] * 5,
+            "away_points": [21] * 5,
+        }
+    )
+    ctx = tend.game_context(sched)
+    assert [_flags(ctx, g)["after_bye"] for g in (1, 2, 3, 4, 5)] == [
+        False,
+        False,
+        True,
+        True,
+        False,
+    ]
+
+
+def test_one_score_rank_and_unscored_edges():
+    # a margin of exactly 8 is one score, 9 is not
+    ctx = tend.game_context(
+        _schedule(home_points=[24, 30, 31], away_points=[16, 21, 10])
+    )
+    assert _flags(ctx, GAME_A)["one_score_game"] is True
+    assert _flags(ctx, GAME_B)["one_score_game"] is False
+    # a rank of 26 is not a top-25 rank
+    ctx = tend.game_context(_schedule(home_rank=[None, None, 26]))
+    assert _flags(ctx, GAME_C)["vs_ranked"] is False
+    # an unscored game is neither a win nor a one-score game: both stay null
+    ctx = tend.game_context(
+        _schedule(home_points=[None, 30, 31], away_points=[None, 10, 10])
+    )
+    for team in (194, 2006):
+        a = _flags(ctx, GAME_A, team)
+        assert a["win"] is None and a["one_score_game"] is None
+
+
+def test_kickoff_ties_break_on_game_id():
+    # two rows at one kickoff (CFBD's phantom duplicates): the lower game_id is
+    # the opener and the other is never "after a bye" of it, whatever the input order
+    sched = _schedule().with_columns(
+        start_date=pl.lit("2024-08-31T16:00:00.000Z"),
+        game_id=pl.Series([9, 8, 7], dtype=pl.Int64),
+    )
+    ctx = tend.game_context(sched)
+    assert ctx.filter(pl.col("opener"))["game_id"].unique().to_list() == [7]
+
+
+def test_unmatched_team_games_are_logged(three_games, capsys):
+    ctx = tend.attach_context(three_games, _schedule().head(2))
+    assert "2 team-game(s) in 1 game(s) not in cfb_schedules" in capsys.readouterr().out
+    assert ctx.filter(pl.col("game_id") == GAME_C)["ctx_home"].null_count() > 0
+    tend.attach_context(three_games, _schedule())
+    assert "not in cfb_schedules" not in capsys.readouterr().out
+
+
 def test_a_tie_is_not_a_win(three_games):
     ctx = tend.attach_context(three_games, _schedule(home_points=[21, 30, 31]))
     assert _true(ctx, GAME_A, 194) == {"home", "one_score_game", "opener"}

@@ -32,8 +32,8 @@ COUNTED_SEASON_TYPES = (2, 3)
 TEAM_GROUP = ("season", "pos_team")
 COACH_GROUP = ("season", "pos_team", "coach")
 COACH_DEF_GROUP = ("season", "def_pos_team", "def_coach")
-#: rest before a game, in days (rounded), that makes it "after a bye"
-BYE_REST_DAYS = 13
+#: rest before a regular-season game, in days (rounded), that makes it "after a bye"
+BYE_REST_DAYS = 12
 #: final margin within which a game is a one-score game
 ONE_SCORE_MARGIN = 8
 #: games that were scheduled but never played: never a team's previous game or opener
@@ -48,15 +48,22 @@ def game_context(schedule: pl.DataFrame) -> pl.DataFrame:
     or an opener counts games against any opponent. The flags:
 
     * ``home`` / ``away`` / ``neutral_site`` -- exactly one per game;
-    * ``vs_ranked`` -- the OPPONENT carried a 1-25 rank at kickoff. Emitted only
-      when the schedule has ``home_rank`` / ``away_rank`` with at least one value:
-      a pre-IF-0 release, or a season whose ranks are unknown, must not read as
-      "never played a ranked team";
-    * ``after_bye`` -- at least :data:`BYE_REST_DAYS` days since the team's
-      previous played game. Kickoffs are UTC instants, so the rest is rounded to
-      the nearest day (a Saturday-night game to a Friday-night one 13 days later
-      is 12.9 days). The season's first game is NEVER after a bye: it has no
-      previous game in the season, and last season's schedule is not read;
+    * ``vs_ranked`` -- the OPPONENT was an FBS top-25 team (rank 1-25) at kickoff;
+      the IF-0 ranks exist only for FBS. ABSENT, not all-false, unless the
+      schedule has ``home_rank`` / ``away_rank`` with at least one value: a
+      pre-IF-0 release, or a season with no ranks, must not read as "never
+      played a ranked team";
+    * ``after_bye`` -- a REGULAR-season game at least :data:`BYE_REST_DAYS` days
+      after the team's previous played game. Kickoffs are UTC instants, so the
+      rest is rounded to the nearest day (a Saturday-night game to a Thursday
+      one 12 days later can be 11.9 days). 401 of 402 CFB regular-season games
+      at a rounded 12 days follow a skipped week (Saturday -> Thursday).
+      Postseason games never count: most follow 2+ weeks off (1,608 of 1,762
+      postseason team-games would), which would swamp the split. The season's
+      first game is NEVER after a bye: it has no previous game in the season,
+      and last season's schedule is not read. Known ceiling: a Saturday ->
+      Tuesday / Wednesday bye (10-11 days) is excluded, because those rests
+      overlap non-bye Tuesday -> Saturday gaps of the same length;
     * ``opener`` -- the team's first played regular-season game;
     * ``one_score_game`` -- final margin within :data:`ONE_SCORE_MARGIN`;
     * ``win`` -- points for > points against, so a tie is not a win.
@@ -100,9 +107,11 @@ def game_context(schedule: pl.DataFrame) -> pl.DataFrame:
     return (
         pl.concat(sides)
         .drop_nulls(["game_id", "team_id", "kickoff"])
-        .sort("team_id", "kickoff")
+        # game_id breaks kickoff ties so opener / after_bye never flip between runs
+        # (CFBD carries phantom duplicate games, e.g. Rhodes v Rhode Island 2004-08)
+        .sort("team_id", "kickoff", "game_id")
         .with_columns(
-            (rest.round(0) >= BYE_REST_DAYS)
+            (pl.col("regular") & (rest.round(0) >= BYE_REST_DAYS))
             .over("team_id")
             .fill_null(False)
             .alias("after_bye"),
@@ -121,14 +130,27 @@ def attach_context(plays: pl.DataFrame, schedule: pl.DataFrame | None) -> pl.Dat
     (``game_id``, ``def_pos_team``). ``game_id`` and the team ids are cast to
     Int64 on both sides here -- an integer parse that raises on a non-integer id
     rather than nulling a join key -- and asserted equal before the join. A
-    ``None`` schedule returns the plays unchanged: no context columns, so sdv-py
-    emits no context splits.
+    team-game the schedule lacks (a missing game, a team-id mismatch) keeps
+    null context and is counted in the log, never silently. A ``None`` schedule
+    returns the plays unchanged: no context columns, so sdv-py emits no context
+    splits.
     """
     if schedule is None:
         return plays
     ctx = game_context(schedule)
     flags = [c for c in ctx.columns if c not in ("game_id", "team_id")]
     df = plays.with_columns(pl.col(*_KEYS).cast(pl.Int64))
+    unmatched = (
+        df.select("game_id", team_id="pos_team")
+        .drop_nulls()
+        .unique()
+        .join(ctx, on=["game_id", "team_id"], how="anti")
+    )
+    if unmatched.height:
+        print(
+            f"  context: {unmatched.height} team-game(s) in "
+            f"{unmatched['game_id'].n_unique()} game(s) not in cfb_schedules; no game context"
+        )
     for side, prefix in (("pos_team", "ctx_"), ("def_pos_team", "def_ctx_")):
         right = ctx.select(
             "game_id",

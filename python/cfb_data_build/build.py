@@ -105,8 +105,9 @@ def _resolve_team_names(
 
 def _release_schedule(season: int) -> pl.DataFrame | None:
     """The published ``cfb_schedules`` season (sdv-py ``load_cfb_schedule``), or ``None``."""
-    from cfb_data_build.derived import _retry
     from sportsdataverse.cfb import load_cfb_schedule
+
+    from cfb_data_build.derived import _retry
 
     return _retry(
         lambda: load_cfb_schedule(seasons=[season]), what=f"cfb_schedules {season}"

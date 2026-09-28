@@ -20,6 +20,14 @@ def main(argv=None) -> int:
         s.add_argument("--seasons", nargs="*", type=int)
         if name != "backtest":
             s.add_argument("--out-dir", default="artifacts/higher_models")
+        if name == "fit-pregame":
+            s.add_argument(
+                "--holdout",
+                nargs="*",
+                type=int,
+                default=[],
+                help="seasons kept out of the ship fit and scored with it frozen",
+            )
         if name == "train-game":
             s.add_argument(
                 "--enrich",
@@ -56,7 +64,7 @@ def main(argv=None) -> int:
     if args.cmd == "fit-pregame":
         from .fit_pregame import main as run
 
-        return run(args.seasons, args.out_dir)
+        return run(args.seasons, args.out_dir, args.holdout)
     if args.cmd == "hierarchical":
         from .hierarchical import run as run_hier
 

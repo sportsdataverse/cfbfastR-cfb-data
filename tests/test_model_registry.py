@@ -34,14 +34,6 @@ NON_PUBLISHING_STAGES: dict[str, str] = {
         "other stages publish. It ships no model of its own, so a registry row "
         "would have nothing to put in artifact/gates/cadence."
     ),
-    "cfb_model_build.cfb_higher_models": (
-        "Research package. Its outputs are experiment records -- pregame_fit.json, "
-        "gbm_tuning.json, game_heads.json, experiments.json -- not published "
-        "artifacts; nothing downstream consumes them. It earns a registry row the "
-        "day one of its models is published, and not before: inventing "
-        "training-data/gates/cadence cells for an unpublished model is worse than "
-        "the gap."
-    ),
 }
 
 

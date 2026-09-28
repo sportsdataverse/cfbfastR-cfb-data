@@ -140,13 +140,38 @@ def test_postseason_caps_the_final_bound():
     assert _cuts(2020, moved)[15] == last
 
 
-def _build(monkeypatch, tmp_path, games: pl.DataFrame):
-    """Run ``build_ratings_weekly(2026)``; return (as_of_dates seen, output)."""
+#: The 2026-09-28 review: week 4 is over, week 5 has not kicked off.
+TODAY = dt.date(2026, 9, 28)
+#: A "today" after every 2026 bound, i.e. the season as it will look once played.
+AFTER_SEASON = dt.date(2027, 2, 1)
+
+
+def _raw_root(monkeypatch, tmp_path, games: pl.DataFrame):
+    """Point the builders at the fixture master and ``games`` as the schedule."""
     (tmp_path / "cfb").mkdir()
     shutil.copy(MASTER, tmp_path / "cfb" / "cfb_schedule_master.parquet")
     monkeypatch.setenv("CFB_RAW_ROOT", str(tmp_path))
 
     import sportsdataverse.cfb as sdv_cfb
+
+    monkeypatch.setattr(
+        sdv_cfb,
+        "load_cfb_schedule",
+        lambda seasons: games.filter(pl.col("season").is_in(seasons)),
+    )
+    return sdv_cfb
+
+
+def _build(
+    monkeypatch,
+    tmp_path,
+    games: pl.DataFrame,
+    *,
+    season: int = 2026,
+    today: dt.date | None = AFTER_SEASON,
+):
+    """Run ``build_ratings_weekly(season)``; return (as_of_dates seen, output)."""
+    sdv_cfb = _raw_root(monkeypatch, tmp_path, games)
 
     seen: list = []
 
@@ -155,12 +180,7 @@ def _build(monkeypatch, tmp_path, games: pl.DataFrame):
         return pl.DataFrame({"season": [season], "team_id": [1]})
 
     monkeypatch.setattr(sdv_cfb, "cfb_ratings", fake_ratings)
-    monkeypatch.setattr(
-        sdv_cfb,
-        "load_cfb_schedule",
-        lambda seasons: games.filter(pl.col("season").is_in(seasons)),
-    )
-    return seen, derived.build_ratings_weekly(2026)
+    return seen, derived.build_ratings_weekly(season, today=today)
 
 
 def test_build_ratings_weekly_fits_each_week_at_its_bound(monkeypatch, tmp_path):
@@ -183,3 +203,72 @@ def test_week_without_a_bound_is_not_rated(monkeypatch, tmp_path):
 
     assert None not in seen and len(seen) == 5
     assert 3 not in out["through_week"].to_list()
+
+
+def test_future_weeks_are_not_built(monkeypatch, tmp_path, capsys):
+    """The master lists all 15 weeks before they are played. A week whose bound
+    is still ahead has no new game to fit, so it refit the played ones and
+    shipped a copy: 2026 through_week 5-15 were week 4 relabelled (review of
+    2026-09-28). Those weeks are not gaps either, so nothing is reported MISSING.
+    """
+    seen, out = _build(monkeypatch, tmp_path, GAMES, today=TODAY)
+
+    assert out["through_week"].to_list() == [3, 4]
+    assert seen == [_cuts(2026)[3], _cuts(2026)[4]]
+    assert "MISSING" not in capsys.readouterr().out
+
+
+@pytest.mark.parametrize("days, weeks", [(-1, [3]), (0, [3, 4]), (1, [3, 4])])
+def test_week_is_built_from_its_cutoff_day(monkeypatch, tmp_path, days, weeks):
+    """Boundary: the bound is EXCLUSIVE (games dated before it), so on the bound's
+    own date every game the snapshot holds has already kicked off.
+    """
+    today = _cuts(2026)[4] + dt.timedelta(days=days)
+
+    _, out = _build(monkeypatch, tmp_path, GAMES, today=today)
+
+    assert out["through_week"].to_list() == weeks
+
+
+def test_completed_season_keeps_every_week(monkeypatch, tmp_path):
+    """Every 2020 bound is in the past on the real clock: the same weeks as ever."""
+    _, out = _build(monkeypatch, tmp_path, GAMES, season=2020, today=None)
+
+    assert out["through_week"].to_list() == list(_cuts(2020)) == [13, 14, 15]
+
+
+@pytest.mark.parametrize(
+    "today, weeks", [(TODAY, [3, 4]), (AFTER_SEASON, [3, 4, 5, 13, 14, 15])]
+)
+def test_team_summaries_weekly_stops_at_the_same_week(
+    monkeypatch, tmp_path, today, weeks
+):
+    """The summaries twin padded the same way (0 changes after 2026 week 4)."""
+    _raw_root(monkeypatch, tmp_path, GAMES)
+    from cfb_data_build import summaries_build
+    from cfb_data_build.config import SUMMARIES_REGISTRY
+
+    spec = SUMMARIES_REGISTRY["team_summaries"]
+    built: list[int] = []
+
+    def fake_build(season, *, through_week, base, publish):
+        built.append(through_week)
+        snap = (
+            Path(base)
+            / "snapshots"
+            / f"through_wk{through_week:02d}"
+            / spec.dataset
+            / "parquet"
+            / f"{spec.stem}_{season}.parquet"
+        )
+        snap.parent.mkdir(parents=True)
+        pl.DataFrame({"team_id": [1]}).write_parquet(snap)
+
+    monkeypatch.setattr(summaries_build, "build_summaries_season", fake_build)
+
+    out = derived.build_team_summaries_weekly(
+        2026, base=str(tmp_path / "out"), today=today
+    )
+
+    assert built == weeks
+    assert out["through_week"].to_list() == weeks

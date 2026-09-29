@@ -8,6 +8,7 @@ From https://github.com/sportsdataverse/cfbfastR-cfb-data
  * [new branch]          feat/cfb-model-suite-completion -> origin/feat/cfb-model-suite-completion
  * [new branch]          feat/cfb-ratings-builder -> origin/feat/cfb-ratings-builder
  * [new branch]          feat/cfb-ratings-cron   -> origin/feat/cfb-ratings-cron
+ * [new branch]          feat/drive-efficiency-columns -> origin/feat/drive-efficiency-columns
  * [new branch]          feat/era-contract-in-model-cards -> origin/feat/era-contract-in-model-cards
  * [new branch]          feat/league-averages    -> origin/feat/league-averages
  * [new branch]          feat/rolling-windows    -> origin/feat/rolling-windows
@@ -145,7 +146,7 @@ cfb_rosters 2026: 25739 rows from 948/949 games | position 100.0% | division 100
   rolling_windows 2026: 23778 rows, 20 cols
 
 === rolling_windows: 0 failures ===
-  cfb_ratings_weekly 2026: 2025 rows, 16 cols, 15 weekly snapshots
+  cfb_ratings_weekly 2026: 507 rows, 16 cols, 4 weekly snapshots
 
 === ratings_weekly: 0 failures ===
 [summaries 2026] percentiles: 99 rows
@@ -172,73 +173,7 @@ cfb_rosters 2026: 25739 rows from 948/949 games | position 100.0% | division 100
 [summaries 2026] rushing: 1042 rows
 [summaries 2026] receiving: 1742 rows
 [summaries 2026] league_averages: 781 rows
-[summaries 2026] percentiles: 99 rows
-[summaries 2026] team_summaries: 138 rows
-[summaries 2026] passing: 314 rows
-[summaries 2026] rushing: 1042 rows
-[summaries 2026] receiving: 1742 rows
-[summaries 2026] league_averages: 781 rows
-[summaries 2026] percentiles: 99 rows
-[summaries 2026] team_summaries: 138 rows
-[summaries 2026] passing: 314 rows
-[summaries 2026] rushing: 1042 rows
-[summaries 2026] receiving: 1742 rows
-[summaries 2026] league_averages: 781 rows
-[summaries 2026] percentiles: 99 rows
-[summaries 2026] team_summaries: 138 rows
-[summaries 2026] passing: 314 rows
-[summaries 2026] rushing: 1042 rows
-[summaries 2026] receiving: 1742 rows
-[summaries 2026] league_averages: 781 rows
-[summaries 2026] percentiles: 99 rows
-[summaries 2026] team_summaries: 138 rows
-[summaries 2026] passing: 314 rows
-[summaries 2026] rushing: 1042 rows
-[summaries 2026] receiving: 1742 rows
-[summaries 2026] league_averages: 781 rows
-[summaries 2026] percentiles: 99 rows
-[summaries 2026] team_summaries: 138 rows
-[summaries 2026] passing: 314 rows
-[summaries 2026] rushing: 1042 rows
-[summaries 2026] receiving: 1742 rows
-[summaries 2026] league_averages: 781 rows
-[summaries 2026] percentiles: 99 rows
-[summaries 2026] team_summaries: 138 rows
-[summaries 2026] passing: 314 rows
-[summaries 2026] rushing: 1042 rows
-[summaries 2026] receiving: 1742 rows
-[summaries 2026] league_averages: 781 rows
-[summaries 2026] percentiles: 99 rows
-[summaries 2026] team_summaries: 138 rows
-[summaries 2026] passing: 314 rows
-[summaries 2026] rushing: 1042 rows
-[summaries 2026] receiving: 1742 rows
-[summaries 2026] league_averages: 781 rows
-[summaries 2026] percentiles: 99 rows
-[summaries 2026] team_summaries: 138 rows
-[summaries 2026] passing: 314 rows
-[summaries 2026] rushing: 1042 rows
-[summaries 2026] receiving: 1742 rows
-[summaries 2026] league_averages: 781 rows
-[summaries 2026] percentiles: 99 rows
-[summaries 2026] team_summaries: 138 rows
-[summaries 2026] passing: 314 rows
-[summaries 2026] rushing: 1042 rows
-[summaries 2026] receiving: 1742 rows
-[summaries 2026] league_averages: 781 rows
-[summaries 2026] percentiles: 99 rows
-[summaries 2026] team_summaries: 138 rows
-[summaries 2026] passing: 314 rows
-[summaries 2026] rushing: 1042 rows
-[summaries 2026] receiving: 1742 rows
-[summaries 2026] league_averages: 781 rows
-[summaries 2026] percentiles: 99 rows
-[summaries 2026] team_summaries: 138 rows
-[summaries 2026] passing: 314 rows
-[summaries 2026] rushing: 1042 rows
-[summaries 2026] receiving: 1742 rows
-[summaries 2026] league_averages: 781 rows
-  cfb_team_summaries_weekly 2026: 2025 rows, 542 cols, 15 weekly snapshots
+  cfb_team_summaries_weekly 2026: 507 rows, 542 cols, 4 weekly snapshots
 
 === team_summaries_weekly: 0 failures ===
   cfb_matchup_features 2026: 1649 rows, 45 cols

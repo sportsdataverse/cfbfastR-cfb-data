@@ -231,6 +231,14 @@ def from_constants(cfg, rating: str = _RATING) -> PregameFit:
     )
 
 
+def _sdv_sha() -> str | None:
+    """The sportsdataverse commit the loaders and shipped constants came from."""
+    from importlib.metadata import distribution
+
+    raw = distribution("sportsdataverse").read_text("direct_url.json")
+    return json.loads(raw).get("vcs_info", {}).get("commit_id") if raw else None
+
+
 def _report(label: str, pred: np.ndarray, frame: pl.DataFrame, sd) -> str:
     return str(
         evaluate(
@@ -298,6 +306,7 @@ def main(
     out_json = asdict(final) | {
         "holdout_seasons": holdout,
         "adj_net_sd": float(np.std(adj_net, ddof=1)),
+        "sportsdataverse_sha": _sdv_sha(),
     }
     if holdout:
         ho = frame.filter(pl.col("season").is_in(holdout))

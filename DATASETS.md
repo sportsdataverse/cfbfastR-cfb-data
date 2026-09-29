@@ -1478,7 +1478,7 @@ season. Because the repo's `cfb/` tree is gitignored, these live only in the
 | division | character | ESPN division/grouping label joined from the team catalog. |
 | conference | character | Conference name (e.g. "SEC", "Mountain West"). |
 | season | integer | Season year (e.g. 2025). |
-| fbs_class | character | Tier classification derived from conference membership: "P4"/"G6" for 2024+, "P5"/"G5" for ≤2023 (Notre Dame → P4/P5; UConn/UMass handled explicitly). |
+| fbs_class | character | Tier classification from the team's SDV conference group id that season (`cfb_groups` release): "P4"/"G6" for 2024+, "P5"/"G5" for ≤2023. Power = ACC, Big Ten, Big 12, SEC, plus the Pac-12 (incl. the Pac-10) through 2023, the football Big East through 2012, and Notre Dame; every other FBS team is G5/G6. |
 
 ---
 

@@ -1,5 +1,7 @@
 From https://github.com/sportsdataverse/cfbfastR-cfb-data
+   87d696c09..3021f4d30  main                    -> origin/main
  * [new branch]          AE/update-air-yards-model -> origin/AE/update-air-yards-model
+ * [new branch]          chore/pregame-refit-post-reprocess -> origin/chore/pregame-refit-post-reprocess
  * [new branch]          chore/readme-repository-layout -> origin/chore/readme-repository-layout
  * [new branch]          docs/automation-status  -> origin/docs/automation-status
  * [new branch]          docs/model-registry-out-of-claude -> origin/docs/model-registry-out-of-claude
@@ -23,6 +25,7 @@ From https://github.com/sportsdataverse/cfbfastR-cfb-data
  * [new branch]          fix/pregame-refit-leakfree -> origin/fix/pregame-refit-leakfree
  * [new branch]          fix/preseason-missing-sources -> origin/fix/preseason-missing-sources
  * [new branch]          fix/preseason-zero-rosters -> origin/fix/preseason-zero-rosters
+ * [new branch]          test/repin-rolling-windows-after-reprocess -> origin/test/repin-rolling-windows-after-reprocess
  * [new tag]             espn_cfb_adv_defensive  -> espn_cfb_adv_defensive
  * [new tag]             espn_cfb_adv_drives     -> espn_cfb_adv_drives
  * [new tag]             espn_cfb_adv_passing    -> espn_cfb_adv_passing
@@ -122,11 +125,6 @@ usage_st_returners 2026: 592 rows from 949 games
 usage_st_blocks 2026: 44 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
 usage_st_team 2026: 233 rows from 949 games
-  pos_team: 100.0% of rows resolved to a team name
-team_tendencies 2026: 233 rows from 949 games
-  coaches: 138 attributed team-seasons for 2026
-  pos_team: 100.0% of rows resolved to a team name
-coach_tendencies 2026: 138 rows from 949 games
   adv_team_gamelog 2026: 662 rows, 90 cols
 
 === gamelog: 0 failures ===
@@ -134,6 +132,11 @@ qa 2026: 331 rows from 949 games
   cfb_schedules 2026: 3679 rows, 43 cols, fbs_game=761, fbs_participant=888, unplayed=0, ranked_sides=299
 
 === cfb_schedules: 0 failures ===
+  pos_team: 100.0% of rows resolved to a team name
+team_tendencies 2026: 233 rows from 949 games
+  coaches: 138 attributed team-seasons for 2026
+  pos_team: 100.0% of rows resolved to a team name
+coach_tendencies 2026: 138 rows from 949 games
 cfb_rosters 2026: 25739 rows from 948/949 games | position 100.0% | division 100.0% | cfbd_recruit_ids 92.3% of 29305 cfbd athletes
 
 === cfb_rosters: 0 failures ===
@@ -142,7 +145,7 @@ cfb_rosters 2026: 25739 rows from 948/949 games | position 100.0% | division 100
 [summaries 2026] passing: 314 rows
 [summaries 2026] rushing: 1042 rows
 [summaries 2026] receiving: 1742 rows
-[summaries 2026] league_averages: 781 rows
+[summaries 2026] league_averages: 790 rows
   rolling_windows 2026: 23778 rows, 20 cols
 
 === rolling_windows: 0 failures ===
@@ -154,26 +157,26 @@ cfb_rosters 2026: 25739 rows from 948/949 games | position 100.0% | division 100
 [summaries 2026] passing: 153 rows
 [summaries 2026] rushing: 520 rows
 [summaries 2026] receiving: 864 rows
-[summaries 2026] league_averages: 780 rows
+[summaries 2026] league_averages: 789 rows
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 137 rows
 [summaries 2026] passing: 249 rows
 [summaries 2026] rushing: 819 rows
 [summaries 2026] receiving: 1389 rows
-[summaries 2026] league_averages: 780 rows
+[summaries 2026] league_averages: 789 rows
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 138 rows
 [summaries 2026] passing: 284 rows
 [summaries 2026] rushing: 949 rows
 [summaries 2026] receiving: 1605 rows
-[summaries 2026] league_averages: 781 rows
+[summaries 2026] league_averages: 790 rows
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 138 rows
 [summaries 2026] passing: 314 rows
 [summaries 2026] rushing: 1042 rows
 [summaries 2026] receiving: 1742 rows
-[summaries 2026] league_averages: 781 rows
-  cfb_team_summaries_weekly 2026: 507 rows, 542 cols, 4 weekly snapshots
+[summaries 2026] league_averages: 790 rows
+  cfb_team_summaries_weekly 2026: 507 rows, 552 cols, 4 weekly snapshots
 
 === team_summaries_weekly: 0 failures ===
   cfb_matchup_features 2026: 1649 rows, 45 cols

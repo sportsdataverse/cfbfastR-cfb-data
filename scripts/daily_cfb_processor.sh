@@ -137,6 +137,7 @@ for i in $(seq "${START_YEAR}" "${END_YEAR}"); do
       local ds="$1"; shift
       (cd python && "$PY" -m cfb_data_build --dataset "$ds" --base ../cfb --cache-dir "$CFB_FINAL_CACHE" -s "$i" -e "$i" "$@") || {
         rc=$?; echo "::warning ::cfb_data_build $ds for season $i exited with code $rc"; SEASON_RC=$rc
+        return "$rc"
       }
     }
 
@@ -151,8 +152,16 @@ for i in $(seq "${START_YEAR}" "${END_YEAR}"); do
     for ds in $PY_REST; do run_py "$ds" --no-fetch --publish; done
     for ds in $PY_DERIVED; do run_py "$ds" --no-fetch --publish; done
     for ds in $PY_QA; do run_py "$ds" --no-fetch --publish; done
-    for ds in $PY_UNIFIED_SCHEDULES; do run_py "$ds" --publish; done
-    for ds in $PY_TENDENCIES; do run_py "$ds" --no-fetch --publish; done
+    # The tendencies' game-context splits read this season's unified schedule
+    # for kickoff dates; if it failed, they would publish from a stale schedule
+    # or none, so they wait for the next run (the season is already red).
+    SCHED_OK=1
+    for ds in $PY_UNIFIED_SCHEDULES; do run_py "$ds" --publish || SCHED_OK=0; done
+    if [ "$SCHED_OK" = 1 ]; then
+      for ds in $PY_TENDENCIES; do run_py "$ds" --no-fetch --publish; done
+    else
+      echo "::warning ::skipped $PY_TENDENCIES for season $i: $PY_UNIFIED_SCHEDULES failed"
+    fi
     for ds in $PY_ROSTERS; do run_py "$ds" --publish; done
 
     # The 6-table summaries family. This ran on R (espn_cfb_15) because the

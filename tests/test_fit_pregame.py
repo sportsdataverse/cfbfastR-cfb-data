@@ -158,3 +158,16 @@ def test_ship_fit_refuses_a_holdout_that_leaves_nothing_to_fit() -> None:
     """Holding out every season would fit on zero games and write NaN constants."""
     with pytest.raises(ValueError, match="no training"):
         fit_for_ship(_frame({2014: 10.0, 2015: 10.0}), holdout=[2014, 2015])
+
+
+def test_sdv_sha_is_none_without_distribution_metadata(monkeypatch) -> None:
+    """A path-only sportsdataverse (no dist metadata) must not lose the run's JSON."""
+    import importlib.metadata as md
+
+    from cfb_model_build.cfb_higher_models.fit_pregame import _sdv_sha
+
+    def _missing(_name):
+        raise md.PackageNotFoundError("sportsdataverse")
+
+    monkeypatch.setattr(md, "distribution", _missing)
+    assert _sdv_sha() is None

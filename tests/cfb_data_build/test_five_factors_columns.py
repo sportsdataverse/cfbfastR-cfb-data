@@ -21,7 +21,9 @@ from cfb_data_build.summaries_input import game_giveaways, prepare_plays_input
 from cfb_data_build.team_summaries import (
     _clean_rank_columns,
     _drive_owners,
+    _join_adjusted_epa,
     _mutate_summary_margins,
+    _strength_faced_ranks,
     _suffix_nonkey,
     _summarize_drives,
     _summarize_team,
@@ -336,3 +338,124 @@ def test_special_teams_turnovers_survive_the_scrimmage_filter():
     # ...but its muff is still one of team 1's two game-1 giveaways, and each
     # team's count is per GAME: team 1 had none in game 2
     assert out["pos_team_game_giveaways"].to_list() == [2, 0, 0, 1]
+
+
+# --- CFBE-1d: points per drive -------------------------------------------------
+# The IF-2 frame again: A owns dA1 (TD), dA2 (FG) and dA3 (INT); B owns dB1 (TD)
+# and dB2 (a pick-six, A's points, so 0 to B's offense).
+_PPD = ("pts_per_drive_off", "pts_per_drive_def", "pts_per_drive_margin")
+
+
+def test_points_per_drive():
+    d = _drives(_plays())
+    a, b = _team(d, "1"), _team(d, "2")
+    assert a["pts_per_drive_off"] == pytest.approx(10 / 3)
+    assert a["pts_per_drive_off_n"] == 3
+    assert a["pts_per_drive_def"] == 3.5 and a["pts_per_drive_def_n"] == 2
+    assert a["pts_per_drive_margin"] == pytest.approx(-1 / 6)
+    # B mirrors A: its defense faced exactly A's three drives
+    assert b["pts_per_drive_off"] == 3.5 and b["pts_per_drive_off_n"] == 2
+    assert b["pts_per_drive_def"] == pytest.approx(10 / 3)
+    assert b["pts_per_drive_def_n"] == 3
+    assert b["pts_per_drive_margin"] == pytest.approx(1 / 6)
+    # more points per drive is better on offense, fewer allowed on defense
+    assert (b["pts_per_drive_off_rank"], a["pts_per_drive_off_rank"]) == (1.0, 2.0)
+    assert (b["pts_per_drive_def_rank"], a["pts_per_drive_def_rank"]) == (1.0, 2.0)
+    assert (b["pts_per_drive_margin_rank"], a["pts_per_drive_margin_rank"]) == (
+        1.0,
+        2.0,
+    )
+    for c in _PPD:
+        assert d.schema[c] == pl.Float64 and d.schema[f"{c}_rank"] == pl.Float64
+    assert (
+        d.schema["pts_per_drive_off_n"] == d.schema["pts_per_drive_def_n"] == pl.Int64
+    )
+
+
+def _ppd(d: pl.DataFrame, team: str) -> tuple:
+    t = _team(d, team)
+    return tuple(t[c] for c in (*_PPD, "pts_per_drive_off_n", "pts_per_drive_def_n"))
+
+
+def test_a_stray_snap_does_not_move_points_per_drive():
+    # an A snap filed under B's touchdown drive: dB1 is still B's drive (two
+    # snaps to one), so it is neither A's drive nor one B's defense faced
+    stray = [*_PLAYS, ("g1", "1", "2", "dB1", "TD", 20, False, False)]
+    base, moved = _drives(_plays()), _drives(_plays(stray))
+    assert _ppd(moved, "1") == _ppd(base, "1")
+    assert _ppd(moved, "2") == _ppd(base, "2")
+
+
+def test_a_team_with_only_stray_snaps_has_no_points_per_drive():
+    # team 2's one snap sits in team 1's field-goal drive: team 2 owns no drive
+    rows = [
+        ("g1", "1", "2", "d1", "FG", 60, False, False),
+        ("g1", "1", "2", "d1", "FG", 30, False, False),
+        ("g1", "2", "1", "d1", "FG", 3, False, False),
+    ]
+    d = _drives(_plays(rows, special=[]))
+    one, two = _team(d, "1"), _team(d, "2")
+    assert (one["pts_per_drive_off"], one["pts_per_drive_off_n"]) == (3.0, 1)
+    assert one["pts_per_drive_off_rank"] == 1.0
+    # null, not 0/0 = NaN, and unranked rather than ranked last
+    assert two["pts_per_drive_off_n"] == 0
+    assert two["pts_per_drive_off"] is None and two["pts_per_drive_off_rank"] is None
+    assert one["pts_per_drive_def_n"] == 0
+    assert one["pts_per_drive_def"] is None and one["pts_per_drive_def_rank"] is None
+    assert d["pts_per_drive_margin"].is_null().all()
+    assert d["pts_per_drive_margin_rank"].is_null().all()
+
+
+@pytest.mark.parametrize(
+    "rows",
+    [
+        _PLAYS,
+        [*_PLAYS, ("g1", "1", "2", "dB1", "TD", 20, False, False)],
+        [
+            ("g1", "1", "2", "d1", "FG", 30, False, False),
+            ("g1", "2", "1", "d2", "TD", 77, False, False),
+            ("g1", "2", "1", "d2", "TD", 71, True, False),
+            ("g1", "1", "2", "d2", "TD", 3, False, False),
+        ],
+    ],
+    ids=["if2", "stray-in-b", "pick-six-try"],
+)
+def test_every_owned_drive_is_one_offense_and_one_defense(rows):
+    d = _drives(_plays(rows, special=[]))
+    assert d["pts_per_drive_off_n"].sum() == d["pts_per_drive_def_n"].sum()
+    off = (d["pts_per_drive_off"] * d["pts_per_drive_off_n"]).sum()
+    def_ = (d["pts_per_drive_def"] * d["pts_per_drive_def_n"]).sum()
+    assert off == pytest.approx(def_)
+
+
+def test_strength_faced_ranks_put_the_toughest_slate_first():
+    df = pl.DataFrame(
+        {
+            # opposing offenses faced: higher is tougher
+            "off_strength_faced": [0.20, 0.10, None],
+            # opposing defenses faced: the EPA/play they allow, lower is tougher
+            "def_strength_faced": [-0.05, 0.10, None],
+        }
+    )
+    got = _strength_faced_ranks(df)
+    # a null strength (under 2 valid games) is unranked, not last
+    assert got["off_strength_faced_rank"].to_list() == [1.0, 2.0, None]
+    assert got["def_strength_faced_rank"].to_list() == [1.0, 2.0, None]
+    assert got.schema["off_strength_faced_rank"] == pl.Float64
+    assert got.schema["def_strength_faced_rank"] == pl.Float64
+
+
+def test_the_adjusted_epa_join_carries_the_strength_faced_ranks():
+    # the builder's one route to the strengths: they cannot ship unranked
+    team_data = pl.DataFrame({"team_id": ["1", "2"]})
+    adjusted = pl.DataFrame(
+        {
+            "team_id": ["1", "2"],
+            "pos_team": ["One", "Two"],
+            "off_strength_faced": [0.20, 0.10],
+            "def_strength_faced": [-0.05, 0.10],
+        }
+    )
+    got = _join_adjusted_epa(team_data, adjusted).sort("team_id")
+    assert got["off_strength_faced_rank"].to_list() == [1.0, 2.0]
+    assert got["def_strength_faced_rank"].to_list() == [1.0, 2.0]

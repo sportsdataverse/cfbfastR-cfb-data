@@ -44,10 +44,11 @@ _EXPLOSIVE_RUSH_EPA = 1.8
 #: the shared ``tendencies`` producer reads. ``yards_to_goal`` is that column here.
 _SCORING_OPP_YARDS_TO_GOAL = 40
 #: Offensive points by ESPN ``drive.result`` (7 per TD, as ``tendencies`` scores
-#: it). 2004-2013 spell the outcomes out -- "RUSHING TD", "PASSING TD",
-#: "FG GOOD", "MADE FG", and 2004 has no plain "TD"/"FG" drive at all -- so a
-#: "TD"/"FG"-only match scores those seasons at zero. Return TDs ("INT TD",
-#: "PUNT RETURN TD", ...) are the other team's points: 0 here.
+#: it), for both points per scoring opportunity and points per drive. 2004-2013
+#: spell the outcomes out -- "RUSHING TD", "PASSING TD", "FG GOOD", "MADE FG",
+#: and 2004 has no plain "TD"/"FG" drive at all -- so a "TD"/"FG"-only match
+#: scores those seasons at zero. Return TDs ("INT TD", "PUNT RETURN TD", ...)
+#: are the other team's points: 0 here.
 #:
 #: Known ceiling: a drive whose result is a clock or data label rather than an
 #: outcome scores 0 even when it ended in a field goal -- over 2004-2025 that is
@@ -535,9 +536,9 @@ def _drives(plays: pl.DataFrame, group: str, *, ascending: bool) -> pl.DataFrame
     """One side's drive totals (``group`` = the offense or the defense team id).
 
     ``plays`` carries ``_drive_owner`` (:func:`_drive_owners`). The yardage
-    totals keep R's per-(team, drive) grouping; scoring opportunities and their
-    points count only the owner's snaps, so a stray snap in someone else's drive
-    is nobody's opportunity.
+    totals keep R's per-(team, drive) grouping; scoring opportunities, points
+    per drive and their points count only the owner's snaps, so a stray snap in
+    someone else's drive is nobody's opportunity and nobody's drive.
     """
     own = pl.col("pos_team_id") == pl.col("_drive_owner")
     per_drive = (
@@ -549,6 +550,7 @@ def _drives(plays: pl.DataFrame, group: str, *, ascending: bool) -> pl.DataFrame
             scoring_opp=(
                 own & (pl.col("yards_to_goal") <= _SCORING_OPP_YARDS_TO_GOAL)
             ).any(),
+            owned=own.any(),
             points=pl.col("drive.result")
             .first()
             .replace_strict(_DRIVE_POINTS, default=0.0, return_dtype=pl.Float64),
@@ -559,6 +561,8 @@ def _drives(plays: pl.DataFrame, group: str, *, ascending: bool) -> pl.DataFrame
         total_gained_yards=pl.col("total_gained_yards").sum(),
         opp_points=pl.col("points").filter(pl.col("scoring_opp") == True).sum(),  # noqa: E712
         pts_per_opp_n=pl.col("scoring_opp").sum().cast(pl.Int64),
+        drive_points=pl.col("points").filter(pl.col("owned") == True).sum(),  # noqa: E712
+        pts_per_drive_n=pl.col("owned").sum().cast(pl.Int64),
     )
     agg = (
         agg.with_columns(
@@ -568,14 +572,19 @@ def _drives(plays: pl.DataFrame, group: str, *, ascending: bool) -> pl.DataFrame
             pts_per_opp=pl.when(pl.col("pts_per_opp_n") > 0).then(
                 pl.col("opp_points") / pl.col("pts_per_opp_n")
             ),
+            # null for a side whose only snaps sit in the other team's drives
+            pts_per_drive=pl.when(pl.col("pts_per_drive_n") > 0).then(
+                pl.col("drive_points") / pl.col("pts_per_drive_n")
+            ),
         )
-        .drop("opp_points")
+        .drop("opp_points", "drive_points")
         .sort(group)
     )
     return agg.with_columns(
         available_yards_pct_rank=_rank("available_yards_pct", descending=not ascending),
         # more points per trip is better on offense, fewer allowed on defense
         pts_per_opp_rank=_rank_known("pts_per_opp", descending=not ascending),
+        pts_per_drive_rank=_rank_known("pts_per_drive", descending=not ascending),
     )
 
 
@@ -600,6 +609,8 @@ def _summarize_drives(plays: pl.DataFrame) -> pl.DataFrame:
             available_yards_pct_margin=pl.col("available_yards_pct_off")
             - pl.col("available_yards_pct_def"),
             pts_per_opp_margin=pl.col("pts_per_opp_off") - pl.col("pts_per_opp_def"),
+            pts_per_drive_margin=pl.col("pts_per_drive_off")
+            - pl.col("pts_per_drive_def"),
         )
         .with_columns(
             total_available_yards_margin_rank=_rank(
@@ -612,7 +623,33 @@ def _summarize_drives(plays: pl.DataFrame) -> pl.DataFrame:
                 "available_yards_pct_margin", descending=True
             ),
             pts_per_opp_margin_rank=_rank_known("pts_per_opp_margin", descending=True),
+            pts_per_drive_margin_rank=_rank_known(
+                "pts_per_drive_margin", descending=True
+            ),
         )
+    )
+
+
+def _strength_faced_ranks(df: pl.DataFrame) -> pl.DataFrame:
+    """Rank the adjusted-EPA strengths of schedule, 1 = the toughest slate.
+
+    ``off_strength_faced`` is the opposing offenses the defense faced (higher is
+    tougher); ``def_strength_faced`` is the EPA/play the opposing defenses allow
+    (lower is tougher). Null (fewer than 2 valid games) stays unranked.
+    """
+    return df.with_columns(
+        off_strength_faced_rank=_rank_known("off_strength_faced", descending=True),
+        def_strength_faced_rank=_rank_known("def_strength_faced", descending=False),
+    )
+
+
+def _join_adjusted_epa(team_data: pl.DataFrame, adjusted: pl.DataFrame) -> pl.DataFrame:
+    """Left-join :func:`cfb_adjusted_epa` onto ``team_data``, strength ranks included.
+
+    One step, so the strengths of schedule can never ship without their ranks.
+    """
+    return _strength_faced_ranks(
+        team_data.join(adjusted.drop("pos_team"), on="team_id", how="left")
     )
 
 
@@ -1399,8 +1436,8 @@ def build_team_summaries(
     schools = _build_schools(plays, yr, groups)
     # Opponent-adjusted EPA via the shared sdv-py primitive (was a local copy;
     # sportsdataverse.cfb.cfb_adjusted_epa is the single owner as of sdv-py 0.0.71).
-    team_data = _prepare_for_write(team_data, yr, schools).join(
-        cfb_adjusted_epa(plays).drop("pos_team"), on="team_id", how="left"
+    team_data = _join_adjusted_epa(
+        _prepare_for_write(team_data, yr, schools), cfb_adjusted_epa(plays)
     )
     # Assert the adjustment ACTUALLY ADJUSTED. On 2026-08-01 this shipped with
     # adj_off_epa at corr 0.9928 against its own raw EPAplay_off -- the ridge

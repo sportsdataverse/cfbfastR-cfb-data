@@ -75,3 +75,15 @@ def test_five_factors_columns_stay_out_of_the_lean_set():
     ):
         assert family_of(f"{c}_diff") == "five_factors"
     assert "five_factors" not in LEAN_FAMILIES
+
+
+def test_drive_efficiency_columns_stay_out_of_the_lean_set():
+    for c in (
+        "pts_per_drive_off",
+        "pts_per_drive_def",
+        "pts_per_drive_margin",
+        "pts_per_drive_off_n",
+        "pts_per_drive_def_n",
+    ):
+        assert family_of(f"{c}_diff") == "drive_efficiency"
+    assert "drive_efficiency" not in LEAN_FAMILIES

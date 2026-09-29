@@ -26,7 +26,7 @@ Expected `col_name | col_type | col_description` for each per-game-compiled **se
 | [rosters](#rosters) | one row per rostered athlete per season (deduped) | ~63 | `espn_cfb_rosters` |
 | [betting](#betting) | one row per game | 9 | `espn_cfb_betting` |
 | [schedules](#schedules) | one row per game | 34 | `espn_cfb_schedules` |
-| [cfb_schedules](#cfb_schedules) ‡ | one row per game (all divisions) | 41 | `cfb_schedules` |
+| [cfb_schedules](#cfb_schedules) ‡ | one row per game (all divisions) | 43 | `cfb_schedules` |
 | [linescores](#linescores) | one row per (team, period) | 5 | `espn_cfb_linescores` |
 | [power_index](#power_index) | one row per team (or per game) | 22 | `espn_cfb_power_index` |
 | [injuries](#injuries) | one row per injury entry | 12 | `espn_cfb_injuries` |
@@ -1212,11 +1212,12 @@ One row per game, **all divisions**, keyed on `game_id`. This is the schedule
 the loaders read (`sportsdataverse.cfb.load_cfb_schedule`), and it is the
 UNIFICATION of the two schedule datasets that used to sit side by side.
 
-**Every column here is ESPN data.** The build reads two feeds -- this repo's
-ESPN-native `schedules` artifact and the CollegeFootballData `/games` endpoint
--- but CollegeFootballData is a *redistributor* of ESPN, not an independent
-source: `game_id` is an ESPN id on both paths, which is why they join on it at
-all. The two feeds are read for COVERAGE, not provenance, and no column below
+**Every column here is ESPN data.** The build reads two schedule feeds -- this
+repo's ESPN-native `schedules` artifact and the CollegeFootballData `/games`
+endpoint -- plus cfbfastR-cfb-raw's ESPN schedule master (`CFB_RAW_ROOT`), which
+supplies only `home_rank` / `away_rank`. CollegeFootballData is a
+*redistributor* of ESPN, not an independent source: `game_id` is an ESPN id on
+both paths, which is why they join on it at all. The two feeds are read for COVERAGE, not provenance, and no column below
 is attributed to CollegeFootballData because none originates there. The only
 values in the `/games` payload that are genuinely NOT ESPN are the modeling
 outputs, and those are excluded (see Columns).
@@ -1249,14 +1250,28 @@ outputs, and those are excluded (see Columns).
   against `home_division` / `away_division`: those are NA for teams outside the
   `fbs`/`fcs`/`ii`/`iii` classification (2023: 21 NA home, 61 NA away) and an NA
   must read FALSE, not NULL.
+* **Rank** (`home_rank` / `away_rank`) is the Top-25 rank ESPN displayed for
+  each team: the AP poll (preseason AP in week 1) until that season's BCS
+  standings (through 2013) or CFP rankings (2014 on) are out, then that
+  ranking. It is joined on `game_id` from cfbfastR-cfb-raw's schedule master
+  (`CFB_RAW_ROOT`). Each value is the rank as of the last raw capture. For a
+  completed game that is the rank at kickoff (every completed-game side in 2012
+  and 2025 weeks 8-12 and 2026 weeks 1-4 matched ESPN's weekly ranking). A game
+  not yet played can lag a poll released since its last capture.
+  **Without the master** (e.g. a failed CI fetch) the ranks are carried forward
+  from the season's last build -- the tracked `cfb_schedules_{season}.parquet`
+  -- so a rebuild never replaces good ranks with nulls. Only games added since
+  that build are NA, and every game is NA when no last build carries the
+  columns. The build warns once either way.
 
 `espn_cfb_schedules` is **retained**, unchanged, as the ESPN-native schedule
 (FBS-scoped, straight off `final.json`) -- it is one of this dataset's two
-inputs, and its columns are documented under [schedules](#schedules).
+schedule feeds, and its columns are documented under [schedules](#schedules).
 Consumers wanting the full picture should read `cfb_schedules`.
 
 Built by `python -m cfb_data_build --dataset cfb_schedules` (needs
-`CFBD_API_KEY`); runs daily right after `schedules` in
+`CFBD_API_KEY`, and the cfbfastR-cfb-raw schedule master at `CFB_RAW_ROOT` or
+the sibling checkout for the ranks); runs daily right after `schedules` in
 `scripts/daily_cfb_processor.sh`.
 
 | col_name | col_type | col_description |
@@ -1302,6 +1317,8 @@ Built by `python -m cfb_data_build --dataset cfb_schedules` (needs
 | playoff_home_seed | integer | Home team's playoff seed. |
 | playoff_away_seed | integer | Away team's playoff seed. |
 | playoff_bowl_name | character | Bowl hosting the playoff game (e.g. "Rose Bowl"). |
+| home_rank | integer | Home team's Top-25 rank as ESPN displayed it for this game (AP, then BCS/CFP once released), 1-25. NA when unranked (ESPN's 99), and for games the raw schedule master lacks (games with no FBS team -- FCS / Division II / III -- and pre-2004). The rank as of the last raw capture: at kickoff for a completed game, possibly a poll behind for one not yet played. Carried forward from the season's last build when the master is unavailable. |
+| away_rank | integer | Away team's Top-25 rank -- see `home_rank`. |
 
 _Release tag: `cfb_schedules`_
 
@@ -1542,6 +1559,12 @@ overall/pass/rush where applicable.
 | total_available_yards_{side} | double | Sum of yards-to-goal available at each drive start. |
 | total_gained_yards_{side} | integer | Sum of net yards gained across drives. |
 | available_yards_pct_{side} | double | `total_gained / total_available` (drive-efficiency rate). |
+| pts_per_drive_{side} | double | Points per drive: `off` on the team's own drives (ESPN's drive team) with at least one non-kneel run or pass snap, scored from `drive.result` like `pts_per_opp` (TD = 7, FG = 3, else 0). A drive ESPN labels as a return TD ("INT TD", "PUNT RETURN TD") scores 0, but one it labels plain "TD" is credited to the drive's owner even when the touchdown was the other team's return (see Known ceilings below); `def` the same for the opponents' drives against this defense; `margin` is `off - def`. Rank 1 = most scored, fewest allowed, highest margin. |
+| pts_per_drive_off_n / pts_per_drive_def_n | integer | Drives, the denominator. |
+
+A null `pts_per_drive_*` means that side owned no drive (its only snaps sat in the other
+team's drives), and its `_rank` is null too: unranked, not last. Kneel-only drives and
+drives with no snap (a kickoff or punt return TD) are not drives here; overtime drives are.
 
 **Five Factors columns** (whole-team only, no `_pass` / `_rush` split). The 7 values are
 double, each with a double `_rank` (1 = best: most points per opportunity on offense,
@@ -1568,6 +1591,14 @@ fewest allowed on defense, fewest giveaways, most takeaways, highest margin). Th
   - Points come from `drive.result`, so a drive whose result is a clock or data label
     scores 0 even when it ended in a field goal. Over 2004–2025 that is 618 "END OF
     HALF", 444 "Not provided" and 127 "END OF GAME" drives.
+  - A return or defensive touchdown on a drive ESPN labels plain "TD" is credited to
+    the drive's owner, so the offense that gave it up gains 7 and its opponent's
+    defense is charged 7. In the 2025 FBS population that is 15 drives (6
+    interception-return, 5 punt-return and 4 blocked-punt TDs): 105 points, +0.0057
+    per drive pooled. It moves 14 offenses and 15 defenses, by up to 0.115 points per
+    drive or 8 rank places. `pts_per_drive` and `pts_per_opp` share it. `_drives`
+    cannot fix it, because the punt and return plays are filtered out before it runs;
+    the fix is scoring drives from their plays, before the scrimmage filter.
   - Turnovers follow the ESPN play-by-play, which disagrees with ESPN's own box score
     on about 14% of 2025 team-games (see `adv_turnover`'s `turnovers` vs
     `turnovers_pbp`).
@@ -1585,6 +1616,8 @@ ridge model over team/opponent indicators (home-field-aware) then averaged per s
 | adj_off_epa_rank | double | National rank of `adj_off_epa` (1 = best). |
 | adj_def_epa_rank | double | National rank of `adj_def_epa` (1 = best). |
 | net_adj_epa_rank | double | National rank of `net_adj_epa` (1 = best). |
+| off_strength_faced_rank | double | Rank of `off_strength_faced`, 1 = the toughest opposing offenses (highest). Null when the strength is null. |
+| def_strength_faced_rank | double | Rank of `def_strength_faced`, 1 = the toughest opposing defenses (lowest EPA/play allowed). Null when the strength is null. |
 
 _Release tag: `espn_cfb_team_summaries`_
 

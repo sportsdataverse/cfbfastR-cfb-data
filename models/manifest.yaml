@@ -112,10 +112,15 @@ models:
     stage: "60"
     artifact: cfb_recruiting_proj per-season parquet
     notes: compute-on-demand via cfb_model_publish recruiting (cfb_recruiting_proj_cron.yml)
+  pregame_closed_form:
+    registry_model: "pregame closed form (sdv-py `cfb_game_predict`; GOP projection)"
+    stage: "34"
+    artifact: pregame_fit.json
+    notes: constants ship in sdv-py cfb_prediction_constants.py and GOP sdv.ts, not as a release asset
 
-# Stage 34 (cfb_higher_models) is research-only by recorded decision — no
-# published model, no registry row (see NON_PUBLISHING_STAGES in
-# tests/test_model_registry.py). Stage 70 emits reports ABOUT the others.
+# Stage 34 (cfb_higher_models) was research-only until 2026-09-27, when its
+# fit_pregame constants became the shipped pregame surface (pregame_closed_form
+# above). Stage 70 emits reports ABOUT the others.
 #
 # 2026-09-02: stage 34 gained `hierarchical` — a gated, pre-registered team-strength
 # model that beats the shipped pregame surface by 2.14 MAE. It is still NOT listed

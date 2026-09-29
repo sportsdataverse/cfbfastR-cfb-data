@@ -1,5 +1,4 @@
 From https://github.com/sportsdataverse/cfbfastR-cfb-data
-   87d696c09..3021f4d30  main                    -> origin/main
  * [new branch]          AE/update-air-yards-model -> origin/AE/update-air-yards-model
  * [new branch]          chore/pregame-refit-post-reprocess -> origin/chore/pregame-refit-post-reprocess
  * [new branch]          chore/readme-repository-layout -> origin/chore/readme-repository-layout
@@ -10,14 +9,12 @@ From https://github.com/sportsdataverse/cfbfastR-cfb-data
  * [new branch]          feat/cfb-model-suite-completion -> origin/feat/cfb-model-suite-completion
  * [new branch]          feat/cfb-ratings-builder -> origin/feat/cfb-ratings-builder
  * [new branch]          feat/cfb-ratings-cron   -> origin/feat/cfb-ratings-cron
- * [new branch]          feat/drive-efficiency-columns -> origin/feat/drive-efficiency-columns
  * [new branch]          feat/era-contract-in-model-cards -> origin/feat/era-contract-in-model-cards
  * [new branch]          feat/league-averages    -> origin/feat/league-averages
  * [new branch]          feat/rolling-windows    -> origin/feat/rolling-windows
  * [new branch]          feat/rosters-cfbd-enrich -> origin/feat/rosters-cfbd-enrich
  * [new branch]          feat/sample-sizes       -> origin/feat/sample-sizes
  * [new branch]          feat/schedule-rank-at-kickoff -> origin/feat/schedule-rank-at-kickoff
- * [new branch]          feat/tendencies-context -> origin/feat/tendencies-context
  * [new branch]          fix/bowl-season-cron    -> origin/fix/bowl-season-cron
  * [new branch]          fix/cfb-recruiting-guard -> origin/fix/cfb-recruiting-guard
  * [new branch]          fix/cfb-weekly-raw-store -> origin/fix/cfb-weekly-raw-store

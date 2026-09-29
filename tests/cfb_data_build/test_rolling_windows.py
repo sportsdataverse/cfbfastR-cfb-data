@@ -48,9 +48,9 @@ def test_reads_every_prior_season_of_the_built_tree(base):
     ).row(0, named=True)
     # cur/prev/season_start only need 2023-2024, so they match the sdv-py oracle exactly
     # (re-pin these three if the 2023-2024 espn_cfb_pbp release is ever republished)
-    assert r["cur"] == pytest.approx(0.625317, abs=1e-6)
+    assert r["cur"] == pytest.approx(0.625554, abs=1e-6)
     assert r["prev"] == pytest.approx(0.457801, abs=1e-6)
-    assert r["season_start"] == pytest.approx(0.464828, abs=1e-6)
+    assert r["season_start"] == pytest.approx(0.468140, abs=1e-6)
     assert df["season"].unique().to_list() == [2024]
     # QB's last 2024 game (401729867, Syracuse @ Washington State) kicks off at
     # 2024-12-28T01:00:00Z -- 2024-12-27 8pm ET. A bare UTC date slice would

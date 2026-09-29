@@ -233,9 +233,12 @@ def from_constants(cfg, rating: str = _RATING) -> PregameFit:
 
 def _sdv_sha() -> str | None:
     """The sportsdataverse commit the loaders and shipped constants came from."""
-    from importlib.metadata import distribution
+    from importlib.metadata import PackageNotFoundError, distribution
 
-    raw = distribution("sportsdataverse").read_text("direct_url.json")
+    try:
+        raw = distribution("sportsdataverse").read_text("direct_url.json")
+    except PackageNotFoundError:  # imported from a path, no dist metadata
+        return None
     return json.loads(raw).get("vcs_info", {}).get("commit_id") if raw else None
 
 

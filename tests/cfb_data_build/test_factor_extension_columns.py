@@ -10,9 +10,11 @@ from __future__ import annotations
 import polars as pl
 import pytest
 from cfb_data_build.team_summaries import (
+    _MARGIN_BASES,
     _clean_rank_columns,
     _field_position_ep,
     _havoc_and_expected_turnovers,
+    _mutate_summary_margins,
     _summarize_drives,
 )
 
@@ -147,3 +149,20 @@ def test_havoc_epa_per_game_and_expected_turnover_margin():
         1.0,
         2.0,
     )
+
+
+def test_havoc_margin_is_created_minus_allowed_whole_team_only():
+    """def - off: havoc is bad for an offense. Whole-team table only, like explosive_margin."""
+    base = {f"{b}_{side}": [0.5, 0.5] for b, _ in _MARGIN_BASES for side in ("off", "def")}
+    whole = pl.DataFrame(
+        base
+        | {"pos_team_id": ["1", "2"], "explosive_off": [0.1, 0.1], "explosive_def": [0.1, 0.1],
+           "turnovers_off": [1.0, 1.0], "turnovers_def": [1.0, 1.0],
+           "havoc_off": [0.10, 0.18], "havoc_def": [0.16, 0.12]}
+    )
+    out = _mutate_summary_margins(whole).sort("pos_team_id")
+    assert out["havoc_margin"].to_list() == pytest.approx([0.06, -0.06])
+    assert out["havoc_margin_rank"].to_list() == [1.0, 2.0]
+    # a pass/rush split carries no turnovers, so it gets no whole-team margins
+    split = whole.drop("turnovers_off", "turnovers_def")
+    assert "havoc_margin" not in _mutate_summary_margins(split).columns

@@ -163,6 +163,7 @@ _FACTOR_EXTENSIONS = {
     "havoc_EPAgame_margin",
     "expected_turnover_margin",
     "turnover_luck",
+    "havoc_margin",
 }
 PYTHON_ONLY = {
     "team_summaries": _FIVE_FACTORS

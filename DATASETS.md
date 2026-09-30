@@ -1614,6 +1614,7 @@ that earned a column in the 2026-09-29 exploration, CFB 2022–2025 and NFL 2016
 | havoc_EPAgame_off | double | EPA per game on the team's own havoc snaps (sack, interception, fumble, pass breakup or negative yardage): what havoc cost the offense, negative. |
 | havoc_EPAgame_def | double | EPA per game on the opponents' havoc snaps against this defense: what its havoc cost them. |
 | havoc_EPAgame_margin | double | `havoc_EPAgame_off - havoc_EPAgame_def`; positive when the team's havoc costs opponents more than theirs costs it. |
+| havoc_margin | double | Havoc rate created minus allowed: `havoc_def - havoc_off`, in shares of plays. `def - off` because havoc is bad for an offense, so positive is good. It is the most stable havoc measure (odd-vs-even-games reliability 0.65 CFB, 0.59 NFL) and pace-neutral, unlike a per-game count. |
 | expected_turnover_margin | double | Connelly's expected turnover margin per game: half of every scrimmage fumble in the team's games recovered by each side, plus interceptions at the season's national share of passes defensed (INT + PBU). The share is measured from the season (2025: 29.8%), not `adv_turnover`'s fixed 0.22, because ESPN's text under-records pass breakups against official stats. |
 | turnover_luck | double | Turnover luck in points per game: `5.0 * (turnover_margin - expected_turnover_margin)`, the scale `adv_turnover`'s `turnover_luck` uses. |
 

@@ -505,9 +505,13 @@ def _mutate_summary_margins(df: pl.DataFrame) -> pl.DataFrame:
             explosive_margin=pl.col("explosive_off") - pl.col("explosive_def"),
             # takeaways minus giveaways, so positive is good
             turnover_margin=pl.col("turnovers_def") - pl.col("turnovers_off"),
+            # havoc rate created minus allowed (percentage points of plays): havoc is
+            # bad for an offense, so def - off, positive is good
+            havoc_margin=pl.col("havoc_def") - pl.col("havoc_off"),
         ).with_columns(
             explosive_margin_rank=_rank("explosive_margin", descending=True),
             turnover_margin_rank=_rank("turnover_margin", descending=True),
+            havoc_margin_rank=_rank("havoc_margin", descending=True),
         )
     return out
 

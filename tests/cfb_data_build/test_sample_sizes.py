@@ -58,9 +58,9 @@ def test_every_team_rate_gets_the_count_it_was_computed_over():
 
 
 def test_removed_metrics_take_their_sample_size_with_them():
-    rc = ("start_position", "start_position_rank", "start_position_n")
+    rc = ("turnovers", "turnovers_rank", "turnovers_n")
     g = _summarize_team(_plays(), "pos_team_id", ascending=False, remove_cols=rc)
-    assert not [c for c in g.columns if c.startswith("start_position")]
+    assert not [c for c in g.columns if c.startswith("turnovers")]
 
 
 def test_n_suffix_moves_to_the_end_like_rank():

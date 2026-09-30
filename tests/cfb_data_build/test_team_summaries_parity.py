@@ -100,6 +100,13 @@ DIVERGENT_FROM_R = {
         "detmergame_rank",
     },
     "team_summaries": {
+        # per drive since 2026-09-29; R averages the drive start over plays
+        "start_position_off",
+        "start_position_def",
+        "start_position_margin",
+        "start_position_off_rank",
+        "start_position_def_rank",
+        "start_position_margin_rank",
         "valid_games",
         "adj_off_epa",
         "adj_def_epa",
@@ -145,10 +152,28 @@ _FIVE_FACTORS = {
 #: too). The ``pts_per_drive_{off,def}_n`` counts are not listed: the test drops
 #: every ``_n`` column before this check.
 _DRIVE_EFFICIENCY = {"pts_per_drive_off", "pts_per_drive_def", "pts_per_drive_margin"}
+#: Team-factor extensions (test_factor_extension_columns.py), Python-only: starting EP
+#: per drive, havoc EPA per game, expected turnover margin and turnover luck.
+_FACTOR_EXTENSIONS = {
+    "drive_start_ep_off",
+    "drive_start_ep_def",
+    "drive_start_ep_margin",
+    "havoc_EPAgame_off",
+    "havoc_EPAgame_def",
+    "havoc_EPAgame_margin",
+    "expected_turnovers_off",
+    "expected_turnovers_def",
+    "expected_turnover_margin",
+    "turnover_luck_off",
+    "turnover_luck_def",
+    "turnover_luck",
+    "havoc_margin",
+}
 PYTHON_ONLY = {
     "team_summaries": _FIVE_FACTORS
     | _DRIVE_EFFICIENCY
-    | {f"{c}_rank" for c in _FIVE_FACTORS | _DRIVE_EFFICIENCY}
+    | _FACTOR_EXTENSIONS
+    | {f"{c}_rank" for c in _FIVE_FACTORS | _DRIVE_EFFICIENCY | _FACTOR_EXTENSIONS}
     | {"off_strength_faced_rank", "def_strength_faced_rank"},
     "passing": _LEADER_PCT
     | {

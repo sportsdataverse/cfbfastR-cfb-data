@@ -29,8 +29,12 @@ everything downstream.
 
 from __future__ import annotations
 
+import functools
+from pathlib import Path
+
 import numpy as np
 import polars as pl
+import sportsdataverse
 from sportsdataverse.cfb import cfb_adjusted_epa, load_cfb_team_group_seasons
 
 from .checks import assert_adjustment_is_real, assert_passer_epa_includes_sacks
@@ -64,6 +68,34 @@ _DRIVE_POINTS: dict[str, float] = {
     "FG GOOD": 3.0,
     "MADE FG": 3.0,
 }
+
+
+#: Connelly's average point value of a turnover, the scale ``adv_turnover``'s
+#: ``turnover_luck`` and GOP's glossary already use for turnover luck.
+_POINTS_PER_TURNOVER = 5.0
+
+
+@functools.cache
+def _field_position_ep() -> pl.DataFrame:
+    """Expected points of a drive start by own yardline (99 rows), bundled with sdv-py.
+
+    The yardline-only table GOP's Paper Index reads, on purpose: the pbp's
+    ``EP_start`` is sdv-py's EP model, whose inputs include score differential and
+    clock, so a drive start priced by it carries the scoreboard. Measured on
+    2022-2025, starting EP from ``EP_start`` correlated 0.95 with points margin
+    against 0.58 from this table (ClaudeCowork notes/2026-09-29-gop-factors-epa-exploration).
+    """
+    path = (
+        Path(sportsdataverse.__file__).parent
+        / "cfb"
+        / "models"
+        / "cfb_field_position_ep.parquet"
+    )
+    return pl.read_parquet(path).select(
+        pl.col("yardline_own").cast(pl.Int64), pl.col("ep").cast(pl.Float64)
+    )
+
+
 # NOTE: there is deliberately no _RIDGE_LAMBDA here. The penalty is owned by
 # `sportsdataverse.cfb.cfb_adjusted_epa` (0.035 as of the 2026-08 audit) and
 # this module calls it without an override. A local `_RIDGE_LAMBDA = 325.0`
@@ -327,7 +359,6 @@ _TEAM_MEAN_SOURCES: dict[str, str] = {
     "third_down_distance": "third_down_distance",
     "late_down_success": "late_down_success",
     "early_down_EPA": "early_down_EPA",
-    "start_position": "drive_start_yards_to_goal",
     "nonExplosiveEpaPerPlay": "nonExplosiveEpa",
     "line_yards": "line_yards",
     "opportunity_rate": "opportunity_run",
@@ -372,7 +403,6 @@ def _summarize_team(
         third_down_distance=pl.col("third_down_distance").mean(),
         late_down_success=pl.col("late_down_success").mean(),
         early_down_EPA=pl.col("early_down_EPA").mean(),
-        start_position=pl.col("drive_start_yards_to_goal").mean(),
         nonExplosiveEpaPerPlay=pl.col("nonExplosiveEpa").mean(),
         line_yards=pl.col("line_yards").mean(),
         opportunity_rate=pl.col("opportunity_run").mean(),
@@ -426,9 +456,8 @@ def _summarize_team(
         red_zone_success_rank=_rank("red_zone_success", descending=not d),
         third_down_success_rank=_rank("third_down_success", descending=not d),
         late_down_success_rank=_rank("late_down_success", descending=not d),
-        # third_down_distance / start_position: asc -> rank(-x); off -> rank(x)
+        # third_down_distance: asc -> rank(-x); off -> rank(x)
         third_down_distance_rank=_rank("third_down_distance", descending=d),
-        start_position_rank=_rank("start_position", descending=d),
         # havoc: asc -> rank(-x); off -> rank(x)
         havoc_rank=_rank("havoc", descending=d),
         # turnovers: fewer giveaways (off) / more takeaways (def) rank first
@@ -469,14 +498,6 @@ def _mutate_summary_margins(df: pl.DataFrame) -> pl.DataFrame:
             for _, m in _MARGIN_BASES
         ]
     )
-    if "start_position_off" in df.columns:
-        out = out.with_columns(
-            start_position_margin=(100 - pl.col("start_position_off"))
-            - (100 - pl.col("start_position_def"))
-        )
-        out = out.with_columns(
-            start_position_margin_rank=_rank("start_position_margin", descending=True)
-        )
     # Five Factors margins: whole-team table only (the pass/rush splits drop
     # turnovers, so they skip this)
     if "turnovers_off" in df.columns:
@@ -484,9 +505,13 @@ def _mutate_summary_margins(df: pl.DataFrame) -> pl.DataFrame:
             explosive_margin=pl.col("explosive_off") - pl.col("explosive_def"),
             # takeaways minus giveaways, so positive is good
             turnover_margin=pl.col("turnovers_def") - pl.col("turnovers_off"),
+            # havoc rate created minus allowed (percentage points of plays): havoc is
+            # bad for an offense, so def - off, positive is good
+            havoc_margin=pl.col("havoc_def") - pl.col("havoc_off"),
         ).with_columns(
             explosive_margin_rank=_rank("explosive_margin", descending=True),
             turnover_margin_rank=_rank("turnover_margin", descending=True),
+            havoc_margin_rank=_rank("havoc_margin", descending=True),
         )
     return out
 
@@ -555,6 +580,18 @@ def _drives(plays: pl.DataFrame, group: str, *, ascending: bool) -> pl.DataFrame
             .first()
             .replace_strict(_DRIVE_POINTS, default=0.0, return_dtype=pl.Float64),
         )
+        .with_columns(
+            _own_yardline=(100 - pl.col("total_available_yards"))
+            .round()
+            .cast(pl.Int64)
+            .clip(1, 99)
+        )
+        .join(
+            _field_position_ep(),
+            left_on="_own_yardline",
+            right_on="yardline_own",
+            how="left",
+        )
     )
     agg = per_drive.group_by(group).agg(
         total_available_yards=pl.col("total_available_yards").sum(),
@@ -563,6 +600,18 @@ def _drives(plays: pl.DataFrame, group: str, *, ascending: bool) -> pl.DataFrame
         pts_per_opp_n=pl.col("scoring_opp").sum().cast(pl.Int64),
         drive_points=pl.col("points").filter(pl.col("owned") == True).sum(),  # noqa: E712
         pts_per_drive_n=pl.col("owned").sum().cast(pl.Int64),
+        # field position is averaged per DRIVE over the owner's drives, in yards and in
+        # points from the same drives. (Until 2026-09-29 start_position was a mean over
+        # PLAYS, so a long drive counted once per snap.)
+        start_position=pl.col("total_available_yards")
+        .filter(pl.col("owned") == True)
+        .mean(),
+        start_position_n=(
+            (pl.col("owned") == True) & pl.col("total_available_yards").is_not_null()
+        )
+        .sum()
+        .cast(pl.Int64),
+        drive_start_ep=pl.col("ep").filter(pl.col("owned") == True).mean(),
     )
     agg = (
         agg.with_columns(
@@ -585,6 +634,10 @@ def _drives(plays: pl.DataFrame, group: str, *, ascending: bool) -> pl.DataFrame
         # more points per trip is better on offense, fewer allowed on defense
         pts_per_opp_rank=_rank_known("pts_per_opp", descending=not ascending),
         pts_per_drive_rank=_rank_known("pts_per_drive", descending=not ascending),
+        # a better start is worth more on offense, less allowed on defense: fewer
+        # yards to go ranks first on offense, more yards to go allowed on defense
+        start_position_rank=_rank("start_position", descending=ascending),
+        drive_start_ep_rank=_rank_known("drive_start_ep", descending=not ascending),
     )
 
 
@@ -611,6 +664,10 @@ def _summarize_drives(plays: pl.DataFrame) -> pl.DataFrame:
             pts_per_opp_margin=pl.col("pts_per_opp_off") - pl.col("pts_per_opp_def"),
             pts_per_drive_margin=pl.col("pts_per_drive_off")
             - pl.col("pts_per_drive_def"),
+            drive_start_ep_margin=pl.col("drive_start_ep_off") - pl.col("drive_start_ep_def"),
+            # (100 - off) - (100 - def): positive when the team starts closer to goal
+            start_position_margin=pl.col("start_position_def")
+            - pl.col("start_position_off"),
         )
         .with_columns(
             total_available_yards_margin_rank=_rank(
@@ -626,7 +683,115 @@ def _summarize_drives(plays: pl.DataFrame) -> pl.DataFrame:
             pts_per_drive_margin_rank=_rank_known(
                 "pts_per_drive_margin", descending=True
             ),
+            drive_start_ep_margin_rank=_rank_known("drive_start_ep_margin", descending=True),
+            start_position_margin_rank=_rank("start_position_margin", descending=True),
         )
+    )
+
+
+def _havoc_and_expected_turnovers(team_off: pl.DataFrame) -> pl.DataFrame:
+    """Whole-team havoc EPA per game and Connelly's expected turnover margin per game.
+
+    * ``havoc_EPAgame_off``: EPA per game on the team's own havoc snaps (the cost,
+      negative); ``_def``: the same on its opponents' snaps it made havoc on;
+      ``_margin`` = off - def, positive when its havoc costs opponents more.
+    * ``expected_turnover_margin``: half of every scrimmage fumble recovered by each
+      side, and interceptions at the season's national share of passes defensed
+      (INT + PBU). ``turnover_luck`` (= 5.0 points x (``turnover_margin`` minus this)) is
+      set by the caller. The interception share is measured from the season, not
+      ``adv_turnover``'s fixed 0.22: ESPN's text under-records pass breakups against
+      official stats (2025: 29.8% of INT + PBU are INTs), so a fixed 22% would read
+      every defense's expected interceptions low. Kick-play turnovers are in ``turnover_margin`` but not here, so a muff
+      reads as luck -- recoveries of loose kicks are close to a coin flip anyway.
+
+    Counts are cast to Float64 before any subtraction: polars sums booleans as
+    UInt32, and takeaways - giveaways wraps to ~4.3e9 whenever it should go negative.
+    """
+    defended = (pl.col("int") == 1) | pl.col("pass_breakup_player_name").is_not_null()
+    on_pass = pl.col("pass") == 1
+    int_share = team_off.select(
+        (pl.col("int") == 1).sum().cast(pl.Float64)
+        / defended.filter(on_pass).sum().cast(pl.Float64)
+    ).item()
+
+    def side(group: str, suffix: str) -> pl.DataFrame:
+        return (
+            team_off.group_by(group)
+            .agg(
+                games=pl.col("game_id").n_unique().cast(pl.Float64),
+                havoc_epa=pl.col("EPA").filter(pl.col("havoc") == True).sum(),
+                fumbles=(pl.col("fumble_vec") == 1).sum().cast(pl.Float64),
+                defended=defended.filter(on_pass).sum().cast(pl.Float64),
+            )
+            .rename({group: "pos_team_id"})
+            .rename(lambda c: c if c == "pos_team_id" else f"{c}{suffix}")
+        )
+
+    off, de = side("pos_team_id", "_off"), side("def_pos_team_id", "_def")
+    per_game = lambda col, side: pl.col(f"{col}_{side}") / pl.col(f"games_{side}")
+    return (
+        off.join(de, on="pos_team_id", how="left")
+        .with_columns(
+            havoc_EPAgame_off=per_game("havoc_epa", "off"),
+            havoc_EPAgame_def=per_game("havoc_epa", "def"),
+            # expected giveaways (off) and takeaways (def) per game: half of each
+            # scrimmage fumble, INTs at the season's share of passes defensed
+            expected_turnovers_off=0.5 * per_game("fumbles", "off")
+            + int_share * per_game("defended", "off"),
+            expected_turnovers_def=0.5 * per_game("fumbles", "def")
+            + int_share * per_game("defended", "def"),
+        )
+        .with_columns(
+            havoc_EPAgame_margin=pl.col("havoc_EPAgame_off")
+            - pl.col("havoc_EPAgame_def"),
+            expected_turnover_margin=pl.col("expected_turnovers_def")
+            - pl.col("expected_turnovers_off"),
+        )
+        .select(
+            "pos_team_id",
+            "havoc_EPAgame_off",
+            "havoc_EPAgame_def",
+            "havoc_EPAgame_margin",
+            "expected_turnovers_off",
+            "expected_turnovers_def",
+            "expected_turnover_margin",
+        )
+        .sort("pos_team_id")
+        .with_columns(
+            # less EPA lost to havoc is better on offense; more inflicted on defense
+            havoc_EPAgame_off_rank=_rank("havoc_EPAgame_off", descending=True),
+            havoc_EPAgame_def_rank=_rank("havoc_EPAgame_def", descending=False),
+            havoc_EPAgame_margin_rank=_rank("havoc_EPAgame_margin", descending=True),
+            # fewer expected giveaways rank first on offense, more takeaways on defense
+            expected_turnovers_off_rank=_rank("expected_turnovers_off", descending=False),
+            expected_turnovers_def_rank=_rank("expected_turnovers_def", descending=True),
+            expected_turnover_margin_rank=_rank(
+                "expected_turnover_margin", descending=True
+            ),
+        )
+    )
+
+
+def _add_turnover_luck(team_data: pl.DataFrame) -> pl.DataFrame:
+    """Turnover luck in points per game, per side and overall, with ranks.
+
+    The part of the turnover counts the team's fumbles and passes defensed did not
+    earn, scaled by ``_POINTS_PER_TURNOVER`` (the scale ``adv_turnover``'s
+    ``turnover_luck`` and GOP's glossary use). Positive = lucky on both sides: fewer
+    giveaways than expected (``_off``), more takeaways than expected (``_def``); the
+    two sum to ``turnover_luck`` = 5 x (``turnover_margin`` - expected margin).
+    """
+    return team_data.with_columns(
+        turnover_luck_off=_POINTS_PER_TURNOVER
+        * (pl.col("expected_turnovers_off") - pl.col("turnovers_off")),
+        turnover_luck_def=_POINTS_PER_TURNOVER
+        * (pl.col("turnovers_def") - pl.col("expected_turnovers_def")),
+        turnover_luck=_POINTS_PER_TURNOVER
+        * (pl.col("turnover_margin") - pl.col("expected_turnover_margin")),
+    ).with_columns(
+        turnover_luck_off_rank=_rank("turnover_luck_off", descending=True),
+        turnover_luck_def_rank=_rank("turnover_luck_def", descending=True),
+        turnover_luck_rank=_rank("turnover_luck", descending=True),
     )
 
 
@@ -1012,11 +1177,9 @@ def build_team_summaries(
         off.join(def_, left_on="pos_team_id", right_on="def_pos_team_id", how="left")
     )
 
-    # field position and turnovers are whole-team figures: no pass/rush split
+    # turnovers are a whole-team figure: no pass/rush split (field position is one
+    # too, and comes from _drives per drive, so the splits never build it)
     rc = (
-        "start_position",
-        "start_position_rank",
-        "start_position_n",
         "turnovers",
         "turnovers_rank",
         "turnovers_n",
@@ -1078,6 +1241,8 @@ def build_team_summaries(
         overall.join(drives_data, on="pos_team_id", how="left", suffix="_drive")
         .join(pass_data, on="pos_team_id", how="left", suffix="_pass")
         .join(rush_data, on="pos_team_id", how="left", suffix="_rush")
+        .join(_havoc_and_expected_turnovers(team_off), on="pos_team_id", how="left")
+        .pipe(_add_turnover_luck)
     )
 
     # leaderboards

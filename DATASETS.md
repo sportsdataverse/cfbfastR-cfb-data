@@ -1543,7 +1543,7 @@ twin:
 | third_down_distance | double | Mean third-down distance to go. |
 | late_down_success | double | Late-down (3rd/4th) success rate. |
 | early_down_EPA | double | Mean EPA on early downs (1st/2nd). |
-| start_position | double | Mean drive start field position (yards to goal). |
+| start_position | double | Average starting field position (yards to goal), averaged per DRIVE over the team's own drives (ESPN's drive team); `def` is the opponents' drives against this defense, and `_n` counts drives. Before 2026-09-29 it was a mean over plays, so a long drive counted once per snap (2025 rankings moved at Spearman 0.92; teams by up to 4.8 yards). `margin` is `def - off`: positive when the team starts closer to goal than its opponents. |
 | nonExplosiveEpaPerPlay | double | Mean EPA on non-explosive plays. |
 | line_yards | double | Mean offensive-line-credited rushing yards. |
 | opportunity_rate | double | Opportunity-run rate. |
@@ -1602,6 +1602,36 @@ fewest allowed on defense, fewest giveaways, most takeaways, highest margin). Th
   - Turnovers follow the ESPN play-by-play, which disagrees with ESPN's own box score
     on about 14% of 2025 team-games (see `adv_turnover`'s `turnovers` vs
     `turnovers_pbp`).
+
+**Team-factor extension columns** (whole-team only; the EPA versions of the five factors
+that earned a column in the 2026-09-29 exploration, CFB 2022–2025 and NFL 2016–2025):
+
+| col_name | col_type | col_description |
+| --- | --- | --- |
+| drive_start_ep_off | double | Average starting field position in POINTS: the expected points of each drive's start, averaged per DRIVE over the team's own drives (ESPN's drive team). Priced by sdv-py's yardline-only table (`cfb/models/cfb_field_position_ep.parquet`, the one GOP's Paper Index reads), never the pbp's `EP_start`, whose model includes score differential and clock. |
+| drive_start_ep_def | double | The same for the opponents' drives against this defense. |
+| drive_start_ep_margin | double | `drive_start_ep_off - drive_start_ep_def`. |
+| havoc_EPAgame_off | double | EPA per game on the team's own havoc snaps (sack, interception, fumble, pass breakup or negative yardage): what havoc cost the offense, negative. |
+| havoc_EPAgame_def | double | EPA per game on the opponents' havoc snaps against this defense: what its havoc cost them. |
+| havoc_EPAgame_margin | double | `havoc_EPAgame_off - havoc_EPAgame_def`; positive when the team's havoc costs opponents more than theirs costs it. |
+| havoc_margin | double | Havoc rate created minus allowed: `havoc_def - havoc_off`, in shares of plays. `def - off` because havoc is bad for an offense, so positive is good. It is the most stable havoc measure (odd-vs-even-games reliability 0.65 CFB, 0.59 NFL) and pace-neutral, unlike a per-game count. |
+| expected_turnovers_off | double | Expected giveaways per game: half of the team's own scrimmage fumbles, plus interceptions at the season's national share of its passes defensed (INT + PBU). |
+| expected_turnovers_def | double | Expected takeaways per game: half of the opponents' scrimmage fumbles, plus interceptions at that share of the passes this defense defensed. |
+| expected_turnover_margin | double | Connelly's expected turnover margin per game, `expected_turnovers_def - expected_turnovers_off`: half of every scrimmage fumble in the team's games recovered by each side, plus interceptions at the season's national share of passes defensed (INT + PBU). The share is measured from the season (2025: 29.8%), not `adv_turnover`'s fixed 0.22, because ESPN's text under-records pass breakups against official stats. |
+| turnover_luck_off | double | Offensive turnover luck, points per game: `5.0 * (expected_turnovers_off - turnovers_off)`, positive when the offense gave the ball away less than expected. |
+| turnover_luck_def | double | Defensive turnover luck, points per game: `5.0 * (turnovers_def - expected_turnovers_def)`, positive when the defense took it away more than expected. |
+| turnover_luck | double | Turnover luck in points per game: `5.0 * (turnover_margin - expected_turnover_margin)`, the scale `adv_turnover`'s `turnover_luck` uses; equals `turnover_luck_off + turnover_luck_def`. |
+
+Each carries a `_rank` (1 = best: the better start, the least havoc cost on offense and the
+most inflicted on defense, the highest margin; for `turnover_luck`, the luckiest).
+
+- `drive_start_ep` and `start_position` are the same drives, in points and in yards: both are
+  averaged per drive over the team's own drives.
+- `turnover_margin` counts special-teams turnovers and `expected_turnover_margin` cannot
+  (it is built from scrimmage fumbles and passes defensed), so a muffed kick lands in
+  `turnover_luck`. Loose-kick recoveries are close to a coin flip, so that is where it belongs.
+- Luck does not persist: its odd-vs-even-games split-half reliability was 0.03 (CFB) and
+  0.00 (NFL), against 0.20 / 0.29 for the expected margin. It explains a record; it is not a skill.
 
 **Opponent-adjusted (ridge-regression) columns** — the headline EPA numbers, fit with a
 ridge model over team/opponent indicators (home-field-aware) then averaged per season:

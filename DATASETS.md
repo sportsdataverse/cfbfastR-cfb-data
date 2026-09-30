@@ -1603,6 +1603,33 @@ fewest allowed on defense, fewest giveaways, most takeaways, highest margin). Th
     on about 14% of 2025 team-games (see `adv_turnover`'s `turnovers` vs
     `turnovers_pbp`).
 
+**Team-factor extension columns** (whole-team only; the EPA versions of the five factors
+that earned a column in the 2026-09-29 exploration, CFB 2022–2025 and NFL 2016–2025):
+
+| col_name | col_type | col_description |
+| --- | --- | --- |
+| start_ep_off | double | Average starting field position in POINTS: the expected points of each drive's start, averaged per DRIVE over the team's own drives (ESPN's drive team). Priced by sdv-py's yardline-only table (`cfb/models/cfb_field_position_ep.parquet`, the one GOP's Paper Index reads), never the pbp's `EP_start`, whose model includes score differential and clock. |
+| start_ep_def | double | The same for the opponents' drives against this defense. |
+| start_ep_margin | double | `start_ep_off - start_ep_def`. |
+| havoc_EPAgame_off | double | EPA per game on the team's own havoc snaps (sack, interception, fumble, pass breakup or negative yardage): what havoc cost the offense, negative. |
+| havoc_EPAgame_def | double | EPA per game on the opponents' havoc snaps against this defense: what its havoc cost them. |
+| havoc_EPAgame_margin | double | `havoc_EPAgame_off - havoc_EPAgame_def`; positive when the team's havoc costs opponents more than theirs costs it. |
+| expected_turnover_margin | double | Connelly's expected turnover margin per game: half of every scrimmage fumble in the team's games recovered by each side, plus interceptions at the season's national share of passes defensed (INT + PBU). The share is measured from the season (2025: 29.8%), not `adv_turnover`'s fixed 0.22, because ESPN's text under-records pass breakups against official stats. |
+| turnover_luck | double | Turnover luck in points per game: `5.0 * (turnover_margin - expected_turnover_margin)`, the scale `adv_turnover`'s `turnover_luck` uses. |
+
+Each carries a `_rank` (1 = best: the better start, the least havoc cost on offense and the
+most inflicted on defense, the highest margin; for `turnover_luck`, the luckiest).
+
+- `start_position` averages the drive start over PLAYS (a long drive counts once per snap);
+  `start_ep` averages over DRIVES. On 2025 the two weightings of the start rank teams at
+  Spearman 0.92 (mean gap 1.6 yards, up to 4.8), so compare `start_ep` with `start_position`
+  knowing they weight drives differently.
+- `turnover_margin` counts special-teams turnovers and `expected_turnover_margin` cannot
+  (it is built from scrimmage fumbles and passes defensed), so a muffed kick lands in
+  `turnover_luck`. Loose-kick recoveries are close to a coin flip, so that is where it belongs.
+- Luck does not persist: its odd-vs-even-games split-half reliability was 0.03 (CFB) and
+  0.00 (NFL), against 0.20 / 0.29 for the expected margin. It explains a record; it is not a skill.
+
 **Opponent-adjusted (ridge-regression) columns** — the headline EPA numbers, fit with a
 ridge model over team/opponent indicators (home-field-aware) then averaged per season:
 

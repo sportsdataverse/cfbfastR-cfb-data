@@ -145,10 +145,23 @@ _FIVE_FACTORS = {
 #: too). The ``pts_per_drive_{off,def}_n`` counts are not listed: the test drops
 #: every ``_n`` column before this check.
 _DRIVE_EFFICIENCY = {"pts_per_drive_off", "pts_per_drive_def", "pts_per_drive_margin"}
+#: Team-factor extensions (test_factor_extension_columns.py), Python-only: starting EP
+#: per drive, havoc EPA per game, expected turnover margin and turnover luck.
+_FACTOR_EXTENSIONS = {
+    "start_ep_off",
+    "start_ep_def",
+    "start_ep_margin",
+    "havoc_EPAgame_off",
+    "havoc_EPAgame_def",
+    "havoc_EPAgame_margin",
+    "expected_turnover_margin",
+    "turnover_luck",
+}
 PYTHON_ONLY = {
     "team_summaries": _FIVE_FACTORS
     | _DRIVE_EFFICIENCY
-    | {f"{c}_rank" for c in _FIVE_FACTORS | _DRIVE_EFFICIENCY}
+    | _FACTOR_EXTENSIONS
+    | {f"{c}_rank" for c in _FIVE_FACTORS | _DRIVE_EFFICIENCY | _FACTOR_EXTENSIONS}
     | {"off_strength_faced_rank", "def_strength_faced_rank"},
     "passing": _LEADER_PCT
     | {

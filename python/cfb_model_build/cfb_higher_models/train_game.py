@@ -29,6 +29,10 @@ from .data import build_game_frame, diff_features, paired_features
 # family here, or it silently joins the recommended model's inputs at the next
 # republish. tests/test_higher_models_families.py enforces that.
 FAMILIES: dict[str, tuple[str, ...]] = {
+    # Team-factor extensions (starting EP, havoc EPA, expected turnovers, luck).
+    # Not lean, like the Five Factors below. First, so "havoc_EPAgame" is not filed
+    # under "efficiency" by its "EPAgame", and "start_ep" does not fall to "other".
+    "team_factors": ("start_ep", "havoc_EPAgame", "expected_turnover", "turnover_luck"),
     # IF-2 Five Factors columns. Deliberately NOT lean: they enter a model only
     # through a reviewed change to LEAN_FAMILIES. First, so "explosive_margin"
     # is not filed under "explosive".
@@ -94,7 +98,9 @@ def family_of(col: str) -> str:
     return "other"
 
 
-def _xy(df: pl.DataFrame, feats: list[str], target: str = "margin") -> tuple[np.ndarray, np.ndarray]:
+def _xy(
+    df: pl.DataFrame, feats: list[str], target: str = "margin"
+) -> tuple[np.ndarray, np.ndarray]:
     X = df.select(feats).to_numpy().astype(np.float64)
     y = df[target].to_numpy()
     return np.nan_to_num(X, nan=0.0, posinf=0.0, neginf=0.0), y.astype(np.float64)
@@ -295,10 +301,14 @@ def assert_arms_differ(frame: pl.DataFrame, sets: dict[str, list[str]]) -> None:
                 "difference of pure noise as a result about those features."
             )
         if dead:
-            print(f"  warning: {name} has {len(dead)}/{len(extra)} empty added columns: {dead[:4]}")
+            print(
+                f"  warning: {name} has {len(dead)}/{len(extra)} empty added columns: {dead[:4]}"
+            )
 
 
-def compare_feature_sets(frame: pl.DataFrame, sets: dict[str, list[str]], *, min_train: int = 3, head=None) -> dict:
+def compare_feature_sets(
+    frame: pl.DataFrame, sets: dict[str, list[str]], *, min_train: int = 3, head=None
+) -> dict:
     """A/B one head across named feature sets on ONE frame.
 
     The frame is fixed so the only thing varying is the feature list -- the
@@ -335,7 +345,9 @@ def sweep_blend_k(seasons: list[int], ks=(2.0, 4.0, 8.0, 12.0, 20.0)) -> dict:
     is still thin. That is the signature of a prior decaying too fast.
     """
     out = {}
-    print(f"{'k':>6} {'MAE':>7} {'Brier':>8} {'wk2-4':>7} {'wk5-8':>7} {'wk9-12':>7} {'wk13+':>7}")
+    print(
+        f"{'k':>6} {'MAE':>7} {'Brier':>8} {'wk2-4':>7} {'wk5-8':>7} {'wk9-12':>7} {'wk13+':>7}"
+    )
     for k in ks:
         frame = build_game_frame(seasons, enrich=True, blend_k=k, verbose=False)
         frame, diffs = diff_features(frame, paired_features(frame))
@@ -347,7 +359,9 @@ def sweep_blend_k(seasons: list[int], ks=(2.0, 4.0, 8.0, 12.0, 20.0)) -> dict:
             name=f"k={k}",
             min_train=3,
         )
-        d = oof.with_columns((pl.col("pred_margin") - pl.col("margin")).abs().alias("ae"))
+        d = oof.with_columns(
+            (pl.col("pred_margin") - pl.col("margin")).abs().alias("ae")
+        )
         buckets = []
         for lo, hi in ((2, 4), (5, 8), (9, 12), (13, 25)):
             s = d.filter(pl.col("week").is_between(lo, hi))
@@ -357,7 +371,10 @@ def sweep_blend_k(seasons: list[int], ks=(2.0, 4.0, 8.0, 12.0, 20.0)) -> dict:
             "brier": rep.wp["brier"],
             "by_week": buckets,
         }
-        print(f"{k:>6.1f} {rep.margin['mae']:>7.3f} {rep.wp['brier']:>8.4f} " + " ".join(f"{b:>7.2f}" for b in buckets))
+        print(
+            f"{k:>6.1f} {rep.margin['mae']:>7.3f} {rep.wp['brier']:>8.4f} "
+            + " ".join(f"{b:>7.2f}" for b in buckets)
+        )
     return out
 
 
@@ -445,7 +462,9 @@ def main(
             min_train=3,
         )
         print("gbm by week bucket (MAE):")
-        d = oof.with_columns((pl.col("pred_margin") - pl.col("margin")).abs().alias("ae"))
+        d = oof.with_columns(
+            (pl.col("pred_margin") - pl.col("margin")).abs().alias("ae")
+        )
         for lo, hi, lbl in (
             (2, 4, "2-4"),
             (5, 8, "5-8"),

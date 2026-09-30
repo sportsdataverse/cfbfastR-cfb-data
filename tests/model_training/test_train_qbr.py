@@ -96,7 +96,8 @@ def _record(model: Path, incumbent: Path, **over) -> dict:
 
 def test_check_gate_refuses_missing_failed_and_swapped_models(tmp_path):
     """Never loosen these checks to publish a model; a changed gate is a new PREREG."""
-    m, inc = _booster(tmp_path / "qbr.ubj"), _booster(tmp_path / "inc.ubj")
+    m, inc = _booster(tmp_path / "qbr.ubj"), tmp_path / "inc.ubj"
+    inc.write_bytes(b"the incumbent")  # _booster is seeded: a second one is the same bytes
     with pytest.raises(RuntimeError, match="no gate record"):
         T.check_gate(m, inc)
     rec = tmp_path / "qbr.gate.json"
@@ -115,6 +116,28 @@ def test_check_gate_refuses_missing_failed_and_swapped_models(tmp_path):
             T.check_gate(m, inc)
     rec.write_text(json.dumps(_record(m, inc)))
     assert T.check_gate(m, inc)["passed"] is True
+
+
+def test_check_gate_after_the_swap_reads_the_replaced_model_from_the_bundle(tmp_path):
+    """Once sdv-py ships the candidate, the installed bundle IS the candidate.
+
+    The model it beat is then named by the bundle's own gate record (sdv-py pins it in
+    test_qbr_model_gate), so publishing from either side of the lock bump works, and a
+    record gated against some other model is still refused.
+    """
+    m, old = _booster(tmp_path / "qbr.ubj"), tmp_path / "old.ubj"
+    old.write_bytes(b"the replaced model")
+    (tmp_path / "qbr.gate.json").write_text(json.dumps(_record(m, old)))
+    bundle = tmp_path / "site" / "qbr_model.ubj"
+    bundle.parent.mkdir()
+    bundle.write_bytes(m.read_bytes())
+    with pytest.raises(RuntimeError, match="other than the incumbent"):
+        T.check_gate(m, bundle)  # no shipped record: nothing says what it replaced
+    bundle.with_suffix(".gate.json").write_text(json.dumps(_record(m, old)))
+    assert T.check_gate(m, bundle)["passed"] is True
+    bundle.with_suffix(".gate.json").write_text(json.dumps(_record(m, old, incumbent_sha256="0" * 64)))
+    with pytest.raises(RuntimeError, match="other than the incumbent"):
+        T.check_gate(m, bundle)
 
 
 def _write_season(root: Path, season: int, games: list[int], rng) -> None:

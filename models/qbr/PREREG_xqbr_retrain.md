@@ -122,3 +122,9 @@ hook (game 401754593), labelled in-sample.
   H is not clean. Another retrain needs a new pre-registration with new training seasons
   and a new holdout, e.g. train through 2026 and hold out 2027 weeks 1–4. `TRAIN_SEASONS`
   and `HOLDOUT` are frozen constants for exactly that reason.
+- **H was not untouched before registration.** The incumbent's H numbers (§0) and the
+  linear baseline above were seen first, and they are part of why this retrain was run.
+  No candidate was fit on or tuned against H, but the decision to retrain was informed by
+  it. So the gate result is a pre-specified paired comparison on H, not independent
+  confirmation. The first confirmatory test of this model is the next pre-registered
+  holdout (e.g. 2027 weeks 1–4).

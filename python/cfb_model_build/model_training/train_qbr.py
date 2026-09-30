@@ -306,8 +306,15 @@ def check_gate(model_path, incumbent_path=None) -> dict:
         and h.get("match_rate", 0) >= MIN_MATCH_RATE
     ):
         raise RuntimeError(f"{model_path.name}: the record's numbers do not meet the gate; refusing")
-    if incumbent_path is not None and rec.get("incumbent_sha256") != sha256(incumbent_path):
-        raise RuntimeError(f"{model_path.name}: gated against a model other than the incumbent; refusing")
+    if incumbent_path is not None:
+        inc = sha256(incumbent_path)
+        if inc == rec["candidate_sha256"]:
+            # sdv-py already ships this model: its bundled record names the model it
+            # replaced (pinned by sdv-py's test_qbr_model_gate), so read the incumbent there
+            shipped = Path(incumbent_path).with_suffix(".gate.json")
+            inc = json.loads(shipped.read_text()).get("incumbent_sha256") if shipped.exists() else None
+        if rec.get("incumbent_sha256") != inc:
+            raise RuntimeError(f"{model_path.name}: gated against a model other than the incumbent; refusing")
     return rec
 
 

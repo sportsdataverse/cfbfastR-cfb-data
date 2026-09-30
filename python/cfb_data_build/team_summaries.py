@@ -734,19 +734,26 @@ def _havoc_and_expected_turnovers(team_off: pl.DataFrame) -> pl.DataFrame:
         .with_columns(
             havoc_EPAgame_off=per_game("havoc_epa", "off"),
             havoc_EPAgame_def=per_game("havoc_epa", "def"),
-            expected_turnover_margin=0.5
-            * (per_game("fumbles", "def") - per_game("fumbles", "off"))
-            + int_share * (per_game("defended", "def") - per_game("defended", "off")),
+            # expected giveaways (off) and takeaways (def) per game: half of each
+            # scrimmage fumble, INTs at the season's share of passes defensed
+            expected_turnovers_off=0.5 * per_game("fumbles", "off")
+            + int_share * per_game("defended", "off"),
+            expected_turnovers_def=0.5 * per_game("fumbles", "def")
+            + int_share * per_game("defended", "def"),
         )
         .with_columns(
             havoc_EPAgame_margin=pl.col("havoc_EPAgame_off")
-            - pl.col("havoc_EPAgame_def")
+            - pl.col("havoc_EPAgame_def"),
+            expected_turnover_margin=pl.col("expected_turnovers_def")
+            - pl.col("expected_turnovers_off"),
         )
         .select(
             "pos_team_id",
             "havoc_EPAgame_off",
             "havoc_EPAgame_def",
             "havoc_EPAgame_margin",
+            "expected_turnovers_off",
+            "expected_turnovers_def",
             "expected_turnover_margin",
         )
         .sort("pos_team_id")
@@ -755,10 +762,36 @@ def _havoc_and_expected_turnovers(team_off: pl.DataFrame) -> pl.DataFrame:
             havoc_EPAgame_off_rank=_rank("havoc_EPAgame_off", descending=True),
             havoc_EPAgame_def_rank=_rank("havoc_EPAgame_def", descending=False),
             havoc_EPAgame_margin_rank=_rank("havoc_EPAgame_margin", descending=True),
+            # fewer expected giveaways rank first on offense, more takeaways on defense
+            expected_turnovers_off_rank=_rank("expected_turnovers_off", descending=False),
+            expected_turnovers_def_rank=_rank("expected_turnovers_def", descending=True),
             expected_turnover_margin_rank=_rank(
                 "expected_turnover_margin", descending=True
             ),
         )
+    )
+
+
+def _add_turnover_luck(team_data: pl.DataFrame) -> pl.DataFrame:
+    """Turnover luck in points per game, per side and overall, with ranks.
+
+    The part of the turnover counts the team's fumbles and passes defensed did not
+    earn, scaled by ``_POINTS_PER_TURNOVER`` (the scale ``adv_turnover``'s
+    ``turnover_luck`` and GOP's glossary use). Positive = lucky on both sides: fewer
+    giveaways than expected (``_off``), more takeaways than expected (``_def``); the
+    two sum to ``turnover_luck`` = 5 x (``turnover_margin`` - expected margin).
+    """
+    return team_data.with_columns(
+        turnover_luck_off=_POINTS_PER_TURNOVER
+        * (pl.col("expected_turnovers_off") - pl.col("turnovers_off")),
+        turnover_luck_def=_POINTS_PER_TURNOVER
+        * (pl.col("turnovers_def") - pl.col("expected_turnovers_def")),
+        turnover_luck=_POINTS_PER_TURNOVER
+        * (pl.col("turnover_margin") - pl.col("expected_turnover_margin")),
+    ).with_columns(
+        turnover_luck_off_rank=_rank("turnover_luck_off", descending=True),
+        turnover_luck_def_rank=_rank("turnover_luck_def", descending=True),
+        turnover_luck_rank=_rank("turnover_luck", descending=True),
     )
 
 
@@ -1209,14 +1242,7 @@ def build_team_summaries(
         .join(pass_data, on="pos_team_id", how="left", suffix="_pass")
         .join(rush_data, on="pos_team_id", how="left", suffix="_rush")
         .join(_havoc_and_expected_turnovers(team_off), on="pos_team_id", how="left")
-        # the part of the turnover margin the team's fumbles and passes defensed did
-        # not earn, in points per game like adv_turnover's turnover_luck and GOP's
-        # glossary: (actual - expected) * _POINTS_PER_TURNOVER
-        .with_columns(
-            turnover_luck=_POINTS_PER_TURNOVER
-            * (pl.col("turnover_margin") - pl.col("expected_turnover_margin"))
-        )
-        .with_columns(turnover_luck_rank=_rank("turnover_luck", descending=True))
+        .pipe(_add_turnover_luck)
     )
 
     # leaderboards

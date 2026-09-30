@@ -12,13 +12,18 @@ from __future__ import annotations
 from pathlib import Path
 
 import polars as pl
-
+from cfb_data_build.team_summaries import (
+    _add_turnover_luck,
+    _havoc_and_expected_turnovers,
+)
 from cfb_model_build.cfb_higher_models.data import feature_columns
 from cfb_model_build.cfb_higher_models.train_game import (
     LEAN_FAMILIES,
     family_of,
     lean_features,
 )
+
+from tests.cfb_data_build.test_factor_extension_columns import _team_off
 from tests.cfb_data_build.test_five_factors_columns import _drives, _overall, _plays
 
 #: the team_summaries columns in the lean set. Adding one is a model change:
@@ -46,6 +51,12 @@ def _summary_columns() -> set[str]:
     """What the builder emits now, plus the newest published table's columns."""
     built = _plays()
     cols = set(feature_columns(_overall(built))) | set(feature_columns(_drives(built)))
+    # the whole-team extras built outside _summarize_team / _drives: havoc EPA, expected
+    # turnovers and turnover luck (the luck step also needs the actual counts)
+    extras = _havoc_and_expected_turnovers(_team_off()).with_columns(
+        turnovers_off=pl.lit(1.0), turnovers_def=pl.lit(1.0), turnover_margin=pl.lit(0.0)
+    )
+    cols |= set(feature_columns(_add_turnover_luck(extras)))
     newest = sorted(_PUBLISHED.glob("cfb_team_summaries_*.parquet"))[-1:]
     for path in newest:
         cols |= set(feature_columns(pl.DataFrame(schema=pl.read_parquet_schema(path))))

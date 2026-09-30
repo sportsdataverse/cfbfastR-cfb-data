@@ -161,7 +161,11 @@ _FACTOR_EXTENSIONS = {
     "havoc_EPAgame_off",
     "havoc_EPAgame_def",
     "havoc_EPAgame_margin",
+    "expected_turnovers_off",
+    "expected_turnovers_def",
     "expected_turnover_margin",
+    "turnover_luck_off",
+    "turnover_luck_def",
     "turnover_luck",
     "havoc_margin",
 }

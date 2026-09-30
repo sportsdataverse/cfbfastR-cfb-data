@@ -11,6 +11,7 @@ import polars as pl
 import pytest
 from cfb_data_build.team_summaries import (
     _MARGIN_BASES,
+    _add_turnover_luck,
     _clean_rank_columns,
     _field_position_ep,
     _havoc_and_expected_turnovers,
@@ -142,6 +143,13 @@ def test_havoc_epa_per_game_and_expected_turnover_margin():
     # survive: in the exploration, subtracting raw UInt32 counts wrapped it to ~4.3e9.
     assert a["expected_turnover_margin"] == pytest.approx(-1 / 6)
     assert b["expected_turnover_margin"] == pytest.approx(1 / 6)
+    # the two sides: A expects 0.5 * 1/2 fumbles + 1/3 * 2/2 defended passes = 7/12
+    # giveaways a game, and 0.5 * 1/2 + 1/3 * 1/2 = 5/12 takeaways; margin 5/12 - 7/12
+    assert a["expected_turnovers_off"] == pytest.approx(7 / 12)
+    assert a["expected_turnovers_def"] == pytest.approx(5 / 12)
+    assert b["expected_turnovers_off"] == pytest.approx(5 / 12)
+    assert (b["expected_turnovers_off_rank"], a["expected_turnovers_off_rank"]) == (1.0, 2.0)
+    assert (b["expected_turnovers_def_rank"], a["expected_turnovers_def_rank"]) == (1.0, 2.0)
     # less EPA lost to havoc ranks first on offense; more inflicted ranks first on defense
     assert (b["havoc_EPAgame_off_rank"], a["havoc_EPAgame_off_rank"]) == (1.0, 2.0)
     assert (b["havoc_EPAgame_def_rank"], a["havoc_EPAgame_def_rank"]) == (1.0, 2.0)
@@ -166,3 +174,29 @@ def test_havoc_margin_is_created_minus_allowed_whole_team_only():
     # a pass/rush split carries no turnovers, so it gets no whole-team margins
     split = whole.drop("turnovers_off", "turnovers_def")
     assert "havoc_margin" not in _mutate_summary_margins(split).columns
+
+
+def test_turnover_luck_per_side_sums_to_the_margin():
+    """Positive = lucky on both sides; off + def = 5 x (turnover_margin - expected margin)."""
+    t = pl.DataFrame(
+        {
+            "pos_team_id": ["X", "Y"],
+            "turnovers_off": [0.5, 1.5],
+            "turnovers_def": [2.0, 0.5],
+            "expected_turnovers_off": [1.0, 1.0],
+            "expected_turnovers_def": [1.2, 1.0],
+        }
+    ).with_columns(
+        turnover_margin=pl.col("turnovers_def") - pl.col("turnovers_off"),
+        expected_turnover_margin=pl.col("expected_turnovers_def")
+        - pl.col("expected_turnovers_off"),
+    )
+    out = _add_turnover_luck(t).sort("pos_team_id")
+    x, y = out.row(0, named=True), out.row(1, named=True)
+    # X: 0.5 fewer giveaways and 0.8 more takeaways than expected
+    assert x["turnover_luck_off"] == pytest.approx(2.5)
+    assert x["turnover_luck_def"] == pytest.approx(4.0)
+    assert x["turnover_luck"] == pytest.approx(6.5)
+    assert y["turnover_luck"] == pytest.approx(y["turnover_luck_off"] + y["turnover_luck_def"])
+    assert (x["turnover_luck_rank"], y["turnover_luck_rank"]) == (1.0, 2.0)
+    assert (x["turnover_luck_off_rank"], x["turnover_luck_def_rank"]) == (1.0, 1.0)

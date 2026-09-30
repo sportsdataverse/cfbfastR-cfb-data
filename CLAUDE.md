@@ -44,12 +44,12 @@ The native model suite moved here from `-raw` (2026-06-17). Run from `python/`:
 | `cpoe` | `python -m cfb_model_build.cpoe` | — |
 | `cfb_matchup` (scoring_opp + rush_expect glms, WEPA weights; feeds dataset stages 41/42) | `python -m cfb_model_build.cfb_matchup` | — |
 
-Cross-repo dependency: `.github/workflows/cfb_model_pipeline.yml` runs `cfbfastR-cfb-raw`'s
-QBR scraper (sparse checkout at `_raw`) for the ESPN-QBR reference. The step tries
-`python/espn_cfb_08_qbr_scrape.py` (the current numbered stage; the implementation lives in
-`python/cfb_raw_scrape/scrape_cfb_qbr.py`), falling back to the two legacy names
-(`espn_cfb_13_qbr_scrape.py`, top-level `scrape_cfb_qbr.py`) so any cfb-raw generation works.
-Drop the fallbacks once cfb-raw's numbering is stable.
+xQBR (`train-qbr`) trains on the **served** box score (`cfb/adv_passing`, sdv-py's
+`advBoxScore.pass`) against ESPN labels **committed** at `models/qbr/espn_qbr_labels.parquet`
+(refresh: `capture-qbr-labels --seasons ...`, a reviewed commit), and is gated against the
+bundled incumbent on a frozen holdout (`models/qbr/PREREG_xqbr_retrain.md`). No arm passing =
+exit 3 and no model; `cfb_model_publish` refuses a QBR model without a passing
+`<stem>.gate.json` for its exact sha256. It no longer reads `cfbfastR-cfb-raw`'s QBR scraper.
 
 Supporting packages: `cfb_data_ingest`, `cfb_model_pbp`, `cfb_model_publish`,
 `cfb_model_reports`. Figures: `uv sync --group figures` (plotnine). GAM tests (`rb_eval`):

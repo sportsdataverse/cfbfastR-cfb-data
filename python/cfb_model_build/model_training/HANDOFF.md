@@ -14,7 +14,12 @@ After Stage-2 training + the parity gate passes:
    assert report["within_tol"], report
    ```
 2. Copy under review (open a sdv-py PR; never auto-overwrite):
-   - `ep_model.ubj`, `wp_spread.ubj`, `qbr_model.ubj` -> `sportsdataverse/cfb/models/`
+   - `ep_model.ubj`, `wp_spread.ubj` -> `sportsdataverse/cfb/models/`
+   - xQBR is NOT validated by prediction parity (a retrain is supposed to differ). Copy
+     `qbr.ubj` -> `qbr_model.ubj` together with `qbr.gate.json` -> `qbr_model.gate.json` and the
+     card; sdv-py's test refuses a bundled `qbr_model.ubj` whose sha256 is not the passing
+     gate record's candidate. Commit the same `qbr.gate.json` + `qbr_partition.parquet` to
+     `models/qbr/` here.
 3. **WP-naive is new to sdv-py.** Also:
    - add `wp_naive.ubj` to `sportsdataverse/cfb/models/` and confirm the
      `[tool.setuptools.package-data]` glob (`cfb/models/*`) ships it;

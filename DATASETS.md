@@ -1835,3 +1835,28 @@ Semantics inherited from the source's FROZEN seasons (its in-flight season brief
 opponent-ELO rolls run over FBS-vs-FBS games only, so a team's FCS opener never counts and its
 week-2 row is null; a team's opener never reads its own game (the source's in-season rule
 did, for the first game only) and takes the prior season's full-season values instead.
+
+### cfb_team_opponent_splits
+
+One row per team-game: the opponent, EPA/play, success rate and points
+(`cfb_data_build.derived.build_team_opponent_splits`). A projection of this repo's
+`adv_team_gamelog`, left-joined to `adv_situational` on `(game_id, team_id)`. Every game is
+kept, FCS opponents and bowls included; "FBS only" is a consumer filter. Ids are Int64.
+
+| col_name | col_type | col_description |
+| --- | --- | --- |
+| season | integer | Season year (e.g. 2025). |
+| season_type | integer | ESPN season type: 2 regular, 3 postseason; 4 is an all-star game (e.g. East-West Shrine), 5 the 2020-21 spring games. |
+| week | integer | Week number; the postseason restarts at 1. |
+| game_id | integer | ESPN game id. |
+| team_id | integer | ESPN id of the team the row describes. |
+| opponent_id | integer | ESPN id of its opponent. |
+| opponent | character | Opponent display name. |
+| is_home | logical | The team was the listed home side. |
+| points_for | integer | The team's final score. |
+| points_against | integer | The opponent's final score. |
+| plays | integer | The team's EPA-scored offensive plays (`adv_team_gamelog.EPA_plays`). |
+| epa_per_play | double | Offensive EPA per play (`adv_team_gamelog.EPA_per_play`). |
+| success_rate | double | Offensive EPA success rate (`adv_situational.EPA_success_rate`); null when the game has no situational row for the team. |
+
+_Release tag: `cfb_team_opponent_splits`_

@@ -15,6 +15,7 @@ from cfb_data_build.config import REGISTRY
 # dataset. Adding one is an entry here plus its builder.
 #
 #   gamelog                  adv_team + schedule context, one row per team-GAME
+#   team_opponent_splits     gamelog + situational success rate, per team-GAME (after gamelog)
 #   ratings_weekly           cfb_ratings at each week's end, long format
 #   team_summaries_weekly    summaries at each week's end, long format
 #   matchup_features         per FBS team-game as-of matchup features (stage 41)
@@ -22,6 +23,7 @@ from cfb_data_build.config import REGISTRY
 #   rolling_windows          cfb_rolling_windows -- last-N-events form (sdv-py rolling_windows), stage 64
 DERIVED = (
     "gamelog",
+    "team_opponent_splits",
     "ratings_weekly",
     "team_summaries_weekly",
     "matchup_features",

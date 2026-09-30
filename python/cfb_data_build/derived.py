@@ -6,6 +6,9 @@ surface for every CFB dataset:
   gamelog                 ``espn_cfb_adv_team_gamelog`` -- adv_team plus the game
                           context it lacks (opponent, home/away, scores, result,
                           date). One row per team-GAME.
+  team_opponent_splits    ``cfb_team_opponent_splits`` -- the gamelog projected to
+                          opponent, points, EPA/play + adv_situational's success
+                          rate. One row per team-GAME; reads this run's gamelog.
   ratings_weekly          ``cfb_ratings_weekly`` -- cfb_ratings at each week's end.
   team_summaries_weekly   ``cfb_team_summaries_weekly`` -- summaries at each
                           week's end.
@@ -80,6 +83,9 @@ SPECS: dict[str, DatasetSpec] = {
     ),
     "rolling_windows": DatasetSpec(
         "rolling_windows", "rolling_windows", "cfb_rolling_windows"
+    ),
+    "team_opponent_splits": DatasetSpec(
+        "team_opponent_splits", "cfb_team_opponent_splits", "cfb_team_opponent_splits"
     ),
 }
 
@@ -438,6 +444,96 @@ def build_gamelog(
     return out.select(lead + rest)
 
 
+#: ``cfb_team_opponent_splits`` columns and dtypes; an empty season carries them too.
+TEAM_OPPONENT_SPLITS_SCHEMA: dict[str, pl.DataType] = {
+    "season": pl.Int64,
+    "season_type": pl.Int64,
+    "week": pl.Int64,
+    "game_id": pl.Int64,
+    "team_id": pl.Int64,
+    "opponent_id": pl.Int64,
+    "opponent": pl.Utf8,
+    "is_home": pl.Boolean,
+    "points_for": pl.Int64,
+    "points_against": pl.Int64,
+    "plays": pl.Int64,
+    "epa_per_play": pl.Float64,
+    "success_rate": pl.Float64,
+}
+
+
+def build_team_opponent_splits(season: int, *, base: str = "cfb") -> pl.DataFrame:
+    """One row per team-GAME: opponent, EPA/play, success rate and points.
+
+    A projection, not a new aggregation: ``adv_team_gamelog`` gives the game
+    context, points, ``EPA_per_play`` and ``EPA_plays``; ``adv_situational``
+    gives ``EPA_success_rate`` on the same ``(game_id, pos_team_id)`` grain.
+    Every game is kept -- FCS opponents and bowls included; "FBS only" is a
+    consumer filter. A left join, so a team-game with no situational row keeps
+    a null ``success_rate`` rather than disappearing. A missing situational
+    parquet raises (the season fails loudly) instead of publishing an all-null
+    column, and so does a game with no situational rows at all: that is a stale
+    ``adv_situational`` (its stage failed this run, leaving the last run's copy),
+    which would publish the newest games with null success rates.
+
+    The situational id column resolves the way :func:`build_gamelog` resolves
+    adv_team's: ``pos_team_id`` when present (``pos_team`` is then the name),
+    else the id itself in ``pos_team`` (older assets). Unlike there, the cast
+    is strict: an id that will not parse raises rather than nulling a join key.
+    """
+    root = Path(base)
+    gamelog = (
+        root / "adv_team_gamelog" / "parquet" / f"adv_team_gamelog_{season}.parquet"
+    )
+    if not gamelog.exists():
+        return pl.DataFrame(schema=TEAM_OPPONENT_SPLITS_SCHEMA)
+    gl = pl.read_parquet(gamelog).select(
+        *(
+            pl.col(c).cast(pl.Int64)
+            for c in (
+                "season",
+                "season_type",
+                "week",
+                "game_id",
+                "team_id",
+                "opponent_id",
+            )
+        ),
+        "opponent",
+        "is_home",
+        "points_for",
+        "points_against",
+        pl.col("EPA_plays").alias("plays"),
+        pl.col("EPA_per_play").alias("epa_per_play"),
+    )
+    sit = pl.read_parquet(
+        root / "adv_situational" / "parquet" / f"adv_situational_{season}.parquet"
+    )
+    id_col = "pos_team_id" if "pos_team_id" in sit.columns else "pos_team"
+    sit = sit.select(
+        pl.col("game_id").cast(pl.Int64),
+        pl.col(id_col).cast(pl.Int64).alias("team_id"),
+        pl.col("EPA_success_rate").alias("success_rate"),
+    )
+    for k in ("game_id", "team_id"):
+        assert gl.schema[k] == sit.schema[k] == pl.Int64, (
+            k,
+            gl.schema[k],
+            sit.schema[k],
+        )
+    stale = gl.join(sit, on="game_id", how="anti")["game_id"].n_unique()
+    if stale:
+        raise ValueError(
+            f"team_opponent_splits {season}: {stale} games have no situational "
+            f"rows (stale adv_situational?)"
+        )
+    return (
+        gl.join(sit, on=["game_id", "team_id"], how="left", validate="m:1")
+        .select(list(TEAM_OPPONENT_SPLITS_SCHEMA))
+        .cast(TEAM_OPPONENT_SPLITS_SCHEMA)
+    )
+
+
 def build_ratings_weekly(
     season: int, *, base: str = "cfb", today: dt.date | None = None
 ) -> pl.DataFrame:
@@ -657,6 +753,7 @@ BUILDERS = {
     "matchup_features": _build_matchup_features,
     "matchup_line": _build_matchup_line,
     "rolling_windows": build_rolling_windows,
+    "team_opponent_splits": build_team_opponent_splits,
 }
 
 

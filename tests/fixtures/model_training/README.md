@@ -17,3 +17,9 @@
   against. Identical to the copies committed at
   `sportsdataverse-py/sportsdataverse/cfb/models/*.card.json`. Do not regenerate: their whole
   value is being the un-rebuilt state.
+- `qbr_week_2024_w1_sample.json` — the first 3 items (plus envelope, `count` set to 3) of
+  a real ESPN core payload,
+  `seasons/2024/types/2/weeks/1/qbr/10000?limit=1000`, trimmed from
+  `cfbfastR-cfb-raw/tests/fixtures/qbr_endpoint_sample.json` (captured 2026-07-17). Game
+  ids 401628460 / 401632062 / 401643776, raw QBR 65.613 / 94.469 / 85.816. It pins
+  `qbr_labels.parse_week`.

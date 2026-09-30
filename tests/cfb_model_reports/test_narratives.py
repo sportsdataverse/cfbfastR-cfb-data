@@ -77,3 +77,25 @@ def test_model_blocks_name_algorithm_and_cv():
         assert "eave-one-season-out" in model or "LOSO" in model, f"{mt} model missing CV"
     assert "525 boosting rounds" in NARRATIVES["ep"].model
     assert "760 boosting rounds" in NARRATIVES["wp_spread"].model
+
+
+def test_qbr_narrative_numbers_come_from_the_committed_gate_record():
+    """Every holdout number in the xQBR prose is the gate record's, so a re-gated model
+    (a new record) fails here until the prose is rewritten -- no hand-typed drift."""
+    import json
+    from pathlib import Path
+
+    rec = json.loads((Path(__file__).resolve().parents[2] / "models" / "qbr" / "qbr.gate.json").read_text())
+    inc, arm = rec["arms"]["incumbent"], rec["arms"][rec["chosen"]]
+    text = NARRATIVES["qbr"].discussion
+    want = [
+        f"{rec['holdout']['holdout_matched']} quarterback-games in {arm['n_games']} games",
+        f"from {inc['rmse']:.2f} (previous model) to {arm['rmse']:.2f}",
+        f"from {inc['r']:.3f} to {arm['r']:.3f}",
+        f"{arm['delta_mse']:.1f}, 95% game-clustered bootstrap CI [{arm['ci_lo']:.1f}, {arm['ci_hi']:.1f}]",
+        f"from {inc['r_total_qbr']:.3f} to {arm['r_total_qbr']:.3f}",
+        f"scored {rec['arms']['spread']['rmse']:.2f}",
+    ]
+    for w in want:
+        assert w in text, w
+    assert rec["chosen"] == "no_spread" and "without it" in text

@@ -61,21 +61,22 @@ def _auc(y, p) -> float:
     return float((r[y == 1].sum() - npos * (npos + 1) / 2) / (npos * nneg))
 
 
-def loso_cv(df: pl.DataFrame, model_type: str, espn_qbr: pl.DataFrame | None = None, log=print) -> dict:
-    """Leave-one-season-out CV for ``model_type`` in {ep, wp, qbr}.
+def loso_cv(df: pl.DataFrame, model_type: str, log=print) -> dict:
+    """Leave-one-season-out CV for ``model_type`` in {ep, wp, fg, xpass, two_pt}.
+
+    QBR's out-of-fold frame is written by ``train-qbr`` itself (``train_qbr.loso_oof``):
+    it trains on the served box-score features, not on this play frame.
 
     Args:
         df: training frame (``pbp_full.parquet``); must carry ``add_winner`` columns
             for WP and ``season``.
-        model_type: ``"ep"`` | ``"wp"`` | ``"qbr"``.
-        espn_qbr: required for ``model_type == "qbr"`` — ESPN QBR reference with
-            ``game_id`` / ``passer_player_name`` / ``raw_qbr``.
+        model_type: ``"ep"`` | ``"wp"`` | ``"fg"`` | ``"xpass"`` | ``"two_pt"``.
         log: per-fold progress callback (default ``print``); pass ``lambda *_: None`` to silence.
 
     Returns:
         ``{"model": str, "pooled": {...}, "per_season": [...], "oof": pl.DataFrame}``.
         Pooled keys: EP ``mlogloss``/``accuracy``/``ep_cal_mae``; WP
-        ``logloss``/``brier``/``auc``/``weighted_cal_err``; QBR ``rmse``/``mae``/``r2``/``corr``.
+        ``logloss``/``brier``/``auc``/``weighted_cal_err``.
     """
     import xgboost as xgb
 
@@ -83,22 +84,18 @@ def loso_cv(df: pl.DataFrame, model_type: str, espn_qbr: pl.DataFrame | None = N
     from .features import (
         ep_matrix,
         fg_matrix,
-        qbr_matrix,
         two_pt_matrix,
         wp_matrix,
         xpass_matrix,
     )
     from .train_ep import train_ep
     from .train_fg import train_fg
-    from .train_qbr import train_qbr
     from .train_two_pt import train_two_pt
     from .train_wp import train_wp
     from .train_xpass import train_xpass
 
-    if model_type not in ("ep", "wp", "qbr", "fg", "xpass", "two_pt"):
-        raise ValueError(f"model_type must be ep|wp|qbr|fg|xpass|two_pt, got {model_type!r}")
-    if model_type == "qbr" and espn_qbr is None:
-        raise ValueError("model_type='qbr' requires espn_qbr reference")
+    if model_type not in ("ep", "wp", "fg", "xpass", "two_pt"):
+        raise ValueError(f"model_type must be ep|wp|fg|xpass|two_pt, got {model_type!r}")
     seasons = sorted(df["season"].unique().to_list())
     per_season: list[dict] = []
     frames: list[pl.DataFrame] = []
@@ -185,25 +182,6 @@ def loso_cv(df: pl.DataFrame, model_type: str, espn_qbr: pl.DataFrame | None = N
                 "auc": _auc(y, p),
             }
             frames.append(pl.DataFrame({"season": np.full(len(y), s), "made": y, "two_pt_pred": p}))
-        else:  # qbr
-            m = train_qbr(tr, espn_qbr)
-            X, _, keys = qbr_matrix(te, era_onehot=True)  # match era-aware shipped qbr_model
-            feat = pl.from_pandas(keys).hstack(pl.from_pandas(X))
-            j = feat.join(espn_qbr, on=["game_id", "passer_player_name"], how="inner").drop_nulls("raw_qbr")
-            if j.height == 0:
-                row = {"season": s, "n": 0, "rmse": None, "mae": None}
-                log(f"[qbr] fold {s}: no joined rows")
-                per_season.append(row)
-                continue
-            pj = m.predict(xgb.DMatrix(j.select(C.QBR_FEATURES).to_pandas()))
-            yj = j["raw_qbr"].to_numpy()
-            row = {
-                "season": s,
-                "n": int(len(yj)),
-                "rmse": float(np.sqrt(np.mean((pj - yj) ** 2))),
-                "mae": float(np.mean(np.abs(pj - yj))),
-            }
-            frames.append(pl.DataFrame({"season": np.full(len(yj), s), "y": yj, "qbr_pred": pj}))
         per_season.append(row)
         log(
             f"[{model_type}] fold {s}: "
@@ -246,14 +224,4 @@ def loso_cv(df: pl.DataFrame, model_type: str, espn_qbr: pl.DataFrame | None = N
         y = oof[_y_col].to_numpy().astype(int)
         p = oof[_pred_col].to_numpy()
         pooled = {"logloss": _bin_logloss(y, p), "brier": float(np.mean((p - y) ** 2)), "auc": _auc(y, p)}
-    elif model_type == "qbr" and oof.height:
-        y, pj = oof["y"].to_numpy(), oof["qbr_pred"].to_numpy()
-        ss_res, ss_tot = float(np.sum((y - pj) ** 2)), float(np.sum((y - y.mean()) ** 2))
-        pooled = {
-            "n": int(len(y)),
-            "rmse": float(np.sqrt(np.mean((pj - y) ** 2))),
-            "mae": float(np.mean(np.abs(pj - y))),
-            "r2": (1 - ss_res / ss_tot) if ss_tot else float("nan"),
-            "corr": float(np.corrcoef(pj, y)[0, 1]),
-        }
     return {"model": model_type, "pooled": pooled, "per_season": per_season, "oof": oof}

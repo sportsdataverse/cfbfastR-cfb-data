@@ -1,6 +1,6 @@
 """Feature contracts, column crosswalk, EP class mapping, and XGBoost params.
 
-The EP/WP/QBR feature lists are imported from sdv-py's model_vars at runtime so this
+The EP/WP feature lists are imported from sdv-py's model_vars at runtime so this
 module can NEVER drift from the shipped inference contract (a test asserts equality).
 """
 from __future__ import annotations
@@ -11,7 +11,6 @@ from sportsdataverse.cfb import model_vars as _mv
 EP_FEATURES: list[str] = list(_mv.ep_final_names)            # 8
 WP_SPREAD_FEATURES: list[str] = list(_mv.wp_final_names)     # 13
 WP_NAIVE_FEATURES: list[str] = [c for c in _mv.wp_final_names if c != "spread_time"]  # 12
-QBR_FEATURES: list[str] = list(_mv.qbr_vars)                 # 6
 EP_CLASS_TO_SCORE: dict[int, int] = dict(_mv.ep_class_to_score_mapping)
 # class order: 0 TD, 1 Opp_TD, 2 FG, 3 Opp_FG, 4 Safety, 5 Opp_Safety, 6 No_Score
 NEXT_SCORE_TO_LABEL: dict[str, int] = {

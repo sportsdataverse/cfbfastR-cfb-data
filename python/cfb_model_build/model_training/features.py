@@ -184,36 +184,3 @@ def two_pt_matrix(df: pl.DataFrame, *, era_onehot: bool = False):
     X = f.select(cols).to_pandas()
     y = (f["two_point_conv_result"] == "success").cast(pl.Int32).to_numpy()
     return X, y, None
-
-
-def qbr_matrix(df: pl.DataFrame, *, era_onehot: bool = False):
-    """Per-(passer, game) weighted means of the 6 qbr_vars (mirrors CFBPlayProcess __process_qbr).
-
-    `spread` is the posteam-perspective game spread. On final.json there is no flat `spread`
-    column, but `start.pos_team_spread` IS the posteam spread -> alias it when `spread` is absent.
-    Returns (X features, None, keys); the ESPN-QBR target is merged later in train_qbr.
-    With ``era_onehot`` the era0..era3 dummies are appended (QBR has no era today).
-    """
-    if "spread" not in df.columns and "start.pos_team_spread" in df.columns:
-        df = df.with_columns(spread=pl.col("start.pos_team_spread"))
-    g = (
-        df.filter(pl.col("passer_player_name").is_not_null())
-        .group_by(["game_id", "season", "passer_player_name"])
-        .agg(
-            qbr_epa=(pl.col("qbr_epa") * pl.col("weight")).sum() / pl.col("weight").sum(),
-            sack_epa=(pl.col("sack_epa") * pl.col("sack_weight")).sum() / pl.col("sack_weight").sum(),
-            pass_epa=(pl.col("pass_epa") * pl.col("pass_weight")).sum() / pl.col("pass_weight").sum(),
-            rush_epa=(pl.col("rush_epa") * pl.col("rush_weight")).sum() / pl.col("rush_weight").sum(),
-            pen_epa=(pl.col("pen_epa") * pl.col("pen_weight")).sum() / pl.col("pen_weight").sum(),
-            spread=pl.col("spread").first(),
-        )
-        .with_columns(pl.col(["sack_epa", "pass_epa", "rush_epa", "pen_epa"]).fill_null(0.0))
-    )
-    base = ["qbr_epa", "sack_epa", "pass_epa", "rush_epa", "pen_epa", "spread"]
-    if era_onehot:
-        g = g.with_columns(_era_onehot("season"))
-        X = g.select(base + C.ERA_ONEHOT_COLS).to_pandas()
-    else:
-        X = g.select(base).to_pandas()
-    keys = g.select(["game_id", "season", "passer_player_name"]).to_pandas()
-    return X, None, keys

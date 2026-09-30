@@ -6,7 +6,8 @@ shipped XGBoost params, on the authoritative frame.
 
 Keepers (from ``era_report.md`` — material out-of-fold gains only):
 
-  qbr_era.ubj              one-hot era, spread-backfilled frame   (LOSO RMSE 17.89 -> 17.42)
+  (qbr_era.ubj was fitted here too; the QBR model now trains on the served box score
+   via ``train-qbr`` -- see ``train_qbr.py``.)
   fg_era.ubj               one-hot era, canonical frame           (LOSO logloss 0.5258 -> 0.5240)
   fd_model_era.ubj         one-hot era (replaces ordinal), backfilled frame
                                                                   (1st-down cal-MAE 0.0035 -> 0.0027)
@@ -16,8 +17,7 @@ Keepers (from ``era_report.md`` — material out-of-fold gains only):
 Run::
 
     python -m cfb_model_build.model_training.era_artifacts --artifacts artifacts \
-        --backfilled artifacts/pbp_full_spreadfilled.parquet \
-        --espn-qbr ../../cfbfastR-cfb-raw/cfb/qbr/espn_qbr.parquet
+        --backfilled artifacts/pbp_full_spreadfilled.parquet
 """
 from __future__ import annotations
 
@@ -28,7 +28,7 @@ import polars as pl
 import xgboost as xgb
 
 from . import constants as C
-from .features import fg_matrix, qbr_matrix, wp_matrix
+from .features import fg_matrix, wp_matrix
 from .ingest import add_winner
 
 
@@ -42,16 +42,6 @@ def _save(model: xgb.Booster, path: Path, *, model_type: str, label: str, featur
     except Exception:  # noqa: BLE001 — card is best-effort
         pass
     print(f"  wrote {path.name} ({len(features)} feats: {', '.join(features)})")
-
-
-def fit_qbr_era(backfilled: pl.DataFrame, espn_qbr: pl.DataFrame, out: Path) -> None:
-    X, _, keys = qbr_matrix(backfilled, era_onehot=True)
-    j = pl.from_pandas(keys).hstack(pl.from_pandas(X)).join(
-        espn_qbr, on=["game_id", "passer_player_name"], how="inner").drop_nulls("raw_qbr")
-    feats = [c for c in j.columns if c not in ("game_id", "season", "passer_player_name", "raw_qbr")]
-    m = xgb.train(C.QBR_PARAMS, xgb.DMatrix(j.select(feats).to_pandas(), label=j["raw_qbr"].to_numpy()),
-                  num_boost_round=C.QBR_NROUNDS)
-    _save(m, out / "qbr_era.ubj", model_type="qbr_era", label="raw_qbr", features=feats)
 
 
 def fit_fg_era(canonical: pl.DataFrame, out: Path) -> None:
@@ -82,27 +72,21 @@ def main(argv=None) -> int:
     ap.add_argument("--artifacts", default="artifacts")
     ap.add_argument("--canonical", default="artifacts/pbp_full.parquet")
     ap.add_argument("--backfilled", default="artifacts/pbp_full_spreadfilled.parquet")
-    ap.add_argument("--espn-qbr", default="../../cfbfastR-cfb-raw/cfb/qbr/espn_qbr.parquet")
-    ap.add_argument("--only", default="", help="comma list: qbr,fg,fourth_down,wp_spread")
+    ap.add_argument("--only", default="", help="comma list: fg,fourth_down,wp_spread")
     args = ap.parse_args(argv)
     out = Path(args.artifacts)
-    targets = {t.strip() for t in args.only.split(",") if t.strip()} or {"qbr", "fg", "fourth_down", "wp_spread"}
+    targets = {t.strip() for t in args.only.split(",") if t.strip()} or {"fg", "fourth_down", "wp_spread"}
 
-    # Only qbr/fourth_down/wp_spread consume the backfilled frame; lazy-load it so
+    # Only fourth_down/wp_spread consume the backfilled frame; lazy-load it so
     # `--only fg` (which uses --canonical) doesn't require the backfill parquet.
     backfilled = (
         pl.read_parquet(args.backfilled)
-        if targets & {"qbr", "fourth_down", "wp_spread"}
+        if targets & {"fourth_down", "wp_spread"}
         else None
     )
     print("fitting side-by-side artifacts (no canonical overwrite):")
     if "fg" in targets:
         fit_fg_era(pl.read_parquet(args.canonical), out)
-    if "qbr" in targets:
-        espn = pl.read_parquet(args.espn_qbr).select(
-            pl.col("game_id").cast(pl.Int64), pl.col("passer_player_name"),
-            pl.col("raw_qbr").cast(pl.Float64, strict=False)).drop_nulls()
-        fit_qbr_era(backfilled, espn, out)
     if "fourth_down" in targets:
         fit_fd_era(backfilled, out)
     if "wp_spread" in targets:

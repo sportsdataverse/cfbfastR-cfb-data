@@ -11,4 +11,6 @@ def test_feature_lists_match_sdvpy_contract():
     assert C.EP_FEATURES == mv.ep_final_names
     assert C.WP_SPREAD_FEATURES == mv.wp_final_names
     assert C.WP_NAIVE_FEATURES == [c for c in mv.wp_final_names if c != "spread_time"]
-    assert C.QBR_FEATURES == mv.qbr_vars
+    # every column sdv-py scores xQBR with is a served column train-qbr reads
+    from cfb_model_build.model_training.train_qbr import SERVED
+    assert set(mv.qbr_vars) <= set(SERVED)

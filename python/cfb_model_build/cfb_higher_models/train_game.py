@@ -31,8 +31,8 @@ from .data import build_game_frame, diff_features, paired_features
 FAMILIES: dict[str, tuple[str, ...]] = {
     # Team-factor extensions (starting EP, havoc EPA, expected turnovers, luck).
     # Not lean, like the Five Factors below. First, so "havoc_EPAgame" is not filed
-    # under "efficiency" by its "EPAgame", and "start_ep" does not fall to "other".
-    "team_factors": ("start_ep", "havoc_EPAgame", "expected_turnover", "turnover_luck"),
+    # under "efficiency" by its "EPAgame", and "drive_start_ep" does not fall to "other".
+    "team_factors": ("drive_start_ep", "havoc_EPAgame", "expected_turnover", "turnover_luck"),
     # IF-2 Five Factors columns. Deliberately NOT lean: they enter a model only
     # through a reviewed change to LEAN_FAMILIES. First, so "explosive_margin"
     # is not filed under "explosive".

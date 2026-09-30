@@ -64,25 +64,35 @@ def _drive_plays() -> pl.DataFrame:
     )
 
 
-def test_start_ep_averages_drives_not_plays():
-    # the build relocates ranks (start_ep_rank_off -> start_ep_off_rank) right after
+def test_field_position_averages_drives_not_plays():
+    # the build relocates ranks (drive_start_ep_rank_off -> drive_start_ep_off_rank) right after
     out = _clean_rank_columns(_summarize_drives(_drive_plays())).sort("pos_team_id")
     one, two = out.row(0, named=True), out.row(1, named=True)
     per_drive = (
         _ep(25) + _ep(60)
     ) / 2  # starts at own 25 (75 to go) and own 60 (40 to go)
     per_play = (3 * _ep(25) + _ep(60)) / 4
-    assert one["start_ep_off"] == pytest.approx(per_drive)
-    assert one["start_ep_off"] != pytest.approx(per_play)
+    assert one["drive_start_ep_off"] == pytest.approx(per_drive)
+    assert one["drive_start_ep_off"] != pytest.approx(per_play)
     # a defense's start EP is its opponents' drive starts
-    assert one["start_ep_def"] == pytest.approx(_ep(20))
-    assert two["start_ep_off"] == pytest.approx(_ep(20))
-    assert two["start_ep_def"] == pytest.approx(per_drive)
-    assert one["start_ep_margin"] == pytest.approx(per_drive - _ep(20))
+    assert one["drive_start_ep_def"] == pytest.approx(_ep(20))
+    assert two["drive_start_ep_off"] == pytest.approx(_ep(20))
+    assert two["drive_start_ep_def"] == pytest.approx(per_drive)
+    assert one["drive_start_ep_margin"] == pytest.approx(per_drive - _ep(20))
     # the better start ranks first on offense, the worse start allowed first on defense
-    assert (one["start_ep_off_rank"], two["start_ep_off_rank"]) == (1.0, 2.0)
-    assert (one["start_ep_def_rank"], two["start_ep_def_rank"]) == (1.0, 2.0)
-    assert one["start_ep_margin_rank"] == 1.0
+    assert (one["drive_start_ep_off_rank"], two["drive_start_ep_off_rank"]) == (1.0, 2.0)
+    assert (one["drive_start_ep_def_rank"], two["drive_start_ep_def_rank"]) == (1.0, 2.0)
+    assert one["drive_start_ep_margin_rank"] == 1.0
+    # the same drives in yards: (75 + 40) / 2, not the per-play (3 * 75 + 40) / 4
+    assert one["start_position_off"] == pytest.approx(57.5)
+    assert one["start_position_off"] != pytest.approx(66.25)
+    assert one["start_position_off_n"] == 2 and two["start_position_off_n"] == 1
+    assert one["start_position_def"] == pytest.approx(80.0)
+    assert one["start_position_margin"] == pytest.approx(80.0 - 57.5)
+    # fewer yards to go ranks first on offense; more allowed ranks first on defense
+    assert (one["start_position_off_rank"], two["start_position_off_rank"]) == (1.0, 2.0)
+    assert (one["start_position_def_rank"], two["start_position_def_rank"]) == (1.0, 2.0)
+    assert one["start_position_margin_rank"] == 1.0
 
 
 # scrimmage snaps: (game, offense, defense, EPA, havoc, int, pass, pass breakup, fumble)

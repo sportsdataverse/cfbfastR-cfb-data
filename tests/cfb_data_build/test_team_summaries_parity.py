@@ -100,6 +100,13 @@ DIVERGENT_FROM_R = {
         "detmergame_rank",
     },
     "team_summaries": {
+        # per drive since 2026-09-29; R averages the drive start over plays
+        "start_position_off",
+        "start_position_def",
+        "start_position_margin",
+        "start_position_off_rank",
+        "start_position_def_rank",
+        "start_position_margin_rank",
         "valid_games",
         "adj_off_epa",
         "adj_def_epa",
@@ -148,9 +155,9 @@ _DRIVE_EFFICIENCY = {"pts_per_drive_off", "pts_per_drive_def", "pts_per_drive_ma
 #: Team-factor extensions (test_factor_extension_columns.py), Python-only: starting EP
 #: per drive, havoc EPA per game, expected turnover margin and turnover luck.
 _FACTOR_EXTENSIONS = {
-    "start_ep_off",
-    "start_ep_def",
-    "start_ep_margin",
+    "drive_start_ep_off",
+    "drive_start_ep_def",
+    "drive_start_ep_margin",
     "havoc_EPAgame_off",
     "havoc_EPAgame_def",
     "havoc_EPAgame_margin",

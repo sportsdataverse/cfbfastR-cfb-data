@@ -359,7 +359,6 @@ _TEAM_MEAN_SOURCES: dict[str, str] = {
     "third_down_distance": "third_down_distance",
     "late_down_success": "late_down_success",
     "early_down_EPA": "early_down_EPA",
-    "start_position": "drive_start_yards_to_goal",
     "nonExplosiveEpaPerPlay": "nonExplosiveEpa",
     "line_yards": "line_yards",
     "opportunity_rate": "opportunity_run",
@@ -404,7 +403,6 @@ def _summarize_team(
         third_down_distance=pl.col("third_down_distance").mean(),
         late_down_success=pl.col("late_down_success").mean(),
         early_down_EPA=pl.col("early_down_EPA").mean(),
-        start_position=pl.col("drive_start_yards_to_goal").mean(),
         nonExplosiveEpaPerPlay=pl.col("nonExplosiveEpa").mean(),
         line_yards=pl.col("line_yards").mean(),
         opportunity_rate=pl.col("opportunity_run").mean(),
@@ -458,9 +456,8 @@ def _summarize_team(
         red_zone_success_rank=_rank("red_zone_success", descending=not d),
         third_down_success_rank=_rank("third_down_success", descending=not d),
         late_down_success_rank=_rank("late_down_success", descending=not d),
-        # third_down_distance / start_position: asc -> rank(-x); off -> rank(x)
+        # third_down_distance: asc -> rank(-x); off -> rank(x)
         third_down_distance_rank=_rank("third_down_distance", descending=d),
-        start_position_rank=_rank("start_position", descending=d),
         # havoc: asc -> rank(-x); off -> rank(x)
         havoc_rank=_rank("havoc", descending=d),
         # turnovers: fewer giveaways (off) / more takeaways (def) rank first
@@ -501,14 +498,6 @@ def _mutate_summary_margins(df: pl.DataFrame) -> pl.DataFrame:
             for _, m in _MARGIN_BASES
         ]
     )
-    if "start_position_off" in df.columns:
-        out = out.with_columns(
-            start_position_margin=(100 - pl.col("start_position_off"))
-            - (100 - pl.col("start_position_def"))
-        )
-        out = out.with_columns(
-            start_position_margin_rank=_rank("start_position_margin", descending=True)
-        )
     # Five Factors margins: whole-team table only (the pass/rush splits drop
     # turnovers, so they skip this)
     if "turnovers_off" in df.columns:
@@ -607,9 +596,18 @@ def _drives(plays: pl.DataFrame, group: str, *, ascending: bool) -> pl.DataFrame
         pts_per_opp_n=pl.col("scoring_opp").sum().cast(pl.Int64),
         drive_points=pl.col("points").filter(pl.col("owned") == True).sum(),  # noqa: E712
         pts_per_drive_n=pl.col("owned").sum().cast(pl.Int64),
-        # averaged per DRIVE, unlike start_position (which averages the drive start
-        # over plays, so a long drive counts once per snap)
-        start_ep=pl.col("ep").filter(pl.col("owned") == True).mean(),
+        # field position is averaged per DRIVE over the owner's drives, in yards and in
+        # points from the same drives. (Until 2026-09-29 start_position was a mean over
+        # PLAYS, so a long drive counted once per snap.)
+        start_position=pl.col("total_available_yards")
+        .filter(pl.col("owned") == True)
+        .mean(),
+        start_position_n=(
+            (pl.col("owned") == True) & pl.col("total_available_yards").is_not_null()
+        )
+        .sum()
+        .cast(pl.Int64),
+        drive_start_ep=pl.col("ep").filter(pl.col("owned") == True).mean(),
     )
     agg = (
         agg.with_columns(
@@ -632,8 +630,10 @@ def _drives(plays: pl.DataFrame, group: str, *, ascending: bool) -> pl.DataFrame
         # more points per trip is better on offense, fewer allowed on defense
         pts_per_opp_rank=_rank_known("pts_per_opp", descending=not ascending),
         pts_per_drive_rank=_rank_known("pts_per_drive", descending=not ascending),
-        # a better start is worth more on offense, less allowed on defense
-        start_ep_rank=_rank_known("start_ep", descending=not ascending),
+        # a better start is worth more on offense, less allowed on defense: fewer
+        # yards to go ranks first on offense, more yards to go allowed on defense
+        start_position_rank=_rank("start_position", descending=ascending),
+        drive_start_ep_rank=_rank_known("drive_start_ep", descending=not ascending),
     )
 
 
@@ -660,7 +660,10 @@ def _summarize_drives(plays: pl.DataFrame) -> pl.DataFrame:
             pts_per_opp_margin=pl.col("pts_per_opp_off") - pl.col("pts_per_opp_def"),
             pts_per_drive_margin=pl.col("pts_per_drive_off")
             - pl.col("pts_per_drive_def"),
-            start_ep_margin=pl.col("start_ep_off") - pl.col("start_ep_def"),
+            drive_start_ep_margin=pl.col("drive_start_ep_off") - pl.col("drive_start_ep_def"),
+            # (100 - off) - (100 - def): positive when the team starts closer to goal
+            start_position_margin=pl.col("start_position_def")
+            - pl.col("start_position_off"),
         )
         .with_columns(
             total_available_yards_margin_rank=_rank(
@@ -676,7 +679,8 @@ def _summarize_drives(plays: pl.DataFrame) -> pl.DataFrame:
             pts_per_drive_margin_rank=_rank_known(
                 "pts_per_drive_margin", descending=True
             ),
-            start_ep_margin_rank=_rank_known("start_ep_margin", descending=True),
+            drive_start_ep_margin_rank=_rank_known("drive_start_ep_margin", descending=True),
+            start_position_margin_rank=_rank("start_position_margin", descending=True),
         )
     )
 
@@ -1136,11 +1140,9 @@ def build_team_summaries(
         off.join(def_, left_on="pos_team_id", right_on="def_pos_team_id", how="left")
     )
 
-    # field position and turnovers are whole-team figures: no pass/rush split
+    # turnovers are a whole-team figure: no pass/rush split (field position is one
+    # too, and comes from _drives per drive, so the splits never build it)
     rc = (
-        "start_position",
-        "start_position_rank",
-        "start_position_n",
         "turnovers",
         "turnovers_rank",
         "turnovers_n",

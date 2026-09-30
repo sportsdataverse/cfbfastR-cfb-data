@@ -119,13 +119,9 @@ def main(argv=None) -> int:
         print(f"labels: {df.height} rows -> {args.out or LABELS_PATH}")
     elif args.cmd == "train-qbr":
         from .qbr_labels import LABELS_PATH
-        from .train_qbr import train_qbr
+        from .train_qbr import bundled_qbr_model, train_qbr
 
-        incumbent = args.incumbent
-        if incumbent is None:
-            import sportsdataverse
-
-            incumbent = Path(sportsdataverse.__file__).parent / "cfb" / "models" / "qbr_model.ubj"
+        incumbent = args.incumbent or bundled_qbr_model()
         return train_qbr(args.data_dir, args.labels or LABELS_PATH, incumbent, args.out)
     elif args.cmd in (
         "train-ep",

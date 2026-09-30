@@ -40,12 +40,28 @@ def test_plan_uploads_refuses_a_qbr_model_without_a_passing_gate(tmp_path):
     (tmp_path / "qbr.json").write_text(json.dumps({"model_type": "qbr"}))
     with pytest.raises(RuntimeError, match="no gate record"):
         plan_uploads(tmp_path)
-    gate = {"passed": True, "candidate_sha256": sha256(tmp_path / "qbr.ubj")}
+    from cfb_model_build.model_training import train_qbr as T
+
+    gate = {
+        "passed": True,
+        "candidate_sha256": sha256(tmp_path / "qbr.ubj"),
+        "incumbent_sha256": sha256(T.bundled_qbr_model()),
+        "chosen": "no_spread",
+        "arms": {"no_spread": {"ci_hi": -1.0, "n": T.MIN_HOLDOUT}},
+        "holdout": {**T.HOLDOUT, "weeks": list(T.HOLDOUT["weeks"]), "match_rate": 1.0},
+    }
     (tmp_path / "qbr.gate.json").write_text(json.dumps(gate))
     assert {p.name for p in plan_uploads(tmp_path)} == {"qbr.ubj", "qbr.json", "qbr.gate.json"}
     (tmp_path / "qbr.ubj").write_bytes(b"a different model")
     with pytest.raises(RuntimeError, match="sha256"):
         plan_uploads(tmp_path)
+    # a card without model_type falls back to the file stem ("qbr_model"): still gated
+    other = tmp_path / "bundle"
+    other.mkdir()
+    (other / "qbr_model.ubj").write_bytes(b"model bytes")
+    (other / "qbr_model.json").write_text(json.dumps({}))
+    with pytest.raises(RuntimeError, match="no gate record"):
+        plan_uploads(other)
 
 
 def _boom(*_a, **_k):

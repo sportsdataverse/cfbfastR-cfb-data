@@ -58,11 +58,19 @@ def sha256(path) -> str:
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
-def served_features(data_dir, seasons) -> pl.DataFrame:
+def bundled_qbr_model() -> Path:
+    """The model serving uses today: the installed sdv-py bundle, i.e. the incumbent."""
+    import sportsdataverse
+
+    return Path(sportsdataverse.__file__).parent / "cfb" / "models" / "qbr_model.ubj"
+
+
+def served_features(data_dir, seasons) -> tuple[pl.DataFrame, dict]:
     """Published ``adv_passing`` rows for ``seasons`` + the passer's ESPN athlete id.
 
     The id is the per-(game, team, name) mode of pbp ``passer_player_id``; a row whose id
     repeats within its game (two name spellings, one athlete) is dropped as ambiguous.
+    Both drops are counted in the returned stats (they land in the gate record).
     """
     key = ["game_id", "pos_team_id", "passer_player_name"]
     out = []
@@ -89,8 +97,15 @@ def served_features(data_dir, seasons) -> pl.DataFrame:
         for k in key:
             assert adv.schema[k] == ids.schema[k], (s, k, adv.schema[k], ids.schema[k])
         out.append(adv.join(ids, on=key, how="left"))
-    df = pl.concat(out, how="vertical_relaxed").drop_nulls("athlete_id")
-    return df.filter(~pl.struct("game_id", "athlete_id").is_duplicated())
+    df = pl.concat(out, how="vertical_relaxed")
+    with_id = df.drop_nulls("athlete_id")
+    kept = with_id.filter(~pl.struct("game_id", "athlete_id").is_duplicated())
+    stats = {
+        "adv_rows": df.height,
+        "no_athlete_id": df.height - with_id.height,
+        "ambiguous_dropped": with_id.height - kept.height,
+    }
+    return kept, stats
 
 
 def labelled(features: pl.DataFrame, labels: pl.DataFrame) -> tuple[pl.DataFrame, dict]:
@@ -126,10 +141,17 @@ def labelled(features: pl.DataFrame, labels: pl.DataFrame) -> tuple[pl.DataFrame
         & pl.col("QBR").is_not_null()
     ).height
     n_h = j.filter(pl.col("split") == "holdout").height
+    # reported, not gated: early seasons join worse (ESPN spellings, missing pbp ids)
+    lab_n = labels.filter(pl.col("season").is_in(TRAIN_SEASONS) & pl.col("QBR").is_not_null()).group_by("season").len()
+    got_n = j.filter(pl.col("split") == "train").group_by("season").len()
+    by_season = lab_n.join(got_n, on="season", how="left", suffix="_matched").sort("season")
     return j, {
         "holdout_labels": n_h_labels,
         "holdout_matched": n_h,
         "match_rate": n_h / max(n_h_labels, 1),
+        "train_match_rate_by_season": {
+            str(r["season"]): round((r["len_matched"] or 0) / r["len"], 4) for r in by_season.to_dicts()
+        },
     }
 
 
@@ -202,13 +224,17 @@ def evaluate(
     assert set(train["season"].unique()).isdisjoint(set(hold["season"].unique())), (
         "train/holdout share a season"
     )
+    if hold.height < MIN_HOLDOUT or join_stats["match_rate"] < MIN_MATCH_RATE:
+        # below the pre-registered floor nothing is scored and nothing can pass (an
+        # empty holdout would otherwise crash before the record is written)
+        failed = {"passed": False, "n": hold.height, "below_floor": True}
+        return {"incumbent": {"n": hold.height}, **{a: dict(failed) for a in ARMS}}, {}
     y, tot, games = (
         hold["QBR"].to_numpy(),
         hold["TQBR"].to_numpy(),
         hold["game_id"].to_numpy(),
     )
     p_inc = predict(incumbent, hold)
-    sized = hold.height >= MIN_HOLDOUT and join_stats["match_rate"] >= MIN_MATCH_RATE
     # When the published exp_qbr was scored by this incumbent, a ~0 gap proves the frame IS
     # the served input. After a model swap it measures the swap instead: reported, not asserted.
     gap = np.abs(p_inc - hold["exp_qbr"].to_numpy().astype(float))
@@ -226,7 +252,7 @@ def evaluate(
         results[arm] = {
             **_fit_stats(y, p, tot),
             **g,
-            "passed": bool(sized and g["ci_hi"] < 0),
+            "passed": bool(g["ci_hi"] < 0),
         }
     return results, models
 
@@ -245,12 +271,15 @@ def loso_oof(train: pl.DataFrame, features: list[str]) -> pl.DataFrame:
     return pl.concat(out)
 
 
-def check_gate(model_path) -> dict:
+def check_gate(model_path, incumbent_path=None) -> dict:
     """Refuse a QBR model without a passing gate record for exactly these bytes.
 
     The record is ``<stem>.gate.json`` beside the model. Imported by the artifact
     publisher -- a gate re-implemented at the call site is how a doc once passed a frame
-    the publisher refused.
+    the publisher refused. The record's own ``passed`` flag is not trusted: the pass
+    condition is re-derived from its numbers against the frozen constants, and with
+    ``incumbent_path`` the model it beat must be that incumbent (else a record gated
+    against a hand-picked weak model would pass).
     """
     model_path = Path(model_path)
     rec_path = model_path.with_suffix(".gate.json")
@@ -267,7 +296,25 @@ def check_gate(model_path) -> dict:
         raise RuntimeError(
             f"{model_path.name}: sha256 differs from the gated candidate; refusing"
         )
+    h, arm = rec.get("holdout", {}), rec.get("arms", {}).get(rec.get("chosen"), {})
+    frozen = {**HOLDOUT, "weeks": list(HOLDOUT["weeks"])}
+    if {k: h.get(k) for k in frozen} != frozen:
+        raise RuntimeError(f"{model_path.name}: gated on a holdout other than the frozen one; refusing")
+    if not (
+        arm.get("ci_hi", 0) < 0
+        and arm.get("n", 0) >= MIN_HOLDOUT
+        and h.get("match_rate", 0) >= MIN_MATCH_RATE
+    ):
+        raise RuntimeError(f"{model_path.name}: the record's numbers do not meet the gate; refusing")
+    if incumbent_path is not None and rec.get("incumbent_sha256") != sha256(incumbent_path):
+        raise RuntimeError(f"{model_path.name}: gated against a model other than the incumbent; refusing")
     return rec
+
+
+def _versions() -> dict:
+    from importlib.metadata import version
+
+    return {"xgboost": xgb.__version__, "polars": pl.__version__, "sportsdataverse": version("sportsdataverse")}
 
 
 def train_qbr(data_dir, labels_path, incumbent_path, out) -> int:
@@ -285,7 +332,7 @@ def train_qbr(data_dir, labels_path, incumbent_path, out) -> int:
     for stale in (out, out.with_suffix(".json"), out.parent / "qbr_partition.parquet", out.parent / "loso_qbr_oof.parquet"):
         stale.unlink(missing_ok=True)
     labels = load_labels(labels_path)
-    feats = served_features(data_dir, [*TRAIN_SEASONS, HOLDOUT["season"]])
+    feats, feat_stats = served_features(data_dir, [*TRAIN_SEASONS, HOLDOUT["season"]])
     frame, join_stats = labelled(feats, labels)
     incumbent = xgb.Booster()
     incumbent.load_model(str(incumbent_path))
@@ -297,6 +344,7 @@ def train_qbr(data_dir, labels_path, incumbent_path, out) -> int:
         "holdout": {**HOLDOUT, "weeks": list(HOLDOUT["weeks"]), **join_stats},
         "train_seasons": [TRAIN_SEASONS[0], TRAIN_SEASONS[-1]],
         "n_train": frame.filter(pl.col("split") == "train").height,
+        "join": feat_stats,
         "gate": f"95% game-clustered bootstrap upper bound of mean(SE_arm - SE_incumbent) < 0 (B={N_BOOT}, seed={SEED})",
         "spread_cost_tolerance_rmse": SPREAD_COST_TOLERANCE,
         "labels_sha256": sha256(labels_path),
@@ -308,6 +356,7 @@ def train_qbr(data_dir, labels_path, incumbent_path, out) -> int:
             for s in [*TRAIN_SEASONS, HOLDOUT["season"]]
         },
         "incumbent_sha256": sha256(incumbent_path),
+        "versions": _versions(),
         "arms": results,
         "chosen": chosen,
         "passed": chosen is not None,
@@ -321,7 +370,7 @@ def train_qbr(data_dir, labels_path, incumbent_path, out) -> int:
         write_xgb_model_card(
             out,
             model_type="qbr",
-            label="espn_raw_qbr",
+            label="qbr",
             model=model,
             hyperparams=C.QBR_PARAMS,
             n_rows=train.height,
@@ -339,13 +388,6 @@ def train_qbr(data_dir, labels_path, incumbent_path, out) -> int:
         loso_oof(train, ARMS[chosen]).write_parquet(out.parent / "loso_qbr_oof.parquet")
     out.with_suffix(".gate.json").write_text(json.dumps(record, indent=2) + "\n")
     for arm, r in results.items():
-        extra = (
-            f" delta_mse {r['delta_mse']:+.2f} [{r['ci_lo']:+.2f}, {r['ci_hi']:+.2f}] passed={r['passed']}"
-            if arm != "incumbent"
-            else ""
-        )
-        print(
-            f"[qbr] {arm:10s} rmse {r['rmse']:.3f} mae {r['mae']:.3f} r {r['r']:.4f}{extra}"
-        )
+        print(f"[qbr] {arm:10s} " + " ".join(f"{k}={v:.3f}" if isinstance(v, float) else f"{k}={v}" for k, v in r.items()))
     print(f"[qbr] chosen: {chosen}")
     return 0 if chosen is not None else GATE_EXIT

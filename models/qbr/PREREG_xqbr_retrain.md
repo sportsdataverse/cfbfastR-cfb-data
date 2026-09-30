@@ -98,3 +98,27 @@ For each arm on H: RMSE, MAE, r and bias against raw QBR, and r against Total QB
 (`TQBR`). For the shipped arm: leave-one-season-out out-of-fold predictions on
 2004–2025. Also the spread effect at identical pbp, and the 2025 Duke / Darian Mensah
 hook (game 401754593), labelled in-sample.
+
+## 7. Addendum, 2026-09-30, after scoring (model review), not part of the registration
+
+- **Scored on H before registration, and not stated above.** The probe that led to this
+  retrain (`/mnt/sdv_repos/tmp/xqbr-probe/quality_report.txt`) also scored a linear
+  baseline, `50.70 + 59.91 * qbr_epa` fit on 2024. On the H QB-games with at least 14
+  dropbacks it had RMSE 13.14, against the incumbent's 13.66 on the same rows. No arm
+  was changed because of it, and it is not a gate arm.
+- **Join losses (review I3).** 379 feature rows over 2004–2026 were dropped as ambiguous:
+  one athlete under two box-score name spellings in a game. 9 of the 550 H labels did not
+  join. Five of those are starters split across spellings, e.g. "Noah Kim" / "N. Kim".
+  Four are a single athlete with no pbp passer id. The early seasons join worse. The
+  counts are now written into the gate record (`join`,
+  `holdout.train_match_rate_by_season`). The spelling split is a serving bug in sdv-py
+  `create_box_score`, which groups passers by name; it is reported separately. The paired
+  comparison is unaffected, but H's RMSE leaves out the rows serving scores worst.
+- **Re-run.** `train-qbr` was re-run after review to add those diagnostics. The chosen arm,
+  every holdout metric and the candidate sha256 must be unchanged, and a changed sha256
+  would void the record. The re-run's record replaces the first one, and the registry
+  notes it.
+- **H is now spent for selection.** It chose between two arms, so a later gate on the same
+  H is not clean. Another retrain needs a new pre-registration with new training seasons
+  and a new holdout, e.g. train through 2026 and hold out 2027 weeks 1–4. `TRAIN_SEASONS`
+  and `HOLDOUT` are frozen constants for exactly that reason.

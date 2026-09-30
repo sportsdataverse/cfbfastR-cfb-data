@@ -78,7 +78,8 @@ jobs:
         # "Commit reports" step to push the regenerated reports back to this repo.
 
       # The enriched per-game finals live in cfbfastR-cfb-raw. Sparse-checkout only
-      # the final/ tree + python/ (the trainers read final.json via --final-dir).
+      # the final/ tree (the trainers read final.json via --final-dir). python/ is no
+      # longer needed: xQBR's labels are committed here, not scraped by cfb-raw.
       - name: Sparse-checkout cfb-raw finals
         uses: actions/checkout@v5
         with:
@@ -86,7 +87,6 @@ jobs:
           path: _raw
           sparse-checkout: |
             cfb/json/final
-            python
           sparse-checkout-cone-mode: true
           persist-credentials: false   # don't leave external-repo creds on the runner
 
@@ -117,29 +117,18 @@ jobs:
         run: |
           uv run python -m cfb_model_build.model_training train-ep --pbp artifacts/pbp_full.parquet --out artifacts/ep.ubj
           uv run python -m cfb_model_build.model_training train-wp --pbp artifacts/pbp_full.parquet --variant spread --out artifacts/wp_spread.ubj
-          # QBR needs the ESPN-QBR reference; scrape it into the raw checkout first.
-          # Cross-repo dependency: the QBR scraper lives in cfbfastR-cfb-raw
-          # (checked out sparse at _raw above). cfb-raw is renaming its ESPN scrapers
-          # to numbered stages (python/espn_cfb_NN_<name>_scrape.py). Reader-side-first:
-          # accept BOTH names HERE, before the writer-side rename lands, so no merge
-          # order breaks this step. Prefer the new numbered path; fall back to legacy.
-          # REMOVE the fallback (and this note) once cfb-raw's main no longer ships
-          # python/scrape_cfb_qbr.py.
-          QBR_SCRAPER="$GITHUB_WORKSPACE/_raw/python/espn_cfb_08_qbr_scrape.py"
-          [ -f "$QBR_SCRAPER" ] || QBR_SCRAPER="$GITHUB_WORKSPACE/_raw/python/espn_cfb_13_qbr_scrape.py"
-          [ -f "$QBR_SCRAPER" ] || QBR_SCRAPER="$GITHUB_WORKSPACE/_raw/python/scrape_cfb_qbr.py"
-          # If NEITHER name is present the cause is upstream (a path change, or a
-          # sparse-checkout that stopped fetching python/) -- not a scrape failure.
-          # Running the missing path anyway and swallowing it with `|| true` buries
-          # that under a "can't open file" line, so say it plainly instead. QBR stays
-          # non-fatal either way: the train step below is already gated on the parquet.
-          if [ -f "$QBR_SCRAPER" ]; then
-            uv run python "$QBR_SCRAPER" -s 2004 -e "$(date +%Y)" --out artifacts/espn_qbr.parquet || true
-          else
-            echo "::warning ::no qbr scraper in _raw (looked for espn_cfb_08_qbr_scrape.py, espn_cfb_13_qbr_scrape.py and scrape_cfb_qbr.py); skipping QBR"
+          # xQBR trains on the served box score (../cfb/adv_passing) against the COMMITTED
+          # ESPN labels (models/qbr/espn_qbr_labels.parquet; refresh them with
+          # `capture-qbr-labels`, a reviewed commit). It is gated against the bundled
+          # incumbent: exit 3 means no arm beat it, so nothing is written and the
+          # incumbent stays -- a warning, not a failed pipeline. Any other code fails.
+          rc=0
+          uv run python -m cfb_model_build.model_training train-qbr --data-dir ../cfb --out artifacts/qbr.ubj || rc=$?
+          if [ "$rc" -eq 3 ]; then
+            echo "::warning ::xQBR: no arm beat the incumbent on the frozen holdout; nothing to publish (see artifacts/qbr.gate.json)"
+          elif [ "$rc" -ne 0 ]; then
+            exit "$rc"
           fi
-          if [ -f artifacts/espn_qbr.parquet ]; then \
-            uv run python -m cfb_model_build.model_training train-qbr --pbp artifacts/pbp_full.parquet --espn-qbr artifacts/espn_qbr.parquet --out artifacts/qbr.ubj; fi
 
       - name: Train fourth-down
         if: ${{ github.event_name == 'schedule' || !inputs.stages || contains(inputs.stages, 'fd') }}
@@ -175,13 +164,12 @@ jobs:
 
       # ---- out-of-fold predictions feed the report calibration metrics ----
       # cfb_model_reports reads these loso_*_oof.parquet files out of --artifacts.
-      - name: LOSO out-of-fold predictions (EP / WP / QBR)
+      - name: LOSO out-of-fold predictions (EP / WP)
         if: ${{ github.event_name == 'schedule' || !inputs.stages || contains(inputs.stages, 'loso') }}
         run: |
           uv run python -m cfb_model_build.model_training loso --pbp artifacts/pbp_full.parquet --model ep --oof-out artifacts/loso_ep_oof.parquet
           uv run python -m cfb_model_build.model_training loso --pbp artifacts/pbp_full.parquet --model wp --oof-out artifacts/loso_wp_oof.parquet
-          if [ -f artifacts/espn_qbr.parquet ]; then \
-            uv run python -m cfb_model_build.model_training loso --pbp artifacts/pbp_full.parquet --model qbr --espn-qbr artifacts/espn_qbr.parquet --oof-out artifacts/loso_qbr_oof.parquet; fi
+          # QBR's out-of-fold frame is written by train-qbr itself (served features).
 
       # ---- scored model play-by-play ----
       - name: Build scored model-PBP

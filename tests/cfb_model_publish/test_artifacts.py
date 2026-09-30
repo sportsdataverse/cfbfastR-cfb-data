@@ -30,6 +30,24 @@ def test_plan_uploads_lists_models_and_cards(tmp_path):
     assert files == {"ep.ubj", "ep.json", "xrepa_final.pkl", "xrepa_final.json"}
 
 
+def test_plan_uploads_refuses_a_qbr_model_without_a_passing_gate(tmp_path):
+    """A QBR model publishes only beside a passing gate record for its exact bytes."""
+    import pytest
+
+    from cfb_model_build.model_training.train_qbr import sha256
+
+    (tmp_path / "qbr.ubj").write_bytes(b"model bytes")
+    (tmp_path / "qbr.json").write_text(json.dumps({"model_type": "qbr"}))
+    with pytest.raises(RuntimeError, match="no gate record"):
+        plan_uploads(tmp_path)
+    gate = {"passed": True, "candidate_sha256": sha256(tmp_path / "qbr.ubj")}
+    (tmp_path / "qbr.gate.json").write_text(json.dumps(gate))
+    assert {p.name for p in plan_uploads(tmp_path)} == {"qbr.ubj", "qbr.json", "qbr.gate.json"}
+    (tmp_path / "qbr.ubj").write_bytes(b"a different model")
+    with pytest.raises(RuntimeError, match="sha256"):
+        plan_uploads(tmp_path)
+
+
 def _boom(*_a, **_k):
     raise AssertionError("should not be called")
 

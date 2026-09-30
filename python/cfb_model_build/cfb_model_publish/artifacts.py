@@ -95,10 +95,20 @@ _PRODUCER = "python/cfb_model_build/cfb_model_publish/artifacts.py"
 
 
 def plan_uploads(artifacts_dir) -> list:
+    """Every discovered model + card; a QBR model also needs, and ships, its gate record.
+
+    ``check_gate`` raises unless the record says the model beat the incumbent AND its
+    sha256 is the gated candidate's, so a failed or swapped QBR model cannot publish.
+    """
+    from cfb_model_build.model_training.train_qbr import check_gate
+
     files: list = []
     for m in discover_models(artifacts_dir):
         files.append(m.model_path)
         files.append(m.card_path)
+        if m.model_type == "qbr":
+            check_gate(m.model_path)
+            files.append(m.model_path.with_suffix(".gate.json"))
     # de-dup, stable order
     seen, out = set(), []
     for p in files:

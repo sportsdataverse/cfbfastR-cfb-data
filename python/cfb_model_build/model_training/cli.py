@@ -26,7 +26,6 @@ def build_parser() -> argparse.ArgumentParser:
     for name in (
         "train-ep",
         "train-wp",
-        "train-qbr",
         "train-fg",
         "train-xpass",
         "train-two-pt",
@@ -36,8 +35,17 @@ def build_parser() -> argparse.ArgumentParser:
         s.add_argument("--out", required=True)
         if name == "train-wp":
             s.add_argument("--variant", choices=["spread", "naive"], default="spread")
-        if name == "train-qbr":
-            s.add_argument("--espn-qbr", required=True)
+    q = sub.add_parser(
+        "train-qbr",
+        help="fit xQBR on the served adv_passing features, gate it vs the incumbent (exit 3 = no arm passed)",
+    )
+    q.add_argument("--data-dir", default="../cfb", help="dataset tree holding adv_passing/ and pbp/ parquet")
+    q.add_argument("--labels", default=None, help="ESPN QBR labels (default: the committed models/qbr file)")
+    q.add_argument("--incumbent", default=None, help="model to beat (default: sdv-py's bundled qbr_model.ubj)")
+    q.add_argument("--out", required=True)
+    cq = sub.add_parser("capture-qbr-labels", help="re-capture ESPN game QBR for seasons into the committed labels file")
+    cq.add_argument("--seasons", nargs="+", type=int, required=True)
+    cq.add_argument("--out", default=None)
     v = sub.add_parser(
         "validate", help="prediction-parity of a retrained model vs a shipped reference"
     )
@@ -46,7 +54,7 @@ def build_parser() -> argparse.ArgumentParser:
     v.add_argument(
         "--type",
         required=True,
-        choices=["ep", "wp", "wp_naive", "qbr"],
+        choices=["ep", "wp", "wp_naive"],
         help="feature family used to build the comparison matrix",
     )
     v.add_argument("--pbp", default="pbp_full.parquet", help="feature source frame")
@@ -64,10 +72,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     lo.add_argument("--pbp", default="pbp_full.parquet")
     lo.add_argument(
-        "--model", required=True, choices=["ep", "wp", "qbr", "fg", "xpass", "two_pt"]
-    )
-    lo.add_argument(
-        "--espn-qbr", help="ESPN QBR reference parquet (required for --model qbr)"
+        "--model", required=True, choices=["ep", "wp", "fg", "xpass", "two_pt"]
     )
     lo.add_argument(
         "--oof-out", help="optional path to write the out-of-fold predictions parquet"
@@ -107,10 +112,24 @@ def main(argv=None) -> int:
             args.final_dir, args.out, args.seasons, odds_path=args.odds
         )
         print(f"wrote {n} rows -> {args.out}")
+    elif args.cmd == "capture-qbr-labels":
+        from .qbr_labels import LABELS_PATH, update_labels
+
+        df = update_labels(args.seasons, out=args.out or LABELS_PATH)
+        print(f"labels: {df.height} rows -> {args.out or LABELS_PATH}")
+    elif args.cmd == "train-qbr":
+        from .qbr_labels import LABELS_PATH
+        from .train_qbr import train_qbr
+
+        incumbent = args.incumbent
+        if incumbent is None:
+            import sportsdataverse
+
+            incumbent = Path(sportsdataverse.__file__).parent / "cfb" / "models" / "qbr_model.ubj"
+        return train_qbr(args.data_dir, args.labels or LABELS_PATH, incumbent, args.out)
     elif args.cmd in (
         "train-ep",
         "train-wp",
-        "train-qbr",
         "train-fg",
         "train-xpass",
         "train-two-pt",
@@ -138,10 +157,6 @@ def main(argv=None) -> int:
             from .train_two_pt import train_two_pt
 
             model = train_two_pt(df)
-        else:
-            from .train_qbr import train_qbr
-
-            model = train_qbr(df, pl.read_parquet(args.espn_qbr))
         Path(args.out).parent.mkdir(parents=True, exist_ok=True)
         model.save_model(args.out)
         from .model_card import write_xgb_model_card
@@ -156,25 +171,21 @@ def main(argv=None) -> int:
             _mtype, _label = "fg", "fg_made"
         elif args.cmd == "train-xpass":
             _mtype, _label = "xpass", "is_pass"
-        elif args.cmd == "train-two-pt":
-            _mtype, _label = "two_pt", "two_point_success"
         else:
-            _mtype, _label = "qbr", "qbr"
-        # train-qbr aggregates to per-QB-game rows and inner-joins ESPN QBR,
-        # so df.height (raw PBP rows) is misleading for that branch.
-        _n_rows = None if args.cmd == "train-qbr" else df.height
+            _mtype, _label = "two_pt", "two_point_success"
+        _n_rows = df.height
         # Hyperparameters and training seasons were being dropped, leaving cards
         # with `hyperparameters: None` / `training_seasons: None` -- i.e. no way to
         # answer "what was this trained on" without reading the code. Record the
         # recipe, the season span, and the corpus the frame came from.
         _params = {
             "ep": C.EP_PARAMS, "fg": C.FG_PARAMS, "xpass": C.XPASS_PARAMS,
-            "two_pt": C.TWO_PT_PARAMS, "qbr": C.QBR_PARAMS,
+            "two_pt": C.TWO_PT_PARAMS,
             "wp_spread": C.WP_SPREAD_PARAMS, "wp_naive": C.WP_NAIVE_PARAMS,
         }.get(_mtype)
         _rounds = {
             "ep": C.EP_NROUNDS, "fg": C.FG_NROUNDS, "xpass": C.XPASS_NROUNDS,
-            "two_pt": C.TWO_PT_NROUNDS, "qbr": C.QBR_NROUNDS,
+            "two_pt": C.TWO_PT_NROUNDS,
             "wp_spread": C.WP_SPREAD_NROUNDS, "wp_naive": C.WP_NAIVE_NROUNDS,
         }.get(_mtype)
         _seasons = (
@@ -209,25 +220,8 @@ def main(argv=None) -> int:
 
         from .validate import loso_cv
 
-        if args.model == "qbr" and not args.espn_qbr:
-            print(
-                "loso --model qbr requires --espn-qbr <reference.parquet>",
-                file=sys.stderr,
-            )
-            return 2
         df = add_winner(pl.read_parquet(args.pbp))
-        espn = None
-        if args.espn_qbr:
-            espn = (
-                pl.read_parquet(args.espn_qbr)
-                .select(
-                    pl.col("game_id").cast(pl.Int64),
-                    pl.col("passer_player_name"),
-                    pl.col("raw_qbr").cast(pl.Float64, strict=False),
-                )
-                .drop_nulls()
-            )
-        res = loso_cv(df, args.model, espn_qbr=espn)
+        res = loso_cv(df, args.model)
         pooled = " ".join(
             f"{k}={v:.4f}" if isinstance(v, float) else f"{k}={v}"
             for k, v in res["pooled"].items()
@@ -241,7 +235,7 @@ def main(argv=None) -> int:
         import polars as pl
         import xgboost as xgb
 
-        from .features import ep_matrix, qbr_matrix, wp_matrix
+        from .features import ep_matrix, wp_matrix
         from .validate import prediction_parity
 
         df = add_winner(pl.read_parquet(args.pbp))
@@ -249,10 +243,8 @@ def main(argv=None) -> int:
             df = df.head(args.sample)
         if args.type == "ep":
             X, _, _ = ep_matrix(df)
-        elif args.type in ("wp", "wp_naive"):
+        else:
             X, _, _ = wp_matrix(df, "naive" if args.type == "wp_naive" else "spread")
-        else:  # qbr
-            X, _, _ = qbr_matrix(df)
         new = xgb.Booster()
         new.load_model(args.model)
         ref = xgb.Booster()

@@ -110,6 +110,17 @@ RELEASE_NOTES: dict[str, str] = {
         "baseline (2004+ history), with delta ranks and sample sizes. One asset "
         "per season, as of the season's last game."
     ),
+    "cfb_team_opponent_splits": (
+        "College Football by-opponent team-game splits: ONE ROW PER TEAM PER "
+        "GAME with season, season_type, week, game_id, team_id, opponent_id, "
+        "opponent, is_home, points_for, points_against, plays, epa_per_play and "
+        "success_rate. A projection of espn_cfb_adv_team_gamelog plus "
+        "espn_cfb_adv_situational's EPA success rate; every game is kept, FCS "
+        "opponents and bowls included. `epa_per_play` has 0.01 resolution (the "
+        "upstream gamelog rounds it). `season_type` includes 4 (all-star games) "
+        "and 5 (the spring 2020-21 games). `is_home` is the listed home side, "
+        "even at neutral sites."
+    ),
 }
 
 

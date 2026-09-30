@@ -472,7 +472,9 @@ def build_team_opponent_splits(season: int, *, base: str = "cfb") -> pl.DataFram
     consumer filter. A left join, so a team-game with no situational row keeps
     a null ``success_rate`` rather than disappearing. A missing situational
     parquet raises (the season fails loudly) instead of publishing an all-null
-    column.
+    column, and so does a game with no situational rows at all: that is a stale
+    ``adv_situational`` (its stage failed this run, leaving the last run's copy),
+    which would publish the newest games with null success rates.
 
     The situational id column resolves the way :func:`build_gamelog` resolves
     adv_team's: ``pos_team_id`` when present (``pos_team`` is then the name),
@@ -518,6 +520,12 @@ def build_team_opponent_splits(season: int, *, base: str = "cfb") -> pl.DataFram
             k,
             gl.schema[k],
             sit.schema[k],
+        )
+    stale = gl.join(sit, on="game_id", how="anti")["game_id"].n_unique()
+    if stale:
+        raise ValueError(
+            f"team_opponent_splits {season}: {stale} games have no situational "
+            f"rows (stale adv_situational?)"
         )
     return (
         gl.join(sit, on=["game_id", "team_id"], how="left", validate="m:1")

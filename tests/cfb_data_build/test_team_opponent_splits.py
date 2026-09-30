@@ -89,14 +89,14 @@ def _situational(
     )
 
 
-def _write(base: Path, gamelog: pl.DataFrame | None, situational: pl.DataFrame) -> str:
-    if gamelog is not None:
-        p = base / "adv_team_gamelog" / "parquet"
-        p.mkdir(parents=True)
-        gamelog.write_parquet(p / f"adv_team_gamelog_{SEASON}.parquet")
-    p = base / "adv_situational" / "parquet"
-    p.mkdir(parents=True)
-    situational.write_parquet(p / f"adv_situational_{SEASON}.parquet")
+def _write(
+    base: Path, gamelog: pl.DataFrame | None, situational: pl.DataFrame | None
+) -> str:
+    for name, df in (("adv_team_gamelog", gamelog), ("adv_situational", situational)):
+        if df is not None:
+            p = base / name / "parquet"
+            p.mkdir(parents=True)
+            df.write_parquet(p / f"{name}_{SEASON}.parquet")
     return str(base)
 
 
@@ -120,6 +120,7 @@ def test_one_row_carries_the_gamelog_points_and_epa_and_the_situational_success_
 
 
 def test_a_gamelog_row_with_no_situational_match_keeps_a_null_success_rate(tmp_path):
+    # game 2 has situational rows (the opponent's), just none for team 333
     base = _write(
         tmp_path,
         _gamelog(
@@ -128,7 +129,7 @@ def test_a_gamelog_row_with_no_situational_match_keeps_a_null_success_rate(tmp_p
                 _row(2, 333, 2, 0.05, 64, 10, 13, home=False),
             ]
         ),
-        _situational([(1, 333, 0.47)]),
+        _situational([(1, 333, 0.47), (2, 2, 0.52)]),
     )
     out = build_team_opponent_splits(SEASON, base=base).sort("game_id")
     assert out["game_id"].to_list() == [1, 2]  # left join: game 2 is not dropped
@@ -146,6 +147,39 @@ def test_an_older_situational_asset_with_the_id_in_pos_team_resolves_like_build_
     )
     out = build_team_opponent_splits(SEASON, base=base)
     assert out["success_rate"].to_list() == [pytest.approx(0.47)]
+
+
+def test_a_game_with_no_situational_rows_at_all_raises(tmp_path):
+    # a stale adv_situational (its stage failed this run) lacks the newest
+    # games entirely; publishing would null their success_rate silently
+    base = _write(
+        tmp_path,
+        _gamelog(
+            [
+                _row(1, 333, 61, 0.21, 70, 24, 17),
+                _row(2, 333, 2, 0.05, 64, 10, 13, home=False),
+            ]
+        ),
+        _situational([(1, 333, 0.47), (1, 61, 0.39)]),
+    )
+    with pytest.raises(ValueError, match="1 games have no situational rows"):
+        build_team_opponent_splits(SEASON, base=base)
+
+
+def test_duplicate_situational_keys_raise_instead_of_fanning_out(tmp_path):
+    base = _write(
+        tmp_path,
+        _gamelog([_row(1, 333, 61, 0.21, 70, 24, 17)]),
+        _situational([(1, 333, 0.47), (1, 333, 0.51)]),
+    )
+    with pytest.raises(pl.exceptions.ComputeError):
+        build_team_opponent_splits(SEASON, base=base)
+
+
+def test_a_missing_situational_parquet_raises(tmp_path):
+    base = _write(tmp_path, _gamelog([_row(1, 333, 61, 0.21, 70, 24, 17)]), None)
+    with pytest.raises(FileNotFoundError):
+        build_team_opponent_splits(SEASON, base=base)
 
 
 def test_ids_are_cast_to_int64_on_both_sides_before_the_join(tmp_path):

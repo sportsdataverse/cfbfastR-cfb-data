@@ -25,6 +25,11 @@ flock -w 10800 8 || { echo "::error ::previous build still running after 3h"; ec
 exec 9>/tmp/git_pull_sdv.lock
 flock -w 3600 9 || { echo "::error ::git_pull sweep held its lock for 1h"; echo "EXIT=1"; exit 1; }
 
+# The processor appends coach_careers output to the season log AFTER committing
+# it; an Actions runner threw that tail away, here it would persist and trip
+# the guard below. Drop stale edits to TRACKED logs only (the lines are in
+# this cron log); any other tracked change still refuses the build.
+git checkout -q -- logs/ 2>/dev/null || true
 branch=$(git rev-parse --abbrev-ref HEAD)
 if [ "$branch" != main ] || [ -n "$(git status --porcelain --untracked-files=no)" ]; then
   echo "::error ::checkout is on '$branch' or has tracked changes; refusing to build"
@@ -50,5 +55,6 @@ export CFBD_API_KEY
 
 bash scripts/daily_cfb_processor.sh "$@"
 rc=$?
+git checkout -q -- logs/ 2>/dev/null || true
 echo "EXIT=$rc $(date -u +%FT%TZ)"
 exit "$rc"

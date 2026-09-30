@@ -7,6 +7,9 @@ parquet/csv/rds. Sibling of `cfbfastR-cfb-raw` (Python/uv).
 - `Rscript -e 'testthat::test_dir("tests/testthat")'` — offline reshape tests (fixture-driven).
 - `Rscript R/espn_cfb_0N_*.R -s YYYY -e YYYY` — build one dataset for a season range.
 - `bash scripts/daily_cfb_R_processor.sh -s YYYY -e YYYY` — build all datasets.
+- `bash scripts/cron_daily_cfb.sh` — the daily build as the droplet cron runs it (chained after
+  each cfbfastR-cfb-raw scrape; the only automatic producer since 2026-09-29 — `daily_cfb.yml`
+  is a manual fallback). Log: `logs/cron_daily_cfb_data_YYYYMMDD.log`, ends with `EXIT=`.
 - `Rscript R/releases_init.R` — one-time release-tag creation on both publish repos.
 - `uv run python python/espn_injuries_daily_snapshot.py [-l nfl ...] [--publish]` — daily
   ESPN injuries snapshot, all 8 leagues (see "ESPN injuries" below). Build-only by default.

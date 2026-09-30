@@ -16,12 +16,13 @@ concurrency:
   group: ${{ github.repository }}-commit
   cancel-in-progress: false
 
+# MANUAL FALLBACK ONLY since 2026-09-29. The droplet crontab runs
+# scripts/cron_daily_cfb.sh after every cfbfastR-cfb-raw scrape -- the one
+# automatic producer. The schedule is gone, and cfb-raw's trigger workflow no
+# longer fires on push (it is manual too), so nothing here starts on its own;
+# two producers racing the same commits and release tags is how nfl-raw and
+# odds-data diverged.
 on:
-  schedule:
-    - cron: '0 11 * 8 *'        # August (preseason), offset after -raw
-    - cron: '0 11 * 9-11 *'     # Sept-Nov (regular season)
-    - cron: '0 11 * 12 *'       # all December -- most bowls fall Dec 21-31
-    - cron: '0 11 1-25 1 *'     # January bowls + CFP, past the ~Jan 19-20 final
   repository_dispatch:
     types: [daily_cfb_data]
   workflow_dispatch:

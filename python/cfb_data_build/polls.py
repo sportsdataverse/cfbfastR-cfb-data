@@ -37,8 +37,10 @@ Probe findings (2026-10-01, from this repo's venv; ``tmp/f8/probe.log``):
   capture is a plain idempotent refetch per season, not append-only: every run
   rebuilds the season from the API and the backfill floor is 2004, not "first
   capture". A fetch failure raises and the season is left untouched rather than
-  a partial season overwriting a complete one; a season whose rebuilt frame
-  equals the committed parquet is skipped (no write, no publish).
+  a partial season overwriting a complete one. In a local build a season whose
+  rebuilt frame equals the committed parquet is not rewritten; with ``publish``
+  it is always written (byte-identical parquet, so the tree stays clean) and
+  uploaded, because local equality is no proof the release has the files.
 * ESPN's "week W" poll is the one released ENTERING week W (the 2024 "Week 5"
   AP is dated 2024-09-22, after the week-4 games). Week 1 is the preseason poll.
 
@@ -304,10 +306,9 @@ def build_polls(
 ) -> dict[str, int]:
     """Fetch one season, derive both tables, write + publish. Returns rows written per dataset.
 
-    A table whose rebuilt frame equals the committed parquet is skipped (no
-    write, no publish): the in-season cron runs daily and ESPN posts weekly, so
-    "nothing new" is the ordinary outcome and must not churn the tree or
-    re-stamp the tag. To force a rewrite, delete the season's parquet first.
+    In a local build a table whose rebuilt frame equals the committed parquet
+    is not rewritten (delete the season's parquet to force one). With
+    ``publish`` the season is always written and uploaded, see below.
     """
     ranks = fetch_ranks(season)
     if ranks.height == 0:
@@ -328,8 +329,16 @@ def build_polls(
         )
         if dry_run:
             continue
+        # The equality skip governs the WRITE only, and only in a local build.
+        # With --publish the season is always rewritten and uploaded: the local
+        # tree cannot know whether the release has these files -- an upload
+        # that failed after the write, or a build-only run followed by
+        # --publish, would otherwise leave the release missing or stale while
+        # the retry reports success. The parquet is byte-deterministic (an
+        # unchanged season leaves the tree clean) and the upload is an
+        # idempotent --clobber, so repeating both is cheap.
         existing = _existing(spec, season, base)
-        if existing is not None and existing.equals(df):
+        if not publish and existing is not None and existing.equals(df):
             print(f"  {spec.dataset} {season}: unchanged, skipped", flush=True)
             continue
         write_dataset(df, spec.dataset, season, spec.stem, base=base)

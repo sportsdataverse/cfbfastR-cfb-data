@@ -257,6 +257,46 @@ def test_a_paginated_listing_raises(monkeypatch):
         fetch_ranks(2024)
 
 
+def test_publish_runs_even_when_the_local_table_is_unchanged(
+    fake_espn, tmp_path, monkeypatch
+):
+    """Local equality is no proof the release has the files (#124 review):
+    an upload that failed after the write, or a build-only run followed by
+    --publish, must still upload."""
+    from cfb_data_build import publish as publish_mod
+
+    calls: list[tuple[str, int]] = []
+    monkeypatch.setattr(
+        publish_mod,
+        "publish_dataset",
+        lambda spec, season, *, base: calls.append((spec.tag, season)),
+    )
+    base = tmp_path / "cfb"
+    argv = [
+        "--dataset",
+        "poll_analytics",
+        "-s",
+        "2024",
+        "-e",
+        "2024",
+        "--base",
+        str(base),
+    ]
+    assert main(argv) == 0  # build-only: written, not published
+    assert calls == []
+    assert (
+        main([*argv, "--publish"]) == 0
+    )  # unchanged locally -> still uploaded, both tags
+    assert calls == [("cfb_poll_analytics", 2024), ("cfb_poll_week_summary", 2024)]
+    # every release format is on disk for the upload to find
+    for d, stem in (
+        ("poll_analytics", "cfb_poll_analytics"),
+        ("poll_week_summary", "cfb_poll_week_summary"),
+    ):
+        for sub in ("parquet", "rds", "csv"):
+            assert (base / d / sub / f"{stem}_2024.{sub}").exists(), (d, sub)
+
+
 def test_cli_group_builds_both_tables_and_skips_an_unchanged_season(
     fake_espn, tmp_path, capsys
 ):

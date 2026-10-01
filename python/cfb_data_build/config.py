@@ -429,6 +429,7 @@ PKG_FUNCTION: dict[str, str] = {
     "cfb_matchup_features": "python/espn_cfb_41_matchup_features_creation.py",
     "cfb_matchup_line": "python/espn_cfb_42_matchup_line_creation.py",
     "cfb_rolling_windows": "python/espn_cfb_64_rolling_windows_creation.py",
+    "cfb_metric_curves": "python/espn_cfb_65_metric_curves_creation.py",
     # no loader yet; consumers read sdv-db cfb.team_opponent_splits
     "cfb_team_opponent_splits": "python/cfb_data_build/derived.py",
     # no loader yet; consumers read sdv-db cfb.league_averages

@@ -84,6 +84,7 @@ SPECS: dict[str, DatasetSpec] = {
     "rolling_windows": DatasetSpec(
         "rolling_windows", "rolling_windows", "cfb_rolling_windows"
     ),
+    "metric_curves": DatasetSpec("metric_curves", "metric_curves", "cfb_metric_curves"),
     "team_opponent_splits": DatasetSpec(
         "team_opponent_splits", "cfb_team_opponent_splits", "cfb_team_opponent_splits"
     ),
@@ -746,6 +747,43 @@ def build_rolling_windows(season: int, *, base: str = "cfb") -> pl.DataFrame:
     return rolling_windows(football_events(pbp, dates), season)
 
 
+#: first season the released pbp carries ``air_yards`` on a usable share of pass
+#: attempts (41 % in 2025, 96 % in 2026). Every earlier season has 0-32 stray
+#: air-yards plays (2014, 2021, 2024: one each; 2023: 32), which would publish as
+#: a one-attempt "curve", so the two air-yards metrics are dropped before it.
+AIR_YARDS_FLOOR = 2025
+_AIR_YARDS_METRICS = ("cmp_pct_by_air_yards", "epa_by_air_yards")
+
+
+def build_metric_curves(season: int, *, base: str = "cfb") -> pl.DataFrame:
+    """``cfb_metric_curves``: league / team / player rate curves along a continuous axis.
+
+    FG% by kick distance, completion% and EPA by air-yards bucket, 4th-down
+    conversion by yards to go and success by down x distance, each bucket with
+    attempts, successes, rate and EPA/attempt (``sportsdataverse.metric_curves``).
+    Curves are per SEASON, so unlike :func:`build_rolling_windows` this reads only
+    ``season``'s pbp, projected to ``FOOTBALL_ATTEMPT_COLUMNS``. The sdv-py
+    function emits all three ``entity_type`` rows (league, team, player) from one
+    call; the air-yards metrics are kept from ``AIR_YARDS_FLOOR`` on only.
+    Returns the empty ``OUTPUT_SCHEMA`` frame when the season's pbp is missing.
+    """
+    from sportsdataverse.metric_curves import (
+        FOOTBALL_ATTEMPT_COLUMNS,
+        OUTPUT_SCHEMA,
+        football_attempts,
+        metric_curves,
+    )
+
+    path = Path(base) / "pbp" / "parquet" / f"play_by_play_{season}.parquet"
+    if not path.is_file():
+        return pl.DataFrame(schema=OUTPUT_SCHEMA)
+    pbp = pl.read_parquet(path, columns=list(FOOTBALL_ATTEMPT_COLUMNS))
+    curves = metric_curves(football_attempts(pbp), "cfb")
+    if season < AIR_YARDS_FLOOR:
+        curves = curves.filter(~pl.col("metric").is_in(_AIR_YARDS_METRICS))
+    return curves
+
+
 BUILDERS = {
     "gamelog": build_gamelog,
     "ratings_weekly": build_ratings_weekly,
@@ -753,6 +791,7 @@ BUILDERS = {
     "matchup_features": _build_matchup_features,
     "matchup_line": _build_matchup_line,
     "rolling_windows": build_rolling_windows,
+    "metric_curves": build_metric_curves,
     "team_opponent_splits": build_team_opponent_splits,
 }
 

@@ -1,5 +1,7 @@
 #!/bin/bash
-# Capture this season's weekly ESPN FPI snapshot (`cfb_fpi_weekly`, stage 13).
+# Capture this season's weekly ESPN FPI snapshot (`cfb_fpi_weekly`, stage 13),
+# then the weekly AP / Coaches / CFP poll history (`cfb_poll_analytics` +
+# `cfb_poll_week_summary`, cfb_data_build.polls) on the same in-season cadence.
 #
 # Run by .github/workflows/cfb_fpi_weekly.yml on its own in-season schedule,
 # deliberately NOT from scripts/daily_cfb_processor.sh. Every other dataset in
@@ -46,6 +48,17 @@ if [ "$BUILD_RC" != "0" ]; then
   exit "$BUILD_RC"
 fi
 
+# Polls ride the same schedule but are NOT time-critical: ESPN keeps poll
+# history (see polls.py), so the builder refetches the whole season, skips a
+# season whose rebuilt tables equal the committed parquet, and a failed run
+# costs nothing permanent.
+"$PY" -m cfb_data_build --dataset poll_analytics -s "$START_YEAR" -e "$END_YEAR" --base ../cfb $PUBLISH
+BUILD_RC=$?
+if [ "$BUILD_RC" != "0" ]; then
+  echo "::error ::poll_analytics build exited with code $BUILD_RC"
+  exit "$BUILD_RC"
+fi
+
 cd "$REPO_ROOT" || exit 1
 # Only when unset. The sibling drivers set this unconditionally because they
 # only ever run in CI; this one is also a documented manual entry point, and a
@@ -56,11 +69,16 @@ git config user.name  >/dev/null 2>&1 || git config --local user.name "Github Ac
 # Explicit path, and `add` rather than `add -u`: a season's FIRST capture is an
 # untracked new file, every later one is a modification, and this catches both.
 git add -- cfb/fpi_weekly || exit 1
+# The poll dirs exist only once a season has been written (code can land
+# before data), and `git add` on a missing pathspec is a hard error.
+for d in cfb/poll_analytics cfb/poll_week_summary; do
+  [ -d "$d" ] && { git add -- "$d" || exit 1; }
+done
 if git diff --cached --quiet; then
-  echo "no new FPI week for ${START_YEAR}-${END_YEAR}; nothing to commit"
+  echo "no new FPI week or poll for ${START_YEAR}-${END_YEAR}; nothing to commit"
   exit 0
 fi
-git commit -m "CFB FPI weekly snapshot (Start: $START_YEAR End: $END_YEAR)" || {
+git commit -m "CFB FPI weekly + polls snapshot (Start: $START_YEAR End: $END_YEAR)" || {
   echo "::error ::commit failed"; exit 1;
 }
 

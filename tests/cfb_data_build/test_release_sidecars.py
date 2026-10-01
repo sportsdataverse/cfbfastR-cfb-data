@@ -59,11 +59,13 @@ def test_every_registry_tag_has_a_package_function():
     from either one would ship a timestamp with no package_function beside it.
     """
     from cfb_data_build.derived import SPECS as DERIVED_SPECS
+    from cfb_data_build.polls import SPECS as POLL_SPECS
 
     published = (
         {s.tag for s in REGISTRY.values()}
         | {s.tag for s in SUMMARIES_REGISTRY.values()}
         | {s.tag for s in DERIVED_SPECS.values()}
+        | {s.tag for s in POLL_SPECS.values()}
     )
     missing = sorted(published - set(PKG_FUNCTION))
     assert missing == [], f"tags with no PKG_FUNCTION entry: {missing}"

@@ -1,0 +1,1719 @@
+{
+ "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/types/2/weeks/5/rankings/1?lang=en&region=us",
+ "id": "1",
+ "name": "AP Top 25",
+ "shortName": "AP Poll",
+ "type": "ap",
+ "occurrence": {
+  "number": 5,
+  "type": "week",
+  "last": false,
+  "value": "5",
+  "displayValue": "Week 5"
+ },
+ "date": "2024-09-22T07:00Z",
+ "headline": "2024 NCAA Football Rankings - AP Poll Week 5",
+ "shortHeadline": "2024 AP Poll: Week 5",
+ "season": {
+  "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024?lang=en&region=us",
+  "year": 2024,
+  "startDate": "2024-07-01T07:00Z",
+  "endDate": "2025-01-22T07:59Z",
+  "displayName": "2024",
+  "type": {
+   "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/types/2?lang=en&region=us",
+   "id": "2",
+   "type": 2,
+   "name": "Regular Season",
+   "abbreviation": "reg",
+   "year": 2024,
+   "startDate": "2024-08-24T07:00Z",
+   "endDate": "2024-12-15T07:59Z",
+   "hasGroups": false,
+   "hasStandings": true,
+   "hasLegs": false,
+   "groups": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/types/2/groups?lang=en&region=us"
+   },
+   "weeks": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/types/2/weeks?lang=en&region=us"
+   },
+   "leaders": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/types/2/leaders?lang=en&region=us"
+   },
+   "slug": "regular-season"
+  },
+  "types": {
+   "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/types?lang=en&region=us",
+   "count": 4,
+   "pageIndex": 1,
+   "pageSize": 4,
+   "pageCount": 1,
+   "items": [
+    {
+     "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/types/1?lang=en&region=us",
+     "id": "1",
+     "type": 1,
+     "name": "Preseason",
+     "abbreviation": "pre",
+     "year": 2024,
+     "startDate": "2024-07-01T07:00Z",
+     "endDate": "2024-08-24T06:59Z",
+     "hasGroups": false,
+     "hasStandings": false,
+     "hasLegs": false,
+     "groups": {
+      "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/types/1/groups?lang=en&region=us"
+     },
+     "weeks": {
+      "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/types/1/weeks?lang=en&region=us"
+     },
+     "slug": "preseason"
+    },
+    {
+     "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/types/2?lang=en&region=us",
+     "id": "2",
+     "type": 2,
+     "name": "Regular Season",
+     "abbreviation": "reg",
+     "year": 2024,
+     "startDate": "2024-08-24T07:00Z",
+     "endDate": "2024-12-15T07:59Z",
+     "hasGroups": false,
+     "hasStandings": true,
+     "hasLegs": false,
+     "groups": {
+      "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/types/2/groups?lang=en&region=us"
+     },
+     "weeks": {
+      "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/types/2/weeks?lang=en&region=us"
+     },
+     "leaders": {
+      "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/types/2/leaders?lang=en&region=us"
+     },
+     "slug": "regular-season"
+    },
+    {
+     "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/types/3?lang=en&region=us",
+     "id": "3",
+     "type": 3,
+     "name": "Postseason",
+     "abbreviation": "post",
+     "year": 2024,
+     "startDate": "2024-12-15T08:00Z",
+     "endDate": "2025-01-22T07:59Z",
+     "hasGroups": false,
+     "hasStandings": true,
+     "hasLegs": false,
+     "groups": {
+      "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/types/3/groups?lang=en&region=us"
+     },
+     "weeks": {
+      "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/types/3/weeks?lang=en&region=us"
+     },
+     "leaders": {
+      "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/types/3/leaders?lang=en&region=us"
+     },
+     "slug": "post-season"
+    },
+    {
+     "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/types/4?lang=en&region=us",
+     "id": "4",
+     "type": 4,
+     "name": "Off Season",
+     "abbreviation": "off",
+     "year": 2024,
+     "startDate": "2025-01-22T08:00Z",
+     "endDate": "2025-02-01T07:59Z",
+     "hasGroups": false,
+     "hasStandings": false,
+     "hasLegs": false,
+     "groups": {
+      "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/types/4/groups?lang=en&region=us"
+     },
+     "weeks": {
+      "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/types/4/weeks?lang=en&region=us"
+     },
+     "slug": "off-season"
+    }
+   ]
+  },
+  "rankings": {
+   "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/rankings?lang=en&region=us"
+  },
+  "athletes": {
+   "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/athletes?lang=en&region=us"
+  },
+  "awards": {
+   "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/awards?lang=en&region=us"
+  },
+  "futures": {
+   "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/futures?lang=en&region=us"
+  },
+  "leaders": {
+   "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/types/2/leaders?lang=en&region=us"
+  }
+ },
+ "lastUpdated": "2024-09-22T21:11Z",
+ "ranks": [
+  {
+   "current": 1,
+   "previous": 1,
+   "points": 1527.0,
+   "firstPlaceVotes": 44,
+   "trend": "-",
+   "record": {
+    "summary": "4-0",
+    "stats": [
+     {
+      "name": "wins",
+      "displayName": "Wins",
+      "shortDisplayName": "W",
+      "description": "Wins",
+      "abbreviation": "W",
+      "type": "wins",
+      "value": 4.0,
+      "displayValue": "4"
+     },
+     {
+      "name": "losses",
+      "displayName": "Losses",
+      "shortDisplayName": "L",
+      "description": "Losses",
+      "abbreviation": "L",
+      "type": "losses",
+      "value": 0.0,
+      "displayValue": "0"
+     }
+    ]
+   },
+   "team": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/teams/251?lang=en&region=us"
+   },
+   "date": "2024-09-22T07:00Z",
+   "lastUpdated": "2024-09-22T21:11Z"
+  },
+  {
+   "current": 2,
+   "previous": 2,
+   "points": 1482.0,
+   "firstPlaceVotes": 13,
+   "trend": "-",
+   "record": {
+    "summary": "3-0",
+    "stats": [
+     {
+      "name": "wins",
+      "displayName": "Wins",
+      "shortDisplayName": "W",
+      "description": "Wins",
+      "abbreviation": "W",
+      "type": "wins",
+      "value": 3.0,
+      "displayValue": "3"
+     },
+     {
+      "name": "losses",
+      "displayName": "Losses",
+      "shortDisplayName": "L",
+      "description": "Losses",
+      "abbreviation": "L",
+      "type": "losses",
+      "value": 0.0,
+      "displayValue": "0"
+     }
+    ]
+   },
+   "team": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/teams/61?lang=en&region=us"
+   },
+   "date": "2024-09-22T07:00Z",
+   "lastUpdated": "2024-09-22T21:11Z"
+  },
+  {
+   "current": 3,
+   "previous": 3,
+   "points": 1432.0,
+   "firstPlaceVotes": 5,
+   "trend": "-",
+   "record": {
+    "summary": "3-0",
+    "stats": [
+     {
+      "name": "wins",
+      "displayName": "Wins",
+      "shortDisplayName": "W",
+      "description": "Wins",
+      "abbreviation": "W",
+      "type": "wins",
+      "value": 3.0,
+      "displayValue": "3"
+     },
+     {
+      "name": "losses",
+      "displayName": "Losses",
+      "shortDisplayName": "L",
+      "description": "Losses",
+      "abbreviation": "L",
+      "type": "losses",
+      "value": 0.0,
+      "displayValue": "0"
+     }
+    ]
+   },
+   "team": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/teams/194?lang=en&region=us"
+   },
+   "date": "2024-09-22T07:00Z",
+   "lastUpdated": "2024-09-22T21:11Z"
+  },
+  {
+   "current": 4,
+   "previous": 4,
+   "points": 1328.0,
+   "firstPlaceVotes": 0,
+   "trend": "-",
+   "record": {
+    "summary": "3-0",
+    "stats": [
+     {
+      "name": "wins",
+      "displayName": "Wins",
+      "shortDisplayName": "W",
+      "description": "Wins",
+      "abbreviation": "W",
+      "type": "wins",
+      "value": 3.0,
+      "displayValue": "3"
+     },
+     {
+      "name": "losses",
+      "displayName": "Losses",
+      "shortDisplayName": "L",
+      "description": "Losses",
+      "abbreviation": "L",
+      "type": "losses",
+      "value": 0.0,
+      "displayValue": "0"
+     }
+    ]
+   },
+   "team": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/teams/333?lang=en&region=us"
+   },
+   "date": "2024-09-22T07:00Z",
+   "lastUpdated": "2024-09-22T21:11Z"
+  },
+  {
+   "current": 5,
+   "previous": 6,
+   "points": 1283.0,
+   "firstPlaceVotes": 0,
+   "trend": "+1",
+   "record": {
+    "summary": "4-0",
+    "stats": [
+     {
+      "name": "wins",
+      "displayName": "Wins",
+      "shortDisplayName": "W",
+      "description": "Wins",
+      "abbreviation": "W",
+      "type": "wins",
+      "value": 4.0,
+      "displayValue": "4"
+     },
+     {
+      "name": "losses",
+      "displayName": "Losses",
+      "shortDisplayName": "L",
+      "description": "Losses",
+      "abbreviation": "L",
+      "type": "losses",
+      "value": 0.0,
+      "displayValue": "0"
+     }
+    ]
+   },
+   "team": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/teams/2633?lang=en&region=us"
+   },
+   "date": "2024-09-22T07:00Z",
+   "lastUpdated": "2024-09-22T21:11Z"
+  },
+  {
+   "current": 6,
+   "previous": 5,
+   "points": 1269.0,
+   "firstPlaceVotes": 0,
+   "trend": "-1",
+   "record": {
+    "summary": "4-0",
+    "stats": [
+     {
+      "name": "wins",
+      "displayName": "Wins",
+      "shortDisplayName": "W",
+      "description": "Wins",
+      "abbreviation": "W",
+      "type": "wins",
+      "value": 4.0,
+      "displayValue": "4"
+     },
+     {
+      "name": "losses",
+      "displayName": "Losses",
+      "shortDisplayName": "L",
+      "description": "Losses",
+      "abbreviation": "L",
+      "type": "losses",
+      "value": 0.0,
+      "displayValue": "0"
+     }
+    ]
+   },
+   "team": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/teams/145?lang=en&region=us"
+   },
+   "date": "2024-09-22T07:00Z",
+   "lastUpdated": "2024-09-22T21:11Z"
+  },
+  {
+   "current": 7,
+   "previous": 8,
+   "points": 1139.0,
+   "firstPlaceVotes": 0,
+   "trend": "+1",
+   "record": {
+    "summary": "4-0",
+    "stats": [
+     {
+      "name": "wins",
+      "displayName": "Wins",
+      "shortDisplayName": "W",
+      "description": "Wins",
+      "abbreviation": "W",
+      "type": "wins",
+      "value": 4.0,
+      "displayValue": "4"
+     },
+     {
+      "name": "losses",
+      "displayName": "Losses",
+      "shortDisplayName": "L",
+      "description": "Losses",
+      "abbreviation": "L",
+      "type": "losses",
+      "value": 0.0,
+      "displayValue": "0"
+     }
+    ]
+   },
+   "team": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/teams/2390?lang=en&region=us"
+   },
+   "date": "2024-09-22T07:00Z",
+   "lastUpdated": "2024-09-22T21:11Z"
+  },
+  {
+   "current": 8,
+   "previous": 9,
+   "points": 1073.0,
+   "firstPlaceVotes": 0,
+   "trend": "+1",
+   "record": {
+    "summary": "3-0",
+    "stats": [
+     {
+      "name": "wins",
+      "displayName": "Wins",
+      "shortDisplayName": "W",
+      "description": "Wins",
+      "abbreviation": "W",
+      "type": "wins",
+      "value": 3.0,
+      "displayValue": "3"
+     },
+     {
+      "name": "losses",
+      "displayName": "Losses",
+      "shortDisplayName": "L",
+      "description": "Losses",
+      "abbreviation": "L",
+      "type": "losses",
+      "value": 0.0,
+      "displayValue": "0"
+     }
+    ]
+   },
+   "team": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/teams/2483?lang=en&region=us"
+   },
+   "date": "2024-09-22T07:00Z",
+   "lastUpdated": "2024-09-22T21:11Z"
+  },
+  {
+   "current": 9,
+   "previous": 10,
+   "points": 1051.0,
+   "firstPlaceVotes": 0,
+   "trend": "+1",
+   "record": {
+    "summary": "3-0",
+    "stats": [
+     {
+      "name": "wins",
+      "displayName": "Wins",
+      "shortDisplayName": "W",
+      "description": "Wins",
+      "abbreviation": "W",
+      "type": "wins",
+      "value": 3.0,
+      "displayValue": "3"
+     },
+     {
+      "name": "losses",
+      "displayName": "Losses",
+      "shortDisplayName": "L",
+      "description": "Losses",
+      "abbreviation": "L",
+      "type": "losses",
+      "value": 0.0,
+      "displayValue": "0"
+     }
+    ]
+   },
+   "team": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/teams/213?lang=en&region=us"
+   },
+   "date": "2024-09-22T07:00Z",
+   "lastUpdated": "2024-09-22T21:11Z"
+  },
+  {
+   "current": 10,
+   "previous": 12,
+   "points": 1037.0,
+   "firstPlaceVotes": 0,
+   "trend": "+2",
+   "record": {
+    "summary": "4-0",
+    "stats": [
+     {
+      "name": "wins",
+      "displayName": "Wins",
+      "shortDisplayName": "W",
+      "description": "Wins",
+      "abbreviation": "W",
+      "type": "wins",
+      "value": 4.0,
+      "displayValue": "4"
+     },
+     {
+      "name": "losses",
+      "displayName": "Losses",
+      "shortDisplayName": "L",
+      "description": "Losses",
+      "abbreviation": "L",
+      "type": "losses",
+      "value": 0.0,
+      "displayValue": "0"
+     }
+    ]
+   },
+   "team": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/teams/254?lang=en&region=us"
+   },
+   "date": "2024-09-22T07:00Z",
+   "lastUpdated": "2024-09-22T21:11Z"
+  },
+  {
+   "current": 11,
+   "previous": 7,
+   "points": 1009.0,
+   "firstPlaceVotes": 0,
+   "trend": "-4",
+   "record": {
+    "summary": "4-0",
+    "stats": [
+     {
+      "name": "wins",
+      "displayName": "Wins",
+      "shortDisplayName": "W",
+      "description": "Wins",
+      "abbreviation": "W",
+      "type": "wins",
+      "value": 4.0,
+      "displayValue": "4"
+     },
+     {
+      "name": "losses",
+      "displayName": "Losses",
+      "shortDisplayName": "L",
+      "description": "Losses",
+      "abbreviation": "L",
+      "type": "losses",
+      "value": 0.0,
+      "displayValue": "0"
+     }
+    ]
+   },
+   "team": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/teams/142?lang=en&region=us"
+   },
+   "date": "2024-09-22T07:00Z",
+   "lastUpdated": "2024-09-22T21:11Z"
+  },
+  {
+   "current": 12,
+   "previous": 18,
+   "points": 805.0,
+   "firstPlaceVotes": 0,
+   "trend": "+6",
+   "record": {
+    "summary": "3-1",
+    "stats": [
+     {
+      "name": "wins",
+      "displayName": "Wins",
+      "shortDisplayName": "W",
+      "description": "Wins",
+      "abbreviation": "W",
+      "type": "wins",
+      "value": 3.0,
+      "displayValue": "3"
+     },
+     {
+      "name": "losses",
+      "displayName": "Losses",
+      "shortDisplayName": "L",
+      "description": "Losses",
+      "abbreviation": "L",
+      "type": "losses",
+      "value": 1.0,
+      "displayValue": "1"
+     }
+    ]
+   },
+   "team": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/teams/130?lang=en&region=us"
+   },
+   "date": "2024-09-22T07:00Z",
+   "lastUpdated": "2024-09-22T21:11Z"
+  },
+  {
+   "current": 13,
+   "previous": 11,
+   "points": 690.0,
+   "firstPlaceVotes": 0,
+   "trend": "-2",
+   "record": {
+    "summary": "2-1",
+    "stats": [
+     {
+      "name": "wins",
+      "displayName": "Wins",
+      "shortDisplayName": "W",
+      "description": "Wins",
+      "abbreviation": "W",
+      "type": "wins",
+      "value": 2.0,
+      "displayValue": "2"
+     },
+     {
+      "name": "losses",
+      "displayName": "Losses",
+      "shortDisplayName": "L",
+      "description": "Losses",
+      "abbreviation": "L",
+      "type": "losses",
+      "value": 1.0,
+      "displayValue": "1"
+     }
+    ]
+   },
+   "team": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/teams/30?lang=en&region=us"
+   },
+   "date": "2024-09-22T07:00Z",
+   "lastUpdated": "2024-09-22T21:11Z"
+  },
+  {
+   "current": 14,
+   "previous": 16,
+   "points": 637.0,
+   "firstPlaceVotes": 0,
+   "trend": "+2",
+   "record": {
+    "summary": "3-1",
+    "stats": [
+     {
+      "name": "wins",
+      "displayName": "Wins",
+      "shortDisplayName": "W",
+      "description": "Wins",
+      "abbreviation": "W",
+      "type": "wins",
+      "value": 3.0,
+      "displayValue": "3"
+     },
+     {
+      "name": "losses",
+      "displayName": "Losses",
+      "shortDisplayName": "L",
+      "description": "Losses",
+      "abbreviation": "L",
+      "type": "losses",
+      "value": 1.0,
+      "displayValue": "1"
+     }
+    ]
+   },
+   "team": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/teams/99?lang=en&region=us"
+   },
+   "date": "2024-09-22T07:00Z",
+   "lastUpdated": "2024-09-22T21:11Z"
+  },
+  {
+   "current": 15,
+   "previous": 19,
+   "points": 553.0,
+   "firstPlaceVotes": 0,
+   "trend": "+4",
+   "record": {
+    "summary": "3-0",
+    "stats": [
+     {
+      "name": "wins",
+      "displayName": "Wins",
+      "shortDisplayName": "W",
+      "description": "Wins",
+      "abbreviation": "W",
+      "type": "wins",
+      "value": 3.0,
+      "displayValue": "3"
+     },
+     {
+      "name": "losses",
+      "displayName": "Losses",
+      "shortDisplayName": "L",
+      "description": "Losses",
+      "abbreviation": "L",
+      "type": "losses",
+      "value": 0.0,
+      "displayValue": "0"
+     }
+    ]
+   },
+   "team": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/teams/97?lang=en&region=us"
+   },
+   "date": "2024-09-22T07:00Z",
+   "lastUpdated": "2024-09-22T21:11Z"
+  },
+  {
+   "current": 16,
+   "previous": 17,
+   "points": 546.0,
+   "firstPlaceVotes": 0,
+   "trend": "+1",
+   "record": {
+    "summary": "3-1",
+    "stats": [
+     {
+      "name": "wins",
+      "displayName": "Wins",
+      "shortDisplayName": "W",
+      "description": "Wins",
+      "abbreviation": "W",
+      "type": "wins",
+      "value": 3.0,
+      "displayValue": "3"
+     },
+     {
+      "name": "losses",
+      "displayName": "Losses",
+      "shortDisplayName": "L",
+      "description": "Losses",
+      "abbreviation": "L",
+      "type": "losses",
+      "value": 1.0,
+      "displayValue": "1"
+     }
+    ]
+   },
+   "team": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/teams/87?lang=en&region=us"
+   },
+   "date": "2024-09-22T07:00Z",
+   "lastUpdated": "2024-09-22T21:11Z"
+  },
+  {
+   "current": 17,
+   "previous": 21,
+   "points": 540.0,
+   "firstPlaceVotes": 0,
+   "trend": "+4",
+   "record": {
+    "summary": "2-1",
+    "stats": [
+     {
+      "name": "wins",
+      "displayName": "Wins",
+      "shortDisplayName": "W",
+      "description": "Wins",
+      "abbreviation": "W",
+      "type": "wins",
+      "value": 2.0,
+      "displayValue": "2"
+     },
+     {
+      "name": "losses",
+      "displayName": "Losses",
+      "shortDisplayName": "L",
+      "description": "Losses",
+      "abbreviation": "L",
+      "type": "losses",
+      "value": 1.0,
+      "displayValue": "1"
+     }
+    ]
+   },
+   "team": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/teams/228?lang=en&region=us"
+   },
+   "date": "2024-09-22T07:00Z",
+   "lastUpdated": "2024-09-22T21:11Z"
+  },
+  {
+   "current": 18,
+   "previous": 20,
+   "points": 530.0,
+   "firstPlaceVotes": 0,
+   "trend": "+2",
+   "record": {
+    "summary": "3-0",
+    "stats": [
+     {
+      "name": "wins",
+      "displayName": "Wins",
+      "shortDisplayName": "W",
+      "description": "Wins",
+      "abbreviation": "W",
+      "type": "wins",
+      "value": 3.0,
+      "displayValue": "3"
+     },
+     {
+      "name": "losses",
+      "displayName": "Losses",
+      "shortDisplayName": "L",
+      "description": "Losses",
+      "abbreviation": "L",
+      "type": "losses",
+      "value": 0.0,
+      "displayValue": "0"
+     }
+    ]
+   },
+   "team": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/teams/66?lang=en&region=us"
+   },
+   "date": "2024-09-22T07:00Z",
+   "lastUpdated": "2024-09-22T21:11Z"
+  },
+  {
+   "current": 19,
+   "previous": 24,
+   "points": 458.0,
+   "firstPlaceVotes": 0,
+   "trend": "+5",
+   "record": {
+    "summary": "4-0",
+    "stats": [
+     {
+      "name": "wins",
+      "displayName": "Wins",
+      "shortDisplayName": "W",
+      "description": "Wins",
+      "abbreviation": "W",
+      "type": "wins",
+      "value": 4.0,
+      "displayValue": "4"
+     },
+     {
+      "name": "losses",
+      "displayName": "Losses",
+      "shortDisplayName": "L",
+      "description": "Losses",
+      "abbreviation": "L",
+      "type": "losses",
+      "value": 0.0,
+      "displayValue": "0"
+     }
+    ]
+   },
+   "team": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/teams/356?lang=en&region=us"
+   },
+   "date": "2024-09-22T07:00Z",
+   "lastUpdated": "2024-09-22T21:11Z"
+  },
+  {
+   "current": 20,
+   "previous": 14,
+   "points": 388.0,
+   "firstPlaceVotes": 0,
+   "trend": "-6",
+   "record": {
+    "summary": "3-1",
+    "stats": [
+     {
+      "name": "wins",
+      "displayName": "Wins",
+      "shortDisplayName": "W",
+      "description": "Wins",
+      "abbreviation": "W",
+      "type": "wins",
+      "value": 3.0,
+      "displayValue": "3"
+     },
+     {
+      "name": "losses",
+      "displayName": "Losses",
+      "shortDisplayName": "L",
+      "description": "Losses",
+      "abbreviation": "L",
+      "type": "losses",
+      "value": 1.0,
+      "displayValue": "1"
+     }
+    ]
+   },
+   "team": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/teams/197?lang=en&region=us"
+   },
+   "date": "2024-09-22T07:00Z",
+   "lastUpdated": "2024-09-22T21:11Z"
+  },
+  {
+   "current": 21,
+   "previous": 15,
+   "points": 375.0,
+   "firstPlaceVotes": 0,
+   "trend": "-6",
+   "record": {
+    "summary": "3-1",
+    "stats": [
+     {
+      "name": "wins",
+      "displayName": "Wins",
+      "shortDisplayName": "W",
+      "description": "Wins",
+      "abbreviation": "W",
+      "type": "wins",
+      "value": 3.0,
+      "displayValue": "3"
+     },
+     {
+      "name": "losses",
+      "displayName": "Losses",
+      "shortDisplayName": "L",
+      "description": "Losses",
+      "abbreviation": "L",
+      "type": "losses",
+      "value": 1.0,
+      "displayValue": "1"
+     }
+    ]
+   },
+   "team": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/teams/201?lang=en&region=us"
+   },
+   "date": "2024-09-22T07:00Z",
+   "lastUpdated": "2024-09-22T21:11Z"
+  },
+  {
+   "current": 22,
+   "previous": 0,
+   "points": 327.0,
+   "firstPlaceVotes": 0,
+   "trend": "+4",
+   "record": {
+    "summary": "4-0",
+    "stats": [
+     {
+      "name": "wins",
+      "displayName": "Wins",
+      "shortDisplayName": "W",
+      "description": "Wins",
+      "abbreviation": "W",
+      "type": "wins",
+      "value": 4.0,
+      "displayValue": "4"
+     },
+     {
+      "name": "losses",
+      "displayName": "Losses",
+      "shortDisplayName": "L",
+      "description": "Losses",
+      "abbreviation": "L",
+      "type": "losses",
+      "value": 0.0,
+      "displayValue": "0"
+     }
+    ]
+   },
+   "team": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/teams/252?lang=en&region=us"
+   },
+   "date": "2024-09-22T07:00Z",
+   "lastUpdated": "2024-09-22T21:11Z"
+  },
+  {
+   "current": 23,
+   "previous": 13,
+   "points": 168.0,
+   "firstPlaceVotes": 0,
+   "trend": "-10",
+   "record": {
+    "summary": "3-1",
+    "stats": [
+     {
+      "name": "wins",
+      "displayName": "Wins",
+      "shortDisplayName": "W",
+      "description": "Wins",
+      "abbreviation": "W",
+      "type": "wins",
+      "value": 3.0,
+      "displayValue": "3"
+     },
+     {
+      "name": "losses",
+      "displayName": "Losses",
+      "shortDisplayName": "L",
+      "description": "Losses",
+      "abbreviation": "L",
+      "type": "losses",
+      "value": 1.0,
+      "displayValue": "1"
+     }
+    ]
+   },
+   "team": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/teams/2306?lang=en&region=us"
+   },
+   "date": "2024-09-22T07:00Z",
+   "lastUpdated": "2024-09-22T21:11Z"
+  },
+  {
+   "current": 24,
+   "previous": 25,
+   "points": 77.0,
+   "firstPlaceVotes": 0,
+   "trend": "+1",
+   "record": {
+    "summary": "3-1",
+    "stats": [
+     {
+      "name": "wins",
+      "displayName": "Wins",
+      "shortDisplayName": "W",
+      "description": "Wins",
+      "abbreviation": "W",
+      "type": "wins",
+      "value": 3.0,
+      "displayValue": "3"
+     },
+     {
+      "name": "losses",
+      "displayName": "Losses",
+      "shortDisplayName": "L",
+      "description": "Losses",
+      "abbreviation": "L",
+      "type": "losses",
+      "value": 1.0,
+      "displayValue": "1"
+     }
+    ]
+   },
+   "team": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/teams/245?lang=en&region=us"
+   },
+   "date": "2024-09-22T07:00Z",
+   "lastUpdated": "2024-09-22T21:11Z"
+  },
+  {
+   "current": 25,
+   "previous": 0,
+   "points": 69.0,
+   "firstPlaceVotes": 0,
+   "trend": "+1",
+   "record": {
+    "summary": "2-1",
+    "stats": [
+     {
+      "name": "wins",
+      "displayName": "Wins",
+      "shortDisplayName": "W",
+      "description": "Wins",
+      "abbreviation": "W",
+      "type": "wins",
+      "value": 2.0,
+      "displayValue": "2"
+     },
+     {
+      "name": "losses",
+      "displayName": "Losses",
+      "shortDisplayName": "L",
+      "description": "Losses",
+      "abbreviation": "L",
+      "type": "losses",
+      "value": 1.0,
+      "displayValue": "1"
+     }
+    ]
+   },
+   "team": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/teams/68?lang=en&region=us"
+   },
+   "date": "2024-09-22T07:00Z",
+   "lastUpdated": "2024-09-22T21:11Z"
+  }
+ ],
+ "others": [
+  {
+   "current": 0,
+   "previous": 0,
+   "points": 67.0,
+   "firstPlaceVotes": 0,
+   "trend": "+26",
+   "record": {
+    "summary": "0-0",
+    "stats": [
+     {
+      "name": "wins",
+      "displayName": "Wins",
+      "shortDisplayName": "W",
+      "description": "Wins",
+      "abbreviation": "W",
+      "type": "wins",
+      "value": 0.0,
+      "displayValue": "0"
+     },
+     {
+      "name": "losses",
+      "displayName": "Losses",
+      "shortDisplayName": "L",
+      "description": "Losses",
+      "abbreviation": "L",
+      "type": "losses",
+      "value": 0.0,
+      "displayValue": "0"
+     }
+    ]
+   },
+   "team": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/teams/265?lang=en&region=us"
+   },
+   "date": "2024-09-22T07:00Z",
+   "lastUpdated": "2024-09-22T21:11Z"
+  },
+  {
+   "current": 0,
+   "previous": 0,
+   "points": 63.0,
+   "firstPlaceVotes": 0,
+   "trend": "+26",
+   "record": {
+    "summary": "0-0",
+    "stats": [
+     {
+      "name": "wins",
+      "displayName": "Wins",
+      "shortDisplayName": "W",
+      "description": "Wins",
+      "abbreviation": "W",
+      "type": "wins",
+      "value": 0.0,
+      "displayValue": "0"
+     },
+     {
+      "name": "losses",
+      "displayName": "Losses",
+      "shortDisplayName": "L",
+      "description": "Losses",
+      "abbreviation": "L",
+      "type": "losses",
+      "value": 0.0,
+      "displayValue": "0"
+     }
+    ]
+   },
+   "team": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/teams/84?lang=en&region=us"
+   },
+   "date": "2024-09-22T07:00Z",
+   "lastUpdated": "2024-09-22T21:11Z"
+  },
+  {
+   "current": 0,
+   "previous": 0,
+   "points": 55.0,
+   "firstPlaceVotes": 0,
+   "trend": "+26",
+   "record": {
+    "summary": "0-0",
+    "stats": [
+     {
+      "name": "wins",
+      "displayName": "Wins",
+      "shortDisplayName": "W",
+      "description": "Wins",
+      "abbreviation": "W",
+      "type": "wins",
+      "value": 0.0,
+      "displayValue": "0"
+     },
+     {
+      "name": "losses",
+      "displayName": "Losses",
+      "shortDisplayName": "L",
+      "description": "Losses",
+      "abbreviation": "L",
+      "type": "losses",
+      "value": 0.0,
+      "displayValue": "0"
+     }
+    ]
+   },
+   "team": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/teams/103?lang=en&region=us"
+   },
+   "date": "2024-09-22T07:00Z",
+   "lastUpdated": "2024-09-22T21:11Z"
+  },
+  {
+   "current": 0,
+   "previous": 0,
+   "points": 53.0,
+   "firstPlaceVotes": 0,
+   "trend": "+26",
+   "record": {
+    "summary": "0-0",
+    "stats": [
+     {
+      "name": "wins",
+      "displayName": "Wins",
+      "shortDisplayName": "W",
+      "description": "Wins",
+      "abbreviation": "W",
+      "type": "wins",
+      "value": 0.0,
+      "displayValue": "0"
+     },
+     {
+      "name": "losses",
+      "displayName": "Losses",
+      "shortDisplayName": "L",
+      "description": "Losses",
+      "abbreviation": "L",
+      "type": "losses",
+      "value": 0.0,
+      "displayValue": "0"
+     }
+    ]
+   },
+   "team": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/teams/2439?lang=en&region=us"
+   },
+   "date": "2024-09-22T07:00Z",
+   "lastUpdated": "2024-09-22T21:11Z"
+  },
+  {
+   "current": 0,
+   "previous": 0,
+   "points": 37.0,
+   "firstPlaceVotes": 0,
+   "trend": "+26",
+   "record": {
+    "summary": "0-0",
+    "stats": [
+     {
+      "name": "wins",
+      "displayName": "Wins",
+      "shortDisplayName": "W",
+      "description": "Wins",
+      "abbreviation": "W",
+      "type": "wins",
+      "value": 0.0,
+      "displayValue": "0"
+     },
+     {
+      "name": "losses",
+      "displayName": "Losses",
+      "shortDisplayName": "L",
+      "description": "Losses",
+      "abbreviation": "L",
+      "type": "losses",
+      "value": 0.0,
+      "displayValue": "0"
+     }
+    ]
+   },
+   "team": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/teams/221?lang=en&region=us"
+   },
+   "date": "2024-09-22T07:00Z",
+   "lastUpdated": "2024-09-22T21:11Z"
+  },
+  {
+   "current": 0,
+   "previous": 22,
+   "points": 25.0,
+   "firstPlaceVotes": 0,
+   "trend": "+22",
+   "record": {
+    "summary": "0-0",
+    "stats": [
+     {
+      "name": "wins",
+      "displayName": "Wins",
+      "shortDisplayName": "W",
+      "description": "Wins",
+      "abbreviation": "W",
+      "type": "wins",
+      "value": 0.0,
+      "displayValue": "0"
+     },
+     {
+      "name": "losses",
+      "displayName": "Losses",
+      "shortDisplayName": "L",
+      "description": "Losses",
+      "abbreviation": "L",
+      "type": "losses",
+      "value": 0.0,
+      "displayValue": "0"
+     }
+    ]
+   },
+   "team": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/teams/158?lang=en&region=us"
+   },
+   "date": "2024-09-22T07:00Z",
+   "lastUpdated": "2024-09-22T21:11Z"
+  },
+  {
+   "current": 0,
+   "previous": 0,
+   "points": 24.0,
+   "firstPlaceVotes": 0,
+   "trend": "+26",
+   "record": {
+    "summary": "0-0",
+    "stats": [
+     {
+      "name": "wins",
+      "displayName": "Wins",
+      "shortDisplayName": "W",
+      "description": "Wins",
+      "abbreviation": "W",
+      "type": "wins",
+      "value": 0.0,
+      "displayValue": "0"
+     },
+     {
+      "name": "losses",
+      "displayName": "Losses",
+      "shortDisplayName": "L",
+      "description": "Losses",
+      "abbreviation": "L",
+      "type": "losses",
+      "value": 0.0,
+      "displayValue": "0"
+     }
+    ]
+   },
+   "team": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/teams/2294?lang=en&region=us"
+   },
+   "date": "2024-09-22T07:00Z",
+   "lastUpdated": "2024-09-22T21:11Z"
+  },
+  {
+   "current": 0,
+   "previous": 0,
+   "points": 11.0,
+   "firstPlaceVotes": 0,
+   "trend": "+26",
+   "record": {
+    "summary": "0-0",
+    "stats": [
+     {
+      "name": "wins",
+      "displayName": "Wins",
+      "shortDisplayName": "W",
+      "description": "Wins",
+      "abbreviation": "W",
+      "type": "wins",
+      "value": 0.0,
+      "displayValue": "0"
+     },
+     {
+      "name": "losses",
+      "displayName": "Losses",
+      "shortDisplayName": "L",
+      "description": "Losses",
+      "abbreviation": "L",
+      "type": "losses",
+      "value": 0.0,
+      "displayValue": "0"
+     }
+    ]
+   },
+   "team": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/teams/256?lang=en&region=us"
+   },
+   "date": "2024-09-22T07:00Z",
+   "lastUpdated": "2024-09-22T21:11Z"
+  },
+  {
+   "current": 0,
+   "previous": 0,
+   "points": 7.0,
+   "firstPlaceVotes": 0,
+   "trend": "+26",
+   "record": {
+    "summary": "0-0",
+    "stats": [
+     {
+      "name": "wins",
+      "displayName": "Wins",
+      "shortDisplayName": "W",
+      "description": "Wins",
+      "abbreviation": "W",
+      "type": "wins",
+      "value": 0.0,
+      "displayValue": "0"
+     },
+     {
+      "name": "losses",
+      "displayName": "Losses",
+      "shortDisplayName": "L",
+      "description": "Losses",
+      "abbreviation": "L",
+      "type": "losses",
+      "value": 0.0,
+      "displayValue": "0"
+     }
+    ]
+   },
+   "team": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/teams/2579?lang=en&region=us"
+   },
+   "date": "2024-09-22T07:00Z",
+   "lastUpdated": "2024-09-22T21:11Z"
+  },
+  {
+   "current": 0,
+   "previous": 0,
+   "points": 4.0,
+   "firstPlaceVotes": 0,
+   "trend": "+26",
+   "record": {
+    "summary": "0-0",
+    "stats": [
+     {
+      "name": "wins",
+      "displayName": "Wins",
+      "shortDisplayName": "W",
+      "description": "Wins",
+      "abbreviation": "W",
+      "type": "wins",
+      "value": 0.0,
+      "displayValue": "0"
+     },
+     {
+      "name": "losses",
+      "displayName": "Losses",
+      "shortDisplayName": "L",
+      "description": "Losses",
+      "abbreviation": "L",
+      "type": "losses",
+      "value": 0.0,
+      "displayValue": "0"
+     }
+    ]
+   },
+   "team": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/teams/2335?lang=en&region=us"
+   },
+   "date": "2024-09-22T07:00Z",
+   "lastUpdated": "2024-09-22T21:11Z"
+  },
+  {
+   "current": 0,
+   "previous": 0,
+   "points": 3.0,
+   "firstPlaceVotes": 0,
+   "trend": "+26",
+   "record": {
+    "summary": "0-0",
+    "stats": [
+     {
+      "name": "wins",
+      "displayName": "Wins",
+      "shortDisplayName": "W",
+      "description": "Wins",
+      "abbreviation": "W",
+      "type": "wins",
+      "value": 0.0,
+      "displayValue": "0"
+     },
+     {
+      "name": "losses",
+      "displayName": "Losses",
+      "shortDisplayName": "L",
+      "description": "Losses",
+      "abbreviation": "L",
+      "type": "losses",
+      "value": 0.0,
+      "displayValue": "0"
+     }
+    ]
+   },
+   "team": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/teams/2116?lang=en&region=us"
+   },
+   "date": "2024-09-22T07:00Z",
+   "lastUpdated": "2024-09-22T21:11Z"
+  },
+  {
+   "current": 0,
+   "previous": 0,
+   "points": 3.0,
+   "firstPlaceVotes": 0,
+   "trend": "+26",
+   "record": {
+    "summary": "0-0",
+    "stats": [
+     {
+      "name": "wins",
+      "displayName": "Wins",
+      "shortDisplayName": "W",
+      "description": "Wins",
+      "abbreviation": "W",
+      "type": "wins",
+      "value": 0.0,
+      "displayValue": "0"
+     },
+     {
+      "name": "losses",
+      "displayName": "Losses",
+      "shortDisplayName": "L",
+      "description": "Losses",
+      "abbreviation": "L",
+      "type": "losses",
+      "value": 0.0,
+      "displayValue": "0"
+     }
+    ]
+   },
+   "team": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/teams/8?lang=en&region=us"
+   },
+   "date": "2024-09-22T07:00Z",
+   "lastUpdated": "2024-09-22T21:11Z"
+  },
+  {
+   "current": 0,
+   "previous": 0,
+   "points": 2.0,
+   "firstPlaceVotes": 0,
+   "trend": "+26",
+   "record": {
+    "summary": "0-0",
+    "stats": [
+     {
+      "name": "wins",
+      "displayName": "Wins",
+      "shortDisplayName": "W",
+      "description": "Wins",
+      "abbreviation": "W",
+      "type": "wins",
+      "value": 0.0,
+      "displayValue": "0"
+     },
+     {
+      "name": "losses",
+      "displayName": "Losses",
+      "shortDisplayName": "L",
+      "description": "Losses",
+      "abbreviation": "L",
+      "type": "losses",
+      "value": 0.0,
+      "displayValue": "0"
+     }
+    ]
+   },
+   "team": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/teams/2567?lang=en&region=us"
+   },
+   "date": "2024-09-22T07:00Z",
+   "lastUpdated": "2024-09-22T21:11Z"
+  },
+  {
+   "current": 0,
+   "previous": 0,
+   "points": 2.0,
+   "firstPlaceVotes": 0,
+   "trend": "+26",
+   "record": {
+    "summary": "0-0",
+    "stats": [
+     {
+      "name": "wins",
+      "displayName": "Wins",
+      "shortDisplayName": "W",
+      "description": "Wins",
+      "abbreviation": "W",
+      "type": "wins",
+      "value": 0.0,
+      "displayValue": "0"
+     },
+     {
+      "name": "losses",
+      "displayName": "Losses",
+      "shortDisplayName": "L",
+      "description": "Losses",
+      "abbreviation": "L",
+      "type": "losses",
+      "value": 0.0,
+      "displayValue": "0"
+     }
+    ]
+   },
+   "team": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/teams/12?lang=en&region=us"
+   },
+   "date": "2024-09-22T07:00Z",
+   "lastUpdated": "2024-09-22T21:11Z"
+  },
+  {
+   "current": 0,
+   "previous": 0,
+   "points": 1.0,
+   "firstPlaceVotes": 0,
+   "trend": "+26",
+   "record": {
+    "summary": "0-0",
+    "stats": [
+     {
+      "name": "wins",
+      "displayName": "Wins",
+      "shortDisplayName": "W",
+      "description": "Wins",
+      "abbreviation": "W",
+      "type": "wins",
+      "value": 0.0,
+      "displayValue": "0"
+     },
+     {
+      "name": "losses",
+      "displayName": "Losses",
+      "shortDisplayName": "L",
+      "description": "Losses",
+      "abbreviation": "L",
+      "type": "losses",
+      "value": 0.0,
+      "displayValue": "0"
+     }
+    ]
+   },
+   "team": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/teams/2426?lang=en&region=us"
+   },
+   "date": "2024-09-22T07:00Z",
+   "lastUpdated": "2024-09-22T21:11Z"
+  }
+ ],
+ "droppedOut": [
+  {
+   "current": 0,
+   "previous": 22,
+   "points": 25.0,
+   "firstPlaceVotes": 0,
+   "trend": "+22",
+   "record": {
+    "summary": "0-0",
+    "stats": [
+     {
+      "name": "wins",
+      "displayName": "Wins",
+      "shortDisplayName": "W",
+      "description": "Wins",
+      "abbreviation": "W",
+      "type": "wins",
+      "value": 0.0,
+      "displayValue": "0"
+     },
+     {
+      "name": "losses",
+      "displayName": "Losses",
+      "shortDisplayName": "L",
+      "description": "Losses",
+      "abbreviation": "L",
+      "type": "losses",
+      "value": 0.0,
+      "displayValue": "0"
+     }
+    ]
+   },
+   "team": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/teams/158?lang=en&region=us"
+   },
+   "date": "2024-09-22T07:00Z",
+   "lastUpdated": "2024-09-22T21:11Z"
+  },
+  {
+   "current": 0,
+   "previous": 23,
+   "points": 0.0,
+   "firstPlaceVotes": 0,
+   "trend": "+23",
+   "record": {
+    "summary": "2-0",
+    "stats": [
+     {
+      "name": "wins",
+      "displayName": "Wins",
+      "shortDisplayName": "W",
+      "description": "Wins",
+      "abbreviation": "W",
+      "type": "wins",
+      "value": 2.0,
+      "displayValue": "2"
+     },
+     {
+      "name": "losses",
+      "displayName": "Losses",
+      "shortDisplayName": "L",
+      "description": "Losses",
+      "abbreviation": "L",
+      "type": "losses",
+      "value": 0.0,
+      "displayValue": "0"
+     }
+    ]
+   },
+   "team": {
+    "$ref": "http://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/2024/teams/2459?lang=en&region=us"
+   },
+   "date": "2024-09-22T07:00Z",
+   "lastUpdated": "2024-09-22T21:11Z"
+  }
+ ],
+ "availability": {}
+}

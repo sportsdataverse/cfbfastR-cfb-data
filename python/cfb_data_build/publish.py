@@ -110,6 +110,26 @@ RELEASE_NOTES: dict[str, str] = {
         "baseline (2004+ history), with delta ranks and sample sizes. One asset "
         "per season, as of the season's last game."
     ),
+    "cfb_metric_curves": (
+        "College Football rate curves along a continuous axis, per SEASON, for "
+        "the league, every team and every credited player (`entity_type`): "
+        "`fg_pct_by_distance` (FG% by kick distance, 5-yard buckets 15-65 then "
+        "65-80), `fourth_conv_by_ytg` (4th-down conversion by yards to go), "
+        "`success_by_down_distance` (EPA success by down x distance; `down` is "
+        "the second axis, 4 x 5 league rows), `cmp_pct_by_air_yards` and "
+        "`epa_by_air_yards` (completion% / EPA success by air-yards bucket). "
+        "Each populated bucket (`x_lo` inclusive, `x_hi` exclusive) carries "
+        "attempts, successes, rate = successes / attempts and the mean EPA per "
+        "attempt; an empty bucket has no row. Regular season + postseason; ids "
+        "are ESPN (`id_source`). SPANS: FG, 4th-down and down x distance curves "
+        "2004+ (`yds_fg` is present on 98.6-100% of FG attempts in every season "
+        "2004-2013 -- 2004 100.0, 2005 98.6, 2006 100.0, 2007 99.8, 2008 99.7, "
+        "2009 100.0, 2010 100.0, 2011 99.8, 2012 99.8, 2013 99.8 -- and 99.1%+ "
+        "since 2014). AIR-YARDS curves 2025+ ONLY: `air_yards` is on 41% of "
+        "2025 pass attempts and 96% of 2026's; every earlier season carries at "
+        "most 32 stray air-yards plays, so the producer drops the two air-yards "
+        "metrics before 2025 rather than publish a one-attempt curve."
+    ),
     "cfb_team_opponent_splits": (
         "College Football by-opponent team-game splits: ONE ROW PER TEAM PER "
         "GAME with season, season_type, week, game_id, team_id, opponent_id, "

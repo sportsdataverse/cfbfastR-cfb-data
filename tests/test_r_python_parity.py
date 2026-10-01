@@ -157,6 +157,7 @@ KNOWN_UNPAIRED.update(
 #   matchup_line     /games + /lines, not final.json; Python-only by design --
 #                    the R source is a private pipeline, not a numbered R stage
 #   rolling_windows  derived, cli.DERIVED; reads cfb/pbp + cfb_schedules
+#   metric_curves    derived, cli.DERIVED; reads cfb/pbp (stage 65)
 NON_DATASET_STAGES: set[str] = {
     "adv_box",
     "team_summaries",
@@ -164,6 +165,7 @@ NON_DATASET_STAGES: set[str] = {
     "matchup_features",
     "matchup_line",
     "rolling_windows",
+    "metric_curves",
 }
 # --------------------------------------------------------------------------
 # End repo-specific data. Everything below is the shared engine.

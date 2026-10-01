@@ -94,12 +94,10 @@ def test_contract_dtypes_ids_entities_and_the_air_yards_span(pbp, curves):
     # 2024 carries a stray air-yards pass attempt (1 of ~57k): the function would
     # emit a one-attempt curve for it, so the producer enforces the 2025+ span.
     assert SEASON < AIR_YARDS_FLOOR
-    assert (
-        pbp.filter(
-            (pl.col("pass_attempt") == True) & pl.col("air_yards").is_not_null()
-        ).height
-        > 0
-    )  # noqa: E712
+    strays = pbp.filter(
+        (pl.col("pass_attempt") == True) & pl.col("air_yards").is_not_null()  # noqa: E712
+    )
+    assert strays.height > 0
     assert not curves["metric"].str.contains("air_yards").any()
     assert set(curves["metric"]) == {
         "fg_pct_by_distance",

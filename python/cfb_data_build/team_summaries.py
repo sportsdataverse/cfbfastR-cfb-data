@@ -1623,13 +1623,7 @@ def build_team_summaries(
     assert_adjustment_is_real(
         team_data, season=yr, through_week=through_week, label=f"team_summaries {yr}"
     )
-    team_data = _attach_cohort_percentiles(
-        team_data,
-        cohort="conference",
-        rank_cols=[c for c in team_data.columns if c.endswith("_rank")],
-        suffix="_conf_pct",
-        min_cohort=MIN_COHORT_TEAMS,
-    )
+    team_data = _attach_conference_percentiles(team_data)
     # A passer's TEPA must carry his sacks and interceptions -- see #30, where
     # it did not and every column still looked individually plausible.
     assert_passer_epa_includes_sacks(qb_data, label=f"passing {yr}")
@@ -1760,6 +1754,8 @@ def _attach_leader_ranks(
 #: percentile of two.
 MIN_COHORT_TEAMS = 5
 MIN_COHORT_PLAYERS = 10
+#: a ``conference`` label that is not a conference: no ``_conf_pct`` cohort, any season
+_INDEPENDENTS = "FBS Independents"
 
 #: roster ``position_abbreviation`` -> ``position_group``. Any other listed position
 #: is ``other``; ESPN's ``-`` placeholder is an unknown position and maps to null.
@@ -1801,6 +1797,23 @@ def _attach_cohort_percentiles(
             .alias(f"{m}{suffix}")
         )
     return df.with_columns(exprs)
+
+
+def _attach_conference_percentiles(team_data: pl.DataFrame) -> pl.DataFrame:
+    """``<m>_conf_pct`` beside every team ``<m>_rank``, cohort ``conference``.
+
+    The independents get a null cohort key in a temporary column, so they get
+    null ``_conf_pct`` and count toward no cohort's ``n``, while the published
+    ``conference`` column is left as it is.
+    """
+    conf = pl.col("conference")
+    return _attach_cohort_percentiles(
+        team_data.with_columns(_conf_cohort=pl.when(conf != _INDEPENDENTS).then(conf)),
+        cohort="_conf_cohort",
+        rank_cols=[c for c in team_data.columns if c.endswith("_rank")],
+        suffix="_conf_pct",
+        min_cohort=MIN_COHORT_TEAMS,
+    ).drop("_conf_cohort")
 
 
 def _attach_position_cohorts(

@@ -18,6 +18,7 @@ from cfb_data_build.team_summaries import (
     MIN_COHORT_PLAYERS,
     MIN_COHORT_TEAMS,
     _attach_cohort_percentiles,
+    _attach_conference_percentiles,
     _attach_leader_ranks,
     _attach_position_cohorts,
     _rank,
@@ -110,6 +111,29 @@ def test_a_null_cohort_key_is_null_and_not_a_cohort_of_its_own():
         out.filter(pl.col("conference") == "A")["EPAplay_off_conf_pct"].null_count()
         == 0
     )
+
+
+def test_fbs_independents_are_no_conference_cohort():
+    df = pl.DataFrame(
+        {
+            "team_id": list(range(1, 13)),
+            "conference": ["A"] * 6 + ["FBS Independents"] * 6,
+            # interleaved, so independents counted into A's n would move A's values
+            "EPAplay_off": [0.1, 0.3, 0.5, 0.7, 0.9, 1.1, 0.2, 0.4, 0.6, 0.8, 1.0, 1.2],
+        }
+    ).with_columns(EPAplay_off_rank=_rank("EPAplay_off", descending=True))
+    out = _attach_conference_percentiles(df)
+    ind = out.filter(pl.col("conference") == "FBS Independents")
+    a = out.filter(pl.col("conference") == "A").sort("EPAplay_off")
+
+    assert ind["EPAplay_off"].null_count() == 0  # the metric is there...
+    assert ind["EPAplay_off_conf_pct"].null_count() == 6  # ...the cohort is not
+    assert a["EPAplay_off_conf_pct"].to_list() == pytest.approx(
+        [100 * k / 7 for k in range(1, 7)]
+    )
+    # the published conference column is untouched and the temp key is gone
+    assert out["conference"].to_list() == df["conference"].to_list()
+    assert out.columns == [*df.columns, "EPAplay_off_conf_pct"]
 
 
 # ---- players ---------------------------------------------------------------

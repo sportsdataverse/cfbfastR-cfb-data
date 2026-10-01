@@ -1,13 +1,15 @@
 """Compile the raw 247 recruit store into publishable datasets.
 
 Reads ``cfb/recruits/json/{year}/page_*.json`` from cfbfastR-cfb-raw and emits
-three tables:
+three tables, and publishes two more from the same roster-continuity family:
 
 ===========================  ====================================================
 ``cfb_recruits``             one row per recruit (season, team_id, stars, grade)
 ``cfb_team_talent``          one row per (season, team_id): talent composite,
                              blue-chip ratio, class counts
 ``cfb_returning_production`` one row per (season, team_id) -- off/def returning
+``cfb_team_portal``          one row per (season, team_id): D-I transfers in/out
+                             from ESPN roster diffs, portal share, talent moved
 ===========================  ====================================================
 
 WHY THIS EXISTS
@@ -160,6 +162,75 @@ def build_team_talent(
     )
 
 
+def build_team_portal(
+    moves: pl.DataFrame, rosters: pl.DataFrame, season: int
+) -> pl.DataFrame:
+    """``cfb_team_portal``: per (season, team_id) transfer counts against the roster.
+
+    Args:
+        moves: sdv-py ``cfb_transfer_moves(season)`` rows (Utf8 ESPN ids, one
+            ``in`` and one ``out`` row per move; identical rows already collapsed).
+        rosters: sdv-py ``load_cfb_rosters(season)`` (Int64 ``team_id`` /
+            ``athlete_id``) -- the denominator and the team list.
+        season: the destination season S (moves compare the S-1 roster to S).
+
+    Returns:
+        One row per team on the season-S roster (FBS and FCS mixed): ``roster_n``,
+        ``transfers_in_n`` / ``transfers_out_n`` (distinct players),
+        ``portal_share`` (= in / roster_n), and the recruit-star talent points
+        moved in, out, and net. Teams with no movers carry 0, not null.
+    """
+    roster_n = rosters.group_by("team_id").agg(
+        pl.col("athlete_id").n_unique().cast(pl.Int64).alias("roster_n")
+    )
+    m = moves.filter(pl.col("season") == season).with_columns(
+        pl.col("team_id").cast(pl.Int64)
+    )
+
+    def _side(direction: str, n_col: str, talent_col: str) -> pl.DataFrame:
+        # a player counts once per team side, however many S-1/S rosters list him
+        return (
+            m.filter(pl.col("direction") == direction)
+            .unique(["team_id", "player_id"], keep="first", maintain_order=True)
+            .group_by("team_id")
+            .agg(
+                pl.len().cast(pl.Int64).alias(n_col),
+                pl.col("talent_points").sum().alias(talent_col),
+            )
+        )
+
+    ins = _side("in", "transfers_in_n", "transfer_talent_in")
+    outs = _side("out", "transfers_out_n", "transfer_talent_out")
+    assert (
+        roster_n.schema["team_id"]
+        == ins.schema["team_id"]
+        == outs.schema["team_id"]
+        == pl.Int64
+    )
+    return (
+        roster_n.join(ins, on="team_id", how="left")
+        .join(outs, on="team_id", how="left")
+        .with_columns(
+            pl.col("transfers_in_n", "transfers_out_n").fill_null(0),
+            pl.col("transfer_talent_in", "transfer_talent_out").fill_null(0.0),
+        )
+        .select(
+            pl.lit(season, dtype=pl.Int64).alias("season"),
+            "team_id",
+            "roster_n",
+            "transfers_in_n",
+            "transfers_out_n",
+            (pl.col("transfers_in_n") / pl.col("roster_n")).alias("portal_share"),
+            "transfer_talent_in",
+            "transfer_talent_out",
+            (pl.col("transfer_talent_in") - pl.col("transfer_talent_out")).alias(
+                "net_transfer_talent"
+            ),
+        )
+        .sort("team_id")
+    )
+
+
 #: Published recruiting datasets. Stems match the release tag, as elsewhere.
 RECRUITING_SPECS = {
     "recruits": DatasetSpec("cfb_recruits", "cfb_recruits", "cfb_recruits"),
@@ -172,6 +243,9 @@ RECRUITING_SPECS = {
         "cfb_returning_production",
         "cfb_returning_production",
     ),
+    # Also not from the recruit store: ESPN roster diffs (S-1 -> S) via sdv-py's
+    # cfb_transfer_moves, with talent points from the cfb_recruits release.
+    "team_portal": DatasetSpec("cfb_team_portal", "cfb_team_portal", "cfb_team_portal"),
 }
 
 #: Datasets that need the 247 raw store. `returning_production` does not.
@@ -202,7 +276,11 @@ def build_recruiting(
     Unlike the game-derived datasets this reads NO game data -- only the raw
     247 store -- so it can rebuild years after the fact with no network at all.
     """
-    from cfb_data_build.checks import assert_returning_is_real, assert_talent_is_real
+    from cfb_data_build.checks import (
+        assert_portal_is_real,
+        assert_returning_is_real,
+        assert_talent_is_real,
+    )
     from cfb_data_build.publish import publish_dataset
 
     if dataset not in RECRUITING_SPECS:
@@ -242,6 +320,31 @@ def build_recruiting(
                     )
                     continue
                 assert_returning_is_real(df, label=f"{spec.dataset} {season}")
+            elif dataset == "team_portal":
+                from sportsdataverse.cfb import cfb_transfer_moves, load_cfb_rosters
+
+                rosters = load_cfb_rosters(season)
+                if not isinstance(rosters, pl.DataFrame):
+                    rosters = pl.from_pandas(rosters)
+                # Same "season not started" skip as returning production: no
+                # season-S roster means nothing to diff yet.
+                if rosters.height == 0:
+                    print(
+                        f"  {spec.dataset} {season}: 0 rows, skipped "
+                        "(season has no roster data yet)",
+                        flush=True,
+                    )
+                    continue
+                moves = cfb_transfer_moves(season)
+                if not isinstance(moves, pl.DataFrame):
+                    moves = pl.from_pandas(moves)
+                df = build_team_portal(moves, rosters, season)
+                fbs = set(
+                    rosters.filter(pl.col("division") == "fbs")["team_id"].to_list()
+                )
+                assert_portal_is_real(
+                    df, fbs_team_ids=fbs, label=f"{spec.dataset} {season}"
+                )
             else:
                 # `recruits` is a per-season passthrough -- it needs ONLY its own
                 # class. Talent draws on classes S-window+1..S, where a missing

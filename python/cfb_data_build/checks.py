@@ -216,6 +216,62 @@ def assert_returning_is_real(df, *, label: str = "") -> None:
         )
 
 
+#: More than this share of teams with no measured arrival means the roster diff
+#: stopped keying (the sdv-py `pl.col("team")` bug raised; a mis-cast id would
+#: instead return ~0 movers). Real 2024: 3,142 D-I moves, Colorado at 41/111.
+MAX_ZERO_PORTAL_SHARE = 0.95
+
+#: A roster diff is only a transfer count over FULL rosters. ESPN rosters before
+#: 2014 list ~55 players per FBS team (players with stats): 2005-2013 have 0-3
+#: FBS teams at >= 70, 2014-2025 have 128-136 (measured 2026-10-01).
+FULL_ROSTER_MIN = 70
+MIN_FULL_FBS_ROSTERS = 100
+
+
+def assert_portal_is_real(df, *, fbs_team_ids, label: str = "") -> None:
+    """Raise if a team-portal table is empty, collapsed, or built on thin rosters.
+
+    Portal share is a roster diff: an ESPN athlete id on team T in season S that
+    sat on a different team's roster in S-1. When the id key breaks, every team
+    comes out at 0 movers and the table still looks well-formed; when the season's
+    rosters are partial, the diff undercounts without erroring. Both are output
+    shapes, so both are asserted on the output.
+
+    Args:
+        df: the built ``cfb_team_portal`` season frame.
+        fbs_team_ids: ESPN team ids classified FBS for the season (FCS rosters
+            must not stand in for missing FBS ones).
+        label: context for the error message.
+    """
+    tag = f" [{label}]" if label else ""
+    if df.height == 0:
+        raise ValueError(
+            f"team portal{tag} is EMPTY -- a season always has rostered teams"
+        )
+    for col in ("team_id", "roster_n", "portal_share"):
+        if col not in df.columns:
+            raise ValueError(
+                f"team portal{tag} is missing {col!r}; got {sorted(df.columns)}"
+            )
+    dead = df.filter(
+        pl.col("portal_share").is_null() | (pl.col("portal_share") == 0)
+    ).height
+    if dead / df.height > MAX_ZERO_PORTAL_SHARE:
+        raise ValueError(
+            f"team portal{tag}: portal_share is null or 0 for {dead}/{df.height} teams "
+            f"(> {MAX_ZERO_PORTAL_SHARE:.0%}) -- the roster diff stopped keying"
+        )
+    full = df.filter(
+        pl.col("team_id").is_in(list(fbs_team_ids))
+        & (pl.col("roster_n") >= FULL_ROSTER_MIN)
+    ).height
+    if full < MIN_FULL_FBS_ROSTERS:
+        raise ValueError(
+            f"team portal{tag}: only {full} FBS teams carry a roster of >= {FULL_ROSTER_MIN} "
+            f"(need {MIN_FULL_FBS_ROSTERS}) -- partial rosters undercount transfers silently"
+        )
+
+
 def assert_passer_epa_includes_sacks(df, *, label: str = "") -> None:
     """Raise if `cfb_passing` looks like it dropped its negative plays again.
 

@@ -46,8 +46,8 @@ POLLS = ("poll_analytics",)
 
 #: Roster-continuity datasets. `recruits`/`team_talent` come from the raw 247
 #: store; `returning_production` comes from the ESPN player box + rosters and
-#: needs no raw store at all.
-RECRUITING = ("recruits", "team_talent", "returning_production")
+#: `team_portal` from ESPN roster diffs -- neither needs a raw store at all.
+RECRUITING = ("recruits", "team_talent", "returning_production", "team_portal")
 
 #: Per-season ESPN team + conference reference, compiled from the season bundles
 #: cfbfastR-cfb-raw commits at cfb/teams/json/{season}.json (read over HTTP).

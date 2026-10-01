@@ -39,6 +39,7 @@ Expected `col_name | col_type | col_description` for each per-game-compiled **se
 | [cfb_league_averages](#cfb_league_averages) † | one row per (season, level, entity, category, metric) | 10 | `cfb_league_averages` |
 | [cfb_poll_analytics](#cfb_poll_analytics) | one row per (season, season_type, week, poll, team) | 13 | `cfb_poll_analytics` |
 | [cfb_poll_week_summary](#cfb_poll_week_summary) | one row per (season, season_type, week, poll) | 8 | `cfb_poll_week_summary` |
+| [cfb_team_portal](#cfb_team_portal) | one row per (season, team) | 9 | `cfb_team_portal` |
 
 > † **Season-level summary datasets.** Unlike every table above (per-game `final`
 > JSON reshaped into a compiled season), these six are produced by
@@ -1944,3 +1945,37 @@ week -- exactly that week's `cfb_poll_analytics` rows.
 | exits | integer | Count of `exited` rows that week. |
 
 _Release tag: `cfb_poll_week_summary`_
+
+### cfb_team_portal
+
+Per `(season, team_id)` D-I transfer counts from ESPN roster diffs (stage 10,
+`python/cfb_data_build/recruiting.py`). A move is an ESPN athlete id on team T's
+season-S roster that sat on a different team's season S-1 roster (ESPN athlete ids
+survive transfers), via sdv-py `cfb_transfer_moves`. One row per team on the
+season-S ESPN roster, FBS and FCS mixed: filter on `teams` classification for FBS.
+
+- **Counts D-I to D-I moves only.** JUCO, NAIA and other non-D-I arrivals never
+  appear on an S-1 ESPN roster, so they are not counted.
+- **Floor 2015.** ESPN rosters before 2014 list about 55 players per FBS team
+  (players with stats), so a diff across them undercounts. 2014 is the first full
+  roster, which makes 2015 the first full diff. A build is rejected when fewer than
+  100 FBS teams carry a roster of 70 or more, or when `portal_share` is null or 0
+  for more than 95% of teams (`assert_portal_is_real`).
+- **Talent points are a weak join.** Each mover's recruit-star points come from the
+  `cfb_recruits` release by case-folded player name (247 `recruit_id` and ESPN
+  athlete ids have no crosswalk). An unmatched mover carries the 0-star default
+  (20 points; FBS constants for every team).
+
+| col_name | col_type | col_description |
+| --- | --- | --- |
+| season | integer | Destination season S; the S-1 roster is diffed against S. |
+| team_id | integer | ESPN team id. |
+| roster_n | integer | Distinct ESPN athletes on the team's season-S roster. |
+| transfers_in_n | integer | Players on the season-S roster who were on a different D-I team's S-1 roster. |
+| transfers_out_n | integer | Players from the team's S-1 roster who are on a different D-I team's season-S roster; a player listed by two destination rosters counts once. |
+| portal_share | double | `transfers_in_n / roster_n`. |
+| transfer_talent_in | double | Sum of the incoming players' recruit-star talent points. |
+| transfer_talent_out | double | Sum of the outgoing players' recruit-star talent points. |
+| net_transfer_talent | double | `transfer_talent_in - transfer_talent_out`. |
+
+_Release tag: `cfb_team_portal`_

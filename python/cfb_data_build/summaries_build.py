@@ -14,13 +14,37 @@ builder-level cumulative snapshot contract (program plan P8).
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import polars as pl
 
 from cfb_data_build.config import SUMMARIES_REGISTRY
-from cfb_data_build.io import write_dataset
+from cfb_data_build.io import dataset_stem, write_dataset
 from cfb_data_build.publish import publish_dataset
 from cfb_data_build.summaries_input import prepare_plays_input
 from cfb_data_build.team_summaries import build_team_summaries
+
+
+def _load_season_rosters(season: int, *, base: str = "cfb") -> pl.DataFrame:
+    """The season's ``cfb_rosters``: this build's output under ``base`` first, else the release.
+
+    The daily processor builds ``cfb_rosters`` just before the summaries, so the
+    local file is the current one; the ``espn_cfb_rosters`` release is the
+    fallback for a build that did not. Empty when neither has the season.
+    """
+    from cfb_data_build.rosters_espn import SPEC
+
+    local = (
+        Path(base)
+        / SPEC.dataset
+        / "parquet"
+        / f"{dataset_stem(SPEC.stem, season)}.parquet"
+    )
+    if local.exists():
+        return pl.read_parquet(local, columns=["athlete_id", "position_abbreviation"])
+    from sportsdataverse.cfb import load_cfb_rosters
+
+    return load_cfb_rosters(seasons=[season])
 
 
 def build_summaries_season(
@@ -32,6 +56,7 @@ def build_summaries_season(
     dry_run: bool = False,
     pbp: pl.DataFrame | None = None,
     schedule: pl.DataFrame | None = None,
+    rosters: pl.DataFrame | None = None,
 ) -> dict[str, int]:
     """Build (and optionally publish) the 6-table family for one season.
 
@@ -45,10 +70,14 @@ def build_summaries_season(
         dry_run: print publish actions instead of running them.
         pbp: pre-loaded pbp frame (loaded from the release when ``None``).
         schedule: pre-loaded schedule frame (loaded when ``None``).
+        rosters: pre-loaded ``cfb_rosters`` frame for the player tables'
+            ``position_group`` (loaded when ``None``, see
+            :func:`_load_season_rosters`).
 
     Returns:
         Row counts per table key.
     """
+    season_base = base  # the roster is a season build output, never a snapshot's
     if through_week is not None:
         if publish:
             raise ValueError(
@@ -78,6 +107,15 @@ def build_summaries_season(
         )
         return {key: 0 for key in SUMMARIES_REGISTRY}
 
+    if rosters is None:
+        rosters = _load_season_rosters(season, base=season_base)
+    if rosters.is_empty():
+        print(
+            f"[summaries {season}] no cfb_rosters for {season}: "
+            "position_group and every *_pos_pct are null",
+            flush=True,
+        )
+
     plays = prepare_plays_input(pbp, schedule, season)
     if through_week is not None:
         # REGULAR-season games through week W only. ESPN restarts postseason
@@ -89,7 +127,9 @@ def build_summaries_season(
             (pl.col("season_type_id") == 2) & (pl.col("week") <= through_week)
         )["game_id"].cast(pl.Utf8)
         plays = plays.filter(pl.col("game_id").is_in(snapshot_ids.implode()))
-    tables = build_team_summaries(plays, season, through_week=through_week)
+    tables = build_team_summaries(
+        plays, season, through_week=through_week, rosters=rosters
+    )
 
     counts: dict[str, int] = {}
     for key, spec in SUMMARIES_REGISTRY.items():

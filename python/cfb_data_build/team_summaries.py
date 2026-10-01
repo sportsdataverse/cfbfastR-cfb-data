@@ -664,7 +664,8 @@ def _summarize_drives(plays: pl.DataFrame) -> pl.DataFrame:
             pts_per_opp_margin=pl.col("pts_per_opp_off") - pl.col("pts_per_opp_def"),
             pts_per_drive_margin=pl.col("pts_per_drive_off")
             - pl.col("pts_per_drive_def"),
-            drive_start_ep_margin=pl.col("drive_start_ep_off") - pl.col("drive_start_ep_def"),
+            drive_start_ep_margin=pl.col("drive_start_ep_off")
+            - pl.col("drive_start_ep_def"),
             # (100 - off) - (100 - def): positive when the team starts closer to goal
             start_position_margin=pl.col("start_position_def")
             - pl.col("start_position_off"),
@@ -683,7 +684,9 @@ def _summarize_drives(plays: pl.DataFrame) -> pl.DataFrame:
             pts_per_drive_margin_rank=_rank_known(
                 "pts_per_drive_margin", descending=True
             ),
-            drive_start_ep_margin_rank=_rank_known("drive_start_ep_margin", descending=True),
+            drive_start_ep_margin_rank=_rank_known(
+                "drive_start_ep_margin", descending=True
+            ),
             start_position_margin_rank=_rank("start_position_margin", descending=True),
         )
     )
@@ -763,8 +766,12 @@ def _havoc_and_expected_turnovers(team_off: pl.DataFrame) -> pl.DataFrame:
             havoc_EPAgame_def_rank=_rank("havoc_EPAgame_def", descending=False),
             havoc_EPAgame_margin_rank=_rank("havoc_EPAgame_margin", descending=True),
             # fewer expected giveaways rank first on offense, more takeaways on defense
-            expected_turnovers_off_rank=_rank("expected_turnovers_off", descending=False),
-            expected_turnovers_def_rank=_rank("expected_turnovers_def", descending=True),
+            expected_turnovers_off_rank=_rank(
+                "expected_turnovers_off", descending=False
+            ),
+            expected_turnovers_def_rank=_rank(
+                "expected_turnovers_def", descending=True
+            ),
             expected_turnover_margin_rank=_rank(
                 "expected_turnover_margin", descending=True
             ),
@@ -1140,6 +1147,7 @@ def build_team_summaries(
     *,
     through_week: int | None = None,
     groups: pl.DataFrame | None = None,
+    rosters: pl.DataFrame | None = None,
 ) -> dict[str, pl.DataFrame]:
     """Build the 6 season tables from a cleaned cfbfastR pbp frame (R build lines 554-958).
 
@@ -1147,6 +1155,8 @@ def build_team_summaries(
     filters nothing -- the caller has -- it only exempts the snapshot from the
     no-op gate. ``groups`` is the season's ``cfb_team_group_seasons`` frame
     that ``fbs_class`` is read from (loaded from the release when ``None``).
+    ``rosters`` is the season's ``cfb_rosters`` frame the player tables'
+    ``position_group`` comes from (``None`` leaves it and ``_pos_pct`` null).
     """
     plays = add_derived_metrics(plays_input)
     warn_implausible_epa_games(plays, yr)
@@ -1613,6 +1623,13 @@ def build_team_summaries(
     assert_adjustment_is_real(
         team_data, season=yr, through_week=through_week, label=f"team_summaries {yr}"
     )
+    team_data = _attach_cohort_percentiles(
+        team_data,
+        cohort="conference",
+        rank_cols=[c for c in team_data.columns if c.endswith("_rank")],
+        suffix="_conf_pct",
+        min_cohort=MIN_COHORT_TEAMS,
+    )
     # A passer's TEPA must carry his sacks and interceptions -- see #30, where
     # it did not and every column still looked individually plausible.
     assert_passer_epa_includes_sacks(qb_data, label=f"passing {yr}")
@@ -1624,6 +1641,9 @@ def build_team_summaries(
     )
     wr_out = _prepare_for_write(wr_data, yr, schools).rename(
         {"receiver_player_id": "player_id"}
+    )
+    qb_out, rb_out, wr_out = (
+        _attach_position_cohorts(t, rosters) for t in (qb_out, rb_out, wr_out)
     )
 
     tables = {
@@ -1733,3 +1753,98 @@ def _attach_leader_ranks(
         *[f"{c}_pct" for c in rank_cols],
     )
     return data.join(out, on=keys, how="left")
+
+
+#: Cohort floors (owner decision D-F5, 2026-09-26): a conference or position group
+#: with fewer rows that have the metric gets a null cohort percentile, not a
+#: percentile of two.
+MIN_COHORT_TEAMS = 5
+MIN_COHORT_PLAYERS = 10
+
+#: roster ``position_abbreviation`` -> ``position_group``. Any other listed position
+#: is ``other``; ESPN's ``-`` placeholder is an unknown position and maps to null.
+_POSITION_GROUPS = {"QB": "QB", "RB": "RB", "FB": "RB", "WR": "WR", "TE": "TE"}
+
+
+def _attach_cohort_percentiles(
+    df: pl.DataFrame,
+    *,
+    cohort: str,
+    rank_cols: list[str],
+    suffix: str,
+    min_cohort: int,
+) -> pl.DataFrame:
+    """Add ``<m>{suffix}``, the Weibull percentile of each ``<m>_rank`` within ``cohort``.
+
+    The cohort rank ``r`` is the rank of ``<m>_rank`` ascending within the cohort,
+    over the rows whose ``<m>`` and ``<m>_rank`` are both non-null (a null
+    ``_rank`` is a non-qualifier; a null ``<m>`` carries R's trailing na.last
+    rank, which is not a placing). ``_rank`` already encodes direction, so
+    ascending is best-first. Ties take ``_rank``'s own ``average`` method. The
+    value is ``100 * (n + 1 - r) / (n + 1)`` with ``n`` those rows in the cohort,
+    and null when ``<m>`` or the cohort key is null or ``n < min_cohort``.
+    """
+    exprs = []
+    for rc in rank_cols:
+        m = rc.removesuffix("_rank")
+        has = (
+            pl.col(m).is_not_null()
+            & pl.col(rc).is_not_null()
+            & pl.col(cohort).is_not_null()
+        )
+        n = has.sum().over(cohort)
+        r = pl.when(has).then(pl.col(rc)).rank(method="average").over(cohort)
+        exprs.append(
+            pl.when(has & (n >= min_cohort))
+            .then(100 * (n + 1 - r) / (n + 1))
+            .cast(pl.Float64)
+            .alias(f"{m}{suffix}")
+        )
+    return df.with_columns(exprs)
+
+
+def _attach_position_cohorts(
+    df: pl.DataFrame, rosters: pl.DataFrame | None
+) -> pl.DataFrame:
+    """Join the roster ``position_group`` onto a player table, then its ``_pos_pct``.
+
+    ``rosters`` is the season's ``cfb_rosters`` (``athlete_id``,
+    ``position_abbreviation``); None or empty leaves ``position_group`` null. An
+    athlete listed twice under one group (a transfer) counts once; one listed
+    under two different groups is ambiguous and stays null. ``athlete_id`` is
+    pinned to the leaderboard ``player_id`` dtype by an integer or string parse;
+    a float on either side raises rather than joining through ``"123.0"``.
+    """
+    key = df.schema["player_id"]
+    if rosters is None or rosters.is_empty():
+        df = df.with_columns(position_group=pl.lit(None, dtype=pl.Utf8))
+    else:
+        src = rosters.schema["athlete_id"]
+        if not all(d.is_integer() or d == pl.Utf8 for d in (src, key)):
+            raise TypeError(
+                f"roster athlete_id is {src}, leaderboard player_id is {key}: "
+                "ids join through an integer or string parse, never a float"
+            )
+        abbr = pl.col("position_abbreviation")
+        pos = (
+            rosters.select(
+                player_id=pl.col("athlete_id").cast(key),
+                position_group=pl.when(abbr.is_not_null() & (abbr != "-")).then(
+                    abbr.replace_strict(_POSITION_GROUPS, default="other")
+                ),
+            )
+            .drop_nulls()
+            .unique()
+            .filter(pl.col("player_id").is_unique())
+        )
+        assert df.schema["player_id"] == pos.schema["player_id"], (
+            f"player_id {df.schema['player_id']} != roster {pos.schema['player_id']}"
+        )
+        df = df.join(pos, on="player_id", how="left", validate="m:1")
+    return _attach_cohort_percentiles(
+        df,
+        cohort="position_group",
+        rank_cols=[c for c in df.columns if c.endswith("_rank")],
+        suffix="_pos_pct",
+        min_cohort=MIN_COHORT_PLAYERS,
+    )

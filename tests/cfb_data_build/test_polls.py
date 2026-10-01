@@ -190,10 +190,8 @@ def fake_espn(monkeypatch):
         assert url.startswith("https://sports.core.api.espn.com/"), url
         if url.endswith("/seasons/2024/types/2/weeks/5/rankings"):
             return listing
-        if "/weeks/5/rankings/1?" in url:
-            return ap
-        if "/weeks/5/rankings/2?" in url:
-            return {"ranks": []}
+        if "/weeks/5/rankings/1?" in url or "/weeks/5/rankings/2?" in url:
+            return ap  # the Coaches ref serves the same 25 teams
         if "/rankings/" in url.split("/weeks/")[-1]:
             raise AssertionError(f"a dropped poll was fetched: {url}")
         return {"count": 0, "items": []}
@@ -205,7 +203,8 @@ def fake_espn(monkeypatch):
 
 def test_fetch_ranks_follows_only_the_kept_polls(fake_espn):
     df = fetch_ranks(2024)
-    assert df.height == 25 and df["poll"].unique().to_list() == ["ap"]
+    assert df.height == 50 and df["poll"].unique().sort().to_list() == ["ap", "coaches"]
+    assert df.filter(pl.col("poll") == "ap").height == 25
     assert df.schema == pl.Schema(polls.RANKS_SCHEMA)
     assert df["week"].unique().to_list() == [5] and df[
         "season_type"
@@ -219,6 +218,43 @@ def test_fetch_ranks_follows_only_the_kept_polls(fake_espn):
         and "/rankings/1?" not in u
         and "/rankings/" in u.split("/weeks/")[-1]
     ]
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [{"ranks": []}, {"error": {"code": 500, "message": "oops"}}],
+    ids=["no-ranks", "error-envelope"],
+)
+def test_a_listed_poll_that_returns_no_ranks_raises(monkeypatch, payload):
+    """A hole, not an empty week: writing it would publish and commit a gap."""
+    listing = json.loads((FIX / "2024_t2_w5_rankings.json").read_text())
+
+    def _get(url: str, **_):
+        if url.endswith("/weeks/5/rankings"):
+            return listing
+        if "/weeks/5/rankings/" in url:
+            return payload
+        return {"count": 0, "items": []}
+
+    monkeypatch.setattr(polls, "_get", _get)
+    monkeypatch.setattr(polls, "_PAUSE", 0)
+    with pytest.raises(ValueError, match="wk5 ap: listed but returned no ranks"):
+        fetch_ranks(2024)
+
+
+def test_a_paginated_listing_raises(monkeypatch):
+    """`count` beyond the items served means polls we never saw."""
+    one = [{"$ref": "http://sports.core.api.espn.com/v2/x/weeks/1/rankings/1?lang=en"}]
+
+    def _get(url: str, **_):
+        if url.endswith("/weeks/1/rankings"):
+            return {"count": 6, "items": one}
+        return {"count": 0, "items": []}
+
+    monkeypatch.setattr(polls, "_get", _get)
+    monkeypatch.setattr(polls, "_PAUSE", 0)
+    with pytest.raises(ValueError, match="paginated"):
+        fetch_ranks(2024)
 
 
 def test_cli_group_builds_both_tables_and_skips_an_unchanged_season(
@@ -251,9 +287,9 @@ def test_cli_group_builds_both_tables_and_skips_an_unchanged_season(
     sm = pl.read_parquet(
         base / "poll_week_summary" / "parquet" / "cfb_poll_week_summary_2024.parquet"
     )
-    assert an.height == 25 and an.schema == pl.Schema(ANALYTICS_SCHEMA)
-    assert sm.height == 1 and sm.schema == pl.Schema(SUMMARY_SCHEMA)
-    assert sm.row(0, named=True)["chaos"] is None  # the only week is the first week
+    assert an.height == 50 and an.schema == pl.Schema(ANALYTICS_SCHEMA)
+    assert sm.height == 2 and sm.schema == pl.Schema(SUMMARY_SCHEMA)
+    assert sm["chaos"].null_count() == 2  # the only week is each poll's first week
 
     capsys.readouterr()
     assert main(argv) == 0

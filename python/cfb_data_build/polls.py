@@ -176,8 +176,14 @@ def poll_rows(
 def _week_rows(season: int, season_type: int, week: int) -> list[dict[str, Any]]:
     """Every kept poll published in one week slot; a fetch failure propagates."""
     listing = _get(f"{CORE}/seasons/{season}/types/{season_type}/weeks/{week}/rankings")
+    items = listing.get("items") or []
+    if (listing.get("count") or 0) > len(items):
+        raise ValueError(
+            f"{season} type{season_type} wk{week}: listing paginated "
+            f"({listing.get('count')} polls, {len(items)} listed)"
+        )
     rows: list[dict[str, Any]] = []
-    for item in listing.get("items") or []:
+    for item in items:
         ref = (item or {}).get("$ref") or ""
         m = _POLL_RE.search(ref)
         if not m or int(m.group(1)) not in POLLS:
@@ -190,9 +196,15 @@ def _week_rows(season: int, season_type: int, week: int) -> list[dict[str, Any]]
             continue
         time.sleep(_PAUSE)
         payload = _get(ref.replace("http://", "https://", 1))
-        rows.extend(
-            poll_rows(season, season_type, week, POLLS[int(m.group(1))], payload)
-        )
+        got = poll_rows(season, season_type, week, POLLS[int(m.group(1))], payload)
+        if not got:
+            # A listed poll that resolves to no ranks (or to a 200 error
+            # envelope) is a hole; writing it would publish and commit a gap.
+            raise ValueError(
+                f"{season} type{season_type} wk{week} {POLLS[int(m.group(1))]}: "
+                "listed but returned no ranks"
+            )
+        rows.extend(got)
     return rows
 
 

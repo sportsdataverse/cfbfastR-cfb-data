@@ -153,7 +153,9 @@ RELEASE_NOTES: dict[str, str] = {
         "week); an `exited` row (rank null) is emitted for a team ranked last "
         "week and not this week; `weeks_ranked` is cumulative and carried on "
         "exit rows. Only the 25 ranked teams -- 'others receiving votes' are "
-        "not captured."
+        "not captured. Every run rebuilds the season from ESPN: an idempotent "
+        "refetch (ESPN keeps poll history), not an append-only capture like "
+        "cfb_fpi_weekly."
     ),
     "cfb_poll_week_summary": (
         "College Football per poll-week movement summary over "

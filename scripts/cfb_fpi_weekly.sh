@@ -51,12 +51,16 @@ fi
 # Polls ride the same schedule but are NOT time-critical: ESPN keeps poll
 # history (see polls.py), so the builder refetches the whole season, skips a
 # season whose rebuilt tables equal the committed parquet, and a failed run
-# costs nothing permanent.
+# costs nothing permanent. So a polls failure must NOT exit here: the FPI
+# parquet above is already written (and published) but not yet committed, and
+# bailing out would leave it to this ephemeral checkout -- the next run would
+# re-capture that week with a later value, the exact clobber the header warns
+# about. Warn, finish the FPI commit/push, and exit with the polls rc at the
+# end so the job still reports the failure.
 "$PY" -m cfb_data_build --dataset poll_analytics -s "$START_YEAR" -e "$END_YEAR" --base ../cfb $PUBLISH
-BUILD_RC=$?
-if [ "$BUILD_RC" != "0" ]; then
-  echo "::error ::poll_analytics build exited with code $BUILD_RC"
-  exit "$BUILD_RC"
+POLLS_RC=$?
+if [ "$POLLS_RC" != "0" ]; then
+  echo "::warning ::poll_analytics build exited with code $POLLS_RC; committing the FPI capture first"
 fi
 
 cd "$REPO_ROOT" || exit 1
@@ -76,7 +80,7 @@ for d in cfb/poll_analytics cfb/poll_week_summary; do
 done
 if git diff --cached --quiet; then
   echo "no new FPI week or poll for ${START_YEAR}-${END_YEAR}; nothing to commit"
-  exit 0
+  exit "$POLLS_RC"
 fi
 git commit -m "CFB FPI weekly + polls snapshot (Start: $START_YEAR End: $END_YEAR)" || {
   echo "::error ::commit failed"; exit 1;
@@ -89,7 +93,7 @@ git commit -m "CFB FPI weekly + polls snapshot (Start: $START_YEAR End: $END_YEA
 for attempt in 1 2 3; do
   if git push origin HEAD; then
     echo "pushed (attempt $attempt)"
-    exit 0
+    exit "$POLLS_RC"
   fi
   echo "push rejected (attempt $attempt); syncing with origin"
   git fetch --quiet origin main || true

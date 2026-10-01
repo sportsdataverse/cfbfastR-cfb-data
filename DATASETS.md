@@ -37,6 +37,8 @@ Expected `col_name | col_type | col_description` for each per-game-compiled **se
 | [receiving](#receiving) † | one row per (team, receiver) per season | 32 | `espn_cfb_receiving` |
 | [percentiles](#percentiles) † | one row per percentile (1–99) | 27 | `espn_cfb_percentiles` |
 | [cfb_league_averages](#cfb_league_averages) † | one row per (season, level, entity, category, metric) | 10 | `cfb_league_averages` |
+| [cfb_poll_analytics](#cfb_poll_analytics) | one row per (season, season_type, week, poll, team) | 13 | `cfb_poll_analytics` |
+| [cfb_poll_week_summary](#cfb_poll_week_summary) | one row per (season, season_type, week, poll) | 8 | `cfb_poll_week_summary` |
 
 > † **Season-level summary datasets.** Unlike every table above (per-game `final`
 > JSON reshaped into a compiled season), these six are produced by
@@ -1890,3 +1892,55 @@ kept, FCS opponents and bowls included; "FBS only" is a consumer filter. Ids are
 | success_rate | double | Offensive EPA success rate (`adv_situational.EPA_success_rate`); null when the game has no situational row for the team. |
 
 _Release tag: `cfb_team_opponent_splits`_
+
+---
+
+### cfb_poll_analytics
+
+Weekly AP (`ap`), AFCA Coaches (`coaches`) and CFP committee (`cfp`) poll history, one row
+per `(season, season_type, week, poll, team_id)`, 2004+, from ESPN's core-v2 rankings
+listing. Python-only (`python/cfb_data_build/polls.py`), no R counterpart. ESPN's week W
+poll is the one released ENTERING week W (week 1 = preseason); the postseason's week 1 is
+the final poll and sequences after the regular season's last published week. Every run
+rebuilds the season from ESPN (an idempotent refetch -- ESPN keeps poll history, so this
+is not append-only like `cfb_fpi_weekly`); only the 25 ranked teams are captured, never
+"others receiving votes".
+
+| col_name | col_type | col_description |
+| --- | --- | --- |
+| season | integer | Season year (e.g. 2025). |
+| season_type | integer | ESPN season type: 2 regular season, 3 postseason. |
+| week | integer | ESPN week slot the poll was published in (entering that week). |
+| poll | character | `ap`, `coaches` or `cfp`. |
+| team_id | integer | ESPN team id, parsed from the rank's `team.$ref`. |
+| rank | integer | Rank this week, 1-25; null on an exit row. |
+| prev_rank | integer | Rank in this poll's previous published week; null when unranked then, or in the poll's first week. |
+| move | integer | `prev_rank - rank`, so up is positive; null unless both are set. |
+| entered | logical | Ranked now and not in the previous week; never true in the poll's first week. |
+| exited | logical | Row emitted for a team ranked last week and not this week (`rank` null). |
+| weeks_ranked | integer | Cumulative weeks ranked in this poll and season, carried on exit rows. |
+| points | double | Poll points; null on exit rows. |
+| first_place_votes | integer | First-place votes; null on exit rows and where ESPN omits it. |
+
+_Release tag: `cfb_poll_analytics`_
+
+---
+
+### cfb_poll_week_summary
+
+Per `(season, season_type, week, poll)` movement summary over `cfb_poll_analytics` (same
+producer). An unranked team counts as rank 26, over the union of teams ranked in either
+week -- exactly that week's `cfb_poll_analytics` rows.
+
+| col_name | col_type | col_description |
+| --- | --- | --- |
+| season | integer | Season year. |
+| season_type | integer | 2 regular season, 3 postseason. |
+| week | integer | ESPN week slot. |
+| poll | character | `ap`, `coaches` or `cfp`. |
+| volatility | double | Population standard deviation of `prev26 - rank26`; null in the poll's first week. |
+| chaos | integer | Sum of `abs(prev26 - rank26)`; null in the poll's first week. |
+| entries | integer | Count of `entered` rows that week. |
+| exits | integer | Count of `exited` rows that week. |
+
+_Release tag: `cfb_poll_week_summary`_

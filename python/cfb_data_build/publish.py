@@ -141,6 +141,29 @@ RELEASE_NOTES: dict[str, str] = {
         "and 5 (the spring 2020-21 games). `is_home` is the listed home side, "
         "even at neutral sites."
     ),
+    "cfb_poll_analytics": (
+        "College Football weekly poll history: ONE ROW PER TEAM PER POLL PER "
+        "WEEK for the AP (`ap`), AFCA Coaches (`coaches`) and CFP committee "
+        "(`cfp`) polls, 2004+, from ESPN's core-v2 rankings. ESPN's week W poll "
+        "is the one released ENTERING week W (week 1 = preseason); the "
+        "postseason's week 1 is the final poll and sequences after the regular "
+        "season's last published week. `prev_rank` is the rank in that poll's "
+        "previous published week; `move = prev_rank - rank` (up is positive); "
+        "`entered` is ranked now and not last week (never in a poll's first "
+        "week); an `exited` row (rank null) is emitted for a team ranked last "
+        "week and not this week; `weeks_ranked` is cumulative and carried on "
+        "exit rows. Only the 25 ranked teams -- 'others receiving votes' are "
+        "not captured. Every run rebuilds the season from ESPN: an idempotent "
+        "refetch (ESPN keeps poll history), not an append-only capture like "
+        "cfb_fpi_weekly."
+    ),
+    "cfb_poll_week_summary": (
+        "College Football per poll-week movement summary over "
+        "cfb_poll_analytics: `entries` / `exits` counts, `chaos` = sum of "
+        "|prev_rank - rank| and `volatility` = population sd of (prev_rank - "
+        "rank), both over the union of teams ranked in either week with an "
+        "unranked side counted as 26, and both null in a poll's first week."
+    ),
 }
 
 

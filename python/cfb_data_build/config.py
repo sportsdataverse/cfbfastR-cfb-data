@@ -434,4 +434,8 @@ PKG_FUNCTION: dict[str, str] = {
     "cfb_team_opponent_splits": "python/cfb_data_build/derived.py",
     # no loader yet; consumers read sdv-db cfb.league_averages
     "cfb_league_averages": "python/cfb_data_build/league_averages.py",
+    # weekly AP / Coaches / CFP poll history (F8); no loader yet, consumers read
+    # sdv-db cfb.poll_analytics / cfb.poll_week_summary
+    "cfb_poll_analytics": "python/cfb_data_build/polls.py",
+    "cfb_poll_week_summary": "python/cfb_data_build/polls.py",
 }

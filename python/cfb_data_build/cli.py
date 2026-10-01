@@ -39,6 +39,11 @@ DERIVED = (
 #   power_index   game x team, the matchup predictions the old asset only linked
 FPI = ("fpi_weekly", "power_index")
 
+#: Weekly AP / Coaches / CFP poll history + analytics, fetched from the core-v2
+#: rankings API (polls.py). One selector writes BOTH tables -- cfb_poll_analytics
+#: and cfb_poll_week_summary, the second derived from the first.
+POLLS = ("poll_analytics",)
+
 #: Roster-continuity datasets. `recruits`/`team_talent` come from the raw 247
 #: store; `returning_production` comes from the ESPN player box + rosters and
 #: needs no raw store at all.
@@ -70,6 +75,7 @@ def build_parser() -> argparse.ArgumentParser:
             "summaries",
             *DERIVED,
             *FPI,
+            *POLLS,
             *RECRUITING,
             *TEAMS,
             *ROSTERS,
@@ -172,6 +178,21 @@ def main(argv: list[str] | None = None) -> int:
 
         failures = build_fpi(
             args.dataset,
+            args.start_year,
+            args.end_year,
+            base=args.base,
+            publish=args.publish,
+            dry_run=args.dry_run,
+        )
+        print(f"\n=== {args.dataset}: {len(failures)} failures ===")
+        for season, kind in failures:
+            print(f"  {season}: {kind}")
+        return 1 if failures else 0
+
+    if args.dataset in POLLS:
+        from cfb_data_build.polls import build_polls_range
+
+        failures = build_polls_range(
             args.start_year,
             args.end_year,
             base=args.base,

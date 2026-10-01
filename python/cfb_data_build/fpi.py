@@ -29,6 +29,8 @@ from __future__ import annotations
 import concurrent.futures as cf
 import json
 import re
+import time
+import urllib.error
 import urllib.request
 from pathlib import Path
 from typing import Any
@@ -59,9 +61,41 @@ SEASON_TYPES = (2, 3)
 _MAX_WEEK = 20
 
 
-def _get(url: str, *, timeout: int = 45) -> dict[str, Any]:
+#: Seconds slept before each retry of a transient failure, so a request makes
+#: at most ``len(_RETRY_WAITS) + 1`` attempts. ~120 sequential requests a season
+#: for the polls capture (which propagates failures) made one stray 403 / 5xx /
+#: timeout fail the whole season.
+_RETRY_WAITS = (2, 6, 18)
+
+
+def _retryable(exc: BaseException) -> bool:
+    """A 403 (rate limit), 429 or 5xx, a connection failure or a read timeout.
+
+    Any other HTTP status is final: a 404 is an answer, not an outage.
+    """
+    if isinstance(exc, urllib.error.HTTPError):
+        return exc.code in (403, 429) or exc.code >= 500
+    return isinstance(exc, (urllib.error.URLError, TimeoutError))
+
+
+def _get_once(url: str, timeout: int) -> dict[str, Any]:
     with urllib.request.urlopen(urllib.request.Request(url, headers=_UA), timeout=timeout) as r:
         return json.load(r)
+
+
+def _get(url: str, *, timeout: int = 45) -> dict[str, Any]:
+    for wait in _RETRY_WAITS:
+        try:
+            return _get_once(url, timeout)
+        except Exception as exc:
+            if not _retryable(exc):
+                raise
+            print(
+                f"  retry in {wait}s after {type(exc).__name__}: {url.split('?')[0][-70:]}",
+                flush=True,
+            )
+            time.sleep(wait)
+    return _get_once(url, timeout)
 
 
 def _week_rows(season: int, season_type: int, week: int) -> list[dict[str, Any]]:

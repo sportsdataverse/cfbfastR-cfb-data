@@ -49,9 +49,9 @@ if [ "$BUILD_RC" != "0" ]; then
 fi
 
 # Polls ride the same schedule but are NOT time-critical: ESPN keeps poll
-# history (see polls.py), so the builder refetches the whole season, skips a
-# season whose rebuilt tables equal the committed parquet, and a failed run
-# costs nothing permanent. So a polls failure must NOT exit here: the FPI
+# history (see polls.py), so the builder refetches the whole season, rewrites
+# it (byte-identical parquet when nothing changed, so the tree stays clean),
+# re-uploads it, and a failed run costs nothing permanent. So a polls failure must NOT exit here: the FPI
 # parquet above is already written (and published) but not yet committed, and
 # bailing out would leave it to this ephemeral checkout -- the next run would
 # re-capture that week with a later value, the exact clobber the header warns

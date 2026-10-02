@@ -69,11 +69,16 @@ PY_WEEKLY="rolling_windows ratings_weekly team_summaries_weekly"
 # also reads the PRIOR season's release for its prev_* block. No final.json.
 PY_MATCHUP="matchup_features matchup_line"
 # Roster continuity. `recruits`/`team_talent` read the 247 raw store in
-# cfbfastR-cfb-raw; `returning_production` reads the ESPN player box and needs
-# no store. `recruiting_proj` consumes talent + returning, so it runs after
-# both. run_py does `cd python`, so the raw root must be absolute or resolve
-# from there -- CFB_RAW_ROOT is exported below for exactly that reason.
-PY_RECRUITING="recruits team_talent returning_production"
+# cfbfastR-cfb-raw; `returning_production` reads the ESPN player box and
+# `team_portal` diffs the published ESPN season rosters (S-1 vs S) -- neither
+# needs a store. Both read the `espn_cfb_rosters` tag PY_ROSTERS publishes
+# earlier in the same season pass. `recruiting_proj` consumes talent + returning,
+# so it runs after both. run_py does `cd python`, so the raw root must be
+# absolute or resolve from there -- CFB_RAW_ROOT is exported below for exactly
+# that reason.
+PY_RECRUITING="recruits team_talent returning_production team_portal"
+# Store-free members of PY_RECRUITING: they still run when the 247 store is absent.
+PY_RECRUITING_NO_STORE="returning_production team_portal"
 
 # Where cfb_data_build caches final.json, relative to python/ (the CLI default).
 # For a multi-season republish on a box that has cfbfastR-cfb-raw checked out,
@@ -189,12 +194,20 @@ for i in $(seq "${START_YEAR}" "${END_YEAR}"); do
     # cleanly skipped to hard failures:
     #   cfb_recruits 2026: FAILED (raw store is missing complete classes [2026])
     # One env var, two unrelated inputs; each guard has to check its own.
+    #
+    # team_portal starts at 2015 (recruiting.TEAM_PORTAL_FIRST_SEASON). Below it
+    # the builder refuses the season outright, which would turn every backfill
+    # season red for a dataset it can never have -- so it is left out there,
+    # exactly as scripts/10_build_recruiting.sh's floor_for does.
+    REC_ALL="$PY_RECRUITING" REC_NO_STORE="$PY_RECRUITING_NO_STORE"
+    if [ "$i" -lt 2015 ]; then
+      REC_ALL="${REC_ALL/team_portal/}" REC_NO_STORE="${REC_NO_STORE/team_portal/}"
+    fi
     if [[ -n "$CFB_RAW_ROOT" && -d "$CFB_RAW_ROOT/cfb/recruits/json" ]]; then
-      for ds in $PY_RECRUITING; do run_py "$ds" --publish; done
+      for ds in $REC_ALL; do run_py "$ds" --publish; done
     else
-      echo "::warning::no 247 recruits store at ${CFB_RAW_ROOT:-<unset>}/cfb/recruits/json; skipping recruiting datasets"
-      # returning_production reads no raw store, so it can still run
-      run_py returning_production --publish
+      echo "::warning::no 247 recruits store at ${CFB_RAW_ROOT:-<unset>}/cfb/recruits/json; skipping recruits/team_talent"
+      for ds in $REC_NO_STORE; do run_py "$ds" --publish; done
     fi
 
     echo "RSCRIPT_RC=$SEASON_RC" > "/tmp/_rc_${i}"

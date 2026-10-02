@@ -1,9 +1,6 @@
-From github.com:sportsdataverse/cfbfastR-cfb-data
- * [new branch]          feat/tendencies-context -> origin/feat/tendencies-context
-Updating files:  63% (94/147)Updating files:  64% (95/147)Updating files:  65% (96/147)Updating files:  66% (98/147)Updating files:  67% (99/147)Updating files:  68% (100/147)Updating files:  69% (102/147)Updating files:  70% (103/147)Updating files:  71% (105/147)Updating files:  72% (106/147)Updating files:  73% (108/147)Updating files:  74% (109/147)Updating files:  75% (111/147)Updating files:  76% (112/147)Updating files:  77% (114/147)Updating files:  78% (115/147)Updating files:  79% (117/147)Updating files:  80% (118/147)Updating files:  81% (120/147)Updating files:  82% (121/147)Updating files:  83% (123/147)Updating files:  84% (124/147)Updating files:  85% (125/147)Updating files:  86% (127/147)Updating files:  87% (128/147)Updating files:  88% (130/147)Updating files:  89% (131/147)Updating files:  90% (133/147)Updating files:  91% (134/147)Updating files:  92% (136/147)Updating files:  93% (137/147)Updating files:  94% (139/147)Updating files:  95% (140/147)Updating files:  96% (142/147)Updating files:  97% (143/147)Updating files:  98% (145/147)Updating files:  99% (146/147)Updating files: 100% (147/147)Updating files: 100% (147/147), done.
   pos_team: 100.0% of rows resolved to a team name
   def_pos_team: 100.0% of rows resolved to a team name
-pbp 2024: 163463 rows from 966 games
+pbp 2024: 163567 rows from 966 games
 2024: 152 coach-seasons, 130 cleanly attributed
 play_participants 2024: 151764 rows from 966 games
 team_box 2024: 1932 rows from 966 games
@@ -42,27 +39,27 @@ adv_player_usage 2024: 19842 rows from 966 games
   pos_team: 100.0% of rows resolved to a team name
 adv_position_group_usage 2024: 7491 rows from 966 games
   def_pos_team: 100.0% of rows resolved to a team name
-adv_tackles 2024: 33707 rows from 966 games
+adv_tackles 2024: 32814 rows from 966 games
   def_pos_team: 100.0% of rows resolved to a team name
-adv_position_group_tackles 2024: 6620 rows from 966 games
+adv_position_group_tackles 2024: 6610 rows from 966 games
   pos_team: 100.0% of rows resolved to a team name
 adv_team_usage 2024: 1892 rows from 966 games
   pos_team: 100.0% of rows resolved to a team name
 adv_drive_scripting 2024: 3784 rows from 966 games
   pos_team: 100.0% of rows resolved to a team name
-usage_players 2024: 4178 rows from 966 games
+usage_players 2024: 4164 rows from 966 games
   pos_team: 100.0% of rows resolved to a team name
 usage_position_groups 2024: 1050 rows from 966 games
   def_pos_team: 100.0% of rows resolved to a team name
-usage_tackles 2024: 9880 rows from 966 games
+usage_tackles 2024: 8254 rows from 966 games
   def_pos_team: 100.0% of rows resolved to a team name
-usage_position_group_tackles 2024: 1408 rows from 966 games
+usage_position_group_tackles 2024: 1420 rows from 966 games
   pos_team: 100.0% of rows resolved to a team name
 usage_teams 2024: 235 rows from 966 games
   pos_team: 100.0% of rows resolved to a team name
 usage_drive_scripting 2024: 470 rows from 966 games
   pos_team: 100.0% of rows resolved to a team name
-adv_st_kickers 2024: 3340 rows from 966 games
+adv_st_kickers 2024: 3342 rows from 966 games
   pos_team: 100.0% of rows resolved to a team name
 adv_st_punters 2024: 2015 rows from 966 games
   pos_team: 100.0% of rows resolved to a team name
@@ -72,27 +69,33 @@ adv_st_blocks 2024: 85 rows from 966 games
   pos_team: 100.0% of rows resolved to a team name
 adv_st_team 2024: 1892 rows from 966 games
   pos_team: 100.0% of rows resolved to a team name
-usage_st_kickers 2024: 880 rows from 966 games
+usage_st_kickers 2024: 881 rows from 966 games
   pos_team: 100.0% of rows resolved to a team name
 usage_st_punters 2024: 332 rows from 966 games
   pos_team: 100.0% of rows resolved to a team name
-usage_st_returners 2024: 1085 rows from 966 games
+usage_st_returners 2024: 1082 rows from 966 games
   def_pos_team: 100.0% of rows resolved to a team name
 usage_st_blocks 2024: 81 rows from 966 games
   pos_team: 100.0% of rows resolved to a team name
 usage_st_team 2024: 235 rows from 966 games
+  adv_team_gamelog 2024: 1892 rows, 90 cols
+
+=== gamelog: 0 failures ===
+  team_opponent_splits 2024: 1892 rows, 13 cols
+
+=== team_opponent_splits: 0 failures ===
+  metric_curves 2024: 7379 rows, 14 cols
+
+=== metric_curves: 0 failures ===
+qa 2024: 966 rows from 966 games
+  cfb_schedules 2024: 3801 rows, 43 cols, fbs_game=799, fbs_participant=920, unplayed=1, ranked_sides=346
+
+=== cfb_schedules: 0 failures ===
   pos_team: 100.0% of rows resolved to a team name
 team_tendencies 2024: 235 rows from 966 games
   coaches: 130 attributed team-seasons for 2024
   pos_team: 100.0% of rows resolved to a team name
 coach_tendencies 2024: 130 rows from 966 games
-  adv_team_gamelog 2024: 1892 rows, 90 cols
-
-=== gamelog: 0 failures ===
-qa 2024: 966 rows from 966 games
-  cfb_schedules 2024: 3801 rows, 43 cols, fbs_game=799, fbs_participant=920, unplayed=1, ranked_sides=346
-
-=== cfb_schedules: 0 failures ===
 cfb_rosters 2024: 27477 rows from 966/966 games | position 100.0% | division 100.0% | cfbd_recruit_ids 75.9% of 22837 cfbd athletes
 
 === cfb_rosters: 0 failures ===
@@ -101,11 +104,11 @@ cfb_rosters 2024: 27477 rows from 966/966 games | position 100.0% | division 100
 [summaries 2024] passing: 548 rows
 [summaries 2024] rushing: 1644 rows
 [summaries 2024] receiving: 2113 rows
-[summaries 2024] league_averages: 776 rows
+[summaries 2024] league_averages: 824 rows
   rolling_windows 2024: 27108 rows, 20 cols
 
 === rolling_windows: 0 failures ===
-  cfb_ratings_weekly 2024: 2079 rows, 16 cols, 16 weekly snapshots
+  cfb_ratings_weekly 2024: 2079 rows, 19 cols, 16 weekly snapshots
 
 === ratings_weekly: 0 failures ===
 [summaries 2024] percentiles: 99 rows
@@ -113,104 +116,104 @@ cfb_rosters 2024: 27477 rows from 966/966 games | position 100.0% | division 100
 [summaries 2024] passing: 112 rows
 [summaries 2024] rushing: 414 rows
 [summaries 2024] receiving: 593 rows
-[summaries 2024] league_averages: 776 rows
+[summaries 2024] league_averages: 824 rows
 [summaries 2024] percentiles: 99 rows
 [summaries 2024] team_summaries: 130 rows
 [summaries 2024] passing: 206 rows
 [summaries 2024] rushing: 754 rows
 [summaries 2024] receiving: 1076 rows
-[summaries 2024] league_averages: 776 rows
+[summaries 2024] league_averages: 824 rows
 [summaries 2024] percentiles: 99 rows
 [summaries 2024] team_summaries: 133 rows
 [summaries 2024] passing: 266 rows
 [summaries 2024] rushing: 892 rows
 [summaries 2024] receiving: 1331 rows
-[summaries 2024] league_averages: 776 rows
+[summaries 2024] league_averages: 824 rows
 [summaries 2024] percentiles: 99 rows
 [summaries 2024] team_summaries: 133 rows
 [summaries 2024] passing: 301 rows
 [summaries 2024] rushing: 1012 rows
 [summaries 2024] receiving: 1480 rows
-[summaries 2024] league_averages: 776 rows
+[summaries 2024] league_averages: 824 rows
 [summaries 2024] percentiles: 99 rows
 [summaries 2024] team_summaries: 134 rows
 [summaries 2024] passing: 322 rows
 [summaries 2024] rushing: 1095 rows
 [summaries 2024] receiving: 1578 rows
-[summaries 2024] league_averages: 776 rows
+[summaries 2024] league_averages: 824 rows
 [summaries 2024] percentiles: 99 rows
 [summaries 2024] team_summaries: 134 rows
 [summaries 2024] passing: 344 rows
 [summaries 2024] rushing: 1173 rows
 [summaries 2024] receiving: 1651 rows
-[summaries 2024] league_averages: 776 rows
+[summaries 2024] league_averages: 824 rows
 [summaries 2024] percentiles: 99 rows
 [summaries 2024] team_summaries: 134 rows
 [summaries 2024] passing: 362 rows
 [summaries 2024] rushing: 1241 rows
 [summaries 2024] receiving: 1713 rows
-[summaries 2024] league_averages: 776 rows
+[summaries 2024] league_averages: 824 rows
 [summaries 2024] percentiles: 99 rows
 [summaries 2024] team_summaries: 134 rows
 [summaries 2024] passing: 386 rows
 [summaries 2024] rushing: 1310 rows
 [summaries 2024] receiving: 1760 rows
-[summaries 2024] league_averages: 776 rows
+[summaries 2024] league_averages: 824 rows
 [summaries 2024] percentiles: 99 rows
 [summaries 2024] team_summaries: 134 rows
 [summaries 2024] passing: 411 rows
 [summaries 2024] rushing: 1367 rows
 [summaries 2024] receiving: 1830 rows
-[summaries 2024] league_averages: 776 rows
+[summaries 2024] league_averages: 824 rows
 [summaries 2024] percentiles: 99 rows
 [summaries 2024] team_summaries: 134 rows
 [summaries 2024] passing: 432 rows
 [summaries 2024] rushing: 1411 rows
 [summaries 2024] receiving: 1868 rows
-[summaries 2024] league_averages: 776 rows
+[summaries 2024] league_averages: 824 rows
 [summaries 2024] percentiles: 99 rows
 [summaries 2024] team_summaries: 134 rows
 [summaries 2024] passing: 446 rows
 [summaries 2024] rushing: 1455 rows
 [summaries 2024] receiving: 1911 rows
-[summaries 2024] league_averages: 776 rows
+[summaries 2024] league_averages: 824 rows
 [summaries 2024] percentiles: 99 rows
 [summaries 2024] team_summaries: 134 rows
 [summaries 2024] passing: 466 rows
 [summaries 2024] rushing: 1501 rows
 [summaries 2024] receiving: 1958 rows
-[summaries 2024] league_averages: 776 rows
+[summaries 2024] league_averages: 824 rows
 [summaries 2024] percentiles: 99 rows
 [summaries 2024] team_summaries: 134 rows
 [summaries 2024] passing: 495 rows
 [summaries 2024] rushing: 1545 rows
 [summaries 2024] receiving: 2008 rows
-[summaries 2024] league_averages: 776 rows
+[summaries 2024] league_averages: 824 rows
 [summaries 2024] percentiles: 99 rows
 [summaries 2024] team_summaries: 134 rows
 [summaries 2024] passing: 517 rows
 [summaries 2024] rushing: 1582 rows
 [summaries 2024] receiving: 2040 rows
-[summaries 2024] league_averages: 776 rows
+[summaries 2024] league_averages: 824 rows
 [summaries 2024] percentiles: 99 rows
 [summaries 2024] team_summaries: 134 rows
 [summaries 2024] passing: 521 rows
 [summaries 2024] rushing: 1586 rows
 [summaries 2024] receiving: 2042 rows
-[summaries 2024] league_averages: 776 rows
+[summaries 2024] league_averages: 824 rows
 [summaries 2024] percentiles: 99 rows
 [summaries 2024] team_summaries: 134 rows
 [summaries 2024] passing: 521 rows
 [summaries 2024] rushing: 1587 rows
 [summaries 2024] receiving: 2043 rows
-[summaries 2024] league_averages: 776 rows
-  cfb_team_summaries_weekly 2024: 2079 rows, 542 cols, 16 weekly snapshots
+[summaries 2024] league_averages: 824 rows
+  cfb_team_summaries_weekly 2024: 2079 rows, 782 cols, 16 weekly snapshots
 
 === team_summaries_weekly: 0 failures ===
   cfb_matchup_features 2024: 1719 rows, 45 cols
 
 === matchup_features: 0 failures ===
-/mnt/sdv_repos/_recompile_lanes/cfbdata-laneB/python/cfb_data_build/matchup_side.py:371: UserWarning: matchup reference 2024: spellings that matched no CFBD school QB starters: ['St. Francis (PA) Red Flash']; coach continuity: ['Sam Houston State']; returning production: ['USF']
+/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/matchup_side.py:371: UserWarning: matchup reference 2024: spellings that matched no CFBD school QB starters: ['St. Francis (PA) Red Flash']; coach continuity: ['Sam Houston State']; returning production: ['USF']
   reference=season_reference(
   cfb_matchup_line 2024: 764 rows, 268 cols
 
@@ -224,5 +227,4 @@ cfb_rosters 2024: 27477 rows from 966/966 games | position 100.0% | division 100
   cfb_returning_production 2024: 229 rows
 
 === returning_production: 0 failures ===
-push rejected (attempt 1); syncing with origin
-pushed: CFB Data Updated (Start: 2024 End: 2024) (attempt 2)
+pushed: CFB Data Updated (Start: 2024 End: 2024) (attempt 1)

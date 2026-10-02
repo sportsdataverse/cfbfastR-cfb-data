@@ -34,26 +34,28 @@ adv_situational 2026: 662 rows from 949 games
 adv_defensive_players 2026: 4030 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
 adv_specialists 2026: 3775 rows from 949 games
+HTTP 504: We couldn't respond to your request in time. Sorry about that. Please try resubmitting your request and contact us if the problem persists. (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/tags/espn_cfb_adv_specialists)
+  gh release upload: exit 1 (attempt 1/3, retrying)
   pos_team: 100.0% of rows resolved to a team name
 adv_player_usage 2026: 8329 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
 adv_position_group_usage 2026: 2616 rows from 949 games
   def_pos_team: 100.0% of rows resolved to a team name
-adv_tackles 2026: 14786 rows from 949 games
+adv_tackles 2026: 14414 rows from 949 games
   def_pos_team: 100.0% of rows resolved to a team name
-adv_position_group_tackles 2026: 2505 rows from 949 games
+adv_position_group_tackles 2026: 2503 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
 adv_team_usage 2026: 662 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
 adv_drive_scripting 2026: 1324 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-usage_players 2026: 4051 rows from 949 games
+usage_players 2026: 3934 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
 usage_position_groups 2026: 980 rows from 949 games
   def_pos_team: 100.0% of rows resolved to a team name
-usage_tackles 2026: 7892 rows from 949 games
+usage_tackles 2026: 7191 rows from 949 games
   def_pos_team: 100.0% of rows resolved to a team name
-usage_position_group_tackles 2026: 1129 rows from 949 games
+usage_position_group_tackles 2026: 1147 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
 usage_teams 2026: 233 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
@@ -69,9 +71,9 @@ adv_st_blocks 2026: 44 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
 adv_st_team 2026: 662 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-usage_st_kickers 2026: 884 rows from 949 games
+usage_st_kickers 2026: 882 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-usage_st_punters 2026: 294 rows from 949 games
+usage_st_punters 2026: 293 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
 usage_st_returners 2026: 592 rows from 949 games
   def_pos_team: 100.0% of rows resolved to a team name
@@ -84,57 +86,15 @@ usage_st_team 2026: 233 rows from 949 games
   team_opponent_splits 2026: 662 rows, 13 cols
 
 === team_opponent_splits: 0 failures ===
+  metric_curves 2026: 14560 rows, 14 cols
+
+=== metric_curves: 0 failures ===
 qa 2026: 331 rows from 949 games
   cfb_schedules 2026: 3679 rows, 43 cols, fbs_game=761, fbs_participant=888, unplayed=0, ranked_sides=299
 
 === cfb_schedules: 0 failures ===
-HTTP 500 (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/599896642)
   pos_team: 100.0% of rows resolved to a team name
 team_tendencies 2026: 233 rows from 949 games
-  gh release upload: exit 1 (attempt 1/3, retrying)
-HTTP 500 (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/599896642)
-  gh release upload: exit 1 (attempt 2/3, retrying)
-HTTP 500 (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/599896642)
-Traceback (most recent call last):
-  File "<frozen runpy>", line 198, in _run_module_as_main
-  File "<frozen runpy>", line 88, in _run_code
-  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
-    raise SystemExit(main())
-                     ~~~~^^
-  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 253, in main
-    build_dataset(
-    ~~~~~~~~~~~~~^
-        args.dataset,
-        ^^^^^^^^^^^^^
-    ...<8 lines>...
-        include_release_ids=args.include_release_ids,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 441, in build_dataset
-    build_season(
-    ~~~~~~~~~~~~^
-        spec,
-        ^^^^^
-    ...<7 lines>...
-        base=base,
-        ^^^^^^^^^^
-    )
-    ^
-  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 356, in build_season
-    publish_dataset(spec, season, base=base)
-    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 185, in publish_dataset
-    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
-    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 154, in _gh_runner
-    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
-    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/.local/share/uv/python/cpython-3.13.13-linux-x86_64-gnu/lib/python3.13/subprocess.py", line 577, in run
-    raise CalledProcessError(retcode, process.args,
-                             output=stdout, stderr=stderr)
-subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_team_tendencies', '../cfb/team_tendencies/parquet/team_tendencies_2026.parquet', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
-::warning ::cfb_data_build team_tendencies for season 2026 exited with code 1
   coaches: 138 attributed team-seasons for 2026
   pos_team: 100.0% of rows resolved to a team name
 coach_tendencies 2026: 138 rows from 949 games
@@ -177,7 +137,7 @@ cfb_rosters 2026: 476 rows from 948/949 games | position 100.0% | division 100.0
 [summaries 2026] rushing: 1042 rows
 [summaries 2026] receiving: 1742 rows
 [summaries 2026] league_averages: 829 rows
-  cfb_team_summaries_weekly 2026: 507 rows, 578 cols, 4 weekly snapshots
+  cfb_team_summaries_weekly 2026: 507 rows, 782 cols, 4 weekly snapshots
 
 === team_summaries_weekly: 0 failures ===
   cfb_matchup_features 2026: 1649 rows, 45 cols
@@ -197,5 +157,4 @@ cfb_rosters 2026: 476 rows from 948/949 games | position 100.0% | division 100.0
   cfb_returning_production 2026: 236 rows
 
 === returning_production: 0 failures ===
-push rejected (attempt 1); syncing with origin
-pushed: CFB Data Updated (Start: 2026 End: 2026) (attempt 2)
+pushed: CFB Data Updated (Start: 2026 End: 2026) (attempt 1)

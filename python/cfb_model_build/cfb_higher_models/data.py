@@ -32,7 +32,9 @@ _CACHE = Path(os.getenv("CFB_HM_CACHE", ".cache/higher_models"))
 # feature count. Dropped by default; `keep_ranks=True` if an experiment wants
 # the normalised-within-week view (ranks ARE scale-stable across eras, which is
 # occasionally the point).
-_DROP_SUFFIX = "_rank"
+#: cohort percentiles (F5: ``<m>_conf_pct`` teams, ``<m>_pos_pct`` players) are ranks
+#: re-expressed within a conference / position group, so they leave with the ranks
+_DROP_SUFFIX = ("_rank", "_conf_pct", "_pos_pct")
 
 
 def _as_polars(df) -> pl.DataFrame:

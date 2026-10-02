@@ -170,11 +170,21 @@ def test_build_recruiting_rejects_an_unknown_dataset(tmp_path) -> None:
         build_recruiting("nope", 2016, 2016, raw_root=tmp_path)
 
 
-def test_team_portal_refuses_seasons_below_its_2015_floor(tmp_path) -> None:
+def test_team_portal_refuses_seasons_below_its_2015_floor(tmp_path, monkeypatch) -> None:
     # the floor lives in the builder, not only in 10_build_recruiting.sh: a direct
-    # `--dataset team_portal -s 2014 --publish` must fail before any fetch
+    # `--dataset team_portal -s 2014 --publish` must fail before any fetch. The test
+    # itself never publishes and stubs the loaders to raise, so a regressed guard fails
+    # here instead of fetching or uploading (an earlier publish=True version of this
+    # test, run with the guard mutated out, uploaded a real 2014 asset).
+    import sportsdataverse.cfb as cfb
+
+    def _no_fetch(*_a, **_k):
+        raise AssertionError("team_portal fetched a season below its floor")
+
+    monkeypatch.setattr(cfb, "load_cfb_rosters", _no_fetch)
+    monkeypatch.setattr(cfb, "cfb_transfer_moves", _no_fetch)
     with pytest.raises(ValueError, match="starts at 2015"):
-        build_recruiting("team_portal", 2014, 2014, raw_root=tmp_path, publish=True)
+        build_recruiting("team_portal", 2014, 2014, raw_root=tmp_path, base=str(tmp_path / "cfb"))
 
 
 def test_talent_gate_fires_on_the_shapes_the_bug_produced() -> None:

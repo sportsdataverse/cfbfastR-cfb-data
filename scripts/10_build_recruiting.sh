@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
-# Build (and optionally publish) the three recruiting datasets.
+# Build (and optionally publish) the four recruiting / roster-continuity datasets.
 #
 #   cfb_recruits              per-recruit rows          2002+
 #   cfb_team_talent           per team-season composite 2005+
 #   cfb_returning_production  per team-season shares    2005+
+#   cfb_team_portal           per team-season transfers 2015+
 #
 # MIN SEASONS ARE MEASURED, NOT ASSUMED:
 #   * 247 returns rows back to 1996, but composite ratings only become usable in
@@ -14,6 +15,13 @@
 #   * returning production needs the season S-1 ESPN player box (floor 2004)
 #     and the season S roster (floor 2003), so its floor is 2005. Verified
 #     live: 2005 -> 161 teams, off_returning mean 0.638 / sd 0.259.
+#   * team portal diffs the season S-1 ESPN roster against season S, so BOTH
+#     must be full rosters. ESPN rosters before 2014 list ~55 players per FBS
+#     team (players with stats): FBS teams with >= 70 rostered were 0-3 in
+#     every season 2005-2013 and 128-136 in 2014-2025 (measured 2026-10-01).
+#     2014 is the first full roster, so 2015 is the first full DIFF. A 2014
+#     build passes the >= 100-full-FBS-rosters gate (it checks season S only)
+#     while diffing against a thin 2013, so the floor, not the gate, keeps it out.
 #
 # Usage:
 #   scripts/10_build_recruiting.sh                      # build all, no publish
@@ -60,11 +68,12 @@ floor_for() {
     recruits)             echo 2002 ;;
     team_talent)          echo 2005 ;;
     returning_production) echo 2005 ;;
+    team_portal)          echo 2015 ;;
     *) echo "unknown dataset: $1" >&2; exit 2 ;;
   esac
 }
 
-[[ -z "$DATASETS" ]] && DATASETS="recruits team_talent returning_production"
+[[ -z "$DATASETS" ]] && DATASETS="recruits team_talent returning_production team_portal"
 
 rc=0
 for ds in $DATASETS; do

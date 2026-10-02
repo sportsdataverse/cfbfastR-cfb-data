@@ -8,6 +8,7 @@ looking healthy. These tests concentrate there.
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 import polars as pl
 import pytest
@@ -169,6 +170,13 @@ def test_build_recruiting_rejects_an_unknown_dataset(tmp_path) -> None:
         build_recruiting("nope", 2016, 2016, raw_root=tmp_path)
 
 
+def test_team_portal_refuses_seasons_below_its_2015_floor(tmp_path) -> None:
+    # the floor lives in the builder, not only in 10_build_recruiting.sh: a direct
+    # `--dataset team_portal -s 2014 --publish` must fail before any fetch
+    with pytest.raises(ValueError, match="starts at 2015"):
+        build_recruiting("team_portal", 2014, 2014, raw_root=tmp_path, publish=True)
+
+
 def test_talent_gate_fires_on_the_shapes_the_bug_produced() -> None:
     """Empty, all-null and flat must each raise; only real data passes.
 
@@ -310,3 +318,130 @@ def test_returning_gate_rejects_a_collapsed_join() -> None:
     assert zeroish["off_returning"].std() > 0.05  # the sd gate must NOT be what fires
     with pytest.raises(ValueError, match="outside"):
         assert_returning_is_real(zeroish, label="zeroish")
+
+
+# --- team_portal --------------------------------------------------------------
+
+_PORTAL_FIXTURES = Path(__file__).resolve().parent / "fixtures" / "team_portal"
+
+_PORTAL_SCHEMA = {
+    "season": pl.Int64,
+    "team_id": pl.Int64,
+    "roster_n": pl.Int64,
+    "transfers_in_n": pl.Int64,
+    "transfers_out_n": pl.Int64,
+    "portal_share": pl.Float64,
+    "transfer_talent_in": pl.Float64,
+    "transfer_talent_out": pl.Float64,
+    "net_transfer_talent": pl.Float64,
+}
+
+
+def _portal_frame(n_teams: int, *, share: float, roster_n: int = 100) -> pl.DataFrame:
+    ins = round(share * roster_n)
+    return pl.DataFrame(
+        {
+            "season": [2024] * n_teams,
+            "team_id": list(range(1, n_teams + 1)),
+            "roster_n": [roster_n] * n_teams,
+            "transfers_in_n": [ins] * n_teams,
+            "portal_share": [ins / roster_n] * n_teams,
+        }
+    )
+
+
+def test_portal_gate_rejects_a_mostly_null_or_zero_share() -> None:
+    """A roster diff whose key broke reports ~no movers while every table looks well-formed."""
+    from cfb_data_build.checks import assert_portal_is_real
+
+    fbs = set(range(1, 121))
+    real = _portal_frame(120, share=0.12)
+    assert_portal_is_real(real, fbs_team_ids=fbs, label="real")
+
+    # 115 of 120 teams (95.8%) at zero share -> collapsed
+    zeroed = real.with_columns(
+        pl.when(pl.col("team_id") > 5)
+        .then(0.0)
+        .otherwise(pl.col("portal_share"))
+        .alias("portal_share")
+    )
+    with pytest.raises(ValueError, match="null or 0"):
+        assert_portal_is_real(zeroed, fbs_team_ids=fbs, label="zeroed")
+    nulled = real.with_columns(
+        pl.when(pl.col("team_id") > 5)
+        .then(None)
+        .otherwise(pl.col("portal_share"))
+        .alias("portal_share")
+    )
+    with pytest.raises(ValueError, match="null or 0"):
+        assert_portal_is_real(nulled, fbs_team_ids=fbs, label="nulled")
+    with pytest.raises(ValueError, match="EMPTY"):
+        assert_portal_is_real(real.head(0), fbs_team_ids=fbs, label="empty")
+
+
+def test_portal_gate_rejects_a_season_without_100_full_fbs_rosters() -> None:
+    """ESPN rosters before 2014 list ~55 players per FBS team; a diff over them is not a portal count."""
+    from cfb_data_build.checks import assert_portal_is_real
+
+    fbs = set(range(1, 121))
+    frame = _portal_frame(120, share=0.12)
+    thin = frame.with_columns(
+        pl.when(pl.col("team_id") > 99)
+        .then(55)
+        .otherwise(pl.col("roster_n"))
+        .alias("roster_n")
+    )
+    with pytest.raises(ValueError, match="99 FBS teams"):
+        assert_portal_is_real(thin, fbs_team_ids=fbs, label="thin")
+    # the same rows pass once 100 FBS teams carry a full roster ...
+    assert_portal_is_real(
+        thin.with_columns(
+            pl.when(pl.col("team_id") == 100)
+            .then(70)
+            .otherwise(pl.col("roster_n"))
+            .alias("roster_n")
+        ),
+        fbs_team_ids=fbs,
+        label="boundary",
+    )
+    # ... and full FCS rosters do not stand in for missing FBS ones
+    with pytest.raises(ValueError, match="FBS teams"):
+        assert_portal_is_real(frame, fbs_team_ids=set(range(1, 100)), label="fcs-heavy")
+
+
+def test_built_2024_portal_ranks_colorado_first_among_fbs() -> None:
+    """Real 2024 inputs (fixture README): Colorado (38) leads FBS, Miami (2390) took Cam Ward."""
+    from cfb_data_build.checks import assert_portal_is_real
+    from cfb_data_build.recruiting import build_team_portal
+
+    moves = pl.read_parquet(_PORTAL_FIXTURES / "moves_2024.parquet")
+    rosters = pl.read_parquet(_PORTAL_FIXTURES / "rosters_2024.parquet")
+    fbs = set(rosters.filter(pl.col("division") == "fbs")["team_id"].to_list())
+
+    df = build_team_portal(moves, rosters, 2024)
+
+    assert df.schema == pl.Schema(_PORTAL_SCHEMA)
+    assert (
+        df.height == rosters["team_id"].n_unique()
+    )  # one row per rostered team, FBS + FCS
+    assert df["team_id"].is_unique().all()
+    assert_portal_is_real(df, fbs_team_ids=fbs, label="cfb_team_portal 2024")
+    ranked = df.filter(pl.col("team_id").is_in(list(fbs))).sort(
+        "portal_share", descending=True
+    )
+    top = ranked.row(0, named=True)
+    assert top["team_id"] == 38
+    assert (top["transfers_in_n"], top["roster_n"]) == (41, 111)
+    miami = df.filter(pl.col("team_id") == 2390).row(0, named=True)
+    assert miami["transfers_in_n"] >= 1
+    # every move row is counted on both sides exactly once
+    assert (
+        df["transfers_in_n"].sum() == moves.filter(pl.col("direction") == "in").height
+    )
+    assert (
+        df["transfers_out_n"].sum() <= moves.filter(pl.col("direction") == "out").height
+    )
+    assert (
+        df["net_transfer_talent"]
+        - (df["transfer_talent_in"] - df["transfer_talent_out"])
+    ).abs().max() < 1e-9

@@ -170,6 +170,13 @@ def test_build_recruiting_rejects_an_unknown_dataset(tmp_path) -> None:
         build_recruiting("nope", 2016, 2016, raw_root=tmp_path)
 
 
+def test_team_portal_refuses_seasons_below_its_2015_floor(tmp_path) -> None:
+    # the floor lives in the builder, not only in 10_build_recruiting.sh: a direct
+    # `--dataset team_portal -s 2014 --publish` must fail before any fetch
+    with pytest.raises(ValueError, match="starts at 2015"):
+        build_recruiting("team_portal", 2014, 2014, raw_root=tmp_path, publish=True)
+
+
 def test_talent_gate_fires_on_the_shapes_the_bug_produced() -> None:
     """Empty, all-null and flat must each raise; only real data passes.
 

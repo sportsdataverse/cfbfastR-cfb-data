@@ -256,6 +256,12 @@ _NEEDS_RAW_STORE = ("recruits", "team_talent")
 #: earliest target season.
 TALENT_WINDOW = 4
 
+#: cfb_team_portal's first season. ESPN rosters before 2014 list ~55 players per FBS
+#: team (players with stats), so a roster diff undercounts transfers, and 2014 diffs
+#: against the thin 2013 rosters. scripts/10_build_recruiting.sh skips below it; the
+#: builder refuses it, so a direct CLI call cannot publish an undercounted season.
+TEAM_PORTAL_FIRST_SEASON = 2015
+
 
 def build_recruiting(
     dataset: str,
@@ -286,6 +292,11 @@ def build_recruiting(
     if dataset not in RECRUITING_SPECS:
         raise ValueError(
             f"unknown recruiting dataset {dataset!r}; expected one of {sorted(RECRUITING_SPECS)}"
+        )
+    if dataset == "team_portal" and start_year < TEAM_PORTAL_FIRST_SEASON:
+        raise ValueError(
+            f"cfb_team_portal starts at {TEAM_PORTAL_FIRST_SEASON} (pre-2014 ESPN rosters are "
+            f"partial, so a roster diff undercounts); got start_year={start_year}"
         )
     spec = RECRUITING_SPECS[dataset]
     have = set(available_years(raw_root)) if dataset in _NEEDS_RAW_STORE else set()

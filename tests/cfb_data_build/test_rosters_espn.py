@@ -9,6 +9,7 @@ pinned schema. All hermetic -- no network, no raw checkout.
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 import polars as pl
 import pytest
@@ -439,3 +440,48 @@ def test_zero_rows_after_games_played_still_raises(monkeypatch):
     _stub_empty_build(monkeypatch, completed=42)
     with pytest.raises(RuntimeError, match="compiled zero roster rows"):
         R.build_season(2025, write=False, publish=False)
+
+
+# ------------------------------------------------- per-game cache: placeholders
+#
+# Real 2026 rows, sliced to three athletes per team (fixtures/game_rosters_2026):
+#   401856634  cached EMPTY on 2026-08-31 (the droplet's actual cache entry); raw
+#              has had players since the game was played.
+#   401864494  cached WITH players; deliberately absent from raw, so it can only
+#              come back from the cache.
+#   401856705  not yet played -- raw is still ESPN's ``data: []`` placeholder.
+ROSTER_FIXTURES = Path(__file__).parent / "fixtures" / "game_rosters_2026"
+STALE, CACHED, UNPLAYED = 401856634, 401864494, 401856705
+
+
+@pytest.fixture()
+def roster_cache(tmp_path):
+    import shutil
+
+    cache = tmp_path / "cache"
+    shutil.copytree(ROSTER_FIXTURES / "cache", cache)
+    return cache
+
+
+def _players(docs: list[dict]) -> dict[int, int]:
+    return {d["game_id"]: len(d.get("data") or []) for d in docs}
+
+
+def test_an_empty_cached_roster_is_a_miss_and_is_fetched_again(roster_cache):
+    """2026: 946 of 948 games were cached as pre-kickoff placeholders on 08-31 and
+    trusted forever, so every later build shipped 476 rows / 4 teams."""
+    docs = R.fetch_game_rosters(
+        [STALE, CACHED], str(ROSTER_FIXTURES / "raw"), cache_dir=roster_cache, workers=1
+    )
+    assert _players(docs) == {STALE: 6, CACHED: 6}
+    assert {r["team_id"] for r in R.roster_rows(docs)} == {151, 333, 23, 30}
+    # The refetched roster replaces the placeholder on disk.
+    assert len(json.loads((roster_cache / f"{STALE}.json").read_text())["data"]) == 6
+
+
+def test_an_empty_roster_is_never_written_to_the_cache(roster_cache):
+    docs = R.fetch_game_rosters(
+        [UNPLAYED], str(ROSTER_FIXTURES / "raw"), cache_dir=roster_cache, workers=1
+    )
+    assert _players(docs) == {UNPLAYED: 0}
+    assert not (roster_cache / f"{UNPLAYED}.json").exists()

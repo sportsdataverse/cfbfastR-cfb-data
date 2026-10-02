@@ -428,6 +428,12 @@ def fetch_game_rosters(
     Fail-soft per game: a missing capture (16 of 19,586 master ids have none) drops
     that game rather than aborting the season. Concurrency stays modest --
     raw.githubusercontent tolerates it, but a per-game payload averages 300 KB.
+
+    The cache holds ONLY rosters with players. Raw writes a ``data: []`` placeholder
+    for every scheduled game, and a placeholder is not an answer: caching one meant
+    trusting it forever (2026: 946 of 948 games cached empty on 08-31, so every later
+    build shipped 476 rows / 4 teams). An empty cached doc is therefore a miss, and
+    an empty fetched doc is returned but never written.
     """
     ids = list(game_ids)
     cache = Path(cache_dir) if cache_dir else None
@@ -438,14 +444,16 @@ def fetch_game_rosters(
         dest = cache / f"{gid}.json" if cache else None
         if dest is not None and dest.exists():
             try:
-                return json.loads(dest.read_text(encoding="utf-8"))
+                cached = json.loads(dest.read_text(encoding="utf-8"))
             except Exception:  # noqa: BLE001 -- corrupt cache entry: re-fetch
-                pass
+                cached = None
+            if cached and cached.get("data"):
+                return cached
         try:
             doc = _read_json(_game_roster_url(raw_base, gid), downloader=downloader)
         except Exception:  # noqa: BLE001 -- one bad game cannot abort the season
             return None
-        if doc is not None and dest is not None:
+        if doc and doc.get("data") and dest is not None:
             dest.write_text(json.dumps(doc), encoding="utf-8")
         return doc
 

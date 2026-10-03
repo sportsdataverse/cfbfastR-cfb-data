@@ -1937,7 +1937,8 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2018,Turner Gill,Liberty,FBS Independents,12,6,6,true
 2018,Billy Napier,Louisiana,Sun Belt,14,7,7,true
 2018,Skip Holtz,Louisiana Tech,Conference USA,13,8,5,true
-2018,Lorenzo Ward,Louisville,ACC,2,0,2,true
+2018,Bobby Petrino,Louisville,ACC,10,2,8,true
+2018,Lorenzo Ward,Louisville,ACC,2,0,2,false
 2018,Doc Holliday,Marshall,Conference USA,13,9,4,true
 2018,Matt Canada,Maryland,Big Ten,12,5,7,true
 2018,Mark Whipple,Massachusetts,FBS Independents,12,4,8,true
@@ -2016,8 +2017,7 @@ season,coach,school,conference,games,wins,losses,clean_attribution
 2018,Chris Petersen,Washington,Pac-12,14,10,4,true
 2018,Mike Leach,Washington State,Pac-12,13,11,2,true
 2018,Dana Holgorsen,West Virginia,Big 12,12,8,4,true
-2018,Bobby Petrino,Western Kentucky,Conference USA,10,2,8,false
-2018,Mike Sanford Jr.,Western Kentucky,Conference USA,12,3,9,false
+2018,Mike Sanford Jr.,Western Kentucky,Conference USA,12,3,9,true
 2018,Tim Lester,Western Michigan,Mid-American,13,7,6,true
 2018,Paul Chryst,Wisconsin,Big Ten,13,8,5,true
 2018,Craig Bohl,Wyoming,Mountain West,12,6,6,true

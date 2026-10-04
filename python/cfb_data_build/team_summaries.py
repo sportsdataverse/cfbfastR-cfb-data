@@ -1029,8 +1029,13 @@ def player_dispersion(rows: pl.DataFrame, keys: list[str]) -> pl.DataFrame:
       rather than both.
 
     All five are null when ``dispersion_games < DISPERSION_MIN_GAMES``.
+
+    The games are SORTED before they are reduced: the per-game frame leaves its
+    group_by in no fixed order and float sums are not associative, so an unsorted
+    mean / sd moves the last bit between two identical builds, and the committed
+    parquet with it.
     """
-    x = pl.col("game_epa")
+    x = pl.col("game_epa").sort()
     mean, sd = x.mean(), x.std(ddof=0)
     out = (
         rows.group_by([*keys, "game_id"])

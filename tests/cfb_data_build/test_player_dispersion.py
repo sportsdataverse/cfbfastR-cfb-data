@@ -53,6 +53,20 @@ def test_dispersion_hand_computed(carries):
     assert (alston["boom_rate"], alston["bust_rate"]) == (0.0, 0.2)
 
 
+def test_row_order_does_not_move_a_bit(carries):
+    # The per-game frame comes out of a group_by in no fixed order, so the reduction
+    # sorts the games first. Feed the same carries in many row orders: every output
+    # must be bit-identical (exact ==, not approx), or a rebuild of an unchanged
+    # season rewrites the committed parquet.
+    def run(df: pl.DataFrame) -> pl.DataFrame:
+        return player_dispersion(df, KEYS).sort(KEYS)
+
+    want = run(carries)
+    for seed in range(40):
+        got = run(carries.sample(fraction=1.0, shuffle=True, seed=seed))
+        assert got.equals(want), f"row order (seed {seed}) changed a dispersion value"
+
+
 def test_under_three_games_is_null(carries):
     brown = _row(player_dispersion(carries, KEYS), BROWN)
     assert brown["dispersion_games"] == 2

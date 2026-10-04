@@ -153,3 +153,43 @@ no tag, no asset. It also has no stored fitted constants (`tau_team`, HFA and th
 `rho` are estimated per fit), so there is nothing here that could go stale the way
 `_RIDGE_LAMBDA = 325` did. Full report:
 `ClaudeCowork/ledgers/2026-09-02-next-ten/reports/cfb-hierarchical.md`.
+
+**2026-10-04 (paper_index: Game on Paper's Paper Index, deserved-win share and luck) — published, recorded here instead of a table row.**
+The table is locked row-for-row to `models/manifest.yaml`, whose entries name a `cfb_model_*`
+stage (`tests/test_model_manifest.py`). This model is applied by two dataset stages and
+trained nowhere in this repo, so its record is this paragraph.
+
+- **Artifacts:** `cfb_paper_index_games_{season}.parquet` (one row per team per scored game),
+  and seven columns on `team_summaries` and `team_summaries_weekly`: `deserved_wins`,
+  `luck_wins`, `luck_z`, `luck_wins_rank`, `luck_z_rank`, `paper_index_games_n`,
+  `paper_index_span`. No model file: the weights are `sportsdataverse.paper_index.WEIGHTS["cfb"]`
+  (eight non-negative weights, intercept-free logistic).
+- **Release tags:** `cfb_paper_index_games`, `espn_cfb_team_summaries`, `cfb_team_summaries_weekly`.
+- **Training data:** not trained here. The released `espn_cfb_pbp` as of 2026-09-07: train
+  2016-2023 (6,637 games), holdout 2024-2025 (1,894 games). The pbp was rebuilt after the fit
+  (sportsdataverse-py #643-#651); the committed 2024 and 2025 files now score 945 + 956 games.
+- **Fitting script:** `game-on-paper-app/python/tools/fit_paper_index.py` (commit `770ba849`).
+  The weights are copied verbatim, at 4 decimals, into sdv-py `sportsdataverse/paper_index.py`
+  (#661, `21549eec`), and applied here by `python/espn_cfb_67_paper_index_games_creation.py`
+  (stage 67) and `cfb_data_build/summaries_build.py` (the summaries build and every weekly
+  snapshot).
+- **Gates at the fit** (sdv-py `tests/fixtures/paper_index/paper_index_oracle.json`): holdout
+  games >= 1,200 (1,894); holdout Brier < 0.09 (0.0657); resolution > 0.10 (0.166); reliability
+  < 0.01 (0.0011); paired against an EPA-only share, mean Brier delta + 2 se <= 0 (-0.0147, se
+  0.0039; EPA-only Brier 0.0805). Holdout log loss 0.2172, accuracy 0.9108. The holdout is not
+  fully clean: the EP model behind the EPA, success and explosiveness inputs was trained on
+  2004-2025.
+- **On the committed (rebuilt) pbp**, same weights, measured 2026-10-04 through this producer:
+  Brier 0.0727 (2024) and 0.0638 (2025), still under the 0.09 ceiling. Train seasons 2016-2023
+  score 0.070-0.083, in-sample. Seasons 2004-2015 were never seen or evaluated by the fit and
+  score 0.071-0.098: over 0.09 in 2004, 2005, 2007, 2009, 2011 and 2013. `paper_index_span`
+  (`train` / `holdout` / `out_of_span`) carries that distinction on every published row.
+- **Gates at publish, producer side: none yet.** There is no accuracy gate here. What fails a
+  build is structural only: stage 67 errors when sdv-py's 98% keep-floor warning fires (it
+  fires on no committed season 2004-2026), and a full-season summaries build errors when no
+  team matches a scored game.
+- **Last retrain:** 2026-09-07 per the sdv-py module docstring (the oracle fixture's
+  `fitted_at`, 2026-09-15, is its regeneration with the same weights).
+- **Cadence:** frozen, and a refit is due (the weights predate the pbp rebuild). A refit is a
+  Game on Paper fit, the sdv-py port, a pin bump here, then a republish of all three tags for
+  2004-2026.

@@ -40,19 +40,22 @@ _DROP_SUFFIX = ("_rank", "_conf_pct", "_pos_pct")
 #: and luck (``cfb_data_build.paper_index.LUCK_COLUMNS``). Their weights were fitted
 #: on who won and ``luck_wins`` subtracts from the real win count, so as a feature
 #: they hand a model its own target, and the fit's train seasons are in-sample on
-#: top (``paper_index_span``). Never features, under any ``keep_ranks``. ``paper_index_span`` is text and would
-#: fall out on dtype; it is named so the rule does not depend on that.
-_OUTCOME_DERIVED = frozenset(
-    {
-        "deserved_wins",
-        "luck_wins",
-        "luck_z",
-        "luck_wins_rank",
-        "luck_z_rank",
-        "paper_index_games_n",
-        "paper_index_span",
-    }
+#: top (``paper_index_span``). Never features, under any ``keep_ranks``.
+#:
+#: Matched by name FRAGMENT, not by exact name, so a column derived from one of
+#: them later (``luck_z_conf_pct``, ``deserved_wins_pct``) is excluded as well.
+#: ``train_game.FAMILIES["outcome"]`` is this same tuple.
+OUTCOME_FRAGMENTS: tuple[str, ...] = (
+    "deserved_wins",
+    "luck_wins",
+    "luck_z",
+    "paper_index",
 )
+
+
+def is_outcome_derived(col: str) -> bool:
+    """Whether ``col`` is (or is derived from) an outcome column: see :data:`OUTCOME_FRAGMENTS`."""
+    return any(f in col for f in OUTCOME_FRAGMENTS)
 
 
 def _as_polars(df) -> pl.DataFrame:
@@ -185,7 +188,7 @@ def assert_asof_boundary(weekly: pl.DataFrame, *, sample_weeks=(5, 8, 11)) -> di
 def feature_columns(weekly: pl.DataFrame, *, keep_ranks: bool = False) -> list[str]:
     """Numeric per-team feature columns, excluding keys and (by default) ranks.
 
-    The outcome-derived columns (``_OUTCOME_DERIVED``) are never returned.
+    Outcome-derived columns (:func:`is_outcome_derived`) are never returned.
     """
     keys = {
         "team_id",
@@ -198,7 +201,7 @@ def feature_columns(weekly: pl.DataFrame, *, keep_ranks: bool = False) -> list[s
     }
     out = []
     for c, dt in zip(weekly.columns, weekly.dtypes):
-        if c in keys or c in _OUTCOME_DERIVED or not dt.is_numeric():
+        if c in keys or is_outcome_derived(c) or not dt.is_numeric():
             continue
         if not keep_ranks and c.endswith(_DROP_SUFFIX):
             continue

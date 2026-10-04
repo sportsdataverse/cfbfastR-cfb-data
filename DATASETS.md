@@ -1663,19 +1663,23 @@ table:
 | --- | --- | --- |
 | deserved_wins | double | Sum of the team's deserved-win shares over its scored games: the wins its play earned on paper. Null when no game was scored. |
 | luck_wins | double | Wins minus `deserved_wins`, over the same games. Positive = won more than it earned. `luck_wins + deserved_wins` is the win count over those games. |
-| luck_z | double | `luck_wins` in standard deviations: divided by `sqrt(sum(p * (1 - p)))` over the team's shares `p`. Null when that variance is 0. |
+| luck_z | double | `luck_wins` divided by `sqrt(sum(p * (1 - p)))` over the team's shares `p`, its standard deviation if each game were a coin weighted by its share. Reads like a z-score over a full season; NOT on a normal scale below about 8 games (see the notes). Null when that variance is 0. |
 | luck_wins_rank | double | Rank of `luck_wins` among the table's teams that have one, 1 = the luckiest. |
 | luck_z_rank | double | Rank of `luck_z`, 1 = the luckiest. |
 | paper_index_games_n | integer | Games that entered the sums; 0 when none did. |
-| paper_index_span | character | Where the season sits against the Paper Index fit: `train` = the season's shares were part of the fit (2016-2023, in-sample), `holdout` = scored out of sample at fit time (2024-2025), `out_of_span` = never seen by the fit and never evaluated. From sdv-py `TRAIN_SEASONS` / `HOLDOUT_SEASONS`. |
+| paper_index_span | character | Where the season sits against the Paper Index fit: `train` = the season's shares were part of the fit (2016-2023, in-sample), `holdout` = scored out of sample at fit time (2024-2025), though not fully clean: the EP model behind the EPA, success and explosiveness inputs was trained on seasons that include them, `out_of_span` = never seen by the fit and never evaluated. From sdv-py `TRAIN_SEASONS` / `HOLDOUT_SEASONS`. |
 
 - The games counted are the ones the Paper Index scores: completed, with a winner, both
   sides at 20 or more scrimmage snaps; regular season and postseason, FCS opponents
   included. That is wider than `valid_games` (FBS vs FBS), and it is not always the
   full schedule: a game the pbp lacks, or one under the snap floor, adds neither a game
   nor a win. Read the sums beside `paper_index_games_n`.
-- Luck includes home field (the share has no home term), and one game is a small sample:
-  filter on `paper_index_games_n` before ranking a partial season.
+- Luck includes home field (the share has no home term).
+- `luck_z` is only z-like with enough games. Over the full 2024 season its spread across
+  the 134 teams is 1.04 and it runs from -2.2 to +3.5. On the 2024 weekly table through
+  week 2 (1-3 games a team) it runs from -4.3 to +6.2, with 5 of 130 teams beyond 3: a few
+  shares near 0 or 1 make the denominator tiny. Below about 8 games read `luck_wins`, and
+  filter on `paper_index_games_n` before ranking.
 - On `cfb_team_summaries_weekly` the seven columns are as of each snapshot: regular-season
   games with `week <= through_week` (inclusive), never the postseason, cut by the same
   game list as the snapshot's plays.
@@ -2125,7 +2129,7 @@ of [team_summaries](#team_summaries).
 | field_position_margin | double | Expected points of the average drive start, team minus opponent. |
 | havoc_margin | double | Havoc created by the team's defense minus havoc it allowed. Positive favors the team. |
 | turnovers_margin | double | Opponent turnovers minus the team's. Positive favors the team. |
-| paper_index_span | character | `train` = the season's shares were part of the weight fit (2016-2023, in-sample), `holdout` = scored out of sample at fit time (2024-2025), `out_of_span` = never seen by the fit and never evaluated. |
+| paper_index_span | character | `train` = the season's shares were part of the weight fit (2016-2023, in-sample), `holdout` = scored out of sample at fit time (2024-2025), though not fully clean: the EP model behind the EPA, success and explosiveness inputs was trained on seasons that include them, `out_of_span` = never seen by the fit and never evaluated. |
 
 Not a model feature: the shares are fitted on who won.
 

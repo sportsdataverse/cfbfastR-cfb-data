@@ -153,7 +153,7 @@ def build_summaries_season(
     # Attached after build_team_summaries, so league_averages and the
     # conference percentiles in there never see the outcome-derived columns.
     tables["team_summaries"] = attach_luck(
-        tables["team_summaries"], paper_games, season
+        tables["team_summaries"], paper_games, season, through_week=through_week
     )
 
     counts: dict[str, int] = {}

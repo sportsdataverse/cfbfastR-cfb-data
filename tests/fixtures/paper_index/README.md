@@ -8,12 +8,12 @@ sdv-py's own Paper Index fixture was cut from (same sha256 as
 
 | fixture | rows | source | source sha256 |
 | --- | --- | --- | --- |
-| `play_by_play_slice.parquet` | 771 (533 from 2024, 238 from 2021) | `cfb/pbp/parquet/play_by_play_2024.parquet` and `play_by_play_2021.parquet` (`espn_cfb_pbp`) | 2024 `9b4bfe6a8241cf496f7c43096c305269abc32431fc96f080e4a12302009994e3`, 2021 `2e6583fe991a0691259c35f1828738bb20998fe06ee087d678d02b7dd8b08b91` |
-| `cfb_schedules_2024_slice.parquet` | 3 | `cfb/cfb_schedules/parquet/cfb_schedules_2024.parquet` (`cfb_schedules`) | `7feb11b7ac2eccd92afd741a59efeb7f1fd26bb51d15675ab1164cd01985a153` |
+| `play_by_play_slice.parquet` | 981 (743 from 2024, 238 from 2021) | `cfb/pbp/parquet/play_by_play_2024.parquet` and `play_by_play_2021.parquet` (`espn_cfb_pbp`) | 2024 `9b4bfe6a8241cf496f7c43096c305269abc32431fc96f080e4a12302009994e3`, 2021 `2e6583fe991a0691259c35f1828738bb20998fe06ee087d678d02b7dd8b08b91` |
+| `cfb_schedules_2024_slice.parquet` | 4 | `cfb/cfb_schedules/parquet/cfb_schedules_2024.parquet` (`cfb_schedules`) | `7feb11b7ac2eccd92afd741a59efeb7f1fd26bb51d15675ab1164cd01985a153` |
 
 ## Selection
 
-**pbp**: every play of five games, projected to
+**pbp**: every play of six games, projected to
 `sportsdataverse.paper_index.PBP_COLUMNS` (23 columns), sorted by
 `game_id, game_play_number`. Ids are as released: `game_id`, `pos_team_id`,
 `homeTeamId`, `awayTeamId` all Int64.
@@ -22,6 +22,7 @@ sdv-py's own Paper Index fixture was cut from (same sha256 as
 | --- | --- | --- | --- | --- | --- | --- |
 | 401636915 | 2024 | regular, 10 | Arizona State (9) at Oklahoma State (197) | 42-21 ASU | 164 | one of sdv-py's 12 oracle games; week W - 1 of the snapshot test |
 | 401636917 | 2024 | regular, 11 | UCF (2116) at Arizona State (9) | 35-31 ASU | 170 | week W of the snapshot test |
+| 401636934 | 2024 | regular, 13 | Texas Tech (2641) at Oklahoma State (197) | 56-48 Texas Tech | 210 | another sdv-py oracle game; a win on a 0.13 share, so the `luck_wins` and `luck_z` orders differ |
 | 401677182 | 2024 | postseason, 1 | Peach Bowl, Texas (251) vs Arizona State (9, listed home) | 39-31 Texas (2OT) | 199 | a bowl: ESPN numbers the postseason from week 1 again |
 | 401309543 | 2021 | regular, 1 | Norfolk State (2450) at Toledo (2649) | 49-10 Toledo | 49 | under the snap floor: the feed holds 11 Toledo and 18 Norfolk State scrimmage snaps |
 | 401282705 | 2021 | regular, 2 | Toledo (2649) at Notre Dame (87) | 32-29 Notre Dame | 189 | Toledo's next game, scored, so its count is 1 and not 2 |
@@ -31,7 +32,7 @@ pair and a bowl. No 2024 game is under the 20-snap floor (all 945 decided games 
 2024 file are scored), so the floor case comes from 2021, where the committed pbp has
 two such games (401309543 and 401282178).
 
-**schedule**: the three 2024 games' rows, columns `game_id`, `season`, `week`,
+**schedule**: the four 2024 games' rows, columns `game_id`, `season`, `week`,
 `season_type`, `season_type_id`, `home_id`, `home_team`, `home_points`, `away_id`,
 `away_team`, `away_points`. The snapshot filter reads `season_type_id` and `week`; the
 scores are the hand check on the win count.
@@ -39,15 +40,16 @@ scores are the hand check on the win count.
 ## Hand numbers
 
 Shares are `sportsdataverse.paper_index.paper_index_games` at sdv-py `21549eec` on the
-fixture rows. The week-10 share is also Game on Paper's own module on the same rows:
-sdv-py's `tests/fixtures/paper_index/gop_compute_cfb.json` gives Oklahoma State's
-`homeShare` as `0.2907412420199904`, so Arizona State's is `0.7092587579800096`.
+fixture rows. The two oracle games are also Game on Paper's own module on the same
+rows: sdv-py's `tests/fixtures/paper_index/gop_compute_cfb.json` gives Oklahoma State's
+`homeShare` as `0.2907412420199904` in 401636915 and `0.8674356066221223` in 401636934.
 
 | team | game | won | `paper_share` |
 | --- | --- | --- | --- |
 | Arizona State | 401636915 (week 10) | yes | 0.70925875798001 |
 | Arizona State | 401636917 (week 11) | yes | 0.12240098401069241 |
 | Arizona State | 401677182 (Peach Bowl) | no | 0.11377000178908554 |
+| Texas Tech | 401636934 (week 13) | yes | 0.13256439337787726 |
 | Toledo | 401282705 (at Notre Dame) | no | 0.5748213286851482 |
 
 Arizona State, season: `deserved_wins` = 0.70925875798001 + 0.12240098401069241 +
@@ -55,9 +57,25 @@ Arizona State, season: `deserved_wins` = 0.70925875798001 + 0.12240098401069241 
 = 1.054570256220212; variance = 0.206211 + 0.107419 + 0.100826 = 0.414456, so `luck_z`
 = 1.054570 / sqrt(0.414456) = 1.638084.
 
+The 2024 season over the five fixture teams, each metric in its own order (rank 1 first):
+
+| team | games | wins | `deserved_wins` | `luck_wins` | `luck_wins_rank` | `luck_z` | `luck_z_rank` |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Arizona State | 3 | 2 | 0.945430 | 1.054570 | 1 | 1.638084 | 2 |
+| Texas Tech | 1 | 1 | 0.132564 | 0.867436 | 2 | 2.558027 | 1 |
+| Texas | 1 | 1 | 0.886230 | 0.113770 | 3 | 0.358295 | 3 |
+| UCF | 1 | 0 | 0.877599 | -0.877599 | 4 | -2.677661 | 5 |
+| Oklahoma State | 2 | 0 | 1.158177 | -1.158177 | 5 | -2.043553 | 4 |
+
+Texas Tech's `luck_z` is sqrt(0.867436 / 0.132564) = 2.558027: one win on a small
+share is fewer wins of luck than Arizona State's three games and more standard
+deviations. Oklahoma State's two losses (shares 0.290741 and 0.867436) are the reverse
+against UCF's one.
+
 Snapshots (regular season, `week <= W`, inclusive): `through_week` 1-9 hold none of
-Arizona State's fixture games, 10 holds week 10, 11-16 hold weeks 10 and 11. The bowl
-is in the season table only.
+Arizona State's fixture games, 10 holds week 10, 11-16 hold weeks 10 and 11. Oklahoma
+State has one game through week 12 and two from week 13. The bowl is in the season
+table only.
 
 Toledo 2021: one game counted. The 49-10 win is not scored, so it adds neither a game
 nor a win: `paper_index_games_n` = 1, `luck_wins` = 0 - 0.5748213286851482.

@@ -28,6 +28,7 @@ are built by name pattern exclude them by name
 
 from __future__ import annotations
 
+import warnings
 from pathlib import Path
 
 import polars as pl
@@ -46,6 +47,11 @@ LEAGUE = "cfb"
 
 #: the released pbp's id columns; all Int64 there, and published unchanged
 _ID_COLUMNS = ("game_id", "pos_team_id", "homeTeamId", "awayTeamId")
+
+#: how sdv-py's keep-floor UserWarning starts (a regex, matched at the start of
+#: the message); stage 67 turns it into an error. The stage test replays the real
+#: warning, so a reworded message upstream fails there instead of passing here.
+_KEEP_FLOOR_WARNING = r"paper_index_games: inputs computable for"
 
 #: ``cfb_paper_index_games``: the sdv-py schema plus the in-sample label
 OUTPUT_SCHEMA: dict[str, pl.DataType] = {
@@ -84,7 +90,9 @@ def paper_index_span(season: int) -> str:
     """Where ``season`` sits against the Paper Index fit.
 
     ``train``: the season's shares were part of the fit (in-sample). ``holdout``:
-    scored out of sample at fit time. ``out_of_span``: never seen by the fit.
+    scored out of sample at fit time, though not fully clean (the EP model behind
+    the EPA, success and explosiveness inputs was trained on seasons that include
+    the holdout). ``out_of_span``: never seen by the fit, never evaluated.
     """
     return pl.select(_span(pl.lit(season))).item()
 
@@ -102,16 +110,16 @@ def paper_index_games_table(pbp: pl.DataFrame) -> pl.DataFrame:
                 f"{c} is {pbp.schema[c]}: the released pbp carries Int64 ids and "
                 "cfb_paper_index_games publishes them unchanged"
             )
-    games = paper_index_games(
-        pbp.select([c for c in PBP_COLUMNS if c in pbp.columns]), LEAGUE
-    )
-    return games.with_columns(paper_index_span=_span(pl.col("season"))).select(
-        list(OUTPUT_SCHEMA)
-    )
+    games = paper_index_games(pbp.select([c for c in PBP_COLUMNS if c in pbp.columns]), LEAGUE)
+    return games.with_columns(paper_index_span=_span(pl.col("season"))).select(list(OUTPUT_SCHEMA))
 
 
 def attach_luck(
-    team_data: pl.DataFrame, games: pl.DataFrame, season: int
+    team_data: pl.DataFrame,
+    games: pl.DataFrame,
+    season: int,
+    *,
+    through_week: int | None = None,
 ) -> pl.DataFrame:
     """Join the season's deserved wins and luck onto a ``team_summaries`` frame.
 
@@ -121,6 +129,13 @@ def attach_luck(
     team's wins over the ``paper_index_games_n`` games counted. A team with no
     scored game gets ``paper_index_games_n = 0`` and null luck. Ranks are over
     the frame's teams that have a value, 1 = the luckiest.
+
+    Raises:
+        ValueError: ``games`` carries another season; or, on a full-season build
+            (``through_week`` is None), no team in the frame matched a scored
+            game. An early snapshot can be empty; a season cannot, so that is an
+            id that stopped matching, not a team without games.
+        TypeError: a float ``team_id`` on either side.
     """
     luck = deserved_wins(games)
     stray = luck.filter(pl.col("season") != season)
@@ -144,16 +159,21 @@ def attach_luck(
         paper_index_games_n=pl.col("games"),
     )
     assert team_data.schema["team_id"] == luck.schema["team_id"]
-    return (
-        team_data.join(luck, on="team_id", how="left", validate="1:1")
-        .with_columns(
-            paper_index_games_n=pl.col("paper_index_games_n").fill_null(0),
-            luck_wins_rank=_rank_known("luck_wins", descending=True),
-            luck_z_rank=_rank_known("luck_z", descending=True),
-            paper_index_span=pl.lit(paper_index_span(season)),
+    joined = team_data.join(luck, on="team_id", how="left", validate="1:1")
+    if through_week is None and joined.height and joined["luck_wins"].count() == 0:
+        # the left join and the zero fill below would publish this as a table
+        # of zero counts and null luck, with nothing saying the ids missed
+        raise ValueError(
+            f"{season}: none of the {joined.height} team_summaries rows matched a "
+            f"Paper Index game ({luck.height} teams scored): the team_id formats "
+            "no longer agree"
         )
-        .select(*team_data.columns, *LUCK_COLUMNS)
-    )
+    return joined.with_columns(
+        paper_index_games_n=pl.col("paper_index_games_n").fill_null(0),
+        luck_wins_rank=_rank_known("luck_wins", descending=True),
+        luck_z_rank=_rank_known("luck_z", descending=True),
+        paper_index_span=pl.lit(paper_index_span(season)),
+    ).select(*team_data.columns, *LUCK_COLUMNS)
 
 
 def build_paper_index_games(season: int, *, base: str = "cfb") -> pl.DataFrame:
@@ -161,8 +181,20 @@ def build_paper_index_games(season: int, *, base: str = "cfb") -> pl.DataFrame:
 
     Reads only ``{base}/pbp/parquet`` (no release fallback). Returns the empty
     :data:`OUTPUT_SCHEMA` frame when the season's pbp is missing.
+
+    Raises:
+        ValueError: sdv-py's keep-floor warning fired (inputs computable for
+            fewer than 98% of the decided games). A warning there; here it
+            would publish a season with games missing, so the stage fails. No
+            committed season 2004-2026 trips it.
     """
     path = Path(base) / "pbp" / "parquet" / f"play_by_play_{season}.parquet"
     if not path.is_file():
         return pl.DataFrame(schema=OUTPUT_SCHEMA)
-    return paper_index_games_table(pl.read_parquet(path, columns=list(PBP_COLUMNS)))
+    pbp = pl.read_parquet(path, columns=list(PBP_COLUMNS))
+    with warnings.catch_warnings():
+        warnings.filterwarnings("error", message=_KEEP_FLOOR_WARNING, category=UserWarning)
+        try:
+            return paper_index_games_table(pbp)
+        except UserWarning as feed_loss:
+            raise ValueError(f"paper_index_games {season}: {feed_loss}") from feed_loss

@@ -50,7 +50,7 @@ def _snapshot_ids(monkeypatch, tmp_path, season: int, through_week: int | None):
     # The Paper Index shares ride the same snapshot filter. Stand in one "share"
     # per game (Int64 ids, as the real table carries them) and record which
     # games reach the luck roll-up.
-    def fake_attach(team, shares, _season):
+    def fake_attach(team, shares, _season, **_kwargs):
         seen["share_ids"] = set(shares["game_id"].cast(pl.Utf8).to_list())
         return team
 

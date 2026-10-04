@@ -19,6 +19,7 @@ from cfb_model_build.cfb_model_publish.artifacts import (
     _gh_runner,
     ensure_release,
 )
+from sportsdataverse.paper_index import HOLDOUT_SEASONS, TRAIN_SEASONS
 from sportsdataverse.release import upload_release_sidecars
 
 from cfb_data_build.config import PKG_FUNCTION, DatasetSpec
@@ -26,6 +27,9 @@ from cfb_data_build.io import dataset_stem
 
 # Mirror R PUBLISH_REPOS (``R/_data_utils.R:5``).
 PUBLISH_REPOS: list[str] = ["sportsdataverse/sportsdataverse-data"]
+
+# the Paper Index fit spans, so the release note names the years sdv-py does
+_PI_TRAIN, _PI_HOLDOUT = TRAIN_SEASONS["cfb"], HOLDOUT_SEASONS["cfb"]
 
 
 def _dataset_files(
@@ -157,6 +161,28 @@ RELEASE_NOTES: dict[str, str] = {
         "throws against that defense with no receiver named (FBS median 0.12 "
         "in 2014, 0.33 in 2024). Nothing is imputed. SPAN: 2014+ only -- "
         "earlier rosters carry no positions."
+    ),
+    "cfb_paper_index_games": (
+        "College Football Paper Index per game: ONE ROW PER TEAM PER SCORED "
+        "GAME (`game_id`, `team_id`, both Int64) with `paper_share`, the "
+        "team's deserved-win probability from eight performance margins "
+        "(success rate, explosive rate, explosiveness, scoring-opportunity "
+        "conversion, points per opportunity, starting field position, havoc, "
+        "turnovers), `opp_share` (the two sum to 1), `won`, and the eight "
+        "`<margin>_margin` columns, team minus opponent "
+        "(`sportsdataverse.paper_index.paper_index_games`, Game on Paper's "
+        "Paper Index). A game is scored when it is completed, has a winner "
+        "and both sides ran at least 20 scrimmage snaps; regular season and "
+        "postseason, FBS and FCS. Summed over a season the shares are the "
+        "`deserved_wins` on espn_cfb_team_summaries / "
+        "cfb_team_summaries_weekly, and wins minus that sum is `luck_wins`. "
+        "IN-SAMPLE LABEL: `paper_index_span` is `train` for "
+        f"{_PI_TRAIN[0]}-{_PI_TRAIN[1]} (the "
+        "season's shares were part of the weight fit, so they are in-sample), "
+        f"`holdout` for {_PI_HOLDOUT[0]}-{_PI_HOLDOUT[1]} (scored out of sample at fit time) and "
+        "`out_of_span` for every other season (never seen by the fit, never "
+        "evaluated). NOT A FEATURE: the shares are fitted on who won, so "
+        "they describe results and must not enter a predictive model."
     ),
     "cfb_team_opponent_splits": (
         "College Football by-opponent team-game splits: ONE ROW PER TEAM PER "

@@ -268,3 +268,4 @@ Every numbered pipeline stage in `python/` (auto-listed; run subsets with the `s
 - `python/espn_cfb_64_rolling_windows_creation.py`
 - `python/espn_cfb_65_metric_curves_creation.py`
 - `python/espn_cfb_66_defense_vs_position_creation.py`
+- `python/espn_cfb_67_paper_index_games_creation.py`

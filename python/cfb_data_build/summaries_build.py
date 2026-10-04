@@ -10,6 +10,10 @@ through the shared :func:`cfb_data_build.io.write_dataset` /
 ``through_week`` keeps REGULAR-season games with ``week <= W`` (postseason
 week numbering restarts at 1, so it never enters a snapshot) — the
 builder-level cumulative snapshot contract (program plan P8).
+
+``team_summaries`` also carries the Paper Index luck columns
+(:mod:`cfb_data_build.paper_index`): the per-game shares are computed from the
+same pbp frame and cut by the same snapshot game ids as the plays.
 """
 
 from __future__ import annotations
@@ -20,6 +24,7 @@ import polars as pl
 
 from cfb_data_build.config import SUMMARIES_REGISTRY
 from cfb_data_build.io import dataset_stem, write_dataset
+from cfb_data_build.paper_index import attach_luck, paper_index_games_table
 from cfb_data_build.publish import publish_dataset
 from cfb_data_build.summaries_input import prepare_plays_input
 from cfb_data_build.team_summaries import build_team_summaries
@@ -45,6 +50,16 @@ def _load_season_rosters(season: int, *, base: str = "cfb") -> pl.DataFrame:
     from sportsdataverse.cfb import load_cfb_rosters
 
     return load_cfb_rosters(seasons=[season])
+
+
+def _keep_games(df: pl.DataFrame, game_ids: pl.Series) -> pl.DataFrame:
+    """Rows of ``df`` whose ``game_id`` is in ``game_ids``, compared in the frame's own id dtype."""
+    if not (game_ids.dtype.is_integer() or game_ids.dtype == pl.Utf8):
+        raise TypeError(
+            f"schedule game_id is {game_ids.dtype}: ids are integer or string, never float"
+        )
+    ids = game_ids.cast(df.schema["game_id"])
+    return df.filter(pl.col("game_id").is_in(ids.implode()))
 
 
 def build_summaries_season(
@@ -117,6 +132,8 @@ def build_summaries_season(
         )
 
     plays = prepare_plays_input(pbp, schedule, season)
+    # Paper Index shares of every scored game, from the same pbp as the plays
+    paper_games = paper_index_games_table(pbp)
     if through_week is not None:
         # REGULAR-season games through week W only. ESPN restarts postseason
         # week numbering at 1, so a bare `week <= W` put every bowl and CFP
@@ -125,10 +142,18 @@ def build_summaries_season(
         # is null on some real pre-2013 regular-season games.
         snapshot_ids = schedule.filter(
             (pl.col("season_type_id") == 2) & (pl.col("week") <= through_week)
-        )["game_id"].cast(pl.Utf8)
-        plays = plays.filter(pl.col("game_id").is_in(snapshot_ids.implode()))
+        )["game_id"]
+        # ONE id list cuts the plays and the per-game shares, so a snapshot's
+        # luck columns and its play aggregates cannot cover different games
+        plays = _keep_games(plays, snapshot_ids)
+        paper_games = _keep_games(paper_games, snapshot_ids)
     tables = build_team_summaries(
         plays, season, through_week=through_week, rosters=rosters
+    )
+    # Attached after build_team_summaries, so league_averages and the
+    # conference percentiles in there never see the outcome-derived columns.
+    tables["team_summaries"] = attach_luck(
+        tables["team_summaries"], paper_games, season
     )
 
     counts: dict[str, int] = {}

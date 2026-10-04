@@ -164,7 +164,8 @@ def defense_vs_position_table(
     """The published table for ONE season's pbp, rosters and unified schedule.
 
     Raises ``TypeError`` on a float team, game or player id (pbp, roster or
-    schedule) rather than joining through ``"213.0"``.
+    schedule) rather than joining through ``"213.0"``, and ``ValueError`` when a
+    defense in the pbp has no row in the schedule.
     """
     rows = defense_vs_position(pbp, rosters, "cfb")
     if rows.height == 0:
@@ -174,6 +175,13 @@ def defense_vs_position_table(
     rows = rows.with_columns(as_int)
     share = _unattributed_target_share(pbp).with_columns(as_int)
     teams = _teams(schedule)
+    unmatched = sorted(set(rows["team_id"]) - set(teams["team_id"]))
+    if unmatched:
+        # a null division would drop the defense from the FBS cohort without a
+        # word and move every other defense's percentile
+        raise ValueError(
+            f"{len(unmatched)} defense team_id(s) have no schedule row: {unmatched[:10]}"
+        )
     for right in (teams, share):
         assert rows.schema["team_id"] == right.schema["team_id"], (
             f"team_id {rows.schema['team_id']} != {right.schema['team_id']}"

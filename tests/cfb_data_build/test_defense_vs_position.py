@@ -233,6 +233,15 @@ def test_float_id_raises(tmp_path, name, col):
         build_defense_vs_position(SEASON, base=_base(tmp_path, **{name: floated}))
 
 
+def test_defense_missing_from_the_schedule_raises():
+    """Georgia's two games dropped from the schedule: no division, so no cohort."""
+    no_georgia = _slice("cfb_schedules").filter(
+        (pl.col("home_id") != UGA) & (pl.col("away_id") != UGA)
+    )
+    with pytest.raises(ValueError, match=r"no schedule row: \[61\]"):
+        defense_vs_position_table(_slice("pbp"), _slice("cfb_rosters"), no_georgia)
+
+
 def test_stage_driver_writes_the_tree_layout(tmp_path):
     base = _base(tmp_path)
     assert build_derived("defense_vs_position", SEASON, SEASON, base=base) == []

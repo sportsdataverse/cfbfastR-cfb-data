@@ -85,6 +85,9 @@ SPECS: dict[str, DatasetSpec] = {
         "rolling_windows", "rolling_windows", "cfb_rolling_windows"
     ),
     "metric_curves": DatasetSpec("metric_curves", "metric_curves", "cfb_metric_curves"),
+    "defense_vs_position": DatasetSpec(
+        "defense_vs_position", "cfb_defense_vs_position", "cfb_defense_vs_position"
+    ),
     "team_opponent_splits": DatasetSpec(
         "team_opponent_splits", "cfb_team_opponent_splits", "cfb_team_opponent_splits"
     ),
@@ -784,6 +787,12 @@ def build_metric_curves(season: int, *, base: str = "cfb") -> pl.DataFrame:
     return curves
 
 
+def _build_defense_vs_position(season: int, *, base: str = "cfb") -> pl.DataFrame:
+    from cfb_data_build.defense_vs_position import build_defense_vs_position
+
+    return build_defense_vs_position(season, base=base)
+
+
 BUILDERS = {
     "gamelog": build_gamelog,
     "ratings_weekly": build_ratings_weekly,
@@ -792,6 +801,7 @@ BUILDERS = {
     "matchup_line": _build_matchup_line,
     "rolling_windows": build_rolling_windows,
     "metric_curves": build_metric_curves,
+    "defense_vs_position": _build_defense_vs_position,
     "team_opponent_splits": build_team_opponent_splits,
 }
 

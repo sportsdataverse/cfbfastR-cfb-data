@@ -1691,6 +1691,11 @@ passers (1 = best).
 | sack_adj_yards | double | `yards − \|sack_yds\|` (sack-adjusted passing yards). |
 | yardsdropback | double | `sack_adj_yards / dropbacks`. |
 | TEPA_rank, EPAgame_rank, EPAplay_rank, success_rank, comppct_rank, yards_rank, yardsplay_rank, yardsgame_rank, sack_adj_yards_rank, yardsdropback_rank, detmer_rank, detmergame_rank | double | National ranks of the like-named metric (1 = best). |
+| dispersion_games | integer | Games with at least one of the player's dropbacks (attempts, sacks and interceptions, the plays `TEPA` sums): the n behind the five dispersion columns. |
+| EPAplay_sd | double | Population sd of the player's per-game EPA/play (a game's EPA sum over its dropbacks (attempts, sacks and interceptions, the plays `TEPA` sums)). Null under 3 games. |
+| EPAplay_p10, EPAplay_p90 | double | Floor and ceiling: 10th / 90th percentile of the per-game EPA/play (linear interpolation, R type 7). Null under 3 games. |
+| boom_rate, bust_rate | double | Share of the player's games more than one sd above / below his own per-game mean (the unweighted mean of those games). Strict, so a player whose games are all equal is neither. Null under 3 games. |
+| boom_rate_rank | double | National rank of `boom_rate` among qualifiers (1 = highest). The other dispersion columns are descriptive and carry no rank or percentile. |
 
 _Release tag: `espn_cfb_passing`_
 
@@ -1720,6 +1725,16 @@ One row per (team, rusher) per season (e.g. 1,573 in 2025). Identity columns are
 | rushing_td | double | Rushing touchdowns. |
 | fumbles | double | Fumbles on rush plays. |
 | TEPA_rank, EPAgame_rank, EPAplay_rank, success_rank, yards_rank, yardsplay_rank, yardsgame_rank | double | National ranks of the like-named metric (1 = best). |
+| dispersion_games | integer | Games with at least one of the player's carries: the n behind the five dispersion columns. |
+| EPAplay_sd | double | Population sd of the player's per-game EPA/play (a game's EPA sum over its carries). Null under 3 games. |
+| EPAplay_p10, EPAplay_p90 | double | Floor and ceiling: 10th / 90th percentile of the per-game EPA/play (linear interpolation, R type 7). Null under 3 games. |
+| boom_rate, bust_rate | double | Share of the player's games more than one sd above / below his own per-game mean (the unweighted mean of those games). Strict, so a player whose games are all equal is neither. Null under 3 games. |
+| boom_rate_rank | double | National rank of `boom_rate` among qualifiers (1 = highest). The other dispersion columns are descriptive and carry no rank or percentile. |
+| line_yards_share, second_level_share, open_field_share | double | Share of carries that gained 4 or fewer yards (losses included), 5-10, and 11 or more (`yds_rushed`; Football Outsiders' line / second-level / open-field cut-points). Over carries with a `yds_rushed`, so the three sum to 1. |
+| stuff_rate | double | Share of carries for 0 or fewer yards, same denominator. |
+| stuff_rate_rank | double | National rank of `stuff_rate` among qualifiers (1 = lowest). The tier shares carry no rank. |
+| EPAplay_one_score, EPAplay_not_one_score | double | EPA per carry with the score within 8 points at the snap (`\|pos_score_diff_start\| <= 8`), and otherwise. Null with no such carries. |
+| EPAplay_one_score_n, EPAplay_not_one_score_n | integer | Carries behind each side of the one-score split. |
 
 _Release tag: `espn_cfb_rushing`_
 
@@ -1753,6 +1768,11 @@ One row per (team, receiver) per season (e.g. 2,295 in 2025). Identity columns a
 | passing_td | double | Receiving touchdowns. |
 | fumbles | double | Fumbles on receiving plays. |
 | TEPA_rank, EPAgame_rank, EPAplay_rank, success_rank, catchpct_rank, yards_rank, yardsplay_rank, yardsgame_rank | double | National ranks of the like-named metric (1 = best). |
+| dispersion_games | integer | Games with at least one of the player's targets: the n behind the five dispersion columns. |
+| EPAplay_sd | double | Population sd of the player's per-game EPA/play (a game's EPA sum over its targets). Null under 3 games. |
+| EPAplay_p10, EPAplay_p90 | double | Floor and ceiling: 10th / 90th percentile of the per-game EPA/play (linear interpolation, R type 7). Null under 3 games. |
+| boom_rate, bust_rate | double | Share of the player's games more than one sd above / below his own per-game mean (the unweighted mean of those games). Strict, so a player whose games are all equal is neither. Null under 3 games. |
+| boom_rate_rank | double | National rank of `boom_rate` among qualifiers (1 = highest). The other dispersion columns are descriptive and carry no rank or percentile. |
 
 _Release tag: `espn_cfb_receiving`_
 

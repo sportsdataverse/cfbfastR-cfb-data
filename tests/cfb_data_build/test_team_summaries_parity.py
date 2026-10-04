@@ -169,6 +169,28 @@ _FACTOR_EXTENSIONS = {
     "turnover_luck",
     "havoc_margin",
 }
+#: TFD-5d per-game dispersion (test_player_dispersion.py), Python-only, on every
+#: player table; only ``boom_rate`` is ranked. The rushing table adds the TFD-13 tiers.
+_DISPERSION = {
+    "dispersion_games",
+    "EPAplay_sd",
+    "EPAplay_p10",
+    "EPAplay_p90",
+    "boom_rate",
+    "bust_rate",
+    "boom_rate_rank",
+    "boom_rate_pct",
+}
+_RUSHER_TIERS = {
+    "line_yards_share",
+    "second_level_share",
+    "open_field_share",
+    "stuff_rate",
+    "stuff_rate_rank",
+    "stuff_rate_pct",
+    "EPAplay_one_score",
+    "EPAplay_not_one_score",
+}
 PYTHON_ONLY = {
     "team_summaries": _FIVE_FACTORS
     | _DRIVE_EFFICIENCY
@@ -190,7 +212,8 @@ PYTHON_ONLY = {
         "sacked_pct",
         "sacked_rank",
         "yardsdropback_pct",
-    },
+    }
+    | _DISPERSION,
     "rushing": _LEADER_PCT
     | {
         "fumbles_pct",
@@ -199,7 +222,9 @@ PYTHON_ONLY = {
         "plays_rank",
         "rushing_td_pct",
         "rushing_td_rank",
-    },
+    }
+    | _DISPERSION
+    | _RUSHER_TIERS,
     "receiving": _LEADER_PCT
     | {
         "catchpct_pct",
@@ -211,7 +236,8 @@ PYTHON_ONLY = {
         "passing_td_rank",
         "targets_pct",
         "targets_rank",
-    },
+    }
+    | _DISPERSION,
 }
 
 # dataset -> (sort keys, correlation columns)

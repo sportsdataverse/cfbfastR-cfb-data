@@ -514,3 +514,25 @@ def test_stage_67_fails_when_games_are_lost_to_the_feed(tmp_path):
     # through the stage driver: a recorded failure and nothing written
     assert build_derived("paper_index_games", 2024, 2024, base=base) == [(2024, "ValueError")]
     assert not (tmp_path / "paper_index_games").exists()
+
+
+def test_publish_imports_on_an_sdv_py_without_paper_index(monkeypatch):
+    # A build that started before the sdv-py pin moved keeps its old venv, and its
+    # later publish steps (coach_careers, after the end-of-run rebase) import this
+    # module. It must import there, and name the fit years where sdv-py has them.
+    import importlib
+    import sys
+
+    import cfb_data_build.publish as publish
+
+    key = "cfb_paper_index_games"
+    assert "2016-2023" in publish.RELEASE_NOTES[key]
+    monkeypatch.setitem(sys.modules, "sportsdataverse.paper_index", None)  # import -> ImportError
+    try:
+        old = importlib.reload(publish)
+        assert "2016-2023" not in old.RELEASE_NOTES[key]
+        assert "sportsdataverse.paper_index" in old.RELEASE_NOTES[key]
+    finally:
+        monkeypatch.undo()
+        importlib.reload(publish)
+    assert "2016-2023" in publish.RELEASE_NOTES[key]

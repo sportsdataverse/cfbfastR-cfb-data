@@ -19,7 +19,6 @@ from cfb_model_build.cfb_model_publish.artifacts import (
     _gh_runner,
     ensure_release,
 )
-from sportsdataverse.paper_index import HOLDOUT_SEASONS, TRAIN_SEASONS
 from sportsdataverse.release import upload_release_sidecars
 
 from cfb_data_build.config import PKG_FUNCTION, DatasetSpec
@@ -28,8 +27,21 @@ from cfb_data_build.io import dataset_stem
 # Mirror R PUBLISH_REPOS (``R/_data_utils.R:5``).
 PUBLISH_REPOS: list[str] = ["sportsdataverse/sportsdataverse-data"]
 
-# the Paper Index fit spans, so the release note names the years sdv-py does
-_PI_TRAIN, _PI_HOLDOUT = TRAIN_SEASONS["cfb"], HOLDOUT_SEASONS["cfb"]
+# The Paper Index fit spans, so the release note names the years sdv-py does.
+# Guarded on purpose: this module publishes EVERY dataset, and a build already
+# running when the sdv-py pin moves keeps its old venv until the next
+# `uv sync` (cron_daily_cfb.sh syncs at its start, not at its end-of-run
+# rebase). Without the guard a later step of that run, such as the coach_careers
+# publish, would die importing a module only one tag's description needs.
+# cfb_paper_index_games itself cannot be built on such a venv, so the fallback
+# text is never published.
+try:
+    from sportsdataverse.paper_index import HOLDOUT_SEASONS, TRAIN_SEASONS
+except ImportError:  # sdv-py older than the paper_index port
+    _PI_TRAIN_TEXT = _PI_HOLDOUT_TEXT = "the seasons `sportsdataverse.paper_index` names"
+else:
+    _PI_TRAIN_TEXT = "{}-{}".format(*TRAIN_SEASONS["cfb"])
+    _PI_HOLDOUT_TEXT = "{}-{}".format(*HOLDOUT_SEASONS["cfb"])
 
 
 def _dataset_files(
@@ -180,9 +192,9 @@ RELEASE_NOTES: dict[str, str] = {
         "it reads like a z-score over a full season and is NOT on a normal "
         "scale below about 8 games (an early weekly snapshot can show +6). "
         "IN-SAMPLE LABEL: `paper_index_span` is `train` for "
-        f"{_PI_TRAIN[0]}-{_PI_TRAIN[1]} (the "
+        f"{_PI_TRAIN_TEXT} (the "
         "season's shares were part of the weight fit, so they are in-sample), "
-        f"`holdout` for {_PI_HOLDOUT[0]}-{_PI_HOLDOUT[1]} (scored out of sample "
+        f"`holdout` for {_PI_HOLDOUT_TEXT} (scored out of sample "
         "at fit time, though not fully clean: the EP model behind the EPA, "
         "success and explosiveness inputs was trained on seasons that include "
         "them) and "

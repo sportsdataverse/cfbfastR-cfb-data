@@ -182,13 +182,49 @@ def _gh_release_exists(tag: str, repo: str) -> bool:
     commands go through GitHub's GraphQL endpoint, whose quota is a separate --
     and exhaustible -- budget. A publish must not fail its create-if-missing
     guard (and then create a duplicate release) because a GraphQL quota ran out.
+
+    Only a 404 means "missing". Any other failure (a 5xx, a 403 rate limit, a
+    network error) is retried and then raised: answering False there sends the
+    caller into ``release create``, which GitHub rejects with HTTP 422
+    "Release.tag_name already exists" -- the 2026-10-03 Saturday run lost its
+    ``adv_st_returners`` publish exactly that way.
     """
-    r = subprocess.run(
-        ["gh", "api", f"repos/{repo}/releases/tags/{tag}", "--silent"],
-        capture_output=True,
-        timeout=GH_TIMEOUT_SECONDS,
-    )
-    return r.returncode == 0
+    err = ""
+    for attempt in range(1, GH_RETRY_ATTEMPTS + 1):
+        r = subprocess.run(
+            ["gh", "api", f"repos/{repo}/releases/tags/{tag}", "--silent"],
+            capture_output=True,
+            text=True,
+            timeout=GH_TIMEOUT_SECONDS,
+        )
+        if r.returncode == 0:
+            return True
+        err = (r.stderr or "").strip()
+        if "HTTP 404" in err:
+            return False
+        if attempt < GH_RETRY_ATTEMPTS:
+            time.sleep(GH_RETRY_BACKOFF_S * attempt)
+    raise RuntimeError(f"cannot tell whether release {repo}:{tag} exists (gh: {err[:200]})")
+
+
+def ensure_release(tag: str, repo: str, body: str, *, run, exists) -> bool:
+    """Create the release for ``tag`` if it is missing; True when this call created it.
+
+    Losing the create race is a success: a concurrent publisher (two sessions, or
+    the daily and a backfill) can create the tag between the check and the create,
+    which ``gh`` reports as HTTP 422 "already exists". The tag being there is the
+    goal, so the failure is confirmed against a second existence check before it
+    propagates.
+    """
+    if exists(tag, repo):
+        return False
+    try:
+        run(["release", "create", tag, "--repo", repo, "--title", tag, "--notes", body])
+    except subprocess.CalledProcessError:
+        if exists(tag, repo):
+            return False
+        raise
+    return True
 
 
 def upload_artifacts(
@@ -223,10 +259,9 @@ def upload_artifacts(
     created_release = False
     if dry_run:
         print(f"[dry-run] would ensure release {repo}:{tag} exists")
-    elif not exists(tag, repo):
+    else:
         body = _RELEASE_BODY.get(tag, f"{tag} (auto-created by cfb_model_publish).")
-        run(["release", "create", tag, "--repo", repo, "--title", tag, "--notes", body])
-        created_release = True
+        created_release = ensure_release(tag, repo, body, run=run, exists=exists)
     uploaded = 0
     for f in files:
         if dry_run:

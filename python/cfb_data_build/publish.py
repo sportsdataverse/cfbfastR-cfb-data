@@ -14,7 +14,11 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Callable
 
-from cfb_model_build.cfb_model_publish.artifacts import _gh_release_exists, _gh_runner
+from cfb_model_build.cfb_model_publish.artifacts import (
+    _gh_release_exists,
+    _gh_runner,
+    ensure_release,
+)
 from sportsdataverse.release import upload_release_sidecars
 
 from cfb_data_build.config import PKG_FUNCTION, DatasetSpec
@@ -206,20 +210,8 @@ def publish_dataset(
     for repo in target_repos:
         if dry_run:
             print(f"[dry-run] would ensure release {repo}:{spec.tag} exists")
-        elif not exists(spec.tag, repo):
-            run(
-                [
-                    "release",
-                    "create",
-                    spec.tag,
-                    "--repo",
-                    repo,
-                    "--title",
-                    spec.tag,
-                    "--notes",
-                    release_notes(spec.tag),
-                ]
-            )
+        else:
+            ensure_release(spec.tag, repo, release_notes(spec.tag), run=run, exists=exists)
         count = 0
         for f in files:
             if dry_run:

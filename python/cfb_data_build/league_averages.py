@@ -33,7 +33,15 @@ SCHEMA: dict[str, pl.DataType] = {
 
 #: numeric columns that identify a row or count its context rather than measure it
 _NOT_METRICS = frozenset(
-    {"season", "team_id", "player_id", "games", "team_games", "valid_games"}
+    {
+        "season",
+        "team_id",
+        "player_id",
+        "games",
+        "team_games",
+        "valid_games",
+        "dispersion_games",
+    }
 )
 #: a rank, a percentile (incl. cohort ``_pos_pct`` / ``_conf_pct``) or a sample size
 #: is derived from a metric, never a metric of its own

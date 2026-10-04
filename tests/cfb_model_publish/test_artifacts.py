@@ -1,6 +1,8 @@
 import json
 from pathlib import Path
 
+import pytest
+
 from cfb_model_build.cfb_model_publish.artifacts import plan_uploads, upload_artifacts
 
 
@@ -127,3 +129,92 @@ def test_skips_create_when_present(tmp_path):
     assert res["created_release"] is False
     assert all(c[0:2] != ["release", "create"] for c in calls)
     assert res["uploaded"] == 4 and len(_data_calls(calls)) == 4
+
+
+# --- the exists check and the create race ----------------------------------------
+# On 2026-10-03 the Saturday daily lost its adv_st_returners publish: a transient
+# failure of the existence probe read as "missing", `gh release create` then got
+# HTTP 422 "Release.tag_name already exists", and the retrying runner failed the
+# step. Only a 404 means missing; losing the create race is a success.
+
+
+class _Proc:
+    def __init__(self, returncode, stderr=""):
+        self.returncode, self.stderr, self.stdout = returncode, stderr, ""
+
+
+def _fake_gh_api(outcomes):
+    outcomes = list(outcomes)
+
+    def run(cmd, **_k):
+        assert cmd[:2] == ["gh", "api"]
+        return outcomes.pop(0)
+
+    return run
+
+
+def test_exists_check_only_a_404_means_missing(monkeypatch):
+    from cfb_model_build.cfb_model_publish import artifacts as mod
+
+    monkeypatch.setattr(mod.time, "sleep", lambda *_a: None)
+    monkeypatch.setattr(mod.subprocess, "run", _fake_gh_api([_Proc(1, "gh: Not Found (HTTP 404)")]))
+    assert mod._gh_release_exists("tag", "owner/repo") is False
+    # a transient 502 is retried, and the release that IS there is reported as present
+    monkeypatch.setattr(
+        mod.subprocess, "run", _fake_gh_api([_Proc(1, "gh: HTTP 502"), _Proc(0)])
+    )
+    assert mod._gh_release_exists("tag", "owner/repo") is True
+
+
+def test_exists_check_raises_instead_of_guessing_missing(monkeypatch):
+    from cfb_model_build.cfb_model_publish import artifacts as mod
+
+    monkeypatch.setattr(mod.time, "sleep", lambda *_a: None)
+    monkeypatch.setattr(
+        mod.subprocess,
+        "run",
+        _fake_gh_api([_Proc(1, "gh: HTTP 403 rate limit exceeded")] * mod.GH_RETRY_ATTEMPTS),
+    )
+    with pytest.raises(RuntimeError, match="cannot tell whether release"):
+        mod._gh_release_exists("tag", "owner/repo")
+
+
+def test_losing_the_create_race_is_a_success(tmp_path):
+    import subprocess
+
+    answers = iter([False, True])  # missing at the check, present after the failed create
+    calls = []
+
+    def runner(args):
+        calls.append(args)
+        if args[:2] == ["release", "create"]:
+            raise subprocess.CalledProcessError(1, ["gh", *args])
+
+    res = upload_artifacts(
+        _seed(tmp_path),
+        "espn_cfb_model_artifacts",
+        "owner/repo",
+        dry_run=False,
+        runner=runner,
+        exists_check=lambda tag, repo: next(answers),
+    )
+    assert res["created_release"] is False
+    assert res["uploaded"] == 4 and len(_data_calls(calls)) == 5
+
+
+def test_a_failed_create_of_a_still_missing_release_propagates(tmp_path):
+    import subprocess
+
+    def runner(args):
+        if args[:2] == ["release", "create"]:
+            raise subprocess.CalledProcessError(1, ["gh", *args])
+
+    with pytest.raises(subprocess.CalledProcessError):
+        upload_artifacts(
+            _seed(tmp_path),
+            "espn_cfb_model_artifacts",
+            "owner/repo",
+            dry_run=False,
+            runner=runner,
+            exists_check=lambda tag, repo: False,
+        )

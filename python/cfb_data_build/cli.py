@@ -22,6 +22,7 @@ from cfb_data_build.config import REGISTRY
 #   matchup_line             per FBS-vs-FBS game, the 268-col matchup line (stage 42)
 #   rolling_windows          cfb_rolling_windows -- last-N-events form (sdv-py rolling_windows), stage 64
 #   metric_curves            cfb_metric_curves -- rate curves along a continuous axis (sdv-py metric_curves), stage 65
+#   defense_vs_position      cfb_defense_vs_position -- what each defense allowed to QB/RB/WR/TE (sdv-py defense_vs_position), stage 66
 DERIVED = (
     "gamelog",
     "team_opponent_splits",
@@ -31,6 +32,7 @@ DERIVED = (
     "matchup_line",
     "rolling_windows",
     "metric_curves",
+    "defense_vs_position",
 )
 
 # ESPN Football Power Index. Separate from DERIVED because these are fetched from

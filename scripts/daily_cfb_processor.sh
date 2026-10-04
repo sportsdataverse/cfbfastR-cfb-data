@@ -63,7 +63,11 @@ PY_ROSTERS="cfb_rosters"
 # PY_UNIFIED_SCHEDULES just published for kickoff dates, so it must run after
 # that -- running it from PY_DERIVED read the PRIOR run's schedule instead of
 # this season's, since PY_UNIFIED_SCHEDULES hadn't published yet.
-PY_WEEKLY="rolling_windows ratings_weekly team_summaries_weekly"
+# defense_vs_position is here for the same reason: it reads this run's cfb/pbp,
+# cfb/cfb_schedules (team names, FBS flag) and cfb/cfb_rosters (position
+# groups), so it follows PY_UNIFIED_SCHEDULES and PY_ROSTERS. Before 2014 it
+# builds nothing and reports no failure.
+PY_WEEKLY="rolling_windows ratings_weekly team_summaries_weekly defense_vs_position"
 # The matchup datasets (stages 41/42) read the cfbfastR_cfb_pbp release the R
 # chain published above plus CFBD /games + /lines (needs CFBD_API_KEY); the line
 # also reads the PRIOR season's release for its prev_* block. No final.json.

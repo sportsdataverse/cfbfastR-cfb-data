@@ -40,6 +40,7 @@ Expected `col_name | col_type | col_description` for each per-game-compiled **se
 | [cfb_poll_analytics](#cfb_poll_analytics) | one row per (season, season_type, week, poll, team) | 13 | `cfb_poll_analytics` |
 | [cfb_poll_week_summary](#cfb_poll_week_summary) | one row per (season, season_type, week, poll) | 8 | `cfb_poll_week_summary` |
 | [cfb_team_portal](#cfb_team_portal) | one row per (season, team) | 9 | `cfb_team_portal` |
+| [cfb_defense_vs_position](#cfb_defense_vs_position) | one row per (season, defense, position group) | 25 | `cfb_defense_vs_position` |
 
 > † **Season-level summary datasets.** Unlike every table above (per-game `final`
 > JSON reshaped into a compiled season), these six are produced by
@@ -1999,3 +2000,63 @@ season-S ESPN roster, FBS and FCS mixed: filter on `teams` classification for FB
 | net_transfer_talent | double | `transfer_talent_in - transfer_talent_out`. |
 
 _Release tag: `cfb_team_portal`_
+
+### cfb_defense_vs_position
+
+What each defense allowed to QBs, RBs, WRs and TEs: one row per
+`(season, team_id, position_group)` for the DEFENSE (stage 66,
+`python/cfb_data_build/defense_vs_position.py`). The rows are sdv-py
+`defense_vs_position` over the season's `cfb/pbp` and `cfb_rosters`; this producer
+adds the Int64 `team_id`, the team display columns, `unattributed_target_share` and
+the percentiles. Regular season + postseason, every game the pbp has, FBS and FCS
+defenses together (`division` says which).
+
+- **Which plays a group gets.** Every dropback (pass attempt or sack) is the QB's. A
+  carry goes to the rusher's roster group and a target to the receiver's, so a
+  completion to a tight end counts once for QB and once for TE. Groups: QB; RB = RB +
+  FB; WR; TE. A carrier or receiver with no roster row, another position, or two
+  groups in one season counts in no group.
+- **WR and TE rows are on targets naming a receiver.** In 2024 ESPN names a receiver
+  on about 69% of throws: on few incompletions and on no interception. The other
+  throws count for QB and for no WR or TE row, so the WR and TE rates are over mostly
+  completed passes and read high. `unattributed_target_share` says how much of a
+  defense's pass volume is missing; it varies by era (FBS median 0.12 in 2014, 0.33
+  in 2024). Nothing is imputed.
+- **Percentiles are among FBS qualifiers.** Each `<metric>_pct` ranks the defenses
+  with `division == "fbs"` and `qualified` (3 or more games) within the season's
+  position group, on the Weibull position `100 * (n + 1 - rank) / (n + 1)`. **A higher
+  `_pct` is always the better defense**: for every metric but one that means allowing
+  less; `sack_rate_allowed` is sacks per dropback the defense got, so there more is
+  better. Non-qualifiers, non-FBS defenses and a cohort under 5 teams carry null.
+- **Floor 2014.** Earlier rosters list nearly every player with no position, so those
+  seasons are not built and no asset is published for them.
+
+| col_name | col_type | col_description |
+| --- | --- | --- |
+| season | integer | Season. |
+| team_id | integer | ESPN team id of the DEFENSE. |
+| pos_team | character | The defense's school name, from the unified schedule (the summaries tables' column name). |
+| division | character | `fbs`, `fcs`, ... from the unified schedule. |
+| conference | character | The defense's conference that season. |
+| position_group | character | `QB`, `RB`, `WR` or `TE`: the offensive group the row's plays belong to. |
+| plays | integer | Plays counted for the group: dropbacks for QB, plus carries and named targets by the group's players. |
+| games | integer | Games with at least one of those plays. |
+| epa_per_play_allowed | double | Mean EPA of the group's plays. Lower is the better defense. WR / TE: on targets naming a receiver. |
+| success_rate_allowed | double | Share of the group's plays with EPA > 0. Lower is better. WR / TE: on targets naming a receiver. |
+| explosive_rate_allowed | double | Share of the group's plays that are a dropback with EPA >= 2.4 or a carry with EPA >= 1.8. Lower is better. WR / TE: on targets naming a receiver. |
+| dropbacks | integer | QB rows only: pass attempts plus sacks faced. |
+| sack_rate_allowed | double | QB rows only: sacks per dropback the defense got. HIGHER is the better defense. |
+| carries | integer | RB rows only: carries by the group's players. |
+| rush_yards_per_carry_allowed | double | RB rows only: rushing yards per carry. Lower is better. |
+| targets | integer | WR / TE rows only: targets naming a receiver of the group. |
+| yards_per_target_allowed | double | WR / TE rows only: receiving yards per target naming a receiver (0 on a named incompletion). Lower is better. |
+| qualified | logical | `games >= 3`. |
+| unattributed_target_share | double | WR / TE rows only, the same value on both: of the throws against this defense (dropbacks that are not sacks), the share naming no receiver. |
+| epa_per_play_allowed_pct | double | Percentile among FBS qualifiers in the season's position group; higher = allowed less EPA per play. |
+| success_rate_allowed_pct | double | Same cohort; higher = allowed a lower success rate. |
+| explosive_rate_allowed_pct | double | Same cohort; higher = allowed a lower explosive rate. |
+| sack_rate_allowed_pct | double | QB rows only; higher = a HIGHER sack rate (the reversed column). |
+| rush_yards_per_carry_allowed_pct | double | RB rows only; higher = allowed fewer yards per carry. |
+| yards_per_target_allowed_pct | double | WR / TE rows only; higher = allowed fewer yards per target naming a receiver. |
+
+_Release tag: `cfb_defense_vs_position`_

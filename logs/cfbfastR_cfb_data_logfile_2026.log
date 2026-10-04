@@ -1,178 +1,127 @@
   pos_team: 100.0% of rows resolved to a team name
   def_pos_team: 100.0% of rows resolved to a team name
-pbp 2026: 60793 rows from 949 games
+pbp 2026: 64499 rows from 949 games
 2026: 138 coach-seasons, 138 cleanly attributed
-play_participants 2026: 56586 rows from 949 games
-team_box 2026: 730 rows from 949 games
-player_box 2026: 31718 rows from 949 games
-drives 401858252: can only concatenate list (not "dict") to list
-drives 401866432: can only concatenate list (not "dict") to list
-drives 401866431: can only concatenate list (not "dict") to list
-drives 401858473: can only concatenate list (not "dict") to list
-drives 401856710: can only concatenate list (not "dict") to list
-drives 401858247: can only concatenate list (not "dict") to list
-drives 401858248: can only concatenate list (not "dict") to list
-drives 401858253: can only concatenate list (not "dict") to list
-drives 401862793: can only concatenate list (not "dict") to list
-drives 401864515: can only concatenate list (not "dict") to list
-drives 401866430: can only concatenate list (not "dict") to list
-drives 401866433: can only concatenate list (not "dict") to list
-drives 401866434: can only concatenate list (not "dict") to list
-drives 401866477: can only concatenate list (not "dict") to list
-drives 401869956: can only concatenate list (not "dict") to list
-drives 401869962: can only concatenate list (not "dict") to list
-drives 401856708: can only concatenate list (not "dict") to list
-drives 2026: 8159 rows from 949 games
-game_rosters 2026: 76448 rows from 949 games
-betting 2026: 365 rows from 949 games
-schedules 2026: 365 rows from 949 games
-linescores 2026: 2864 rows from 949 games
+play_participants 2026: 60048 rows from 949 games
+team_box 2026: 770 rows from 949 games
+player_box 2026: 33579 rows from 949 games
+drives 401860899: can only concatenate list (not "dict") to list
+drives 401862790: can only concatenate list (not "dict") to list
+drives 401856818: can only concatenate list (not "dict") to list
+drives 401856711: can only concatenate list (not "dict") to list
+drives 401862788: can only concatenate list (not "dict") to list
+drives 401869942: can only concatenate list (not "dict") to list
+drives 401871089: can only concatenate list (not "dict") to list
+drives 401858249: can only concatenate list (not "dict") to list
+drives 401856821: can only concatenate list (not "dict") to list
+drives 401858478: can only concatenate list (not "dict") to list
+drives 401860898: can only concatenate list (not "dict") to list
+drives 401862792: can only concatenate list (not "dict") to list
+drives 401869842: can only concatenate list (not "dict") to list
+drives 401856706: can only concatenate list (not "dict") to list
+drives 401858477: can only concatenate list (not "dict") to list
+drives 401869932: can only concatenate list (not "dict") to list
+drives 2026: 8659 rows from 949 games
+game_rosters 2026: 81149 rows from 949 games
+betting 2026: 385 rows from 949 games
+schedules 2026: 385 rows from 949 games
+linescores 2026: 3038 rows from 949 games
   power_index 2026: 1776 rows, 7 cols
 
 === power_index: 0 failures ===
 injuries 2026: 0 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_team 2026: 729 rows from 949 games
+adv_team 2026: 770 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_passing 2026: 1262 rows from 949 games
+adv_passing 2026: 1326 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_rushing 2026: 4149 rows from 949 games
+adv_rushing 2026: 4387 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_receiving 2026: 7238 rows from 949 games
+adv_receiving 2026: 7648 rows from 949 games
   def_pos_team: 100.0% of rows resolved to a team name
-adv_defensive 2026: 729 rows from 949 games
+adv_defensive 2026: 770 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_turnover 2026: 730 rows from 949 games
+adv_turnover 2026: 770 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_drives 2026: 729 rows from 949 games
+adv_drives 2026: 770 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_situational 2026: 729 rows from 949 games
+adv_situational 2026: 770 rows from 949 games
   def_pos_team: 100.0% of rows resolved to a team name
-adv_defensive_players 2026: 4311 rows from 949 games
+adv_defensive_players 2026: 4574 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_specialists 2026: 4058 rows from 949 games
+adv_specialists 2026: 4294 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_player_usage 2026: 8938 rows from 949 games
+adv_player_usage 2026: 9442 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_position_group_usage 2026: 2852 rows from 949 games
+adv_position_group_usage 2026: 3025 rows from 949 games
   def_pos_team: 100.0% of rows resolved to a team name
-adv_tackles 2026: 15438 rows from 949 games
+adv_tackles 2026: 16367 rows from 949 games
   def_pos_team: 100.0% of rows resolved to a team name
-adv_position_group_tackles 2026: 2725 rows from 949 games
+adv_position_group_tackles 2026: 2889 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_team_usage 2026: 729 rows from 949 games
+adv_team_usage 2026: 770 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_drive_scripting 2026: 1440 rows from 949 games
+adv_drive_scripting 2026: 1528 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-usage_players 2026: 3999 rows from 949 games
+usage_players 2026: 4030 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-usage_position_groups 2026: 986 rows from 949 games
+usage_position_groups 2026: 994 rows from 949 games
   def_pos_team: 100.0% of rows resolved to a team name
-usage_tackles 2026: 7302 rows from 949 games
+usage_tackles 2026: 7386 rows from 949 games
   def_pos_team: 100.0% of rows resolved to a team name
-usage_position_group_tackles 2026: 1167 rows from 949 games
+usage_position_group_tackles 2026: 1186 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-usage_teams 2026: 234 rows from 949 games
+usage_teams 2026: 235 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-usage_drive_scripting 2026: 467 rows from 949 games
+usage_drive_scripting 2026: 469 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_st_kickers 2026: 1950 rows from 949 games
+adv_st_kickers 2026: 2068 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_st_punters 2026: 775 rows from 949 games
-HTTP 422: Validation Failed (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases)
-Release.tag_name already exists
-Traceback (most recent call last):
-  File "<frozen runpy>", line 198, in _run_module_as_main
-  File "<frozen runpy>", line 88, in _run_code
-  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
-    raise SystemExit(main())
-                     ~~~~^^
-  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 276, in main
-    build_dataset(
-    ~~~~~~~~~~~~~^
-        args.dataset,
-        ^^^^^^^^^^^^^
-    ...<8 lines>...
-        include_release_ids=args.include_release_ids,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 441, in build_dataset
-    build_season(
-    ~~~~~~~~~~~~^
-        spec,
-        ^^^^^
-    ...<7 lines>...
-        base=base,
-        ^^^^^^^^^^
-    )
-    ^
-  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 356, in build_season
-    publish_dataset(spec, season, base=base)
-    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 210, in publish_dataset
-    run(
-    ~~~^
-        [
-        ^
-    ...<9 lines>...
-        ]
-        ^
-    )
-    ^
-  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_model_build/cfb_model_publish/artifacts.py", line 165, in _gh_runner
-    subprocess.run(["gh", *args], check=True, timeout=GH_TIMEOUT_SECONDS)
-    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/.local/share/uv/python/cpython-3.13.13-linux-x86_64-gnu/lib/python3.13/subprocess.py", line 577, in run
-    raise CalledProcessError(retcode, process.args,
-                             output=stdout, stderr=stderr)
-subprocess.CalledProcessError: Command '['gh', 'release', 'create', 'espn_cfb_adv_st_returners', '--repo', 'sportsdataverse/sportsdataverse-data', '--title', 'espn_cfb_adv_st_returners', '--notes', 'espn_cfb_adv_st_returners (CFB dataset, Python-built).']' returned non-zero exit status 1.
+adv_st_punters 2026: 816 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_st_returners 2026: 1069 rows from 949 games
-::warning ::cfb_data_build adv_st_returners for season 2026 exited with code 1
+adv_st_returners 2026: 1135 rows from 949 games
   def_pos_team: 100.0% of rows resolved to a team name
-adv_st_blocks 2026: 49 rows from 949 games
+adv_st_blocks 2026: 51 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-adv_st_team 2026: 729 rows from 949 games
+adv_st_team 2026: 769 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-usage_st_kickers 2026: 899 rows from 949 games
+usage_st_kickers 2026: 913 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-usage_st_punters 2026: 297 rows from 949 games
+usage_st_punters 2026: 302 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-usage_st_returners 2026: 603 rows from 949 games
+usage_st_returners 2026: 622 rows from 949 games
   def_pos_team: 100.0% of rows resolved to a team name
-usage_st_blocks 2026: 49 rows from 949 games
+usage_st_blocks 2026: 51 rows from 949 games
   pos_team: 100.0% of rows resolved to a team name
-usage_st_team 2026: 234 rows from 949 games
-  adv_team_gamelog 2026: 729 rows, 90 cols
+usage_st_team 2026: 235 rows from 949 games
+  adv_team_gamelog 2026: 770 rows, 90 cols
 
 === gamelog: 0 failures ===
-  team_opponent_splits 2026: 729 rows, 13 cols
+  team_opponent_splits 2026: 770 rows, 13 cols
 
 === team_opponent_splits: 0 failures ===
-  metric_curves 2026: 14761 rows, 14 cols
+  metric_curves 2026: 14923 rows, 14 cols
 
 === metric_curves: 0 failures ===
-qa 2026: 365 rows from 949 games
+qa 2026: 385 rows from 949 games
   cfb_schedules 2026: 3679 rows, 43 cols, fbs_game=761, fbs_participant=888, unplayed=0, ranked_sides=299
 
 === cfb_schedules: 0 failures ===
   pos_team: 100.0% of rows resolved to a team name
-team_tendencies 2026: 234 rows from 949 games
+team_tendencies 2026: 235 rows from 949 games
   coaches: 138 attributed team-seasons for 2026
   pos_team: 100.0% of rows resolved to a team name
 coach_tendencies 2026: 138 rows from 949 games
-cfb_rosters 2026: 25741 rows from 948/949 games | position 100.0% | division 100.0% | cfbd_recruit_ids 92.3% of 29305 cfbd athletes
+cfb_rosters 2026: 25853 rows from 948/949 games | position 100.0% | division 100.0% | cfbd_recruit_ids 92.2% of 29305 cfbd athletes
 
 === cfb_rosters: 0 failures ===
-  !! 2026: 2 of 248 games have an implausible mean EPA/play (|mean| > 0.5) -- suspect corrupt end-state yardlines; worst -0.71 in game 401856710
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 138 rows
-[summaries 2026] passing: 325 rows
-[summaries 2026] rushing: 1076 rows
-[summaries 2026] receiving: 1784 rows
+[summaries 2026] passing: 331 rows
+[summaries 2026] rushing: 1103 rows
+[summaries 2026] receiving: 1815 rows
 [summaries 2026] league_averages: 829 rows
-  rolling_windows 2026: 24092 rows, 20 cols
+  rolling_windows 2026: 24368 rows, 20 cols
 
 === rolling_windows: 0 failures ===
   cfb_ratings_weekly 2026: 507 rows, 19 cols, 4 weekly snapshots
@@ -222,7 +171,8 @@ cfb_rosters 2026: 25741 rows from 948/949 games | position 100.0% | division 100
   cfb_returning_production 2026: 236 rows
 
 === returning_production: 0 failures ===
-  cfb_team_portal 2026: 232 rows
+  cfb_team_portal 2026: 233 rows
 
 === team_portal: 0 failures ===
-pushed: CFB Data Updated (Start: 2026 End: 2026) (attempt 1)
+push rejected (attempt 1); syncing with origin
+pushed: CFB Data Updated (Start: 2026 End: 2026) (attempt 2)

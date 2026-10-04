@@ -32,7 +32,8 @@ PY_REST="play_participants team_box player_box drives game_rosters betting sched
 # matters: gamelog <- adv_team; team_opponent_splits <- gamelog + adv_situational;
 # metric_curves <- this run's cfb/pbp only (per-season curves, no schedule, no
 # career history), so unlike rolling_windows it does not wait for PY_WEEKLY.
-PY_DERIVED="gamelog team_opponent_splits metric_curves"
+# paper_index_games <- this run's cfb/pbp only, the same way.
+PY_DERIVED="gamelog team_opponent_splits metric_curves paper_index_games"
 # Report-only data-integrity gate (V2). Runs after pbp so its drift gate can
 # read the season parquet this run just wrote. Published since the deliberate
 # first espn_cfb_qa_2026 release; still report-only -- qa.BLOCKING is False, so

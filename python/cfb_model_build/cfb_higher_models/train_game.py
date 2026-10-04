@@ -19,7 +19,7 @@ import numpy as np
 import polars as pl
 
 from .backtest import shipped_margin, walk_forward
-from .data import build_game_frame, diff_features, paired_features
+from .data import OUTCOME_FRAGMENTS, build_game_frame, diff_features, paired_features
 
 # Column-name fragments that define a feature family. Used for ablation: which
 # part of the play-level substrate actually carries pregame signal?
@@ -29,6 +29,11 @@ from .data import build_game_frame, diff_features, paired_features
 # family here, or it silently joins the recommended model's inputs at the next
 # republish. tests/test_higher_models_families.py enforces that.
 FAMILIES: dict[str, tuple[str, ...]] = {
+    # Paper Index deserved wins and luck (CFBE-5d): derived from game OUTCOMES, so
+    # never lean and never a feature. data.feature_columns already drops them by
+    # the same fragments; this is the second guard, should that one ever be
+    # removed. First, so no other fragment claims them.
+    "outcome": OUTCOME_FRAGMENTS,
     # Team-factor extensions (starting EP, havoc EPA, expected turnovers, luck).
     # Not lean, like the Five Factors below. First, so "havoc_EPAgame" is not filed
     # under "efficiency" by its "EPAgame", and "drive_start_ep" does not fall to "other".

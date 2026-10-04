@@ -41,6 +41,13 @@ _NOT_METRICS = frozenset(
         "team_games",
         "valid_games",
         "dispersion_games",
+        # Paper Index (paper_index.LUCK_COLUMNS): a game count, and season sums
+        # derived from game outcomes. A league mean of luck is ~0 by
+        # construction and none of them is a play metric.
+        "paper_index_games_n",
+        "deserved_wins",
+        "luck_wins",
+        "luck_z",
     }
 )
 #: a rank, a percentile (incl. cohort ``_pos_pct`` / ``_conf_pct``) or a sample size

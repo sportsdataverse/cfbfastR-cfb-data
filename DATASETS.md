@@ -41,6 +41,7 @@ Expected `col_name | col_type | col_description` for each per-game-compiled **se
 | [cfb_poll_week_summary](#cfb_poll_week_summary) | one row per (season, season_type, week, poll) | 8 | `cfb_poll_week_summary` |
 | [cfb_team_portal](#cfb_team_portal) | one row per (season, team) | 9 | `cfb_team_portal` |
 | [cfb_defense_vs_position](#cfb_defense_vs_position) | one row per (season, defense, position group) | 25 | `cfb_defense_vs_position` |
+| [cfb_paper_index_games](#cfb_paper_index_games) | one row per (game, team), scored games only | 17 | `cfb_paper_index_games` |
 
 > † **Season-level summary datasets.** Unlike every table above (per-game `final`
 > JSON reshaped into a compiled season), these six are produced by
@@ -1653,6 +1654,39 @@ ridge model over team/opponent indicators (home-field-aware) then averaged per s
 | off_strength_faced_rank | double | Rank of `off_strength_faced`, 1 = the toughest opposing offenses (highest). Null when the strength is null. |
 | def_strength_faced_rank | double | Rank of `def_strength_faced`, 1 = the toughest opposing defenses (lowest EPA/play allowed). Null when the strength is null. |
 
+**Deserved wins and luck (Paper Index)** — the season sum of each game's
+`paper_share` from [cfb_paper_index_games](#cfb_paper_index_games), rolled up by sdv-py
+`sportsdataverse.paper_index.deserved_wins`. Python-only; the last seven columns of the
+table:
+
+| col_name | col_type | col_description |
+| --- | --- | --- |
+| deserved_wins | double | Sum of the team's deserved-win shares over its scored games: the wins its play earned on paper. Null when no game was scored. |
+| luck_wins | double | Wins minus `deserved_wins`, over the same games. Positive = won more than it earned. `luck_wins + deserved_wins` is the win count over those games. |
+| luck_z | double | `luck_wins` divided by `sqrt(sum(p * (1 - p)))` over the team's shares `p`, its standard deviation if each game were a coin weighted by its share. Reads like a z-score over a full season; NOT on a normal scale below about 8 games (see the notes). Null when that variance is 0. |
+| luck_wins_rank | double | Rank of `luck_wins` among the table's teams that have one, 1 = the luckiest. |
+| luck_z_rank | double | Rank of `luck_z`, 1 = the luckiest. |
+| paper_index_games_n | integer | Games that entered the sums; 0 when none did. |
+| paper_index_span | character | Where the season sits against the Paper Index fit: `train` = the season's shares were part of the fit (2016-2023, in-sample), `holdout` = scored out of sample at fit time (2024-2025), though not fully clean: the EP model behind the EPA, success and explosiveness inputs was trained on seasons that include them, `out_of_span` = never seen by the fit and never evaluated. From sdv-py `TRAIN_SEASONS` / `HOLDOUT_SEASONS`. |
+
+- The games counted are the ones the Paper Index scores: completed, with a winner, both
+  sides at 20 or more scrimmage snaps; regular season and postseason, FCS opponents
+  included. That is wider than `valid_games` (FBS vs FBS), and it is not always the
+  full schedule: a game the pbp lacks, or one under the snap floor, adds neither a game
+  nor a win. Read the sums beside `paper_index_games_n`.
+- Luck includes home field (the share has no home term).
+- `luck_z` is only z-like with enough games. Over the full 2024 season its spread across
+  the 134 teams is 1.04 and it runs from -2.2 to +3.5. On the 2024 weekly table through
+  week 2 (1-3 games a team) it runs from -4.3 to +6.2, with 5 of 130 teams beyond 3: a few
+  shares near 0 or 1 make the denominator tiny. Below about 8 games read `luck_wins`, and
+  filter on `paper_index_games_n` before ranking.
+- On `cfb_team_summaries_weekly` the seven columns are as of each snapshot: regular-season
+  games with `week <= through_week` (inclusive), never the postseason, cut by the same
+  game list as the snapshot's plays.
+- **Not model features.** They are built from game outcomes (the weights were fitted on
+  who won, and `luck_wins` subtracts from the win count). `cfb_higher_models`' feature
+  list and `cfb_league_averages` exclude them by name.
+
 _Release tag: `espn_cfb_team_summaries`_
 
 ---
@@ -2060,3 +2094,43 @@ defenses together (`division` says which).
 | yards_per_target_allowed_pct | double | WR / TE rows only; higher = allowed fewer yards per target naming a receiver. |
 
 _Release tag: `cfb_defense_vs_position`_
+
+---
+
+### cfb_paper_index_games
+
+Who won each game on paper: one row per team per scored game, keyed
+`(game_id, team_id)` (stage 67, `python/cfb_data_build/paper_index.py`). The rows are
+sdv-py `sportsdataverse.paper_index.paper_index_games` over the season's `cfb/pbp`,
+unchanged; this producer adds `paper_index_span`. The model is Game on Paper's Paper
+Index: eight performance margins through an intercept-free logistic, so an even game
+reads 50/50. The weights were fitted there and are not refitted here.
+
+A game is scored when it is completed, has a winner and both sides ran at least 20
+scrimmage snaps; regular season and postseason, FBS and FCS. In 2024 that is 945 of
+the 946 games in the pbp. The season sums are the `deserved_wins` / `luck_*` columns
+of [team_summaries](#team_summaries).
+
+| col_name | col_type | col_description |
+| --- | --- | --- |
+| game_id | integer | ESPN game id (Int64). |
+| team_id | integer | ESPN team id (Int64), as the pbp's `pos_team_id`. |
+| season | integer | Season year. |
+| season_type | integer | ESPN season type of the game: 2 regular, 3 postseason. |
+| week | integer | ESPN week; the postseason restarts at 1. |
+| won | logical | The team outscored its opponent. |
+| paper_share | double | The team's deserved-win probability, 0-1. |
+| opp_share | double | The opponent's; the two sum to 1. |
+| success_margin | double | Success rate, team minus opponent. |
+| explosive_margin | double | Explosive-play rate, team minus opponent. |
+| explosive_epa_margin | double | EPA per successful play, team minus opponent. |
+| opp_conversion_margin | double | Scoring-opportunity conversion rate, team minus opponent. |
+| pts_per_opp_margin | double | Points per scoring opportunity, team minus opponent. |
+| field_position_margin | double | Expected points of the average drive start, team minus opponent. |
+| havoc_margin | double | Havoc created by the team's defense minus havoc it allowed. Positive favors the team. |
+| turnovers_margin | double | Opponent turnovers minus the team's. Positive favors the team. |
+| paper_index_span | character | `train` = the season's shares were part of the weight fit (2016-2023, in-sample), `holdout` = scored out of sample at fit time (2024-2025), though not fully clean: the EP model behind the EPA, success and explosiveness inputs was trained on seasons that include them, `out_of_span` = never seen by the fit and never evaluated. |
+
+Not a model feature: the shares are fitted on who won.
+
+_Release tag: `cfb_paper_index_games`_

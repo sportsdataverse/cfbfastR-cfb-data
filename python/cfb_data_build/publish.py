@@ -27,6 +27,22 @@ from cfb_data_build.io import dataset_stem
 # Mirror R PUBLISH_REPOS (``R/_data_utils.R:5``).
 PUBLISH_REPOS: list[str] = ["sportsdataverse/sportsdataverse-data"]
 
+# The Paper Index fit spans, so the release note names the years sdv-py does.
+# Guarded on purpose: this module publishes EVERY dataset, and a build already
+# running when the sdv-py pin moves keeps its old venv until the next
+# `uv sync` (cron_daily_cfb.sh syncs at its start, not at its end-of-run
+# rebase). Without the guard a later step of that run, such as the coach_careers
+# publish, would die importing a module only one tag's description needs.
+# cfb_paper_index_games itself cannot be built on such a venv, so the fallback
+# text is never published.
+try:
+    from sportsdataverse.paper_index import HOLDOUT_SEASONS, TRAIN_SEASONS
+except ImportError:  # sdv-py older than the paper_index port
+    _PI_TRAIN_TEXT = _PI_HOLDOUT_TEXT = "the seasons `sportsdataverse.paper_index` names"
+else:
+    _PI_TRAIN_TEXT = "{}-{}".format(*TRAIN_SEASONS["cfb"])
+    _PI_HOLDOUT_TEXT = "{}-{}".format(*HOLDOUT_SEASONS["cfb"])
+
 
 def _dataset_files(
     spec: DatasetSpec, season: int | None, base: str | Path
@@ -157,6 +173,34 @@ RELEASE_NOTES: dict[str, str] = {
         "throws against that defense with no receiver named (FBS median 0.12 "
         "in 2014, 0.33 in 2024). Nothing is imputed. SPAN: 2014+ only -- "
         "earlier rosters carry no positions."
+    ),
+    "cfb_paper_index_games": (
+        "College Football Paper Index per game: ONE ROW PER TEAM PER SCORED "
+        "GAME (`game_id`, `team_id`, both Int64) with `paper_share`, the "
+        "team's deserved-win probability from eight performance margins "
+        "(success rate, explosive rate, explosiveness, scoring-opportunity "
+        "conversion, points per opportunity, starting field position, havoc, "
+        "turnovers), `opp_share` (the two sum to 1), `won`, and the eight "
+        "`<margin>_margin` columns, team minus opponent "
+        "(`sportsdataverse.paper_index.paper_index_games`, Game on Paper's "
+        "Paper Index). A game is scored when it is completed, has a winner "
+        "and both sides ran at least 20 scrimmage snaps; regular season and "
+        "postseason, FBS and FCS. Summed over a season the shares are the "
+        "`deserved_wins` on espn_cfb_team_summaries / "
+        "cfb_team_summaries_weekly, and wins minus that sum is `luck_wins`. "
+        "`luck_z` there divides that gap by its binomial standard deviation; "
+        "it reads like a z-score over a full season and is NOT on a normal "
+        "scale below about 8 games (an early weekly snapshot can show +6). "
+        "IN-SAMPLE LABEL: `paper_index_span` is `train` for "
+        f"{_PI_TRAIN_TEXT} (the "
+        "season's shares were part of the weight fit, so they are in-sample), "
+        f"`holdout` for {_PI_HOLDOUT_TEXT} (scored out of sample "
+        "at fit time, though not fully clean: the EP model behind the EPA, "
+        "success and explosiveness inputs was trained on seasons that include "
+        "them) and "
+        "`out_of_span` for every other season (never seen by the fit, never "
+        "evaluated). NOT A FEATURE: the shares are fitted on who won, so "
+        "they describe results and must not enter a predictive model."
     ),
     "cfb_team_opponent_splits": (
         "College Football by-opponent team-game splits: ONE ROW PER TEAM PER "

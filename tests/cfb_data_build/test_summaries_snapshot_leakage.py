@@ -46,6 +46,16 @@ def _snapshot_ids(monkeypatch, tmp_path, season: int, through_week: int | None):
         lambda p, _s, _season: p.with_columns(pl.col("game_id").cast(pl.Utf8)),
     )
     monkeypatch.setattr(sb, "build_team_summaries", fake_build)
+
+    # The Paper Index shares ride the same snapshot filter. Stand in one "share"
+    # per game (Int64 ids, as the real table carries them) and record which
+    # games reach the luck roll-up.
+    def fake_attach(team, shares, _season, **_kwargs):
+        seen["share_ids"] = set(shares["game_id"].cast(pl.Utf8).to_list())
+        return team
+
+    monkeypatch.setattr(sb, "paper_index_games_table", lambda p: p.select("game_id"))
+    monkeypatch.setattr(sb, "attach_luck", fake_attach)
     monkeypatch.setattr(sb, "write_dataset", lambda *a, **k: None)
     sb.build_summaries_season(
         season,
@@ -58,6 +68,8 @@ def _snapshot_ids(monkeypatch, tmp_path, season: int, through_week: int | None):
     # the snapshot must reach the builder AS a snapshot: that is what exempts it
     # from the full-season no-op gate (checks.assert_adjustment_is_real)
     assert seen["through_week"] == through_week
+    # one id list cuts both: the luck columns cover exactly the plays' games
+    assert seen["share_ids"] == seen["ids"]
     return seen["ids"]
 
 

@@ -90,9 +90,10 @@ def summarize(
         return pl.DataFrame(schema=SCHEMA)
     long = (
         df.select(pl.col(cols).cast(pl.Float64))
-        .unpivot(variable_name="metric", value_name="v")
+        # value_name must not be a metric's own name: polars 2.0 raises DuplicateError on the collision
+        .unpivot(variable_name="metric", value_name="__value")
         # is_finite() is null on a null, and filter keeps only True
-        .filter(pl.col("v").is_finite())
+        .filter(pl.col("__value").is_finite())
     )
     # group_by's per-group row order is not guaranteed, and float sum/variance
     # are not associative -- summing the same values in a different order can
@@ -101,9 +102,9 @@ def summarize(
     # order the parallel group_by happened to hand it this run (else the
     # published parquet churns byte-for-byte between identical rebuilds).
     out = long.group_by("metric", maintain_order=True).agg(
-        mean=pl.col("v").sort().mean(),
-        median=pl.col("v").sort().median(),
-        sd=pl.col("v").sort().std(),
+        mean=pl.col("__value").sort().mean(),
+        median=pl.col("__value").sort().median(),
+        sd=pl.col("__value").sort().std(),
         n=pl.len(),
     )
     return (

@@ -264,7 +264,9 @@ def published_frame(url: str, columns: list[str] | None = None) -> pl.DataFrame 
     not there yet (a first publish) or a network hiccup must not fail a build.
     """
     try:
-        return pl.read_parquet(url, columns=columns)
+        # use_pyarrow: polars 2.0's own reader asks for the footer with a suffix range, which
+        # GitHub's release CDN answers with 501 -- and this best-effort read would then go quiet.
+        return pl.read_parquet(url, columns=columns, use_pyarrow=True)
     except Exception as exc:  # noqa: BLE001 -- no release yet / offline / transient
         log.info("drift gate: previous release unreadable (%s): %r", url, exc)
         return None

@@ -1943,7 +1943,7 @@ kept, FCS opponents and bowls included; "FBS only" is a consumer filter. Ids are
 | is_home | logical | The team was the listed home side. |
 | points_for | integer | The team's final score. |
 | points_against | integer | The opponent's final score. |
-| plays | integer | The team's EPA-scored offensive plays (`adv_team_gamelog.EPA_plays`). |
+| plays | integer | The team's offensive scrimmage plays (`adv_team_gamelog.scrimmage_plays`), the plays `epa_per_play` averages over. Until 2026-10 it was `EPA_plays`, which also counts special teams (2025 median 77 vs 66). |
 | epa_per_play | double | Offensive EPA per play (`adv_team_gamelog.EPA_per_play`). |
 | success_rate | double | Offensive EPA success rate (`adv_situational.EPA_success_rate`); null when the game has no situational row for the team. |
 

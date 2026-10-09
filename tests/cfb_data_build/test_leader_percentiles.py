@@ -6,11 +6,11 @@ deterministic arithmetic contract -- direction, the qualifier gate, and above al
 what happens to a NULL metric -- and a null at a known position is exactly what a
 real season will not hand you on demand.
 
-The null case is the one that matters. ``_rank`` reproduces R's ``na.last = TRUE``
-and gives a null metric a TRAILING rank, which is correct for a leaderboard; if
-the percentile were derived from that rank alone, a missing stat would render as
+The null case is the one that matters. R's ``na.last = TRUE`` gave a null metric
+a TRAILING rank; a percentile derived from that would render a missing stat as
 the 0th percentile -- an unknown displayed to a reader as the worst value on the
-board -- and would also inflate the denominator for everyone else.
+board -- and would also inflate the denominator for everyone else. ``_rank`` now
+leaves it unranked (C4), and ``_pct`` excludes it from ``n``.
 """
 
 from __future__ import annotations
@@ -50,8 +50,8 @@ def test_a_null_metric_yields_a_null_percentile_not_a_zero():
 
     # the null row is null in the percentile, NOT 0.0 and NOT the worst placing
     assert pct[3] is None
-    # ...and it still carries a trailing RANK, which is the leaderboard behaviour
-    assert out["epa_rank"].to_list()[3] == 4.0
+    # ...and no rank either: R's trailing na.last rank read as the worst (C4)
+    assert out["epa_rank"].to_list()[3] is None
 
 
 def test_a_null_metric_does_not_depress_everyone_elses_percentile():

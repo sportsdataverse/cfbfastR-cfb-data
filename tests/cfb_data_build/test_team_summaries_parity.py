@@ -119,6 +119,27 @@ DIVERGENT_FROM_R = {
     },
 }
 
+#: The percentile-parity fixes (audit 2026-10-08) redefined these on purpose, so
+#: every column with one of these prefixes is divergent: ``play_stuffed`` and
+#: ``opportunity_*`` are over rushes (F1/C1), an interception's return is no longer
+#: offensive yardage (A3), drive yardage counts owned drives only, capped at the
+#: yards available (E4), and passer ``success`` is over dropbacks (D4).
+DIVERGENT_PREFIXES_FROM_R = {
+    "percentiles": ("play_stuffed", "opportunity_run", "yardsplay"),
+    "team_summaries": (
+        "play_stuffed",
+        "opportunity_rate",
+        "yards_",
+        "yardsplay",
+        "yardsgame",
+        "yardsdrive",
+        "total_available_yards",
+        "total_gained_yards",
+        "available_yards_pct",
+    ),
+    "passing": ("success",),
+}
+
 # Python-only ADDITIVE columns: the leader percentiles / ranks added in #50
 # (feat(summaries): player percentiles) have no R counterpart, so the oracle can
 # never carry them. They are asserted PRESENT (a silent drop still fails) and
@@ -297,7 +318,9 @@ def test_team_summaries_parity(
     lost = sorted(extra - set(got.columns))
     assert not lost, f"{ds}: Python-only columns missing from the build: {lost}"
     got = got.drop(list(extra))
-    drop = DIVERGENT_FROM_R.get(ds, set())
+    drop = DIVERGENT_FROM_R.get(ds, set()) | {
+        c for c in oracle.columns if c.startswith(DIVERGENT_PREFIXES_FROM_R.get(ds, ()))
+    }
     corr = {c for c in corr if c not in drop}
     if drop:
         # a divergent column must still be EMITTED -- only its values differ
@@ -305,6 +328,14 @@ def test_team_summaries_parity(
         assert not gone, f"{ds}: divergent columns no longer produced: {gone}"
         got = got.drop([c for c in drop if c in got.columns])
         oracle = oracle.drop([c for c in drop if c in oracle.columns])
+    # C4: Python leaves a null metric, or a column that is all-null or constant,
+    # unranked where R's na.last ranked it, so R's rank is not compared there
+    got, oracle = got.sort(keys), oracle.sort(keys)
+    oracle = oracle.with_columns(
+        pl.when(got[c].is_not_null()).then(pl.col(c)).alias(c)
+        for c in got.columns
+        if c.endswith("_rank") and c in oracle.columns
+    )
     assert_frame_parity(
         got,
         oracle,

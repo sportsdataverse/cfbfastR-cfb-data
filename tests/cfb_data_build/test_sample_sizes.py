@@ -101,7 +101,7 @@ def test_player_rate_n_is_its_real_denominator():
         25,
         0,
     ]  # att + pass_int; 0 where comppct is null
-    assert out["success_n"].to_list() == [25, 0]
+    assert out["success_n"].to_list() == [30, 2]  # per DROPBACK since D4
     assert out["EPAgame_n"].to_list() == [3, 1]
     assert all(out.schema[c] == pl.Int64 for c in out.columns if c.endswith("_n"))
 

@@ -176,9 +176,9 @@ def test_a_stray_snap_in_the_other_teams_drive_is_nobodys_opportunity():
     assert (one["pts_per_opp_off"], one["pts_per_opp_off_n"]) == (3.0, 1)
     assert (two["pts_per_opp_def"], two["pts_per_opp_def_n"]) == (3.0, 1)
     assert two["pts_per_opp_off_n"] == 0 and one["pts_per_opp_def_n"] == 0
-    # the yardage totals keep R's per-(team, drive) grouping: the stray
-    # (team 1, d2) row still adds d2's start, the 77
-    assert one["total_available_yards_off"] == 30 + 77
+    # the yardage totals count owned drives too now (E4): the stray (team 1, d2)
+    # row no longer adds d2's start, the 77
+    assert one["total_available_yards_off"] == 30
 
 
 def test_drive_owner_is_espns_drive_team_when_it_has_a_snap():
@@ -225,7 +225,8 @@ def test_no_scoring_opportunity_is_null_and_unranked():
     assert two["pts_per_opp_off_n"] == 0
     # null, not 0/0 = NaN, and unranked rather than ranked last
     assert two["pts_per_opp_off"] is None and two["pts_per_opp_off_rank"] is None
-    assert one["pts_per_opp_off_rank"] == 1.0
+    # a lone value has nothing to rank against (C4: zero variance ranks nobody)
+    assert one["pts_per_opp_off"] == 7.0 and one["pts_per_opp_off_rank"] is None
     assert one["pts_per_opp_def"] is None and one["pts_per_opp_def_rank"] is None
     assert d["pts_per_opp_margin"].is_null().all()
     assert d["pts_per_opp_margin_rank"].is_null().all()
@@ -396,7 +397,8 @@ def test_a_team_with_only_stray_snaps_has_no_points_per_drive():
     d = _drives(_plays(rows, special=[]))
     one, two = _team(d, "1"), _team(d, "2")
     assert (one["pts_per_drive_off"], one["pts_per_drive_off_n"]) == (3.0, 1)
-    assert one["pts_per_drive_off_rank"] == 1.0
+    # a lone value has nothing to rank against (C4: zero variance ranks nobody)
+    assert one["pts_per_drive_off_rank"] is None
     # null, not 0/0 = NaN, and unranked rather than ranked last
     assert two["pts_per_drive_off_n"] == 0
     assert two["pts_per_drive_off"] is None and two["pts_per_drive_off_rank"] is None

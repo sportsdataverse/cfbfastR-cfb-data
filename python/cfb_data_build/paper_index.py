@@ -41,7 +41,7 @@ from sportsdataverse.paper_index import (
     paper_index_games,
 )
 
-from cfb_data_build.team_summaries import _rank_known
+from cfb_data_build.team_summaries import _rank
 
 LEAGUE = "cfb"
 
@@ -170,8 +170,8 @@ def attach_luck(
         )
     return joined.with_columns(
         paper_index_games_n=pl.col("paper_index_games_n").fill_null(0),
-        luck_wins_rank=_rank_known("luck_wins", descending=True),
-        luck_z_rank=_rank_known("luck_z", descending=True),
+        luck_wins_rank=_rank("luck_wins", descending=True),
+        luck_z_rank=_rank("luck_z", descending=True),
         paper_index_span=pl.lit(paper_index_span(season)),
     ).select(*team_data.columns, *LUCK_COLUMNS)
 

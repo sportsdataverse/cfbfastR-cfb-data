@@ -40,6 +40,7 @@ def _gamelog(rows: list[dict], *, id_dtype=pl.Int64) -> pl.DataFrame:
             "EPA_penalty": pl.Float64,
             "EPA_per_play": pl.Float64,
             "EPA_plays": pl.Int64,
+            "scrimmage_plays": pl.Int64,
         },
     )
 
@@ -59,7 +60,9 @@ def _row(game_id, team_id, opponent_id, epa, plays, pf, pa, *, home=True) -> dic
         "points_against": pa,
         "EPA_penalty": -0.5,
         "EPA_per_play": epa,
-        "EPA_plays": plays,
+        # EPA_per_play is over scrimmage plays; EPA_plays adds special teams (E10)
+        "EPA_plays": plays + 11,
+        "scrimmage_plays": plays,
     }
 
 
@@ -117,6 +120,18 @@ def test_one_row_carries_the_gamelog_points_and_epa_and_the_situational_success_
     assert r["success_rate"] == pytest.approx(0.47)
     assert (r["points_for"], r["points_against"], r["plays"]) == (24, 17, 70)
     assert r["opponent"] == "team 61" and r["is_home"] is True
+
+
+def test_plays_is_the_scrimmage_count_epa_per_play_is_over(tmp_path):
+    """E10: ``plays`` was ``EPA_plays`` (special teams too, median 77) beside an
+    ``epa_per_play`` averaged over the scrimmage plays (66)."""
+    base = _write(
+        tmp_path,
+        _gamelog([_row(1, 333, 61, 0.21, 66, 24, 17)]),
+        _situational([(1, 333, 0.47)]),
+    )
+    out = build_team_opponent_splits(SEASON, base=base)
+    assert out["plays"].to_list() == [66]  # not 77
 
 
 def test_a_gamelog_row_with_no_situational_match_keeps_a_null_success_rate(tmp_path):

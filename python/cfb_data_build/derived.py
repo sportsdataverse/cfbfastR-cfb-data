@@ -473,7 +473,7 @@ def build_team_opponent_splits(season: int, *, base: str = "cfb") -> pl.DataFram
     """One row per team-GAME: opponent, EPA/play, success rate and points.
 
     A projection, not a new aggregation: ``adv_team_gamelog`` gives the game
-    context, points, ``EPA_per_play`` and ``EPA_plays``; ``adv_situational``
+    context, points, ``EPA_per_play`` and its ``scrimmage_plays``; ``adv_situational``
     gives ``EPA_success_rate`` on the same ``(game_id, pos_team_id)`` grain.
     Every game is kept -- FCS opponents and bowls included; "FBS only" is a
     consumer filter. A left join, so a team-game with no situational row keeps
@@ -510,7 +510,9 @@ def build_team_opponent_splits(season: int, *, base: str = "cfb") -> pl.DataFram
         "is_home",
         "points_for",
         "points_against",
-        pl.col("EPA_plays").alias("plays"),
+        # the scrimmage plays EPA_per_play averages over (E10); EPA_plays also
+        # counts special teams (2025 median 77 vs 66)
+        pl.col("scrimmage_plays").alias("plays"),
         pl.col("EPA_per_play").alias("epa_per_play"),
     )
     sit = pl.read_parquet(

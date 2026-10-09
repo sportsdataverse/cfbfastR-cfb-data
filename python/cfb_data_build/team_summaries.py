@@ -174,27 +174,21 @@ PERCENTILE_METRICS: list[str] = [
 
 
 def _rank(col: str, *, descending: bool) -> pl.Expr:
-    """R ``rank()`` -- average ties, ``na.last=TRUE``. ``rank(-x)`` -> descending=True.
+    """R ``rank()`` with average ties (``rank(-x)`` -> descending=True), but NULL
+    wherever a rank would say nothing.
 
-    R keeps NA rows and assigns them the *trailing* ranks in row order; polars
-    ranks nulls to null, so reproduce na.last explicitly. (Callers sort by the
-    group key first, matching dplyr's sorted-group output, so the trailing ranks
-    land deterministically.)
+    Deliberately diverges from the R oracle's ``na.last = TRUE`` (C4): R gave a
+    null metric a TRAILING rank, so an unknown read as the worst value (Rice
+    2026 ``red_zone_success_off_pass``: null, ranked 138th). A null metric now
+    gets a null rank, and a column with fewer than two distinct values ranks
+    nobody -- all-null (``line_yards`` on pass plays) ranked teams 1..n in
+    team-id order, and constant (``passrate`` on pass plays is 1) tied every
+    team at the middle rank.
     """
     c = pl.col(col)
-    base = c.rank(method="average", descending=descending)
-    n_nonnull = c.is_not_null().sum()
-    null_trail = (n_nonnull + c.is_null().cum_sum()).cast(pl.Float64)
-    return pl.when(c.is_null()).then(null_trail).otherwise(base)
-
-
-def _rank_known(col: str, *, descending: bool) -> pl.Expr:
-    """:func:`_rank`, but a null metric stays unranked (null) instead of trailing.
-
-    For a metric that is undefined rather than bad when null: points per
-    scoring opportunity for a side that never had one.
-    """
-    return pl.when(pl.col(col).is_not_null()).then(_rank(col, descending=descending))
+    return pl.when(c.drop_nulls().n_unique() > 1).then(
+        c.rank(method="average", descending=descending).cast(pl.Float64)
+    )
 
 
 def _pct(col: str) -> pl.Expr:
@@ -205,11 +199,8 @@ def _pct(col: str) -> pl.Expr:
 
     Two things the rank column alone does not give us:
 
-    * ``_rank`` reproduces R's ``na.last = TRUE`` and hands a null metric a
-      TRAILING rank. That is right for a leaderboard, but a percentile is a
-      user-facing number and "unknown" must not render as "worst" -- so a null
-      metric yields a null percentile, and null rows are excluded from ``n``
-      rather than depressing everyone else's placing.
+    * a null metric (null rank) yields a null percentile, and null rows are
+      excluded from ``n`` rather than depressing everyone else's placing.
     * The position is Weibull, ``(n + 1 - rank) / (n + 1)``, which is symmetric:
       the best qualifier lands at ``n/(n+1)`` and the worst at ``1/(n+1)``.
       Nobody is pinned to an exact 0 or 100, which reads better in a UI and
@@ -254,7 +245,25 @@ def add_derived_metrics(plays: pl.DataFrame) -> pl.DataFrame:
         .then(pl.col("away_EPA_rush"))
         .otherwise(None),
         game_id=pl.col("game_id").cast(pl.Utf8),
-        play_stuffed=pl.col("yards_gained") <= 0,
+        # The next two deliberately DIVERGE from the R oracle (as pass_success /
+        # rush_success do in per_game_metrics), which is wrong on both:
+        #
+        # * an interception gains the offense nothing. statYardage carries the
+        #   RETURN on an INT play (1,238 INTs in 2025, mean +12.4), and R counted
+        #   it as offense; the sdv-py box zeroes it (cfb_pbp.py `yards_per_play`).
+        # * a stuff is a RUN for no gain, over rushes only: sdv-py's `stuffed_run`
+        #   (play type "Rush", yds_rushed <= 0), the box's `rushing_stuff_rate`
+        #   that GOP ranks against this ladder. R's `yards_gained <= 0` over every
+        #   play counted incompletions and sacks (2025 ladder p50 0.300 vs box
+        #   0.161). Null on non-rush plays, so every mean is over rushes.
+        yards_gained=pl.when(pl.col("int") == 1)
+        .then(0)
+        .otherwise(pl.col("yards_gained")),
+        play_stuffed=pl.when(pl.col("rush") == 1).then(
+            ((pl.col("play_type") == "Rush") & (pl.col("yds_rushed") <= 0)).fill_null(
+                False
+            )
+        ),
         red_zone=pl.col("yards_to_goal") <= 20,
         epa_success=pl.col("epa_success").cast(pl.Float64),
     )
@@ -287,7 +296,9 @@ def add_derived_metrics(plays: pl.DataFrame) -> pl.DataFrame:
         .when(pl.col("rush") == 1)
         .then(pl.col("EPA") >= _EXPLOSIVE_RUSH_EPA)
         .otherwise(False),
-        opportunity_run=(pl.col("rush") == 1) & (pl.col("yds_rushed") >= 4),
+        # over rushes, null elsewhere (R's False on passes made "Opportunity %"
+        # rushrate x per-carry rate: 2025 Army #1 at 0.850 x 0.480)
+        opportunity_run=pl.when(pl.col("rush") == 1).then(pl.col("yds_rushed") >= 4),
     )
     df = df.with_columns(
         adj_rush_yardage=pl.when((pl.col("rush") == 1) & (pl.col("yds_rushed") > 10))
@@ -434,9 +445,7 @@ def _summarize_team(
         ],
     ).drop("n_games", "n_drives", "n_turnovers")
 
-    g = g.sort(
-        group
-    )  # dplyr group_by+summarize returns key-sorted; needed for na.last ranks
+    g = g.sort(group)  # dplyr group_by+summarize returns key-sorted
     d = ascending  # ascending=True -> rank(x); else rank(-x)
     g = g.with_columns(
         playsgame_rank=_rank("playsgame", descending=not d),
@@ -561,10 +570,13 @@ def _drive_owners(plays: pl.DataFrame) -> pl.DataFrame:
 def _drives(plays: pl.DataFrame, group: str, *, ascending: bool) -> pl.DataFrame:
     """One side's drive totals (``group`` = the offense or the defense team id).
 
-    ``plays`` carries ``_drive_owner`` (:func:`_drive_owners`). The yardage
-    totals keep R's per-(team, drive) grouping; scoring opportunities, points
-    per drive and their points count only the owner's snaps, so a stray snap in
-    someone else's drive is nobody's opportunity and nobody's drive.
+    ``plays`` carries ``_drive_owner`` (:func:`_drive_owners`). Every drive total
+    counts only the owner's drives, so a stray snap in someone else's drive is
+    nobody's opportunity and nobody's drive. (Until 2026-10 the yardage totals
+    kept R's per-(team, drive) grouping, which handed a stray snap the OTHER
+    team's drive yards against its own start: available-yards shares above 1.)
+    A drive gains at most the yards it had available; ESPN's ``drive.yards``
+    exceeds that on a few dozen drives a season.
     """
     own = pl.col("pos_team_id") == pl.col("_drive_owner")
     per_drive = (
@@ -582,6 +594,11 @@ def _drives(plays: pl.DataFrame, group: str, *, ascending: bool) -> pl.DataFrame
             .replace_strict(_DRIVE_POINTS, default=0.0, return_dtype=pl.Float64),
         )
         .with_columns(
+            total_gained_yards=pl.when(
+                pl.col("total_available_yards").is_not_null()
+            ).then(pl.min_horizontal("total_gained_yards", "total_available_yards"))
+        )
+        .with_columns(
             _own_yardline=(100 - pl.col("total_available_yards"))
             .round()
             .cast(pl.Int64)
@@ -595,8 +612,12 @@ def _drives(plays: pl.DataFrame, group: str, *, ascending: bool) -> pl.DataFrame
         )
     )
     agg = per_drive.group_by(group).agg(
-        total_available_yards=pl.col("total_available_yards").sum(),
-        total_gained_yards=pl.col("total_gained_yards").sum(),
+        total_available_yards=pl.col("total_available_yards")
+        .filter(pl.col("owned") == True)  # noqa: E712
+        .sum(),
+        total_gained_yards=pl.col("total_gained_yards")
+        .filter(pl.col("owned") == True)  # noqa: E712
+        .sum(),
         opp_points=pl.col("points").filter(pl.col("scoring_opp") == True).sum(),  # noqa: E712
         pts_per_opp_n=pl.col("scoring_opp").sum().cast(pl.Int64),
         drive_points=pl.col("points").filter(pl.col("owned") == True).sum(),  # noqa: E712
@@ -616,8 +637,10 @@ def _drives(plays: pl.DataFrame, group: str, *, ascending: bool) -> pl.DataFrame
     )
     agg = (
         agg.with_columns(
-            available_yards_pct=pl.col("total_gained_yards")
-            / pl.col("total_available_yards"),
+            # null, not Infinity, for a side with no available yards on record
+            available_yards_pct=pl.when(pl.col("total_available_yards") > 0).then(
+                pl.col("total_gained_yards") / pl.col("total_available_yards")
+            ),
             # null, not 0/0 = NaN, for a side that never reached the 40
             pts_per_opp=pl.when(pl.col("pts_per_opp_n") > 0).then(
                 pl.col("opp_points") / pl.col("pts_per_opp_n")
@@ -633,12 +656,12 @@ def _drives(plays: pl.DataFrame, group: str, *, ascending: bool) -> pl.DataFrame
     return agg.with_columns(
         available_yards_pct_rank=_rank("available_yards_pct", descending=not ascending),
         # more points per trip is better on offense, fewer allowed on defense
-        pts_per_opp_rank=_rank_known("pts_per_opp", descending=not ascending),
-        pts_per_drive_rank=_rank_known("pts_per_drive", descending=not ascending),
+        pts_per_opp_rank=_rank("pts_per_opp", descending=not ascending),
+        pts_per_drive_rank=_rank("pts_per_drive", descending=not ascending),
         # a better start is worth more on offense, less allowed on defense: fewer
         # yards to go ranks first on offense, more yards to go allowed on defense
         start_position_rank=_rank("start_position", descending=ascending),
-        drive_start_ep_rank=_rank_known("drive_start_ep", descending=not ascending),
+        drive_start_ep_rank=_rank("drive_start_ep", descending=not ascending),
     )
 
 
@@ -681,13 +704,9 @@ def _summarize_drives(plays: pl.DataFrame) -> pl.DataFrame:
             available_yards_pct_margin_rank=_rank(
                 "available_yards_pct_margin", descending=True
             ),
-            pts_per_opp_margin_rank=_rank_known("pts_per_opp_margin", descending=True),
-            pts_per_drive_margin_rank=_rank_known(
-                "pts_per_drive_margin", descending=True
-            ),
-            drive_start_ep_margin_rank=_rank_known(
-                "drive_start_ep_margin", descending=True
-            ),
+            pts_per_opp_margin_rank=_rank("pts_per_opp_margin", descending=True),
+            pts_per_drive_margin_rank=_rank("pts_per_drive_margin", descending=True),
+            drive_start_ep_margin_rank=_rank("drive_start_ep_margin", descending=True),
             start_position_margin_rank=_rank("start_position_margin", descending=True),
         )
     )
@@ -811,8 +830,8 @@ def _strength_faced_ranks(df: pl.DataFrame) -> pl.DataFrame:
     (lower is tougher). Null (fewer than 2 valid games) stays unranked.
     """
     return df.with_columns(
-        off_strength_faced_rank=_rank_known("off_strength_faced", descending=True),
-        def_strength_faced_rank=_rank_known("def_strength_faced", descending=False),
+        off_strength_faced_rank=_rank("off_strength_faced", descending=True),
+        def_strength_faced_rank=_rank("def_strength_faced", descending=False),
     )
 
 
@@ -1428,6 +1447,7 @@ def build_team_summaries(
                 "sack_taken_player_id",
                 "yds_sacked",
                 "EPA",
+                "success",
                 "game_id",
             ]
         )
@@ -1447,6 +1467,7 @@ def build_team_summaries(
             # EPA of the sacks, so it can be returned to the passer's total.
             # Without this the QB's TEPA omits its largest negative component.
             sack_epa=pl.col("EPA").sum(),
+            _sack_success=pl.col("success").fill_null(0).sum(),
         )
         .rename({"qb_id": "passer_player_id"})
     )
@@ -1528,11 +1549,11 @@ def build_team_summaries(
             pass_int=pl.col("pass_int").fill_null(0),
             sack_epa=pl.col("sack_epa").fill_null(0.0),
             int_epa=pl.col("int_epa").fill_null(0.0),
+            _sack_success=pl.col("_sack_success").fill_null(0.0),
         )
         # Seed the attempt-side columns for rows the union just added. They have
         # no attempts by construction, so every count is a true 0; `games` and
-        # the name come from the sack/INT plays themselves. `success` stays null
-        # -- it is a mean over attempts, and this passer has none.
+        # the name come from the sack/INT plays themselves.
         .join(_team_games, on="pos_team_id", how="left", suffix="_tm")
         .with_columns(
             passer_player_name=pl.coalesce("passer_player_name", "neg_name"),
@@ -1607,7 +1628,19 @@ def build_team_summaries(
             # these from the attempts-only sum before sacks/INTs were folded in
             EPAplay=pl.col("TEPA") / pl.col("dropbacks"),
             EPAgame=pl.col("TEPA") / pl.col("games"),
+            # success over DROPBACKS too, like EPAplay (D4): it was a mean over
+            # attempts, so a passer's sacks and picks never counted against it
+            # (Jack Layne 2025: .480 published vs .428 over his dropbacks). A sack
+            # keeps its own `success`; an interception is never a success -- the
+            # rule-based `success` reads statYardage, which on a pick carries the
+            # RETURN, so 2 of Layne's 9 picks scored as successes.
+            success=(
+                pl.col("success").fill_null(0.0) * pl.col("plays")
+                + pl.col("_sack_success")
+            )
+            / pl.col("dropbacks"),
         )
+        .drop("_sack_success")
     )
     # per-game dispersion over the same plays TEPA / dropbacks sum: attempts, sacks
     # and interceptions, so a game of sacks or picks is a game here too
@@ -1788,7 +1821,7 @@ PLAYER_SAMPLE_SIZES: dict[str, dict[str, pl.Expr]] = {
         ),  # TEPA / dropbacks (sacks + INTs folded in, #30)
         "yardsdropback": pl.col("dropbacks"),
         "comppct": pl.col("att") + pl.col("pass_int"),
-        "success": pl.col("plays"),  # mean over attempts
+        "success": pl.col("dropbacks"),  # attempts + sacks + INTs (D4)
         "yardsplay": pl.col("plays"),
         "detmer": pl.col("games"),
         "detmergame": pl.col("games"),
@@ -1895,8 +1928,8 @@ def _attach_cohort_percentiles(
 
     The cohort rank ``r`` is the rank of ``<m>_rank`` ascending within the cohort,
     over the rows whose ``<m>`` and ``<m>_rank`` are both non-null (a null
-    ``_rank`` is a non-qualifier; a null ``<m>`` carries R's trailing na.last
-    rank, which is not a placing). ``_rank`` already encodes direction, so
+    ``_rank`` is a non-qualifier, a null metric, or a column that ranks nobody
+    -- see :func:`_rank`). ``_rank`` already encodes direction, so
     ascending is best-first. Ties take ``_rank``'s own ``average`` method. The
     value is ``100 * (n + 1 - r) / (n + 1)`` with ``n`` those rows in the cohort,
     and null when ``<m>`` or the cohort key is null or ``n < min_cohort``.

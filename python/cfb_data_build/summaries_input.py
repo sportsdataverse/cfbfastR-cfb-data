@@ -287,18 +287,46 @@ def prepare_plays_input(
     )
 
     # --- drive start position: possession-oriented yards-to-goal from the
-    # drive header. `drive.start.yardLine` is the absolute coordinate measured
-    # from the HOME goal line, so the home offense flips it. (The R oracle's
-    # column is CFBD's native possession-oriented drive field; validated
-    # empirically vs the released 2024 table — mean 71.6 vs R 71.8.) ---
+    # drive header. (The R oracle's column is CFBD's native possession-oriented
+    # drive field; validated empirically vs the released 2024 table — mean 71.6
+    # vs R 71.8.) ---
     if "drive_start_yards_to_goal" not in df.columns:
-        yard = pl.col("drive.start.yardLine").cast(pl.Float64)
-        df = df.with_columns(
-            drive_start_yards_to_goal=pl.when(
-                pl.col("pos_team_id") == pl.col("home_id")
-            )
-            .then(100 - yard)
-            .otherwise(yard)
-        )
+        df = df.with_columns(drive_start_yards_to_goal=drive_start_yards_to_goal())
 
     return df.sort(["game_id", "game_play_number"])
+
+
+def drive_start_yards_to_goal() -> pl.Expr:
+    """The drive's starting yards-to-goal for the snapping team, from the drive header.
+
+    ``drive.start.yardLine`` is the absolute coordinate from the HOME goal line,
+    so the home offense flips it -- but not in every game: in 135 of 2019's games
+    (and 142 of 2025's) the header is measured from the other end, and some
+    headers carry a 0 placeholder (398 drives in 2025, a team's whole game for
+    Miami (OH) 2025 weeks 1-3). Either way the available-yards share broke
+    (Infinity, or Clemson 2019 at 1.60). So the orientation is the one that
+    agrees with the drive's first snap (``yards_to_goal``, possession-oriented
+    per play), and a header at a goal line (0 / 100 / null) falls back to that
+    first snap.
+    """
+    yard = pl.col("drive.start.yardLine").cast(pl.Float64)
+    header = (
+        pl.when(pl.col("pos_team_id") == pl.col("home_id"))
+        .then(100 - yard)
+        .otherwise(yard)
+    )
+    first_snap = (
+        pl.col("yards_to_goal")
+        .cast(pl.Float64)
+        .sort_by("game_play_number")
+        .first()
+        .over("drive_id", "pos_team_id")
+    )
+    agrees = (header - first_snap).abs() <= (100 - header - first_snap).abs()
+    return (
+        pl.when(yard.is_null() | (yard <= 0) | (yard >= 100))
+        .then(first_snap)
+        .when(first_snap.is_null() | agrees)
+        .then(header)
+        .otherwise(100 - header)
+    )

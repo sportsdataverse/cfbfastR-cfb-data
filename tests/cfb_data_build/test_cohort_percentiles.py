@@ -82,8 +82,8 @@ def test_a_null_metric_is_null_and_drops_out_of_n():
     out = _conf(_teams(a_epa=a)).filter(pl.col("conference") == "A").sort("team_id")
     pct = out["EPAplay_off_conf_pct"].to_list()
 
-    # _rank hands the null a TRAILING league rank; it must not become a placing
-    assert out["EPAplay_off_rank"][2] is not None
+    # _rank leaves the null unranked (C4), and the cohort percentile follows
+    assert out["EPAplay_off_rank"][2] is None
     assert pct[2] is None
     assert [p for p in pct if p is not None] == pytest.approx(
         [100 * k / 6 for k in range(1, 6)]

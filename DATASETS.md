@@ -1506,7 +1506,10 @@ across a few axes, so a column name decodes as:
   plays only.
 - **`_rank`** — 1–N national rank of that value among FBS teams that season (1 = best;
   direction is metric- and side-aware, e.g. low defensive EPA ranks 1st). Without
-  `_rank`, the column holds the raw metric value.
+  `_rank`, the column holds the raw metric value. Null where a rank says nothing: a null
+  metric, or a column with fewer than two distinct values (all-null, like
+  `line_yards_off_pass`, or constant, like `passrate_off_pass`). Until 2026-10 R's
+  `na.last` ranked a null last and tied a constant column at the middle rank.
 
 Examples: `EPAplay_off` (offensive EPA/play), `success_def_rank` (defensive
 success-rate rank), `explosive_off_pass` (offensive pass explosiveness),
@@ -1534,10 +1537,10 @@ twin:
 | EPAplay | double | EPA per play. |
 | EPAdrive | double | EPA per drive. |
 | EPAgame | double | EPA per game. |
-| yards | double | Total yards gained. |
-| yardsplay | double | Yards per play. |
+| yards | double | Total yards gained. An interception counts 0 (its statYardage is the return, the defense's yards; until 2026-10 it counted as offense). |
+| yardsplay | double | Yards per play (interceptions as 0 yards). |
 | yardsgame | double | Yards per game. |
-| play_stuffed | double | Stuffed-play rate (stopped at or behind the line). |
+| play_stuffed | double | Run-stuff rate: share of RUSHES that are a "Rush" for 0 or fewer yards (sdv-py `stuffed_run`, the box's `rushing_stuff_rate`); null on the `_pass` split. Until 2026-10 it was the share of all plays with `yards_gained <= 0`, so incompletions and sacks counted (2025 team-game median 0.300 vs 0.161). |
 | drives | integer | Drive count. |
 | drivesgame | double | Drives per game. |
 | yardsdrive | double | Yards per drive. |
@@ -1548,10 +1551,10 @@ twin:
 | third_down_distance | double | Mean third-down distance to go. |
 | late_down_success | double | Late-down (3rd/4th) success rate. |
 | early_down_EPA | double | Mean EPA on early downs (1st/2nd). |
-| start_position | double | Average starting field position (yards to goal), averaged per DRIVE over the team's own drives (ESPN's drive team); `def` is the opponents' drives against this defense, and `_n` counts drives. Before 2026-09-29 it was a mean over plays, so a long drive counted once per snap (2025 rankings moved at Spearman 0.92; teams by up to 4.8 yards). `margin` is `def - off`: positive when the team starts closer to goal than its opponents. |
+| start_position | double | Average starting field position (yards to goal), averaged per DRIVE over the team's own drives (ESPN's drive team; the start as in `total_available_yards`, corrected 2026-10 for flipped and 0-placeholder drive headers); `def` is the opponents' drives against this defense, and `_n` counts drives. Before 2026-09-29 it was a mean over plays, so a long drive counted once per snap (2025 rankings moved at Spearman 0.92; teams by up to 4.8 yards). `margin` is `def - off`: positive when the team starts closer to goal than its opponents. |
 | nonExplosiveEpaPerPlay | double | Mean EPA on non-explosive plays. |
 | line_yards | double | Mean offensive-line-credited rushing yards. |
-| opportunity_rate | double | Opportunity-run rate. |
+| opportunity_rate | double | Opportunity rate: share of RUSHES gaining 4+ yards; null on the `_pass` split. Until 2026-10 it was over all plays (rush rate x per-carry rate). |
 
 `margin` variants (offense − defense, each with `_rank`) exist for: `TEPA`, `EPAplay`,
 `EPAdrive`, `EPAgame`, `success`, `yardsplay`, and `start_position`, across
@@ -1561,9 +1564,9 @@ overall/pass/rush where applicable.
 
 | col_name | col_type | col_description |
 | --- | --- | --- |
-| total_available_yards_{side} | double | Sum of yards-to-goal available at each drive start. |
-| total_gained_yards_{side} | integer | Sum of net yards gained across drives. |
-| available_yards_pct_{side} | double | `total_gained / total_available` (drive-efficiency rate). |
+| total_available_yards_{side} | double | Sum of yards-to-goal available at each drive start, over the team's own drives (ESPN's drive team; `def` the opponents' drives). The start is the drive header oriented to agree with the drive's first snap, or that snap when the header is a 0 / missing placeholder. |
+| total_gained_yards_{side} | integer | Sum of net yards gained across the same drives, each capped at its available yards. |
+| available_yards_pct_{side} | double | `total_gained / total_available` (drive-efficiency rate, 0-1); null when no available yards are on record. Until 2026-10 a stray snap in the other team's drive, a flipped header or a 0 placeholder could push it above 1 or to Infinity. |
 | pts_per_drive_{side} | double | Points per drive: `off` on the team's own drives (ESPN's drive team) with at least one non-kneel run or pass snap, scored from `drive.result` like `pts_per_opp` (TD = 7, FG = 3, else 0). A drive ESPN labels as a return TD ("INT TD", "PUNT RETURN TD") scores 0, but one it labels plain "TD" is credited to the drive's owner even when the touchdown was the other team's return (see Known ceilings below); `def` the same for the opponents' drives against this defense; `margin` is `off - def`. Rank 1 = most scored, fewest allowed, highest margin. |
 | pts_per_drive_off_n / pts_per_drive_def_n | integer | Drives, the denominator. |
 
@@ -1712,7 +1715,7 @@ passers (1 = best).
 | yards | double | Passing (receiving) yards on the passer's attempts. |
 | yardsplay | double | Yards per play. |
 | yardsgame | double | Yards per game. |
-| success | double | Success rate (positive-EPA share). |
+| success | double | Success rate over DROPBACKS (attempts + sacks + interceptions; a pick is never a success), like `EPAplay`; `success_n` = `dropbacks`. Until 2026-10 it was over attempts only. |
 | comp | double | Completions. |
 | att | double | Pass attempts. |
 | comppct | double | Completion percentage (mean completion indicator). |
@@ -1831,7 +1834,7 @@ team's number against the FBS field. No team identity columns.
 | early_down_EPA | double | Early-down EPA. |
 | late_down_success | double | Late-down success rate. |
 | success | double | Overall success rate. |
-| yardsplay | double | Yards per play. |
+| yardsplay | double | Yards per play (interceptions as 0 yards). |
 | dropbacks | double | Dropbacks (count). |
 | rushes | double | Rushes (count). |
 | EPAdropback | double | EPA per dropback. |
@@ -1842,12 +1845,12 @@ team's number against the FBS field. No team identity columns.
 | explosive | double | Overall explosive-play rate. |
 | third_down_success | double | Third-down success rate. |
 | red_zone_success | double | Red-zone success rate. |
-| play_stuffed | double | Stuffed-play rate. |
+| play_stuffed | double | Run-stuff rate over rushes (see `team_summaries.play_stuffed`). |
 | nonExplosiveEpaPerPlay | double | EPA per play on non-explosive plays. |
 | havoc | double | Havoc rate. |
 | yardsrush | double | Yards per rush. |
 | lineyards | double | Offensive-line-credited rushing yards. |
-| opportunity_run | double | Opportunity-run rate. |
+| opportunity_run | double | Share of rushes gaining 4+ yards. |
 | third_down_distance | double | Third-down distance to go. |
 
 _Release tag: `espn_cfb_percentiles`_
@@ -1943,7 +1946,7 @@ kept, FCS opponents and bowls included; "FBS only" is a consumer filter. Ids are
 | is_home | logical | The team was the listed home side. |
 | points_for | integer | The team's final score. |
 | points_against | integer | The opponent's final score. |
-| plays | integer | The team's EPA-scored offensive plays (`adv_team_gamelog.EPA_plays`). |
+| plays | integer | The team's offensive scrimmage plays (`adv_team_gamelog.scrimmage_plays`), the plays `epa_per_play` averages over. Until 2026-10 it was `EPA_plays`, which also counts special teams (2025 median 77 vs 66). |
 | epa_per_play | double | Offensive EPA per play (`adv_team_gamelog.EPA_per_play`). |
 | success_rate | double | Offensive EPA success rate (`adv_situational.EPA_success_rate`); null when the game has no situational row for the team. |
 

@@ -1075,6 +1075,52 @@ def player_dispersion(rows: pl.DataFrame, keys: list[str]) -> pl.DataFrame:
     )
 
 
+#: E3 (owner decision: blank them for now): above this share of a season's
+#: incompletions naming no receiver, the receiving table's per-target rates are
+#: null. ``targets`` counts only the targets ESPN attributes, and an unnamed
+#: incompletion drops out of every receiver's denominator. Measured on the
+#: summaries plays (FBS/FBS, EPA non-null), the seasons fall into two groups with
+#: nothing between 0.235 and 0.415:
+#: 2014-2020 0.220-0.235 (pooled catch rate 0.658-0.684), against
+#: 2021 0.415, 2022 0.495, 2023 0.560, 2024 0.772 (pooled catch 0.742 -> 0.880),
+#: and 2025 0.079, 2026 0.057 (pooled catch 0.652, 0.653). 0.30 sits in that gap.
+MAX_UNATTRIBUTED_INCOMPLETION_SHARE = 0.30
+#: receiving columns over attributed targets (``plays`` == targets in that table),
+#: plus the spread of a receiver's per-game EPA per target
+_PER_TARGET_RECEIVING = (
+    "EPAplay",
+    "success",
+    "yardsplay",
+    "catchpct",
+    *_DISPERSION_COLS,
+)
+
+
+def unattributed_incompletion_share(plays: pl.DataFrame) -> float | None:
+    """Share of the incompletions in ``plays`` that name no receiver (E3).
+
+    An incompletion is a pass attempt that is not a completion, an interception or
+    a sack (``summaries_input``'s ``incompletion_player`` rule). It is
+    unattributed when it gives the receiving table no row: no target and no
+    reception id. None when there are no incompletions.
+    """
+    inc = plays.filter(
+        (pl.col("pass") == 1)
+        & (pl.col("pass_attempt") == 1)
+        & (pl.col("completion").fill_null(0.0) == 0)
+        & (pl.col("int").fill_null(0.0) == 0)
+        & (pl.col("sack_vec").fill_null(0.0) == 0)
+    )
+    if inc.height == 0:
+        return None
+    return inc.select(
+        (
+            pl.col("target_player_id").is_null()
+            & pl.col("reception_player_id").is_null()
+        ).mean()
+    ).item()
+
+
 #: Football Outsiders' cut-points on a carry's own yards (``yds_rushed``, penalty
 #: yardage excluded): the line takes 4 or fewer, losses included; the second level
 #: 5-10; the open field 11 or more. The same cuts ``line_yards`` /
@@ -1737,6 +1783,19 @@ def build_team_summaries(
     wr_data = summarize_receiver(wr_rows, by=wr_keys).join(
         player_dispersion(wr_rows, wr_keys), on=wr_keys, how="left", validate="1:1"
     )
+    # E3: blanked BEFORE ranking, so every _rank / _pct / _pos_pct of these columns
+    # is null too, and league_averages (no finite value -> no row) takes no mean
+    unattributed = unattributed_incompletion_share(team_off)
+    if (unattributed or 0.0) > MAX_UNATTRIBUTED_INCOMPLETION_SHARE:
+        print(
+            f"[summaries {yr}] receiving: {unattributed:.1%} of incompletions name "
+            f"no receiver (> {MAX_UNATTRIBUTED_INCOMPLETION_SHARE:.0%}); "
+            "per-target rates null",
+            flush=True,
+        )
+        wr_data = wr_data.with_columns(
+            pl.lit(None, dtype=pl.Float64).alias(c) for c in _PER_TARGET_RECEIVING
+        )
     wr_data = _attach_leader_ranks(
         wr_data,
         keys=wr_keys,

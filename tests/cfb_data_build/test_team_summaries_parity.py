@@ -138,6 +138,8 @@ DIVERGENT_PREFIXES_FROM_R = {
         "available_yards_pct",
     ),
     "passing": ("success",),
+    # E3: 2023 names no receiver on 56% of incompletions, so per-target rates are null
+    "receiving": ("EPAplay", "success", "yardsplay", "catchpct"),
 }
 
 # Python-only ADDITIVE columns: the leader percentiles / ranks added in #50

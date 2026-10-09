@@ -1789,7 +1789,7 @@ One row per (team, receiver) per season (e.g. 2,295 in 2025). Identity columns a
 | --- | --- | --- |
 | player_id | double | ESPN athlete id of the receiver. |
 | receiver_player_name | character | Receiver display name. |
-| plays | integer | Targets (plays the receiver was involved in). |
+| plays | integer | Attributed targets (pass plays naming the receiver as target or catcher). |
 | games | integer | Distinct games the receiver appeared in. |
 | team_games | integer | Team's games played (leaderboard-minimum denominator). |
 | playsgame | double | Targets per game. |
@@ -1801,8 +1801,8 @@ One row per (team, receiver) per season (e.g. 2,295 in 2025). Identity columns a
 | yardsgame | double | Yards per game. |
 | success | double | Success rate (positive-EPA share). |
 | comp | integer | Receptions (catches). |
-| targets | integer | Targets. |
-| catchpct | double | `comp / targets` (catch rate). |
+| targets | integer | Attributed targets: passes ESPN charts to this receiver. An incompletion naming no receiver counts for nobody, so this undercounts real targets (see below). |
+| catchpct | double | `comp / targets` (catch rate). Null in seasons whose per-target rates are blanked (below). |
 | passing_td | double | Receiving touchdowns. |
 | fumbles | double | Fumbles on receiving plays. |
 | TEPA_rank, EPAgame_rank, EPAplay_rank, success_rank, catchpct_rank, yards_rank, yardsplay_rank, yardsgame_rank | double | National ranks of the like-named metric (1 = best). |
@@ -1811,6 +1811,18 @@ One row per (team, receiver) per season (e.g. 2,295 in 2025). Identity columns a
 | EPAplay_p10, EPAplay_p90 | double | Floor and ceiling: 10th / 90th percentile of the per-game EPA/play (linear interpolation, R type 7). Null under 3 games. |
 | boom_rate, bust_rate | double | Share of the player's games more than one sd above / below his own per-game mean (the unweighted mean of those games). Strict, so a player whose games are all equal is neither. Null under 3 games. |
 | boom_rate_rank | double | National rank of `boom_rate` among qualifiers (1 = highest). The other dispersion columns are descriptive and carry no rank or percentile. |
+
+**Per-target rates are null when ESPN stopped naming receivers.** ESPN names no receiver on
+part of each season's incompletions; those throws drop out of every receiver's `targets`, so
+the per-target rates read high (2024 pooled catch rate 0.880 against 0.652 in 2025). When more
+than 30% of a season's incompletions (FBS/FBS, the plays this table is built from) name no
+receiver (`team_summaries.MAX_UNATTRIBUTED_INCOMPLETION_SHARE`), `EPAplay`, `success`,
+`yardsplay`, `catchpct`, `EPAplay_sd`, `EPAplay_p10`, `EPAplay_p90`, `boom_rate` and
+`bust_rate` are null, with every `_rank`, `_pct` and `_pos_pct` of them, and
+`cfb_league_averages` has no row for them. The counts (`plays`, `comp`, `targets`, `yards`)
+and the per-game columns stay. Measured share: 2014–2020 0.22–0.24, 2021 0.42, 2022 0.50,
+2023 0.56, 2024 0.77, 2025 0.08, 2026 0.06, so **2021–2024 are blanked**. The 2014–2020
+share still drops about a fifth of incompletions, so those per-target rates read somewhat high.
 
 _Release tag: `espn_cfb_receiving`_
 

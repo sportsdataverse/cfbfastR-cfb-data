@@ -22,12 +22,12 @@ from pathlib import Path
 
 import polars as pl
 
-from cfb_data_build.config import SUMMARIES_REGISTRY
+from cfb_data_build.config import REGISTRY, SUMMARIES_REGISTRY
 from cfb_data_build.io import dataset_stem, write_dataset
 from cfb_data_build.paper_index import attach_luck, paper_index_games_table
 from cfb_data_build.publish import publish_dataset
 from cfb_data_build.summaries_input import prepare_plays_input
-from cfb_data_build.team_summaries import build_team_summaries
+from cfb_data_build.team_summaries import build_team_summaries, team_pass_breakups
 
 
 def _load_season_rosters(season: int, *, base: str = "cfb") -> pl.DataFrame:
@@ -52,6 +52,26 @@ def _load_season_rosters(season: int, *, base: str = "cfb") -> pl.DataFrame:
     return load_cfb_rosters(seasons=[season])
 
 
+def _load_season_player_box(season: int, *, base: str = "cfb") -> pl.DataFrame:
+    """The season's ``player_box``: this build's output under ``base`` first, else the release.
+
+    Read for ESPN's box ``passesDefended`` (E7). The daily processor builds
+    ``player_box`` before the summaries, as it does ``cfb_rosters``.
+    """
+    spec = REGISTRY["player_box"]
+    local = (
+        Path(base)
+        / spec.dataset
+        / "parquet"
+        / f"{dataset_stem(spec.stem, season)}.parquet"
+    )
+    if local.exists():
+        return pl.read_parquet(local)
+    from sportsdataverse.cfb import load_cfb_player_box
+
+    return load_cfb_player_box(seasons=[season])
+
+
 def _keep_games(df: pl.DataFrame, game_ids: pl.Series) -> pl.DataFrame:
     """Rows of ``df`` whose ``game_id`` is in ``game_ids``, compared in the frame's own id dtype."""
     if not (game_ids.dtype.is_integer() or game_ids.dtype == pl.Utf8):
@@ -72,6 +92,7 @@ def build_summaries_season(
     pbp: pl.DataFrame | None = None,
     schedule: pl.DataFrame | None = None,
     rosters: pl.DataFrame | None = None,
+    player_box: pl.DataFrame | None = None,
 ) -> dict[str, int]:
     """Build (and optionally publish) the 6-table family for one season.
 
@@ -88,6 +109,9 @@ def build_summaries_season(
         rosters: pre-loaded ``cfb_rosters`` frame for the player tables'
             ``position_group`` (loaded when ``None``, see
             :func:`_load_season_rosters`).
+        player_box: pre-loaded ``player_box`` frame whose ``passesDefended``
+            expected turnovers count (loaded when ``None``, see
+            :func:`_load_season_player_box`; an empty frame keeps the text breakups).
 
     Returns:
         Row counts per table key.
@@ -131,6 +155,9 @@ def build_summaries_season(
             flush=True,
         )
 
+    if player_box is None:
+        player_box = _load_season_player_box(season, base=season_base)
+
     plays = prepare_plays_input(pbp, schedule, season)
     # Paper Index shares of every scored game, from the same pbp as the plays
     paper_games = paper_index_games_table(pbp)
@@ -148,7 +175,11 @@ def build_summaries_season(
         plays = _keep_games(plays, snapshot_ids)
         paper_games = _keep_games(paper_games, snapshot_ids)
     tables = build_team_summaries(
-        plays, season, through_week=through_week, rosters=rosters
+        plays,
+        season,
+        through_week=through_week,
+        rosters=rosters,
+        pass_breakups=team_pass_breakups(player_box),
     )
     # Attached after build_team_summaries, so league_averages and the
     # conference percentiles in there never see the outcome-derived columns.

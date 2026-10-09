@@ -1623,9 +1623,9 @@ that earned a column in the 2026-09-29 exploration, CFB 2022–2025 and NFL 2016
 | havoc_EPAgame_def | double | EPA per game on the opponents' havoc snaps against this defense: what its havoc cost them. |
 | havoc_EPAgame_margin | double | `havoc_EPAgame_off - havoc_EPAgame_def`; positive when the team's havoc costs opponents more than theirs costs it. |
 | havoc_margin | double | Havoc rate created minus allowed: `havoc_def - havoc_off`, in shares of plays. `def - off` because havoc is bad for an offense, so positive is good. It is the most stable havoc measure (odd-vs-even-games reliability 0.65 CFB, 0.59 NFL) and pace-neutral, unlike a per-game count. |
-| expected_turnovers_off | double | Expected giveaways per game: half of the team's own scrimmage fumbles, plus interceptions at the season's national share of its passes defensed (INT + PBU). |
+| expected_turnovers_off | double | Expected giveaways per game: half of the team's own scrimmage fumbles, plus interceptions at the season's national share of its passes defensed (INT + PBU). Breakups come from ESPN's game box `passesDefended` (breakups only, so INT + PD) when it covers at least 95% of the season's team-games (2024 on), else from the play text. |
 | expected_turnovers_def | double | Expected takeaways per game: half of the opponents' scrimmage fumbles, plus interceptions at that share of the passes this defense defensed. |
-| expected_turnover_margin | double | Connelly's expected turnover margin per game, `expected_turnovers_def - expected_turnovers_off`: half of every scrimmage fumble in the team's games recovered by each side, plus interceptions at the season's national share of passes defensed (INT + PBU). The share is measured from the season (2025: 29.8%), not `adv_turnover`'s fixed 0.22, because ESPN's text under-records pass breakups against official stats. |
+| expected_turnover_margin | double | Connelly's expected turnover margin per game, `expected_turnovers_def - expected_turnovers_off`: half of every scrimmage fumble in the team's games recovered by each side, plus interceptions at the season's national share of passes defensed (INT + PBU). The share is measured from the season, not `adv_turnover`'s fixed 0.22: over the box breakups it is 19.6% (2024) and 19.1% (2025); over the text breakups, which ESPN under-records (2025 weeks 1–8: 0.47 a team-game, weeks 9+: 3.22), it read 85.6% and 29.8%. |
 | turnover_luck_off | double | Offensive turnover luck, points per game: `5.0 * (expected_turnovers_off - turnovers_off)`, positive when the offense gave the ball away less than expected. |
 | turnover_luck_def | double | Defensive turnover luck, points per game: `5.0 * (turnovers_def - expected_turnovers_def)`, positive when the defense took it away more than expected. |
 | turnover_luck | double | Turnover luck in points per game: `5.0 * (turnover_margin - expected_turnover_margin)`, the scale `adv_turnover`'s `turnover_luck` uses; equals `turnover_luck_off + turnover_luck_def`. |
@@ -1789,7 +1789,7 @@ One row per (team, receiver) per season (e.g. 2,295 in 2025). Identity columns a
 | --- | --- | --- |
 | player_id | double | ESPN athlete id of the receiver. |
 | receiver_player_name | character | Receiver display name. |
-| plays | integer | Targets (plays the receiver was involved in). |
+| plays | integer | Attributed targets (pass plays naming the receiver as target or catcher). |
 | games | integer | Distinct games the receiver appeared in. |
 | team_games | integer | Team's games played (leaderboard-minimum denominator). |
 | playsgame | double | Targets per game. |
@@ -1801,8 +1801,8 @@ One row per (team, receiver) per season (e.g. 2,295 in 2025). Identity columns a
 | yardsgame | double | Yards per game. |
 | success | double | Success rate (positive-EPA share). |
 | comp | integer | Receptions (catches). |
-| targets | integer | Targets. |
-| catchpct | double | `comp / targets` (catch rate). |
+| targets | integer | Attributed targets: passes ESPN charts to this receiver. An incompletion naming no receiver counts for nobody, so this undercounts real targets (see below). |
+| catchpct | double | `comp / targets` (catch rate). Null in seasons whose per-target rates are blanked (below). |
 | passing_td | double | Receiving touchdowns. |
 | fumbles | double | Fumbles on receiving plays. |
 | TEPA_rank, EPAgame_rank, EPAplay_rank, success_rank, catchpct_rank, yards_rank, yardsplay_rank, yardsgame_rank | double | National ranks of the like-named metric (1 = best). |
@@ -1811,6 +1811,18 @@ One row per (team, receiver) per season (e.g. 2,295 in 2025). Identity columns a
 | EPAplay_p10, EPAplay_p90 | double | Floor and ceiling: 10th / 90th percentile of the per-game EPA/play (linear interpolation, R type 7). Null under 3 games. |
 | boom_rate, bust_rate | double | Share of the player's games more than one sd above / below his own per-game mean (the unweighted mean of those games). Strict, so a player whose games are all equal is neither. Null under 3 games. |
 | boom_rate_rank | double | National rank of `boom_rate` among qualifiers (1 = highest). The other dispersion columns are descriptive and carry no rank or percentile. |
+
+**Per-target rates are null when ESPN stopped naming receivers.** ESPN names no receiver on
+part of each season's incompletions; those throws drop out of every receiver's `targets`, so
+the per-target rates read high (2024 pooled catch rate 0.880 against 0.652 in 2025). When more
+than 30% of a season's incompletions (FBS/FBS, the plays this table is built from) name no
+receiver (`team_summaries.MAX_UNATTRIBUTED_INCOMPLETION_SHARE`), `EPAplay`, `success`,
+`yardsplay`, `catchpct`, `EPAplay_sd`, `EPAplay_p10`, `EPAplay_p90`, `boom_rate` and
+`bust_rate` are null, with every `_rank`, `_pct` and `_pos_pct` of them, and
+`cfb_league_averages` has no row for them. The counts (`plays`, `comp`, `targets`, `yards`)
+and the per-game columns stay. Measured share: 2014–2020 0.22–0.24, 2021 0.42, 2022 0.50,
+2023 0.56, 2024 0.77, 2025 0.08, 2026 0.06, so **2021–2024 are blanked**. The 2014–2020
+share still drops about a fifth of incompletions, so those per-target rates read somewhat high.
 
 _Release tag: `espn_cfb_receiving`_
 

@@ -305,7 +305,8 @@ def _summaries(
     """
     seen: dict = {}
 
-    def fake_build(plays, _season, *, through_week=None, rosters=None):
+    # pass_breakups: the box-score passes defended the builder now takes (E7)
+    def fake_build(plays, _season, *, through_week=None, rosters=None, pass_breakups=None):
         seen["play_games"] = set(plays["game_id"].to_list())
         return {k: None for k in SUMMARIES_REGISTRY} | {
             "team_summaries": _teams(ASU, OKST, UCF, TEXAS)
@@ -333,6 +334,7 @@ def _summaries(
         pbp=_pbp(2024),
         schedule=_schedule() if schedule is None else schedule,
         rosters=pl.DataFrame(),
+        player_box=pl.DataFrame(),  # no box: keeps the stub offline (E7 loader)
     )
     # the plays and the shares were cut by the same games
     assert seen["share_games"] == seen["play_games"]

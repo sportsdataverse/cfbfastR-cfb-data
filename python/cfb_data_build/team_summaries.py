@@ -712,7 +712,80 @@ def _summarize_drives(plays: pl.DataFrame) -> pl.DataFrame:
     )
 
 
-def _havoc_and_expected_turnovers(team_off: pl.DataFrame) -> pl.DataFrame:
+#: E7: the share of a season's team-games ESPN's box ``passesDefended`` must cover
+#: before expected turnovers count it. Below it the whole season stays on the text
+#: breakups, so two breakup sources are never ranked against each other. Measured
+#: over FBS/FBS team-games: 2024 0.999, 2025 1.000, 2026 1.000 (played); 2023 0.58
+#: (from week 5 only); 2016-2022 under 0.18; no column before 2016.
+MIN_BOX_PD_COVERAGE = 0.95
+
+
+def team_pass_breakups(player_box: pl.DataFrame | None) -> pl.DataFrame | None:
+    """Pass breakups per ``(game_id, def_pos_team_id)`` from ESPN's game box, or None.
+
+    ESPN's college ``passesDefended`` ("PD") is pass breakups ONLY, not breakups plus
+    interceptions: on 2025 weeks 9+ and the postseason, where the play text charts
+    breakups again, a team-game's PD fit 0.94 x text breakups + 0.10 x INTs
+    (corr 0.94 with the breakups, equal to them on 86% of team-games), and PD is below
+    the INT count on 5% of team-games. So passes defended = INT + PD. Unlike the text
+    (2025 weeks 1-8: 0.47 breakups a team-game; weeks 9+: 3.22), PD holds at ~3.2 in
+    2024 and in both halves of 2025.
+
+    None when ``player_box`` is None or predates the column (before 2016). Ids are
+    joined as strings parsed from ESPN's integers; a float id raises rather than
+    joining through ``"401.0"``.
+    """
+    if player_box is None or "passesDefended" not in player_box.columns:
+        return None
+    for k in ("game_id", "team_id"):
+        dtype = player_box.schema[k]
+        if not (dtype.is_integer() or dtype == pl.Utf8):
+            raise TypeError(f"player_box {k} is {dtype}: ids are integer or string")
+    return (
+        player_box.filter(
+            (pl.col("category") == "defensive") & pl.col("passesDefended").is_not_null()
+        )
+        .group_by("game_id", "team_id")
+        .agg(box_pbu=pl.col("passesDefended").cast(pl.Float64).sum())
+        .select(
+            pl.col("game_id").cast(pl.Utf8),
+            pl.col("team_id").cast(pl.Utf8).alias("def_pos_team_id"),
+            "box_pbu",
+        )
+    )
+
+
+def _box_passes_defended(
+    team_games: pl.DataFrame, pass_breakups: pl.DataFrame | None
+) -> pl.DataFrame:
+    """Swap each team-game's text ``defended`` for INT + box PD, when the season has the box.
+
+    A team-game the box misses keeps its text count. A season whose box covers less
+    than :data:`MIN_BOX_PD_COVERAGE` of its team-games is returned as it came.
+    """
+    if pass_breakups is None:
+        return team_games
+    keys = ["game_id", "def_pos_team_id"]
+    for k in keys:
+        assert team_games.schema[k] == pass_breakups.schema[k], (
+            f"{k}: plays {team_games.schema[k]} != box {pass_breakups.schema[k]}"
+        )
+    joined = team_games.join(pass_breakups, on=keys, how="left", validate="m:1")
+    box = pl.col("box_pbu")
+    if joined.height == 0 or joined.select(box.is_not_null().mean()).item() < (
+        MIN_BOX_PD_COVERAGE
+    ):
+        return team_games
+    return joined.with_columns(
+        defended=pl.when(box.is_not_null())
+        .then(pl.col("ints") + box)
+        .otherwise(pl.col("defended"))
+    ).drop("box_pbu")
+
+
+def _havoc_and_expected_turnovers(
+    team_off: pl.DataFrame, pass_breakups: pl.DataFrame | None = None
+) -> pl.DataFrame:
     """Whole-team havoc EPA per game and Connelly's expected turnover margin per game.
 
     * ``havoc_EPAgame_off``: EPA per game on the team's own havoc snaps (the cost,
@@ -726,26 +799,42 @@ def _havoc_and_expected_turnovers(team_off: pl.DataFrame) -> pl.DataFrame:
       official stats (2025: 29.8% of INT + PBU are INTs), so a fixed 22% would read
       every defense's expected interceptions low. Kick-play turnovers are in ``turnover_margin`` but not here, so a muff
       reads as luck -- recoveries of loose kicks are close to a coin flip anyway.
+    * Passes defended come from the text breakups unless ``pass_breakups``
+      (:func:`team_pass_breakups`) covers the season (E7): ESPN's text charts a
+      breakup on 1-12% of 2025 weeks 1-8 incompletions and 27% from week 9, so the
+      text count moves mid-season while the box count does not. The INT share is
+      taken over the same counts.
 
     Counts are cast to Float64 before any subtraction: polars sums booleans as
     UInt32, and takeaways - giveaways wraps to ~4.3e9 whenever it should go negative.
     """
-    defended = (pl.col("int") == 1) | pl.col("pass_breakup_player_name").is_not_null()
-    on_pass = pl.col("pass") == 1
-    int_share = team_off.select(
-        (pl.col("int") == 1).sum().cast(pl.Float64)
-        / defended.filter(on_pass).sum().cast(pl.Float64)
+    is_int = pl.col("int") == 1
+    team_games = _box_passes_defended(
+        team_off.filter(pl.col("pass") == 1)
+        .group_by("game_id", "pos_team_id", "def_pos_team_id")
+        .agg(
+            ints=is_int.sum().cast(pl.Float64),
+            defended=(is_int | pl.col("pass_breakup_player_name").is_not_null())
+            .sum()
+            .cast(pl.Float64),
+        ),
+        pass_breakups,
+    )
+    int_share = team_games.select(
+        pl.col("ints").sum() / pl.col("defended").sum()
     ).item()
 
     def side(group: str, suffix: str) -> pl.DataFrame:
+        defended = team_games.group_by(group).agg(pl.col("defended").sum())
         return (
             team_off.group_by(group)
             .agg(
                 games=pl.col("game_id").n_unique().cast(pl.Float64),
                 havoc_epa=pl.col("EPA").filter(pl.col("havoc") == True).sum(),
                 fumbles=(pl.col("fumble_vec") == 1).sum().cast(pl.Float64),
-                defended=defended.filter(on_pass).sum().cast(pl.Float64),
             )
+            .join(defended, on=group, how="left")
+            .with_columns(pl.col("defended").fill_null(0.0))
             .rename({group: "pos_team_id"})
             .rename(lambda c: c if c == "pos_team_id" else f"{c}{suffix}")
         )
@@ -1307,6 +1396,7 @@ def build_team_summaries(
     through_week: int | None = None,
     groups: pl.DataFrame | None = None,
     rosters: pl.DataFrame | None = None,
+    pass_breakups: pl.DataFrame | None = None,
 ) -> dict[str, pl.DataFrame]:
     """Build the 6 season tables from a cleaned cfbfastR pbp frame (R build lines 554-958).
 
@@ -1316,6 +1406,8 @@ def build_team_summaries(
     that ``fbs_class`` is read from (loaded from the release when ``None``).
     ``rosters`` is the season's ``cfb_rosters`` frame the player tables'
     ``position_group`` comes from (``None`` leaves it and ``_pos_pct`` null).
+    ``pass_breakups`` is :func:`team_pass_breakups` of the season's ``player_box``,
+    the passes defended expected turnovers count (``None`` keeps the text breakups).
     """
     plays = add_derived_metrics(plays_input)
     warn_implausible_epa_games(plays, yr)
@@ -1410,7 +1502,11 @@ def build_team_summaries(
         overall.join(drives_data, on="pos_team_id", how="left", suffix="_drive")
         .join(pass_data, on="pos_team_id", how="left", suffix="_pass")
         .join(rush_data, on="pos_team_id", how="left", suffix="_rush")
-        .join(_havoc_and_expected_turnovers(team_off), on="pos_team_id", how="left")
+        .join(
+            _havoc_and_expected_turnovers(team_off, pass_breakups),
+            on="pos_team_id",
+            how="left",
+        )
         .pipe(_add_turnover_luck)
     )
 

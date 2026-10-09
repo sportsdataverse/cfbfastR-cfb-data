@@ -33,7 +33,8 @@ def _snapshot_ids(monkeypatch, tmp_path, season: int, through_week: int | None):
     schedule = games.select("game_id", "week", "season_type", "season_type_id")
     seen: dict = {}
 
-    def fake_build(plays, _season, *, through_week=None, rosters=None):
+    # pass_breakups: the box-score passes defended the builder now takes (E7)
+    def fake_build(plays, _season, *, through_week=None, rosters=None, pass_breakups=None):
         seen["ids"] = set(plays["game_id"].to_list())
         seen["through_week"] = through_week
         return {k: None for k in SUMMARIES_REGISTRY}
@@ -64,6 +65,7 @@ def _snapshot_ids(monkeypatch, tmp_path, season: int, through_week: int | None):
         pbp=pbp,
         schedule=schedule,
         rosters=pl.DataFrame(),
+        player_box=pl.DataFrame(),  # no box: keeps the stub offline (E7 loader)
     )
     # the snapshot must reach the builder AS a snapshot: that is what exempts it
     # from the full-season no-op gate (checks.assert_adjustment_is_real)

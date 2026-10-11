@@ -267,6 +267,12 @@ def main(argv: Optional[List[str]] = None) -> int:
                 write_parquet(rosters, p)
                 produced.append(p)
                 manifest.append(_row("rosters", current, rosters, "cfb_rosters_crosswalk() [current]"))
+                # Also keep a per-season copy of the current snapshot, so history accumulates from 2026 on
+                # (the season-less file above is what load_cfb_rosters_crosswalk reads and is overwritten).
+                # Only the CURRENT season is ever written: a past season here would be today's roster relabeled.
+                ps = args.out_dir / f"cfb_rosters_crosswalk_{current}.parquet"
+                write_parquet(rosters.with_columns(pl.lit(current, dtype=pl.Int32).alias("season")), ps)
+                produced.append(ps)
             else:
                 logger.warning("rosters crosswalk empty; skipped")
         except Exception as exc:  # noqa: BLE001
@@ -277,6 +283,14 @@ def main(argv: Optional[List[str]] = None) -> int:
         return 1
 
     manifest_path = args.out_dir / "cfb_crosswalk_in_data_repo.csv"
+    if args.upload and not manifest_path.exists():
+        # The manifest is gitignored, so a fresh checkout has none to merge into: seed it from the release,
+        # or the --clobber upload would publish a manifest listing only this run's seasons.
+        subprocess.run(
+            ["gh", "release", "download", args.release_tag, "-R", args.repo, "-p", manifest_path.name,
+             "-D", str(manifest_path.parent)],
+            check=False, capture_output=True,
+        )
     _write_manifest(manifest, manifest_path)
     produced.append(manifest_path)
 
@@ -303,10 +317,19 @@ def _row(dataset: str, season: int, df: pl.DataFrame, source_fn: str) -> dict:
 def _write_manifest(rows: List[dict], path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     fields = ["dataset", "season", "row_count", "col_count", "generated_at_utc", "source_fn"]
+    # Merge with the existing manifest: a one-season daily run must update its own rows, not publish a
+    # manifest that lists only that season (the asset is uploaded with --clobber).
+    built = {(r["dataset"], str(r["season"])) for r in rows}
+    kept: List[dict] = []
+    if path.exists():
+        with path.open(newline="", encoding="utf-8") as fh:
+            kept = [r for r in csv.DictReader(fh) if (r.get("dataset"), str(r.get("season"))) not in built]
+    merged = sorted(kept + rows, key=lambda r: (str(r["dataset"]), str(r["season"])))
     with path.open("w", newline="", encoding="utf-8") as fh:
-        writer = csv.DictWriter(fh, fieldnames=fields)
+        writer = csv.DictWriter(fh, fieldnames=fields, extrasaction="ignore")
         writer.writeheader()
-        writer.writerows(rows)
+        writer.writerows(merged)
+    rows = merged
     logger.info("wrote manifest %s (%s rows)", path.name, len(rows))
 
 

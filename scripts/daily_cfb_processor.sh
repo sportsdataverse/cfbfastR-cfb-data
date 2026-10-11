@@ -215,6 +215,16 @@ for i in $(seq "${START_YEAR}" "${END_YEAR}"); do
       for ds in $REC_NO_STORE; do run_py "$ds" --publish; done
     fi
 
+    # ESPN x Fox x Yahoo identity crosswalk (cfb_crosswalk tag): teams + schedule every run, rosters on the
+    # Sunday chain only (one current-roster snapshot; 2 workers -- 4 drew ESPN 403 retries on 2026-10-11).
+    # It was hand-run only and silently stopped at 2025; built here, cfb/crosswalk is committed below with
+    # the season. A failure marks the season red instead of passing quietly.
+    XW_DS="teams schedule"
+    if [ "$(date -u +%u)" = 7 ] && [ "$i" = "$END_YEAR" ]; then XW_DS="teams schedule rosters"; fi
+    "$PY" python/build_cfb_crosswalk.py -s "$i" -e "$i" --datasets $XW_DS --roster-workers 2 --upload || {
+      rc=$?; echo "::warning ::cfb crosswalk for season $i exited with code $rc"; SEASON_RC=$rc
+    }
+
     echo "RSCRIPT_RC=$SEASON_RC" > "/tmp/_rc_${i}"
     # the tee pipeline runs this block in a subshell, so a push failure is
     # carried out through a sentinel like the season rc above

@@ -106,16 +106,19 @@ def build_rosters(season: int, teams_xwalk: pl.DataFrame, workers: int) -> pl.Da
     """
     pairs = (
         teams_xwalk.filter(pl.col("espn_team_id").is_not_null() & pl.col("fox_team_id").is_not_null())
-        .select("espn_team_id", "fox_team_id")
-        .unique()
+        .select("espn_team_id", "fox_team_id", "yahoo_team_id")
+        .unique(subset=["espn_team_id", "fox_team_id"])
     )
     if pairs.height == 0:
         logger.warning("season %s: no espn<->fox team pairs; rosters crosswalk empty", season)
         return pl.DataFrame()
 
-    def one(espn_id: int, fox_id: str) -> Optional[pl.DataFrame]:
+    def one(espn_id: int, fox_id: str, yahoo_id: Optional[str] = None) -> Optional[pl.DataFrame]:
+        # Yahoo joins only when the teams crosswalk already holds its team id (sportsdataverse-py #762);
+        # without one, a per-team Yahoo directory lookup costs two requests and mostly fails.
+        kw = {"providers": ("espn", "fox", "yahoo"), "yahoo_team_id": yahoo_id} if yahoo_id else {"providers": ("espn", "fox")}
         try:
-            df = cfb_rosters_crosswalk(espn_id, fox_id, season=season, providers=("espn", "fox"))
+            df = cfb_rosters_crosswalk(espn_id, fox_id, season=season, **kw)
         except Exception as exc:  # noqa: BLE001 -- one team must not sink the season
             logger.warning("season %s team espn=%s fox=%s: roster crosswalk failed: %s", season, espn_id, fox_id, exc)
             return None
@@ -131,7 +134,7 @@ def build_rosters(season: int, teams_xwalk: pl.DataFrame, workers: int) -> pl.Da
     rows = list(pairs.iter_rows(named=True))
     frames: List[pl.DataFrame] = []
     with ThreadPoolExecutor(max_workers=max(1, workers)) as pool:
-        futures = {pool.submit(one, r["espn_team_id"], r["fox_team_id"]): r for r in rows}
+        futures = {pool.submit(one, r["espn_team_id"], r["fox_team_id"], r["yahoo_team_id"]): r for r in rows}
         done = 0
         for fut in as_completed(futures):
             done += 1

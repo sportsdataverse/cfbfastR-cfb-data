@@ -4,14 +4,15 @@ R's ``publish_dataset`` (``R/_data_utils.R:170-181``) uploads each format to the
 ``sportsdataverse-data`` release under the dataset's tag, creating the release
 if absent. ``cfb_model_publish.artifacts.upload_artifacts`` is model-discovery
 specific, so we reuse its low-level gh helpers (``_gh_release_exists`` for the
-create-if-missing guard, ``_gh_runner`` for the ``gh`` invocation) with an
-explicit dataset file list. ``runner`` / ``exists_check`` are injectable for
+create-if-missing guard; ``gh`` itself runs through :func:`gh_retry`, which keeps
+``_gh_runner``'s retry knobs but never repeats a 4xx) with an explicit dataset file list. ``runner`` / ``exists_check`` are injectable for
 hermetic tests (same convention as ``upload_artifacts``).
 """
 
 from __future__ import annotations
 
 import hashlib
+import logging
 import re
 import subprocess
 import time
@@ -331,6 +332,25 @@ def gh_retry(args: list[str]) -> None:
         time.sleep(GH_RETRY_BACKOFF_S * attempt)
 
 
+log = logging.getLogger(__name__)
+
+
+def report_missing(tag: str, repo: str, name: str, digests) -> None:
+    """After a failed upload, say loudly if ``--clobber`` deleted the asset and nothing replaced it."""
+    try:
+        now = digests(tag, repo)
+    except Exception as exc:  # noqa: BLE001 -- the upload error is what propagates
+        log.error("%s: upload of %s failed and the tag cannot be re-listed: %s", tag, name, exc)
+        return
+    if now is None or name not in now:
+        log.error(
+            "ASSET MISSING: %s:%s was deleted by --clobber and not re-uploaded; "
+            "consumers get a 404 until the next publish",
+            tag,
+            name,
+        )
+
+
 def _sha256(path: Path) -> str:
     with open(path, "rb") as fh:
         return "sha256:" + hashlib.file_digest(fh, "sha256").hexdigest()
@@ -349,6 +369,11 @@ def publish_dataset(
 ) -> dict[str, object]:
     """Upload a dataset+season's files to each release tag (create-if-missing, clobber).
 
+    Default ``gh`` transport is :func:`gh_retry` (CFB_GH_RETRY_ATTEMPTS /
+    CFB_GH_RETRY_BACKOFF_S / CFB_GH_TIMEOUT_SECONDS, transient failures only).
+    A final upload failure re-lists the tag and logs ASSET MISSING for a file
+    ``--clobber`` deleted, then raises.
+
     Only what changed uploads: ONE release listing per tag gives every asset's
     sha256, and the rds/csv(.gz) -- whose bytes move every build (rds write
     time, gzip mtime) but are derived from the parquet -- are skipped whole when
@@ -358,7 +383,7 @@ def publish_dataset(
     release) is injectable for tests; an injected ``exists_check`` alone keeps
     the old probe-and-upload-everything behaviour.
     """
-    run = runner or _gh_runner
+    run = runner or gh_retry
     exists = exists_check or _gh_release_exists
     if digests is None:
         digests = (
@@ -393,7 +418,11 @@ def publish_dataset(
             todo = [f for f in files if f is pq or remote.get(f.name) != _sha256(f)]
         skipped[repo] = [f.name for f in files if f not in todo]
         for f in todo:  # a failed sibling raises before the parquet goes
-            run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+            try:
+                run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+            except subprocess.CalledProcessError:
+                report_missing(spec.tag, repo, f.name, digests)
+                raise
         if skipped[repo]:
             print(f"{spec.tag}: {len(skipped[repo])} unchanged asset(s) skipped, {len(todo)} uploaded")
         if todo:

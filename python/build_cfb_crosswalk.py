@@ -73,7 +73,7 @@ from sportsdataverse.cfb.cfb_schedule import most_recent_cfb_season
 from sportsdataverse.release import upload_release_sidecars
 
 from cfb_model_build.cfb_model_publish.artifacts import PKG_FUNCTION
-from cfb_data_build.publish import _release_digests, _sha256, gh_retry
+from cfb_data_build.publish import _release_digests, _sha256, gh_retry, report_missing
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 
@@ -202,7 +202,7 @@ def upload_assets(paths: List[Path], tag: str, repo: str, *, run=None, digests=_
         try:
             run(["release", "upload", tag, str(p), "--clobber", "-R", repo])
         except subprocess.CalledProcessError:
-            _report_missing(tag, repo, p.name, digests)
+            report_missing(tag, repo, p.name, digests)
             raise  # main() exits non-zero -> the season goes red -> cron_alert
         logger.info("  uploaded %s", p.name)
 
@@ -216,18 +216,6 @@ def upload_assets(paths: List[Path], tag: str, repo: str, *, run=None, digests=_
             pkg_function=PKG_FUNCTION.get(tag, "python/build_cfb_crosswalk.py"),
             repo=repo,
         )
-
-
-def _report_missing(tag: str, repo: str, name: str, digests) -> None:
-    """After a failed upload, say loudly if --clobber deleted the asset and nothing replaced it."""
-    try:
-        now = digests(tag, repo)
-    except Exception as exc:  # noqa: BLE001 -- the upload error is what propagates
-        logger.error("%s: upload of %s failed and the tag cannot be re-listed: %s", tag, name, exc)
-        return
-    if now is None or name not in now:
-        logger.error("ASSET MISSING: %s:%s was deleted by --clobber and not re-uploaded; "
-                     "consumers get a 404 until the next publish", tag, name)
 
 
 # ---------------------------------------------------------------------------

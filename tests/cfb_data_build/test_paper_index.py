@@ -65,6 +65,7 @@ def _no_publish_no_network(monkeypatch):
     monkeypatch.setattr("cfb_data_build.publish.publish_dataset", refuse)
     monkeypatch.setattr(sb, "publish_dataset", refuse)
     monkeypatch.setattr("cfb_data_build.publish._gh_runner", refuse)
+    monkeypatch.setattr("cfb_data_build.publish.gh_retry", refuse)
     monkeypatch.setattr(socket, "socket", refuse)
 
 

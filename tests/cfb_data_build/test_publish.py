@@ -133,3 +133,67 @@ def test_release_digests_404_is_none_other_errors_raise(monkeypatch):
     monkeypatch.setattr(subprocess, "run", lambda *a, **k: R(1, err="HTTP 403: rate limit"))
     with pytest.raises(RuntimeError):
         publish._release_digests("t", REPO)
+
+
+# --- transport: gh_retry (no 4xx retries) + missing-asset re-list --------------
+
+
+def test_default_transport_is_gh_retry_with_the_existing_knobs():
+    import inspect
+
+    from cfb_model_build.cfb_model_publish import artifacts
+
+    src = inspect.getsource(publish.publish_dataset)
+    assert "runner or gh_retry" in src
+    # the CFB_GH_* env knobs still drive it
+    assert publish.GH_RETRY_ATTEMPTS == artifacts.GH_RETRY_ATTEMPTS
+    assert publish.GH_RETRY_BACKOFF_S == artifacts.GH_RETRY_BACKOFF_S
+
+
+def test_gh_retry_transient_then_success_and_4xx_not_retried(monkeypatch):
+    import subprocess
+
+    import pytest
+
+    class P:
+        def __init__(self, rc, err=""):
+            self.returncode, self.stdout, self.stderr = rc, "", err
+
+    def seq(results):
+        it, seen = iter(results), []
+
+        def _run(argv, **kw):
+            seen.append(argv)
+            return P(*next(it))
+
+        monkeypatch.setattr(publish.subprocess, "run", _run)
+        return seen
+
+    monkeypatch.setattr(publish, "GH_RETRY_BACKOFF_S", 0)
+    seen = seq([(1, "HTTP 502: Bad Gateway"), (0,)])
+    publish.gh_retry(["release", "upload", "t", "f", "--clobber"])
+    assert len(seen) == 2
+
+    seen = seq([(1, "HTTP 404: Not Found")] * 3)
+    with pytest.raises(subprocess.CalledProcessError):
+        publish.gh_retry(["release", "upload", "t", "f", "--clobber"])
+    assert len(seen) == 1
+
+
+def test_failed_upload_names_the_asset_clobber_deleted(tmp_path, caplog):
+    import subprocess
+
+    import pytest
+
+    files = _write(tmp_path)
+    listings = iter([{files["csv"].name: "sha256:x"}, {files["csv"].name: "sha256:x"}])
+
+    def runner(argv):
+        if argv[:2] == ["release", "upload"] and argv[3].endswith(".rds"):
+            raise subprocess.CalledProcessError(1, argv, "", "HTTP 502")
+
+    with pytest.raises(subprocess.CalledProcessError):
+        publish.publish_dataset(
+            SPEC, 2026, base=tmp_path, runner=runner, digests=lambda t, r: next(listings)
+        )
+    assert f"ASSET MISSING: {SPEC.tag}:{files['rds'].name}" in caplog.text

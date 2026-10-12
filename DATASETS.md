@@ -1941,7 +1941,7 @@ did, for the first game only) and takes the prior season's full-season values in
 
 ### cfb_team_opponent_splits
 
-One row per team-game: the opponent, EPA/play, success rate and points
+One row per team-game: the opponent, EPA/play, success rate, pass/rush splits and points
 (`cfb_data_build.derived.build_team_opponent_splits`). A projection of this repo's
 `adv_team_gamelog`, left-joined to `adv_situational` on `(game_id, team_id)`. Every game is
 kept, FCS opponents and bowls included; "FBS only" is a consumer filter. Ids are Int64.
@@ -1961,6 +1961,12 @@ kept, FCS opponents and bowls included; "FBS only" is a consumer filter. Ids are
 | plays | integer | The team's offensive scrimmage plays (`adv_team_gamelog.scrimmage_plays`), the plays `epa_per_play` averages over. Until 2026-10 it was `EPA_plays`, which also counts special teams (2025 median 77 vs 66). |
 | epa_per_play | double | Offensive EPA per play (`adv_team_gamelog.EPA_per_play`). |
 | success_rate | double | Offensive EPA success rate (`adv_situational.EPA_success_rate`); null when the game has no situational row for the team. |
+| pass_plays | integer | The team's offensive pass plays (`adv_team_gamelog.passes`), the plays `epa_per_pass` averages over. |
+| rush_plays | integer | The team's offensive rush plays (`adv_team_gamelog.rushes`), the plays `epa_per_rush` averages over. |
+| epa_per_pass | double | Offensive EPA per pass play (`adv_team_gamelog.EPA_passing_per_play`). |
+| epa_per_rush | double | Offensive EPA per rush play (`adv_team_gamelog.EPA_rushing_per_play`). |
+| success_rate_pass | double | Offensive EPA success rate on pass plays (`adv_situational.EPA_success_pass_rate`); null when the game has no situational row for the team. |
+| success_rate_rush | double | Offensive EPA success rate on rush plays (`adv_situational.EPA_success_rush_rate`); null when the game has no situational row for the team. |
 
 _Release tag: `cfb_team_opponent_splits`_
 

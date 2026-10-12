@@ -41,6 +41,10 @@ def _gamelog(rows: list[dict], *, id_dtype=pl.Int64) -> pl.DataFrame:
             "EPA_per_play": pl.Float64,
             "EPA_plays": pl.Int64,
             "scrimmage_plays": pl.Int64,
+            "passes": pl.Int64,
+            "rushes": pl.Int64,
+            "EPA_passing_per_play": pl.Float64,
+            "EPA_rushing_per_play": pl.Float64,
         },
     )
 
@@ -63,6 +67,10 @@ def _row(game_id, team_id, opponent_id, epa, plays, pf, pa, *, home=True) -> dic
         # EPA_per_play is over scrimmage plays; EPA_plays adds special teams (E10)
         "EPA_plays": plays + 11,
         "scrimmage_plays": plays,
+        "passes": plays // 2,
+        "rushes": plays - plays // 2,
+        "EPA_passing_per_play": epa + 0.1,
+        "EPA_rushing_per_play": epa - 0.1,
     }
 
 
@@ -82,13 +90,25 @@ def _situational(
             if legacy
             else {"pos_team_id": t, "pos_team": f"team {t}"}
         )
-        | {"EPA_success_rate": r, "game_id": g, "season": SEASON}
+        | {
+            "EPA_success_rate": r,
+            "EPA_success_pass_rate": r + 0.05,
+            "EPA_success_rush_rate": r - 0.05,
+            "game_id": g,
+            "season": SEASON,
+        }
         for g, t, r in rows
     ]
     return pl.DataFrame(
         data,
         schema=ids
-        | {"EPA_success_rate": pl.Float64, "game_id": pl.Int64, "season": pl.Int64},
+        | {
+            "EPA_success_rate": pl.Float64,
+            "EPA_success_pass_rate": pl.Float64,
+            "EPA_success_rush_rate": pl.Float64,
+            "game_id": pl.Int64,
+            "season": pl.Int64,
+        },
     )
 
 
@@ -120,6 +140,22 @@ def test_one_row_carries_the_gamelog_points_and_epa_and_the_situational_success_
     assert r["success_rate"] == pytest.approx(0.47)
     assert (r["points_for"], r["points_against"], r["plays"]) == (24, 17, 70)
     assert r["opponent"] == "team 61" and r["is_home"] is True
+
+
+def test_pass_rush_splits_come_from_the_gamelog_and_situational_columns(tmp_path):
+    base = _write(
+        tmp_path,
+        _gamelog([_row(1, 333, 61, 0.21, 71, 24, 17)]),
+        _situational([(1, 333, 0.47), (1, 61, 0.39)]),
+    )
+    r = build_team_opponent_splits(SEASON, base=base).row(0, named=True)
+    assert (r["pass_plays"], r["rush_plays"]) == (35, 36)
+    assert r["epa_per_pass"] == pytest.approx(0.31)
+    assert r["epa_per_rush"] == pytest.approx(0.11)
+    assert r["success_rate_pass"] == pytest.approx(
+        0.52
+    )  # the team's, not the opponent's
+    assert r["success_rate_rush"] == pytest.approx(0.42)
 
 
 def test_plays_is_the_scrimmage_count_epa_per_play_is_over(tmp_path):
@@ -197,6 +233,65 @@ def test_a_missing_situational_parquet_raises(tmp_path):
         build_team_opponent_splits(SEASON, base=base)
 
 
+REAL = REPO / "cfb"
+
+
+@pytest.mark.skipif(
+    not (REAL / "adv_team" / "parquet" / f"adv_team_{SEASON}.parquet").exists(),
+    reason="needs the committed 2025 adv_* parquets",
+)
+def test_real_2025_pass_rush_splits_reproduce_adv_team_and_situational_per_game():
+    """Real 2025 data: every team-game's pass/rush split equals adv_team's, and the
+    plays-weighted season EPA per play still reproduces adv_team's (Alabama = 333)."""
+    out = build_team_opponent_splits(SEASON, base=str(REAL))
+    assert out.schema == pl.Schema(TEAM_OPPONENT_SPLITS_SCHEMA)
+    adv = pl.read_parquet(REAL / "adv_team" / "parquet" / f"adv_team_{SEASON}.parquet")
+    adv = adv.select(
+        pl.col("game_id").cast(pl.Int64),
+        pl.col("pos_team_id").cast(pl.Int64).alias("team_id"),
+        pl.col("passes").cast(pl.Int64),
+        pl.col("rushes").cast(pl.Int64),
+        "EPA_passing_per_play",
+        "EPA_rushing_per_play",
+        "EPA_per_play",
+        "scrimmage_plays",
+    )
+    j = out.join(adv, on=["game_id", "team_id"], how="inner", validate="1:1")
+    assert j.height == out.height > 1000
+    assert (j["pass_plays"] == j["passes"]).all()
+    assert (j["rush_plays"] == j["rushes"]).all()
+    for mine, theirs in (
+        ("epa_per_pass", "EPA_passing_per_play"),
+        ("epa_per_rush", "EPA_rushing_per_play"),
+        ("epa_per_play", "EPA_per_play"),
+    ):
+        assert j[mine].equals(j[theirs]), mine
+    sit = pl.read_parquet(
+        REAL / "adv_situational" / "parquet" / f"adv_situational_{SEASON}.parquet"
+    ).select(
+        pl.col("game_id").cast(pl.Int64),
+        pl.col("pos_team_id").cast(pl.Int64).alias("team_id"),
+        "EPA_success_pass_rate",
+        "EPA_success_rush_rate",
+    )
+    k = out.join(sit, on=["game_id", "team_id"], how="inner", validate="1:1")
+    assert k["success_rate_pass"].equals(k["EPA_success_pass_rate"])
+    assert k["success_rate_rush"].equals(k["EPA_success_rush_rate"])
+    # a team's pass and rush plays sum to no more than its scrimmage plays
+    assert (j["pass_plays"] + j["rush_plays"] <= j["plays"]).all()
+    bama = out.filter(pl.col("team_id") == 333)
+    assert bama.height >= 13
+    w = pl.col("epa_per_play") * pl.col("plays")
+    assert (bama.select(w.sum() / pl.col("plays").sum()).item()) == pytest.approx(
+        j.filter(pl.col("team_id") == 333)
+        .select(
+            (pl.col("EPA_per_play") * pl.col("scrimmage_plays")).sum()
+            / pl.col("scrimmage_plays").sum()
+        )
+        .item()
+    )
+
+
 def test_ids_are_cast_to_int64_on_both_sides_before_the_join(tmp_path):
     # gamelog ids narrower than Int64 (the schedule master ships Int32 game_id)
     # against a legacy text pos_team: the build casts both sides, then asserts
@@ -231,6 +326,9 @@ def test_the_contract_dtypes():
         "week",
     ):
         assert s[c] == pl.Int64, c
+    assert s["pass_plays"] == s["rush_plays"] == pl.Int64
+    for c in ("epa_per_pass", "epa_per_rush", "success_rate_pass", "success_rate_rush"):
+        assert s[c] == pl.Float64, c
     assert s["epa_per_play"] == s["success_rate"] == pl.Float64
     assert s["is_home"] == pl.Boolean and s["opponent"] == pl.Utf8
 

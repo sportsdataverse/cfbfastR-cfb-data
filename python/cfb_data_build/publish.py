@@ -11,10 +11,16 @@ hermetic tests (same convention as ``upload_artifacts``).
 
 from __future__ import annotations
 
+import hashlib
+import subprocess
+import time
 from pathlib import Path
 from typing import Callable
 
 from cfb_model_build.cfb_model_publish.artifacts import (
+    GH_RETRY_ATTEMPTS,
+    GH_RETRY_BACKOFF_S,
+    GH_TIMEOUT_SECONDS,
     _gh_release_exists,
     _gh_runner,
     ensure_release,
@@ -259,6 +265,43 @@ def _stamp(tag: str, run: Callable[[list[str]], object], repo: str) -> None:
     )
 
 
+def _release_digests(tag: str, repo: str) -> dict[str, str] | None:
+    """``{asset name: "sha256:<hex>"}`` for *tag* in ONE REST call; ``None`` = no release.
+
+    The release object embeds its whole asset list, each asset with a
+    GitHub-computed ``digest``, so this one call is both the create-if-missing
+    probe and the change check. Same failure contract as ``_gh_release_exists``:
+    only a 404 means "missing"; anything else is retried, then raised.
+    """
+    err = ""
+    for attempt in range(1, GH_RETRY_ATTEMPTS + 1):
+        r = subprocess.run(
+            [
+                "gh",
+                "api",
+                f"repos/{repo}/releases/tags/{tag}",
+                "--jq",
+                r'.assets[] | "\(.name)\t\(.digest)"',
+            ],
+            capture_output=True,
+            text=True,
+            timeout=GH_TIMEOUT_SECONDS,
+        )
+        if r.returncode == 0:
+            return dict(ln.split("\t", 1) for ln in r.stdout.splitlines() if "\t" in ln)
+        err = (r.stderr or "").strip()
+        if "HTTP 404" in err:
+            return None
+        if attempt < GH_RETRY_ATTEMPTS:
+            time.sleep(GH_RETRY_BACKOFF_S * attempt)
+    raise RuntimeError(f"cannot list release {repo}:{tag} (gh: {err[:200]})")
+
+
+def _sha256(path: Path) -> str:
+    with open(path, "rb") as fh:
+        return "sha256:" + hashlib.file_digest(fh, "sha256").hexdigest()
+
+
 def publish_dataset(
     spec: DatasetSpec,
     season: int | None,
@@ -268,26 +311,63 @@ def publish_dataset(
     dry_run: bool = False,
     runner: Callable[[list[str]], None] | None = None,
     exists_check: Callable[[str, str], bool] | None = None,
+    digests: Callable[[str, str], dict[str, str] | None] | None = None,
 ) -> dict[str, object]:
-    """Upload a dataset+season's files to each release tag (create-if-missing, clobber)."""
+    """Upload a dataset+season's files to each release tag (create-if-missing, clobber).
+
+    Only what changed uploads: ONE release listing per tag gives every asset's
+    sha256, and the rds/csv(.gz) -- whose bytes move every build (rds write
+    time, gzip mtime) but are derived from the parquet -- are skipped whole when
+    the parquet matches and every file is already on the release. The parquet
+    uploads LAST, so a matching parquet always means the previous upload of the
+    whole set finished. ``digests`` (``{name: "sha256:..."}`` or ``None`` = no
+    release) is injectable for tests; an injected ``exists_check`` alone keeps
+    the old probe-and-upload-everything behaviour.
+    """
     run = runner or _gh_runner
     exists = exists_check or _gh_release_exists
+    if digests is None:
+        digests = (
+            (lambda t, r: {} if exists_check(t, r) else None)
+            if exists_check is not None
+            else _release_digests
+        )
     target_repos = repos if repos is not None else PUBLISH_REPOS
     files = _dataset_files(spec, season, base)
+    files.sort(key=lambda f: f.suffix == ".parquet")
+    pq = next((f for f in files if f.suffix == ".parquet"), None)
     uploaded: dict[str, int] = {}
+    skipped: dict[str, list[str]] = {}
     for repo in target_repos:
         if dry_run:
             print(f"[dry-run] would ensure release {repo}:{spec.tag} exists")
-        else:
-            ensure_release(spec.tag, repo, release_notes(spec.tag), run=run, exists=exists)
-        count = 0
-        for f in files:
-            if dry_run:
+            for f in files:
                 print(f"[dry-run] would upload {f} -> {repo}:{spec.tag}")
-                continue
+            uploaded[repo] = 0
+            continue
+        remote = digests(spec.tag, repo)
+        if remote is None:
+            ensure_release(spec.tag, repo, release_notes(spec.tag), run=run, exists=exists)
+            remote = {}
+        if (
+            pq is not None
+            and remote.get(pq.name) == _sha256(pq)
+            and all(f.name in remote for f in files)
+        ):
+            todo: list[Path] = []
+        else:
+            todo = [f for f in files if f is pq or remote.get(f.name) != _sha256(f)]
+        skipped[repo] = [f.name for f in files if f not in todo]
+        for f in todo:  # a failed sibling raises before the parquet goes
             run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
-            count += 1
-        if count:
+        if skipped[repo]:
+            print(f"{spec.tag}: {len(skipped[repo])} unchanged asset(s) skipped, {len(todo)} uploaded")
+        if todo:
             _stamp(spec.tag, run, repo)
-        uploaded[repo] = count
-    return {"tag": spec.tag, "files": [str(f) for f in files], "uploaded": uploaded}
+        uploaded[repo] = len(todo)
+    return {
+        "tag": spec.tag,
+        "files": [str(f) for f in files],
+        "uploaded": uploaded,
+        "skipped": skipped,
+    }

@@ -12,6 +12,7 @@ hermetic tests (same convention as ``upload_artifacts``).
 from __future__ import annotations
 
 import hashlib
+import re
 import subprocess
 import time
 from pathlib import Path
@@ -295,6 +296,39 @@ def _release_digests(tag: str, repo: str) -> dict[str, str] | None:
         if attempt < GH_RETRY_ATTEMPTS:
             time.sleep(GH_RETRY_BACKOFF_S * attempt)
     raise RuntimeError(f"cannot list release {repo}:{tag} (gh: {err[:200]})")
+
+
+#: Retry only what a repeat can fix: a 5xx or a dropped connection, never a 4xx.
+_PERMANENT = re.compile(r"HTTP 4\d\d")
+_TRANSIENT = re.compile(
+    r"HTTP 5\d\d|connection (reset|refused)|timed? ?out|unexpected EOF|TLS handshake"
+    r"|no such host|temporary failure",
+    re.IGNORECASE,
+)
+
+
+def gh_retry(args: list[str]) -> None:
+    """Run ``gh``: up to GH_RETRY_ATTEMPTS tries with backoff on a transient failure.
+
+    ``_gh_runner``'s attempt count and backoff, but classified: a 4xx (auth, 404,
+    422 already_exists) raises at once, since repeating it cannot help.
+    """
+    for attempt in range(1, GH_RETRY_ATTEMPTS + 1):
+        proc = subprocess.run(
+            ["gh", *args], capture_output=True, text=True, timeout=GH_TIMEOUT_SECONDS
+        )
+        if proc.returncode == 0:
+            return
+        err = proc.stderr or ""
+        transient = not _PERMANENT.search(err) and _TRANSIENT.search(err)
+        if attempt == GH_RETRY_ATTEMPTS or not transient:
+            raise subprocess.CalledProcessError(proc.returncode, ["gh", *args], proc.stdout, err)
+        print(
+            f"  gh {' '.join(args[:2])}: transient failure (attempt {attempt}/"
+            f"{GH_RETRY_ATTEMPTS}, retrying): {err.strip()[:200]}",
+            flush=True,
+        )
+        time.sleep(GH_RETRY_BACKOFF_S * attempt)
 
 
 def _sha256(path: Path) -> str:

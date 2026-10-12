@@ -73,7 +73,7 @@ from sportsdataverse.cfb.cfb_schedule import most_recent_cfb_season
 from sportsdataverse.release import upload_release_sidecars
 
 from cfb_model_build.cfb_model_publish.artifacts import PKG_FUNCTION
-from cfb_data_build.publish import _release_digests, _sha256
+from cfb_data_build.publish import _release_digests, _sha256, gh_retry
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 
@@ -159,23 +159,20 @@ def write_parquet(df: pl.DataFrame, path: Path) -> None:
     logger.info("wrote %s (%s rows, %s cols)", path.name, df.height, df.width)
 
 
-def ensure_release(tag: str, repo: str) -> None:
-    """Create the release tag if it doesn't exist yet (uploads can't create it)."""
-    exists = subprocess.run(
-        ["gh", "release", "view", tag, "-R", repo],
-        capture_output=True, text=True,
-    )
-    if exists.returncode == 0:
-        return
+def ensure_release(tag: str, repo: str, *, run=gh_retry, digests=_release_digests) -> None:
+    """Create the release tag (upload_assets calls this only after the listing 404'd)."""
     logger.info("creating release tag %s on %s", tag, repo)
-    subprocess.run(
-        ["gh", "release", "create", tag, "-R", repo,
-         "--title", "CFB Cross-Source Crosswalk",
-         "--notes", "ESPN x Fox x Yahoo CFB identity crosswalks (teams / schedule / rosters), "
-                    "per season. Built by cfbfastR-cfb-data scripts/build_cfb_crosswalk.py "
-                    "(sportsdataverse-py); read by sportsdataverse.cfb.load_cfb_*_crosswalk()."],
-        check=True,
-    )
+    try:
+        run(["release", "create", tag, "-R", repo,
+             "--title", "CFB Cross-Source Crosswalk",
+             "--notes", "ESPN x Fox x Yahoo CFB identity crosswalks (teams / schedule / rosters), "
+                        "per season. Built by cfbfastR-cfb-data scripts/build_cfb_crosswalk.py "
+                        "(sportsdataverse-py); read by sportsdataverse.cfb.load_cfb_*_crosswalk()."])
+    except subprocess.CalledProcessError:
+        # a 5xx can land the create and still fail; a repeat then gets 422 already_exists
+        if digests(tag, repo) is None:
+            raise
+        logger.warning("release %s create failed but the tag exists; continuing", tag)
 
 
 def upload_assets(paths: List[Path], tag: str, repo: str, *, run=None, digests=_release_digests) -> None:
@@ -188,10 +185,10 @@ def upload_assets(paths: List[Path], tag: str, repo: str, *, run=None, digests=_
     """
     if not paths:
         return
-    run = run or (lambda args: subprocess.run(["gh", *args], check=True))
+    run = run or gh_retry
     remote = digests(tag, repo)
     if remote is None:
-        ensure_release(tag, repo)
+        ensure_release(tag, repo, run=run, digests=digests)
         remote = {}
     data = [p for p in paths if p.suffix == ".parquet" and remote.get(p.name) != _sha256(p)]
     index = [p for p in paths if p.suffix != ".parquet" and (data or p.name not in remote)]
@@ -202,7 +199,11 @@ def upload_assets(paths: List[Path], tag: str, repo: str, *, run=None, digests=_
     # 0), so upload individually with --clobber and let check=True surface any
     # failure. Slower, but each asset is verified.
     for p in todo:
-        run(["release", "upload", tag, str(p), "--clobber", "-R", repo])
+        try:
+            run(["release", "upload", tag, str(p), "--clobber", "-R", repo])
+        except subprocess.CalledProcessError:
+            _report_missing(tag, repo, p.name, digests)
+            raise  # main() exits non-zero -> the season goes red -> cron_alert
         logger.info("  uploaded %s", p.name)
 
     # R's sportsdataverse_save() stamps every tag it writes; this uploader never
@@ -215,6 +216,18 @@ def upload_assets(paths: List[Path], tag: str, repo: str, *, run=None, digests=_
             pkg_function=PKG_FUNCTION.get(tag, "python/build_cfb_crosswalk.py"),
             repo=repo,
         )
+
+
+def _report_missing(tag: str, repo: str, name: str, digests) -> None:
+    """After a failed upload, say loudly if --clobber deleted the asset and nothing replaced it."""
+    try:
+        now = digests(tag, repo)
+    except Exception as exc:  # noqa: BLE001 -- the upload error is what propagates
+        logger.error("%s: upload of %s failed and the tag cannot be re-listed: %s", tag, name, exc)
+        return
+    if now is None or name not in now:
+        logger.error("ASSET MISSING: %s:%s was deleted by --clobber and not re-uploaded; "
+                     "consumers get a 404 until the next publish", tag, name)
 
 
 # ---------------------------------------------------------------------------

@@ -60,8 +60,73 @@ def test_manifest_missing_from_release_uploads_alone(tmp_path):
 def test_no_release_creates_it_and_uploads_all(tmp_path, monkeypatch):
     files = _files(tmp_path)
     created = []
-    monkeypatch.setattr(bx, "ensure_release", lambda t, r: created.append(t))
+    monkeypatch.setattr(bx, "ensure_release", lambda t, r, **k: created.append(t))
     calls: list[list[str]] = []
     bx.upload_assets(files, TAG, REPO, run=calls.append, digests=lambda t, r: None)
     assert created == [TAG]
     assert _uploads(calls)[:3] == [p.name for p in files]
+
+
+# --- bounded retry: a 502 on the delete half of --clobber dropped an asset (2026-10-12) ---
+
+
+class _Proc:
+    def __init__(self, rc, err=""):
+        self.returncode, self.stdout, self.stderr = rc, "", err
+
+
+def _seq(monkeypatch, results):
+    from cfb_data_build import publish
+
+    seen = []
+    it = iter(results)
+
+    def _run(argv, **kw):
+        seen.append(argv)
+        return _Proc(*next(it))
+
+    monkeypatch.setattr(publish, "GH_RETRY_BACKOFF_S", 0)
+    monkeypatch.setattr(publish.subprocess, "run", _run)
+    return publish, seen
+
+
+def test_gh_retry_transient_then_success(monkeypatch):
+    publish, seen = _seq(monkeypatch, [(1, "HTTP 502: Server Error"), (0,)])
+    publish.gh_retry(["release", "upload", TAG, "f", "--clobber"])
+    assert len(seen) == 2
+
+
+def test_gh_retry_never_repeats_a_4xx(monkeypatch):
+    import subprocess
+
+    import pytest
+
+    publish, seen = _seq(monkeypatch, [(1, "HTTP 403: Forbidden")] * 3)
+    with pytest.raises(subprocess.CalledProcessError):
+        publish.gh_retry(["release", "upload", TAG, "f", "--clobber"])
+    assert len(seen) == 1
+
+
+def test_failed_upload_names_the_asset_clobber_deleted(tmp_path, caplog):
+    import subprocess
+
+    import pytest
+
+    files = _files(tmp_path)
+    listings = iter([{}, {}])  # before, and the re-list after the failure: nothing there
+
+    def run(argv):
+        raise subprocess.CalledProcessError(1, argv, "", "HTTP 502")
+
+    with pytest.raises(subprocess.CalledProcessError):
+        bx.upload_assets(files, TAG, REPO, run=run, digests=lambda t, r: next(listings))
+    assert f"ASSET MISSING: {TAG}:{files[0].name}" in caplog.text
+
+
+def test_create_that_landed_despite_failing_is_not_fatal(tmp_path):
+    import subprocess
+
+    def run(argv):
+        raise subprocess.CalledProcessError(1, argv, "", "HTTP 422: already_exists")
+
+    bx.ensure_release(TAG, REPO, run=run, digests=lambda t, r: {})  # re-list finds it

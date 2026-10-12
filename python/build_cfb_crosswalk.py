@@ -73,6 +73,7 @@ from sportsdataverse.cfb.cfb_schedule import most_recent_cfb_season
 from sportsdataverse.release import upload_release_sidecars
 
 from cfb_model_build.cfb_model_publish.artifacts import PKG_FUNCTION
+from cfb_data_build.publish import _release_digests, _sha256
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 
@@ -177,29 +178,40 @@ def ensure_release(tag: str, repo: str) -> None:
     )
 
 
-def upload_assets(paths: List[Path], tag: str, repo: str) -> None:
+def upload_assets(paths: List[Path], tag: str, repo: str, *, run=None, digests=_release_digests) -> None:
+    """Upload only what changed: ONE release listing gives every asset's sha256.
+
+    A parquet uploads when its digest differs from the release's. The manifest
+    csv carries a generated_at_utc stamp, so it differs every run; it uploads
+    only when a parquet did, or when the release lacks it. ``run`` / ``digests``
+    are injectable for tests.
+    """
     if not paths:
         return
-    ensure_release(tag, repo)
-    logger.info("uploading %s asset(s) to %s@%s (one at a time)", len(paths), repo, tag)
+    run = run or (lambda args: subprocess.run(["gh", *args], check=True))
+    remote = digests(tag, repo)
+    if remote is None:
+        ensure_release(tag, repo)
+        remote = {}
+    data = [p for p in paths if p.suffix == ".parquet" and remote.get(p.name) != _sha256(p)]
+    index = [p for p in paths if p.suffix != ".parquet" and (data or p.name not in remote)]
+    todo = data + index  # the manifest goes after the parquets it describes
+    logger.info("uploading %s of %s asset(s) to %s@%s (one at a time)", len(todo), len(paths), repo, tag)
     # Upload per-file: a single batched `gh release upload` of many assets can
     # silently drop some (observed: the larger files dropped while gh still exited
     # 0), so upload individually with --clobber and let check=True surface any
     # failure. Slower, but each asset is verified.
-    for p in paths:
-        subprocess.run(
-            ["gh", "release", "upload", tag, str(p), "--clobber", "-R", repo],
-            check=True,
-        )
+    for p in todo:
+        run(["release", "upload", tag, str(p), "--clobber", "-R", repo])
         logger.info("  uploaded %s", p.name)
 
     # R's sportsdataverse_save() stamps every tag it writes; this uploader never
     # did. Runs last so the timestamp describes a finished upload, and only when
     # something actually uploaded.
-    if paths:
+    if todo:
         upload_release_sidecars(
             tag,
-            runner=lambda args: subprocess.run(["gh", *args], check=True),
+            runner=run,
             pkg_function=PKG_FUNCTION.get(tag, "python/build_cfb_crosswalk.py"),
             repo=repo,
         )

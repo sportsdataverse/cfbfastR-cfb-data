@@ -207,3 +207,36 @@ def write_recruiting_card(results: list[dict], out_dir) -> Path:
     path.write_text(json.dumps(card, indent=2) + "\n", encoding="utf-8")
     print(f"card: {path}")
     return path
+
+
+#: rb_eval outputs published as per-season assets on ``espn_cfb_model_pbp``.
+#: ``python -m cfb_model_build.rb_eval`` writes each as ONE whole-corpus
+#: ``<family>.parquet`` (rush_plays alone is ~190 MB, past GitHub's 100 MB
+#: reject), so they ship sharded by their ``season`` column.
+RB_EVAL_FAMILIES = ("rush_plays", "rusher_seasons", "xrepa_loso")
+
+
+def shard_rb_eval(src_dir, out_dir) -> list[dict]:
+    """Split each rb_eval ``<family>.parquet`` in ``src_dir`` into ``rb_eval_<family>_<season>.parquet``.
+
+    A family whose blob is absent is skipped, so a publish with no fresh build
+    re-uploads the shards already in ``out_dir``. A null ``season`` raises: the
+    row would otherwise land in no shard and vanish from the release.
+    """
+    import polars as pl
+
+    out = Path(out_dir)
+    out.mkdir(parents=True, exist_ok=True)
+    results = []
+    for fam in RB_EVAL_FAMILIES:
+        src = Path(src_dir) / f"{fam}.parquet"
+        if not src.exists():
+            continue
+        df = pl.read_parquet(src)
+        if df["season"].null_count():
+            raise ValueError(f"{src}: {df['season'].null_count()} rows with a null season")
+        for season in df["season"].unique().sort().to_list():
+            part = df.filter(pl.col("season") == season)
+            part.write_parquet(out / f"rb_eval_{fam}_{season}.parquet")
+            results.append({"family": fam, "season": season, "rows": part.height})
+    return results

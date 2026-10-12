@@ -8,6 +8,7 @@ the ratings math (that is gated in sdv-py's own oracle suite).
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 import polars as pl
 import pytest
@@ -18,6 +19,7 @@ from cfb_model_build.cfb_model_publish.builders import (
     MIN_SEASON_RECRUITING,
     build_ratings,
     build_recruiting,
+    shard_rb_eval,
     write_ratings_card,
     write_recruiting_card,
 )
@@ -204,3 +206,33 @@ def test_cli_recruiting_build_only_writes_files_and_skips_upload(tmp_path, monke
     assert rc == 0
     assert (tmp_path / "cfb_recruiting_proj_2023.parquet").exists()
     assert (tmp_path / "cfb_recruiting_proj_card.json").exists()
+
+
+def test_rb_eval_shards_per_season_and_publishes_without_restamping(tmp_path):
+    """Each blob splits by season; the upload skips sidecars (the tag dates model_pbp)."""
+    src, out = tmp_path / "src", tmp_path / "out"
+    src.mkdir()
+    pl.DataFrame({"season": [2024, 2025, 2025], "x": [1, 2, 3]}).write_parquet(src / "rush_plays.parquet")
+    pl.DataFrame({"season": [2025], "x": [9]}).write_parquet(src / "xrepa_loso.parquet")
+
+    res = shard_rb_eval(src, out)
+
+    assert [(r["family"], r["season"], r["rows"]) for r in res] == [
+        ("rush_plays", 2024, 1), ("rush_plays", 2025, 2), ("xrepa_loso", 2025, 1),
+    ]
+    assert pl.read_parquet(out / "rb_eval_rush_plays_2025.parquet")["season"].to_list() == [2025, 2025]
+
+    calls = []
+    up = upload_artifacts(
+        out, "espn_cfb_model_pbp", "r/r", pattern="rb_eval_*.parquet",
+        runner=calls.append, exists_check=lambda tag, repo: True, stamp=False,
+    )
+    assert up["uploaded"] == 3
+    assert all(c[:2] == ["release", "upload"] and "--clobber" in c for c in calls)
+    assert all(Path(c[3]).name.startswith("rb_eval_") for c in calls)
+
+
+def test_rb_eval_refuses_a_null_season(tmp_path):
+    pl.DataFrame({"season": [2025, None]}).write_parquet(tmp_path / "rusher_seasons.parquet")
+    with pytest.raises(ValueError, match="null season"):
+        shard_rb_eval(tmp_path, tmp_path / "out")

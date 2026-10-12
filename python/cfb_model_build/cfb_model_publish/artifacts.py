@@ -236,6 +236,7 @@ def upload_artifacts(
     dry_run: bool = False,
     runner=None,
     exists_check=None,
+    stamp: bool = True,
 ) -> dict:
     """Upload each discovered model + card to the ``tag`` release on ``repo``.
 
@@ -248,6 +249,10 @@ def upload_artifacts(
             instead of running model discovery. Dataset tags publish parquet +
             a card sidecar, which ``discover_models`` -- which looks for model
             files -- would not find. Omit for the model-artifacts path.
+        stamp: Upload the release sidecars after the data. Pass False when
+            adding assets to a tag another dataset owns (rb_eval on
+            ``espn_cfb_model_pbp``): its ``timestamp.txt`` dates model_pbp,
+            and restamping it would claim that dataset moved.
     """
     run = runner or _gh_runner
     exists = exists_check or _gh_release_exists
@@ -272,7 +277,7 @@ def upload_artifacts(
     # stamp LAST so the timestamp describes a finished upload, and only when
     # something actually uploaded -- a stamp on a no-op run would claim data
     # moved when it did not
-    if uploaded:
+    if uploaded and stamp:
         upload_release_sidecars(
             tag, runner=run, pkg_function=PKG_FUNCTION.get(tag, _PRODUCER), repo=repo
         )

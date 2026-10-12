@@ -6,6 +6,7 @@ from .artifacts import upload_artifacts
 from .builders import (
     build_ratings,
     build_recruiting,
+    shard_rb_eval,
     write_ratings_card,
     write_recruiting_card,
 )
@@ -62,6 +63,17 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="write parquet + card, skip the upload",
     )
+
+    rb = sub.add_parser(
+        "rb-eval",
+        help="shard the rb_eval outputs per season + publish them to espn_cfb_model_pbp",
+    )
+    rb.add_argument("--src", default="cfb/rb_eval", help="dir holding the rb_eval <family>.parquet blobs")
+    rb.add_argument("--out", default="cfb/rb_eval/parquet")
+    rb.add_argument("--tag", default="espn_cfb_model_pbp")
+    rb.add_argument("--repo", default="sportsdataverse/sportsdataverse-data")
+    rb.add_argument("--dry-run", action="store_true")
+    rb.add_argument("--build-only", action="store_true", help="write the shards, skip the upload")
     return ap
 
 
@@ -121,6 +133,24 @@ def main(argv=None) -> int:
             f"publish: seasons={len(results)} rows={total} uploaded={res['uploaded']} "
             f"-> {args.repo}:{res['tag']}"
             + created
+            + (" (dry-run)" if args.dry_run else "")
+        )
+    elif args.cmd == "rb-eval":
+        shards = shard_rb_eval(args.src, args.out)
+        print(f"rb-eval: wrote {len(shards)} shards -> {args.out}")
+        if args.build_only:
+            return 0
+        # stamp=False: the tag's timestamp.txt dates model_pbp, not these assets
+        res = upload_artifacts(
+            args.out,
+            args.tag,
+            args.repo,
+            pattern="rb_eval_*.parquet",
+            dry_run=args.dry_run,
+            stamp=False,
+        )
+        print(
+            f"publish: uploaded={res['uploaded']} files={len(res['files'])} -> {args.repo}:{res['tag']}"
             + (" (dry-run)" if args.dry_run else "")
         )
     return 0

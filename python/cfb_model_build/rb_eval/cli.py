@@ -6,6 +6,10 @@ Usage:
   uv run python -m cfb_model_build.rb_eval train      --seasons cfb/rb_eval/rusher_seasons.parquet --out cfb/rb_eval/
   uv run python -m cfb_model_build.rb_eval validate   --loso cfb/rb_eval/xrepa_loso.parquet --out cfb/rb_eval/
   uv run python -m cfb_model_build.rb_eval figures    --table cfb/rb_eval/calibration.parquet --out cfb/rb_eval/
+
+After features/aggregate/train, shard + publish the three outputs per season to
+the ``espn_cfb_model_pbp`` release (``rb_eval_<family>_<season>.parquet``):
+  uv run python -m cfb_model_build.cfb_model_publish rb-eval
 """
 from __future__ import annotations
 

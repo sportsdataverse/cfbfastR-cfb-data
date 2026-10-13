@@ -466,11 +466,19 @@ TEAM_OPPONENT_SPLITS_SCHEMA: dict[str, pl.DataType] = {
     "plays": pl.Int64,
     "epa_per_play": pl.Float64,
     "success_rate": pl.Float64,
+    # pass/rush splits: adv_team's EPA_passing_per_play / EPA_rushing_per_play /
+    # EPA_success_{pass,rush}_rate, snake-cased the way epa_per_play is
+    "pass_plays": pl.Int64,
+    "rush_plays": pl.Int64,
+    "epa_per_pass": pl.Float64,
+    "epa_per_rush": pl.Float64,
+    "success_rate_pass": pl.Float64,
+    "success_rate_rush": pl.Float64,
 }
 
 
 def build_team_opponent_splits(season: int, *, base: str = "cfb") -> pl.DataFrame:
-    """One row per team-GAME: opponent, EPA/play, success rate and points.
+    """One row per team-GAME: opponent, EPA/play, success rate, pass/rush splits and points.
 
     A projection, not a new aggregation: ``adv_team_gamelog`` gives the game
     context, points, ``EPA_per_play`` and its ``scrimmage_plays``; ``adv_situational``
@@ -514,6 +522,10 @@ def build_team_opponent_splits(season: int, *, base: str = "cfb") -> pl.DataFram
         # counts special teams (2025 median 77 vs 66)
         pl.col("scrimmage_plays").alias("plays"),
         pl.col("EPA_per_play").alias("epa_per_play"),
+        pl.col("passes").cast(pl.Int64).alias("pass_plays"),
+        pl.col("rushes").cast(pl.Int64).alias("rush_plays"),
+        pl.col("EPA_passing_per_play").alias("epa_per_pass"),
+        pl.col("EPA_rushing_per_play").alias("epa_per_rush"),
     )
     sit = pl.read_parquet(
         root / "adv_situational" / "parquet" / f"adv_situational_{season}.parquet"
@@ -523,6 +535,8 @@ def build_team_opponent_splits(season: int, *, base: str = "cfb") -> pl.DataFram
         pl.col("game_id").cast(pl.Int64),
         pl.col(id_col).cast(pl.Int64).alias("team_id"),
         pl.col("EPA_success_rate").alias("success_rate"),
+        pl.col("EPA_success_pass_rate").alias("success_rate_pass"),
+        pl.col("EPA_success_rush_rate").alias("success_rate_rush"),
     )
     for k in ("game_id", "team_id"):
         assert gl.schema[k] == sit.schema[k] == pl.Int64, (

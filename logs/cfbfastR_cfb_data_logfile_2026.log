@@ -112,8 +112,7 @@ usage_st_team 2026: 235 rows from 949 games
 espn_cfb_adv_team_gamelog: 3 unchanged asset(s) skipped, 0 uploaded
 
 === gamelog: 0 failures ===
-  team_opponent_splits 2026: 896 rows, 13 cols
-cfb_team_opponent_splits: 3 unchanged asset(s) skipped, 0 uploaded
+  team_opponent_splits 2026: 896 rows, 19 cols
 
 === team_opponent_splits: 0 failures ===
   metric_curves 2026: 15455 rows, 14 cols
@@ -223,14 +222,13 @@ cfb_team_portal: 1 unchanged asset(s) skipped, 0 uploaded
 === team_portal: 1 failures ===
   2026: ValueError
 ::warning ::cfb_data_build team_portal for season 2026 exited with code 1
-2026-10-12 06:40:36,047 INFO === season 2026 ===
-2026-10-12 06:40:38,980 INFO wrote cfb_teams_crosswalk_2026.parquet (828 rows, 11 cols)
-2026-10-12 06:41:22,037 INFO wrote cfb_schedule_crosswalk_2026.parquet (1671 rows, 11 cols)
-2026-10-12 06:41:22,040 INFO wrote manifest cfb_crosswalk_in_data_repo.csv (29 rows)
-2026-10-12 06:41:22,040 INFO built 3 artifact(s) under cfb/crosswalk/parquet
-2026-10-12 06:41:22,387 INFO uploading 2 of 3 asset(s) to sportsdataverse/sportsdataverse-data@cfb_crosswalk (one at a time)
-2026-10-12 06:41:23,604 INFO   uploaded cfb_schedule_crosswalk_2026.parquet
-2026-10-12 06:41:24,693 INFO   uploaded cfb_crosswalk_in_data_repo.csv
-2026-10-12 06:41:29,253 INFO published to sportsdataverse/sportsdataverse-data@cfb_crosswalk
-push rejected (attempt 1); syncing with origin
-pushed: CFB Data Updated (Start: 2026 End: 2026) (attempt 2)
+2026-10-13 06:22:21,712 INFO === season 2026 ===
+2026-10-13 06:22:23,772 INFO wrote cfb_teams_crosswalk_2026.parquet (828 rows, 11 cols)
+2026-10-13 06:23:17,596 INFO wrote cfb_schedule_crosswalk_2026.parquet (1671 rows, 11 cols)
+2026-10-13 06:23:17,598 INFO wrote manifest cfb_crosswalk_in_data_repo.csv (29 rows)
+2026-10-13 06:23:17,599 INFO built 3 artifact(s) under cfb/crosswalk/parquet
+2026-10-13 06:23:17,945 INFO uploading 2 of 3 asset(s) to sportsdataverse/sportsdataverse-data@cfb_crosswalk (one at a time)
+2026-10-13 06:23:19,283 INFO   uploaded cfb_schedule_crosswalk_2026.parquet
+2026-10-13 06:23:20,712 INFO   uploaded cfb_crosswalk_in_data_repo.csv
+2026-10-13 06:23:26,141 INFO published to sportsdataverse/sportsdataverse-data@cfb_crosswalk
+pushed: CFB Data Updated (Start: 2026 End: 2026) (attempt 1)

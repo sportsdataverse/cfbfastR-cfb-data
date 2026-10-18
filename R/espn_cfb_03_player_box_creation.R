@@ -18,8 +18,10 @@ reshape_player_box <- function(g) {
       for (a in cat$athletes %||% list()) {
         stats <- unlist(a$stats)
         vals <- as.list(as.character(stats))
-        if (length(keys) == length(vals) && length(keys) > 0) {
-          names(vals) <- keys
+        # ESPN drops a TRAILING stat it did not compute (adjQBR in a no-QBR game) but
+        # keeps its key, so fewer values are the leading keys (game-on-paper-app#328)
+        if (length(vals) > 0 && length(vals) <= length(keys)) {
+          names(vals) <- keys[seq_along(vals)]
         } else if (length(vals) > 0) {
           names(vals) <- paste0("stat_", seq_along(vals))
         }

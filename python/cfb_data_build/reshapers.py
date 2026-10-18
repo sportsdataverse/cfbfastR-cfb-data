@@ -90,7 +90,9 @@ def reshape_qa(game: dict[str, Any]) -> pl.DataFrame:
     """
     from cfb_data_build.qa import QA_SCHEMA, game_qa_row
 
-    row = game_qa_row(game, processing_version=game.get("processing_version") or "unknown")
+    row = game_qa_row(
+        game, processing_version=game.get("processing_version") or "unknown"
+    )
     df = pl.DataFrame([{k: row.get(k) for k in QA_SCHEMA}], schema=QA_SCHEMA)
     return stamp_identity(df, game, week=True)
 
@@ -133,7 +135,10 @@ def reshape_player_box(game: dict[str, Any]) -> pl.DataFrame:
             cname = cat.get("name")
             for a in cat.get("athletes") or []:
                 vals = [_chr(x) for x in (a.get("stats") or [])]
-                if len(keys) == len(vals) and len(keys) > 0:
+                # ESPN drops a TRAILING stat it did not compute (adjQBR in a no-QBR
+                # game) but keeps its key, so fewer values are the leading keys
+                # (game-on-paper-app#328); only more values than keys is unalignable.
+                if 0 < len(vals) <= len(keys):
                     row: dict[str, Any] = dict(zip(keys, vals))
                 elif len(vals) > 0:
                     row = {f"stat_{i + 1}": v for i, v in enumerate(vals)}

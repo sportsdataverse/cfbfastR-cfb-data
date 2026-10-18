@@ -133,7 +133,10 @@ def reshape_player_box(game: dict[str, Any]) -> pl.DataFrame:
             cname = cat.get("name")
             for a in cat.get("athletes") or []:
                 vals = [_chr(x) for x in (a.get("stats") or [])]
-                if len(keys) == len(vals) and len(keys) > 0:
+                # ESPN drops a TRAILING stat it did not compute (adjQBR in a no-QBR
+                # game) but keeps its key, so fewer values are the leading keys
+                # (game-on-paper-app#328); only more values than keys is unalignable.
+                if 0 < len(vals) <= len(keys):
                     row: dict[str, Any] = dict(zip(keys, vals))
                 elif len(vals) > 0:
                     row = {f"stat_{i + 1}": v for i, v in enumerate(vals)}

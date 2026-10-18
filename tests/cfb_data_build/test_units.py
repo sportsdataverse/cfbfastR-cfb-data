@@ -17,7 +17,11 @@ from cfb_data_build.pbp import (
     build_pbp_frame,
 )
 from cfb_data_build.reshape import _norm_cell, bind_games, flat_block_frame
-from cfb_data_build.reshapers import reshape_linescores, reshape_power_index
+from cfb_data_build.reshapers import (
+    reshape_linescores,
+    reshape_player_box,
+    reshape_power_index,
+)
 
 FIX = Path(__file__).parent / "fixtures"
 GID = 401628455
@@ -148,6 +152,60 @@ def test_reshape_power_index_no_fpi_game_is_empty_not_crash() -> None:
         "power_index": {"items": [{"stat": "fpi", "value": 1.5}], **_stamped()},
     }
     assert reshape_power_index(g).height == 1
+
+
+def test_reshape_player_box_names_passing_stats_when_espn_omits_qbr() -> None:
+    # A game ESPN computed no QBR for still lists all six passing ``keys`` (ending
+    # ``adjQBR``) but ships five ``stats`` and five ``labels`` per athlete (raw
+    # 401858206, Miami at Stanford 2026). The trailing key is the one dropped, so
+    # the five values are the first five keys -- not an unlabeled stat_1..stat_5
+    # (game-on-paper-app#328: the player game log lost its passing line).
+    keys = [
+        "completions/passingAttempts",
+        "passingYards",
+        "yardsPerPassAttempt",
+        "passingTouchdowns",
+        "interceptions",
+        "adjQBR",
+    ]
+    athlete = {"athlete": {"id": "5121169", "displayName": "Darian Mensah"}}
+    g = {
+        "id": 401858206,
+        "season": 2026,
+        "boxscore": {
+            "players": [
+                {
+                    "team": {"id": "2390"},
+                    "statistics": [
+                        {
+                            "name": "passing",
+                            "keys": keys,
+                            "labels": ["C/ATT", "YDS", "AVG", "TD", "INT"],
+                            "athletes": [
+                                {**athlete, "stats": ["27/30", "401", "13.4", "5", "0"]}
+                            ],
+                        },
+                        {
+                            "name": "rushing",
+                            "keys": ["rushingAttempts", "rushingYards"],
+                            "labels": ["CAR", "YDS"],
+                            "athletes": [{**athlete, "stats": ["1", "5", "9"]}],
+                        },
+                    ],
+                }
+            ]
+        },
+    }
+    df = reshape_player_box(g)
+    row = df.filter(pl.col("category") == "passing").row(0, named=True)
+    assert row["completions/passingAttempts"] == "27/30"
+    assert row["passingYards"] == "401"
+    assert row["interceptions"] == "0"
+    assert row.get("adjQBR") is None
+    assert all(v is None for k, v in row.items() if k.startswith("stat_"))
+    # more values than keys is not a trailing drop: nothing to align, keep stat_N
+    rush = df.filter(pl.col("category") == "rushing").row(0, named=True)
+    assert rush["stat_3"] == "9"
 
 
 def test_return_player_names_survive_the_alias_drop() -> None:

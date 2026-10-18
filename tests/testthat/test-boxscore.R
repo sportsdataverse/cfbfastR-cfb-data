@@ -21,3 +21,20 @@ test_that("reshape_player_box returns athlete rows with category + stamped ids",
   expect_true(all(df$game_id == as.integer(g$id)))
   expect_true("passing" %in% df$category)
 })
+
+test_that("reshape_player_box names passing stats when ESPN omits QBR (game-on-paper-app#328)", {
+  # six passing keys (ending adjQBR) but five stats: the trailing key is the one dropped
+  keys <- list("completions/passingAttempts", "passingYards", "yardsPerPassAttempt",
+               "passingTouchdowns", "interceptions", "adjQBR")
+  g2 <- list(id = 401858206, season = 2026, boxscore = list(players = list(list(
+    team = list(id = "2390"),
+    statistics = list(list(name = "passing", keys = keys, athletes = list(list(
+      athlete = list(id = "5121169", displayName = "Darian Mensah"),
+      stats = list("27/30", "401", "13.4", "5", "0")
+    )))))
+  )))
+  df <- reshape_player_box(g2)
+  expect_equal(df[["completions/passingAttempts"]], "27/30")
+  expect_equal(df[["interceptions"]], "0")
+  expect_false(any(startsWith(names(df), "stat_")))
+})

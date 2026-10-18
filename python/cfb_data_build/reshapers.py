@@ -90,9 +90,7 @@ def reshape_qa(game: dict[str, Any]) -> pl.DataFrame:
     """
     from cfb_data_build.qa import QA_SCHEMA, game_qa_row
 
-    row = game_qa_row(
-        game, processing_version=game.get("processing_version") or "unknown"
-    )
+    row = game_qa_row(game, processing_version=game.get("processing_version") or "unknown")
     df = pl.DataFrame([{k: row.get(k) for k in QA_SCHEMA}], schema=QA_SCHEMA)
     return stamp_identity(df, game, week=True)
 

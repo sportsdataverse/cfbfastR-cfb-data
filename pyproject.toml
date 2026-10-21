@@ -8,7 +8,8 @@ dependencies = [
     # depends on CFB pbp fixes (player-id join, box-score id fallback) that are
     # merged but unreleased. uv.lock previously pinned an older main commit, so
     # the venv silently built on pre-fix code.
-    "sportsdataverse @ git+https://github.com/sportsdataverse/sportsdataverse-py@main",
+    # pinned 2026-10-21 until REPROCESS runs #1/#2 (sdv-py quality program, WB-nfl-2)
+    "sportsdataverse @ git+https://github.com/sportsdataverse/sportsdataverse-py@9e9e0d6de36eba6450d5025a4852408fb4f3128c",
     "pandas>=2.0",
     "polars>=1.0",
     "pyarrow>=15.0",
@@ -28,7 +29,8 @@ dependencies = [
 # Native .rds writing (write_rds(cls=)) landed in sportsdataverse-py #274 (0.0.72),
 # which is NOT on PyPI (latest published is 0.0.71). Track git main like the other
 # -data producers so cfb_data_build can emit .rds.
-sportsdataverse = { git = "https://github.com/sportsdataverse/sportsdataverse-py", branch = "main" }
+# pinned 2026-10-21 until REPROCESS runs #1/#2 (sdv-py quality program, WB-nfl-2)
+sportsdataverse = { git = "https://github.com/sportsdataverse/sportsdataverse-py", rev = "9e9e0d6de36eba6450d5025a4852408fb4f3128c" }
 
 [dependency-groups]
 bayes = [

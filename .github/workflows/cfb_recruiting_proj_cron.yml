@@ -60,10 +60,11 @@ jobs:
       # The pinned `sportsdataverse` release does not ship the recruiting
       # projection surface -- install from git until a release carries it.
       # TODO: re-pin to a PyPI release once one ships `cfb_recruiting_projection`.
-      - name: Install sportsdataverse from git (main)
+      # pinned 2026-10-21 until REPROCESS runs #1/#2 (sdv-py quality program, WB-nfl-2)
+      - name: Install sportsdataverse from git (pinned)
         run: |
           uv pip install \
-            "sportsdataverse @ git+https://github.com/sportsdataverse/sportsdataverse-py.git@main"
+            "sportsdataverse @ git+https://github.com/sportsdataverse/sportsdataverse-py.git@9e9e0d6de36eba6450d5025a4852408fb4f3128c"
 
       # Canary. Every `uv run` below MUST pass --no-sync: a bare `uv run`
       # re-syncs from uv.lock and silently REVERTS the git install above. This

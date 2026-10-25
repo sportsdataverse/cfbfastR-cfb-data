@@ -263,6 +263,21 @@ TALENT_WINDOW = 4
 TEAM_PORTAL_FIRST_SEASON = 2015
 
 
+def published_nothing(res: object) -> bool:
+    """True when a ``publish_dataset`` result put no file on any release.
+
+    An asset skipped because its sha256 already matches the release IS published:
+    a mid-season recruiting class rarely changes, so ``uploaded`` is 0 on most days.
+    Counting only ``uploaded`` failed every unchanged season (2026-10-18), which
+    left the build's outputs uncommitted and the cron refused every run after.
+    """
+    if not isinstance(res, dict):
+        return True
+    return not any((res.get("uploaded") or {}).values()) and not any(
+        (res.get("skipped") or {}).values()
+    )
+
+
 def build_recruiting(
     dataset: str,
     start_year: int,
@@ -399,11 +414,7 @@ def build_recruiting(
                 # A publish that uploaded nothing is a FAILURE, not a success.
                 # Without this the tag exists, the log says "N rows", and the
                 # release is empty -- which is how this shipped the first time.
-                if not dry_run and not any(
-                    (res.get("uploaded") or {}).values()
-                    if isinstance(res, dict)
-                    else []
-                ):
+                if not dry_run and published_nothing(res):
                     raise ValueError(
                         f"{spec.dataset} {season}: publish uploaded 0 files. Expected "
                         f"{Path(base) / spec.dataset / 'parquet'}/{spec.stem}_{season}.parquet"

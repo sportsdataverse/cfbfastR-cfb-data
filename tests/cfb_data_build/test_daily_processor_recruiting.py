@@ -56,3 +56,15 @@ def test_team_portal_is_left_out_below_its_floor(with_store):
 def test_store_free_datasets_still_run_without_the_247_store(tmp_path):
     assert _run_block(2026, tmp_path) == ["returning_production", "team_portal"]
     assert _run_block(2014, tmp_path) == ["returning_production"]
+
+
+def test_unchanged_skip_counts_as_published():
+    from cfb_data_build.recruiting import published_nothing
+
+    repo = "sportsdataverse/sportsdataverse-data"
+    # 2026-10-18: sha256 matched the release, so nothing uploaded and all skipped.
+    assert not published_nothing({"uploaded": {repo: 0}, "skipped": {repo: ["a.parquet"]}})
+    assert not published_nothing({"uploaded": {repo: 3}, "skipped": {repo: []}})
+    # The original failure: an empty file list, so nothing uploaded AND nothing skipped.
+    assert published_nothing({"uploaded": {repo: 0}, "skipped": {repo: []}})
+    assert published_nothing(None)

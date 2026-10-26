@@ -44,9 +44,9 @@ PUBLISH_REPOS: list[str] = ["sportsdataverse/sportsdataverse-data"]
 # cfb_paper_index_games itself cannot be built on such a venv, so the fallback
 # text is never published.
 try:
-    from sportsdataverse.paper_index import HOLDOUT_SEASONS, TRAIN_SEASONS
+    from sportsdataverse.analytics.paper_index import HOLDOUT_SEASONS, TRAIN_SEASONS
 except ImportError:  # sdv-py older than the paper_index port
-    _PI_TRAIN_TEXT = _PI_HOLDOUT_TEXT = "the seasons `sportsdataverse.paper_index` names"
+    _PI_TRAIN_TEXT = _PI_HOLDOUT_TEXT = "the seasons `sportsdataverse.analytics.paper_index` names"
 else:
     _PI_TRAIN_TEXT = "{}-{}".format(*TRAIN_SEASONS["cfb"])
     _PI_HOLDOUT_TEXT = "{}-{}".format(*HOLDOUT_SEASONS["cfb"])
@@ -164,7 +164,7 @@ RELEASE_NOTES: dict[str, str] = {
         "/ TE) with the EPA per play, success rate and explosive rate that "
         "defense allowed to the group, plus QB dropbacks and sack rate, RB "
         "carries and yards per carry, WR / TE targets and yards per target "
-        "(`sportsdataverse.defense_vs_position`). Every dropback is the QB's; a "
+        "(`sportsdataverse.analytics.defense_vs_position`). Every dropback is the QB's; a "
         "carry goes to the rusher's roster group and a target to the "
         "receiver's, so a completion counts for QB and for its receiver's "
         "group. Regular season + postseason, every game in the pbp (FBS and "
@@ -190,7 +190,7 @@ RELEASE_NOTES: dict[str, str] = {
         "conversion, points per opportunity, starting field position, havoc, "
         "turnovers), `opp_share` (the two sum to 1), `won`, and the eight "
         "`<margin>_margin` columns, team minus opponent "
-        "(`sportsdataverse.paper_index.paper_index_games`, Game on Paper's "
+        "(`sportsdataverse.analytics.paper_index.paper_index_games`, Game on Paper's "
         "Paper Index). A game is scored when it is completed, has a winner "
         "and both sides ran at least 20 scrimmage snaps; regular season and "
         "postseason, FBS and FCS. Summed over a season the shares are the "

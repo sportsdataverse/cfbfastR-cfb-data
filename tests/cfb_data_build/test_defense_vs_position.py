@@ -13,8 +13,8 @@ from pathlib import Path
 import polars as pl
 import pytest
 from polars.testing import assert_frame_equal
-from sportsdataverse.defense_vs_position import OUTPUT_SCHEMA as T1_SCHEMA
-from sportsdataverse.defense_vs_position import PBP_COLUMNS, defense_vs_position
+from sportsdataverse.analytics.defense_vs_position import OUTPUT_SCHEMA as T1_SCHEMA
+from sportsdataverse.analytics.defense_vs_position import PBP_COLUMNS, defense_vs_position
 
 from cfb_data_build.cli import DERIVED
 from cfb_data_build.config import PKG_FUNCTION

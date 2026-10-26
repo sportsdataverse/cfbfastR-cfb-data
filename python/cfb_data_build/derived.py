@@ -707,13 +707,13 @@ def build_rolling_windows(season: int, *, base: str = "cfb") -> pl.DataFrame:
     Reads every committed pbp season from ``PBP_FLOOR`` to ``season`` (the career
     history the baselines need) plus the unified schedule for kickoff dates.
 
-    Memory: `sportsdataverse.rolling_windows.rolling_windows` holds the whole
+    Memory: `sportsdataverse.analytics.rolling_windows.rolling_windows` holds the whole
     events history resident (~5-7 GB peak for the full 2004-2026 CFB run,
     measured ~1.5 GB for 4 seasons). This builder keeps its own footprint down
     by projecting to `FOOTBALL_PBP_COLUMNS` at read time rather than reading
     each season's full pbp frame, so it doesn't add its own multiple on top.
     """
-    from sportsdataverse.rolling_windows import (
+    from sportsdataverse.analytics.rolling_windows import (
         FOOTBALL_PBP_COLUMNS,
         football_events,
         rolling_windows,
@@ -782,14 +782,14 @@ def build_metric_curves(season: int, *, base: str = "cfb") -> pl.DataFrame:
 
     FG% by kick distance, completion% and EPA by air-yards bucket, 4th-down
     conversion by yards to go and success by down x distance, each bucket with
-    attempts, successes, rate and EPA/attempt (``sportsdataverse.metric_curves``).
+    attempts, successes, rate and EPA/attempt (``sportsdataverse.analytics.metric_curves``).
     Curves are per SEASON, so unlike :func:`build_rolling_windows` this reads only
     ``season``'s pbp, projected to ``FOOTBALL_ATTEMPT_COLUMNS``. The sdv-py
     function emits all three ``entity_type`` rows (league, team, player) from one
     call; the air-yards metrics are kept from ``AIR_YARDS_FLOOR`` on only.
     Returns the empty ``OUTPUT_SCHEMA`` frame when the season's pbp is missing.
     """
-    from sportsdataverse.metric_curves import (
+    from sportsdataverse.analytics.metric_curves import (
         FOOTBALL_ATTEMPT_COLUMNS,
         OUTPUT_SCHEMA,
         football_attempts,

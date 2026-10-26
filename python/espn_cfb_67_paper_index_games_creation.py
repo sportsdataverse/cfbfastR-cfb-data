@@ -3,7 +3,7 @@
 Thin entrypoint. The build lives in ``cfb_data_build``; this file exists so
 the directory listing is the pipeline and each dataset is runnable on its own.
 Computed at build time from ONE season of the committed ``cfb/pbp``
-(``sportsdataverse.paper_index``), so the installed sdv-py defines the weights,
+(``sportsdataverse.analytics.paper_index``), so the installed sdv-py defines the weights,
 the game filters and the fit spans behind ``paper_index_span``. The season sums
 are the ``deserved_wins`` / ``luck_*`` columns of ``team_summaries`` (stage 15).
 

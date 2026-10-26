@@ -2,7 +2,7 @@
 
 One row per ``(season, team_id, position_group)`` for the DEFENSE (stage 66),
 from one season of the committed ``cfb/pbp`` plus that season's ``cfb_rosters``
-and ``cfb_schedules``. The rows are ``sportsdataverse.defense_vs_position``'s,
+and ``cfb_schedules``. The rows are ``sportsdataverse.analytics.defense_vs_position``'s,
 passed through unchanged; the producer adds only what it owns:
 
 * ``team_id`` as Int64: an integer parse of the function's text id, never
@@ -49,12 +49,12 @@ from __future__ import annotations
 from pathlib import Path
 
 import polars as pl
-from sportsdataverse.defense_vs_position import OUTPUT_SCHEMA as _T1_SCHEMA
+from sportsdataverse.analytics.defense_vs_position import OUTPUT_SCHEMA as _T1_SCHEMA
 
 # ponytail: _plays is sdv-py's private population filter; importing it keeps the
 # share on exactly the plays the rows count. uv.lock pins the commit; if sdv-py
 # renames it this import fails at build time -- ask for a public name then.
-from sportsdataverse.defense_vs_position import (
+from sportsdataverse.analytics.defense_vs_position import (
     PBP_COLUMNS,
     _plays,
     defense_vs_position,

@@ -1,6 +1,6 @@
 """Paper Index per game (stage 67) and the season luck columns on ``team_summaries``.
 
-The model is ``sportsdataverse.paper_index`` (Game on Paper's Paper Index; the
+The model is ``sportsdataverse.analytics.paper_index`` (Game on Paper's Paper Index; the
 weights were fitted there and are not refitted here). This module adds no formula.
 It owns the producer parts only:
 
@@ -32,7 +32,7 @@ import warnings
 from pathlib import Path
 
 import polars as pl
-from sportsdataverse.paper_index import (
+from sportsdataverse.analytics.paper_index import (
     GAMES_SCHEMA,
     HOLDOUT_SEASONS,
     PBP_COLUMNS,

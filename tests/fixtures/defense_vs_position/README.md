@@ -17,7 +17,7 @@ files sdv-py's own fixture was cut from are byte-identical to the
 **pbp**: every play (special teams and penalties included) the seven defenses below
 defended in the listed games: the semi-join of the season pbp on those
 `(def_pos_team_id, game_id)` pairs, sorted by `game_id, game_play_number`. Columns:
-`sportsdataverse.defense_vs_position.PBP_COLUMNS["cfb"]` plus `type.text` and `text`
+`sportsdataverse.analytics.defense_vs_position.PBP_COLUMNS["cfb"]` plus `type.text` and `text`
 for reading plays by hand.
 
 | defense (`team_id`) | division | games (`game_id`) | why it is here |

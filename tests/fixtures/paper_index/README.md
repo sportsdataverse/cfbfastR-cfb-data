@@ -14,7 +14,7 @@ sdv-py's own Paper Index fixture was cut from (same sha256 as
 ## Selection
 
 **pbp**: every play of six games, projected to
-`sportsdataverse.paper_index.PBP_COLUMNS` (23 columns), sorted by
+`sportsdataverse.analytics.paper_index.PBP_COLUMNS` (23 columns), sorted by
 `game_id, game_play_number`. Ids are as released: `game_id`, `pos_team_id`,
 `homeTeamId`, `awayTeamId` all Int64.
 
@@ -39,7 +39,7 @@ scores are the hand check on the win count.
 
 ## Hand numbers
 
-Shares are `sportsdataverse.paper_index.paper_index_games` at sdv-py `21549eec` on the
+Shares are `sportsdataverse.analytics.paper_index.paper_index_games` at sdv-py `21549eec` on the
 fixture rows. The two oracle games are also Game on Paper's own module on the same
 rows: sdv-py's `tests/fixtures/paper_index/gop_compute_cfb.json` gives Oklahoma State's
 `homeShare` as `0.2907412420199904` in 401636915 and `0.8674356066221223` in 401636934.

@@ -162,14 +162,14 @@ trained nowhere in this repo, so its record is this paragraph.
 - **Artifacts:** `cfb_paper_index_games_{season}.parquet` (one row per team per scored game),
   and seven columns on `team_summaries` and `team_summaries_weekly`: `deserved_wins`,
   `luck_wins`, `luck_z`, `luck_wins_rank`, `luck_z_rank`, `paper_index_games_n`,
-  `paper_index_span`. No model file: the weights are `sportsdataverse.paper_index.WEIGHTS["cfb"]`
+  `paper_index_span`. No model file: the weights are `sportsdataverse.analytics.paper_index.WEIGHTS["cfb"]`
   (eight non-negative weights, intercept-free logistic).
 - **Release tags:** `cfb_paper_index_games`, `espn_cfb_team_summaries`, `cfb_team_summaries_weekly`.
 - **Training data:** not trained here. The released `espn_cfb_pbp` as of 2026-09-07: train
   2016-2023 (6,637 games), holdout 2024-2025 (1,894 games). The pbp was rebuilt after the fit
   (sportsdataverse-py #643-#651); the committed 2024 and 2025 files now score 945 + 956 games.
 - **Fitting script:** `game-on-paper-app/python/tools/fit_paper_index.py` (commit `770ba849`).
-  The weights are copied verbatim, at 4 decimals, into sdv-py `sportsdataverse/paper_index.py`
+  The weights are copied verbatim, at 4 decimals, into sdv-py `sportsdataverse/analytics/paper_index.py`
   (#661, `21549eec`), and applied here by `python/espn_cfb_67_paper_index_games_creation.py`
   (stage 67) and `cfb_data_build/summaries_build.py` (the summaries build and every weekly
   snapshot).

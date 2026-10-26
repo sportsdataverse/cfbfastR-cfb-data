@@ -93,3 +93,35 @@ def test_shrunk_flags_only_a_lost_provider_leg():
         {"cbs_player_id": ["1", "2", "3"], "fox_athlete_id": [None, None, None]}
     )
     assert bp.shrunk(old, new) == {"fox_athlete_id": (1, 0)}
+
+
+def test_upload_merges_a_players_row_and_publishes_through_the_crosswalk_uploader(
+    tmp_path, monkeypatch
+):
+    import build_cfb_crosswalk as bx
+
+    (tmp_path / bx.MANIFEST).write_text(
+        "dataset,season,row_count,col_count,generated_at_utc,source_fn\nteams,2025,9,3,then,x\n"
+    )
+    frame = pl.DataFrame({c: [None] for c in bp.SCHEMA}, schema=bp.SCHEMA).with_columns(
+        pl.lit(2025, dtype=pl.Int32).alias("season"),
+        pl.lit("c1").alias("cbs_player_id"),
+    )
+    monkeypatch.setattr(bp, "build_season", lambda season, alt_root: (frame, {}))
+    sent = []
+    monkeypatch.setattr(
+        bx, "upload_assets", lambda paths, tag, repo: sent.append((paths, tag, repo))
+    )
+    assert (
+        bp.main(["-s", "2025", "-e", "2025", "--out", str(tmp_path), "--upload"]) == 0
+    )
+    ((paths, tag, repo),) = sent
+    assert [p.name for p in paths] == [
+        "cfb_players_crosswalk_2025.parquet",
+        bx.MANIFEST,
+    ]
+    assert (tag, repo) == ("cfb_crosswalk", "sportsdataverse/sportsdataverse-data")
+    rows = (tmp_path / bx.MANIFEST).read_text().splitlines()
+    assert rows[1].startswith("players,2025,1,10,") and rows[2].startswith(
+        "teams,2025,9,"
+    )

@@ -298,17 +298,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         logger.error("no artifacts produced; nothing to write or upload")
         return 1
 
-    manifest_path = args.out_dir / "cfb_crosswalk_in_data_repo.csv"
-    if args.upload and not manifest_path.exists():
-        # The manifest is gitignored, so a fresh checkout has none to merge into: seed it from the release,
-        # or the --clobber upload would publish a manifest listing only this run's seasons.
-        subprocess.run(
-            ["gh", "release", "download", args.release_tag, "-R", args.repo, "-p", manifest_path.name,
-             "-D", str(manifest_path.parent)],
-            check=False, capture_output=True,
-        )
-    _write_manifest(manifest, manifest_path)
-    produced.append(manifest_path)
+    produced.append(update_manifest(manifest, args.out_dir, args.upload, args.release_tag, args.repo))
 
     logger.info("built %s artifact(s) under %s", len(produced), args.out_dir)
     if args.upload:
@@ -328,6 +318,26 @@ def _row(dataset: str, season: int, df: pl.DataFrame, source_fn: str) -> dict:
         "generated_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "source_fn": source_fn,
     }
+
+
+MANIFEST = "cfb_crosswalk_in_data_repo.csv"
+
+
+def update_manifest(rows: list[dict], out_dir: Path, upload: bool, tag: str, repo: str) -> Path:
+    """Merge ``rows`` into ``out_dir``'s manifest; when uploading, seed it from the release first.
+
+    Shared with ``build_cfb_players_crosswalk.py`` (its ``players`` rows).
+    """
+    path = out_dir / MANIFEST
+    if upload and not path.exists():
+        # The manifest is gitignored, so a fresh checkout has none to merge into: seed it from the release,
+        # or the --clobber upload would publish a manifest listing only this run's seasons.
+        subprocess.run(
+            ["gh", "release", "download", tag, "-R", repo, "-p", path.name, "-D", str(path.parent)],
+            check=False, capture_output=True,
+        )
+    _write_manifest(rows, path)
+    return path
 
 
 def _write_manifest(rows: List[dict], path: Path) -> None:

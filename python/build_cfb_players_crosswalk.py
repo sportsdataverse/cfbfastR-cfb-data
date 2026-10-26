@@ -14,12 +14,15 @@ through sdv-py's ``sportsdataverse._crosswalk_alt.match_season``:
 Writes ``{--out}/cfb_players_crosswalk_{season}.parquet`` (default ``cfb/crosswalk/parquet``): one
 row per (ESPN team, ESPN athlete) matched by at least one provider. A rebuilt season that would
 hold fewer ids in any provider column than the file already in ``--out`` is refused (never drop a
-leg).
+leg). ``--upload`` merges a ``players`` row per season into ``cfb_crosswalk_in_data_repo.csv`` and
+publishes to the ``cfb_crosswalk`` tag through ``build_cfb_crosswalk.upload_assets`` (only the
+parquets whose sha256 differs from the release's).
 
-Runs on this repo's ``.venv`` (its sdv-py pin ships ``_crosswalk_alt``)::
+Runs on this repo's ``.venv`` (its sdv-py pin ships ``_crosswalk_alt``); driven by
+``scripts/cron_alt_fill.sh``::
 
     .venv/bin/python python/build_cfb_players_crosswalk.py -s 2016 -e 2026 \\
-        [--alt-root ../cfbfastR-cfb-alt-data] [--out DIR]
+        [--alt-root ../cfbfastR-cfb-alt-data] [--out DIR] [--upload]
 """
 
 from __future__ import annotations
@@ -231,12 +234,19 @@ def main(argv: list[str] | None = None) -> int:
         default=OUT,
         help="output dir (default: cfb/crosswalk/parquet)",
     )
+    ap.add_argument(
+        "--upload",
+        action="store_true",
+        help="publish changed seasons to the release tag",
+    )
+    ap.add_argument("--release-tag", default="cfb_crosswalk")
+    ap.add_argument("--repo", default="sportsdataverse/sportsdataverse-data")
     a = ap.parse_args(argv)
     logging.basicConfig(
         level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s"
     )
     a.out.mkdir(parents=True, exist_ok=True)
-    rc = 0
+    rc, produced, manifest = 0, [], []
     for season in range(a.start, a.end + 1):
         out, _ = build_season(season, a.alt_root)
         if out is None or out.height == 0:
@@ -255,12 +265,27 @@ def main(argv: list[str] | None = None) -> int:
                 rc = 1
                 continue
         out.write_parquet(path, compression="zstd")
+        produced.append(path)
         log.info(
             "cfb %s: %d rows, %s -> %s",
             season,
             out.height,
             {c: out[c].drop_nulls().len() for c in LEGS_IDS},
             path,
+        )
+        if a.upload:
+            from build_cfb_crosswalk import _row
+
+            manifest.append(
+                _row("players", season, out, "build_cfb_players_crosswalk.py")
+            )
+    if a.upload and produced:
+        from build_cfb_crosswalk import update_manifest, upload_assets
+
+        upload_assets(
+            produced + [update_manifest(manifest, a.out, True, a.release_tag, a.repo)],
+            a.release_tag,
+            a.repo,
         )
     return rc
 

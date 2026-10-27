@@ -14,7 +14,7 @@ from pathlib import Path
 import polars as pl
 import pytest
 from polars.testing import assert_frame_equal
-from sportsdataverse import paper_index as t1
+from sportsdataverse.analytics import paper_index as t1
 
 import cfb_data_build.summaries_build as sb
 from cfb_data_build import league_averages
@@ -530,11 +530,11 @@ def test_publish_imports_on_an_sdv_py_without_paper_index(monkeypatch):
 
     key = "cfb_paper_index_games"
     assert "2016-2023" in publish.RELEASE_NOTES[key]
-    monkeypatch.setitem(sys.modules, "sportsdataverse.paper_index", None)  # import -> ImportError
+    monkeypatch.setitem(sys.modules, "sportsdataverse.analytics.paper_index", None)  # import -> ImportError
     try:
         old = importlib.reload(publish)
         assert "2016-2023" not in old.RELEASE_NOTES[key]
-        assert "sportsdataverse.paper_index" in old.RELEASE_NOTES[key]
+        assert "sportsdataverse.analytics.paper_index" in old.RELEASE_NOTES[key]
     finally:
         monkeypatch.undo()
         importlib.reload(publish)

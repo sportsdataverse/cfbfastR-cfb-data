@@ -7,7 +7,7 @@ from pathlib import Path
 
 import polars as pl
 import pytest
-from sportsdataverse.rolling_windows import FOOTBALL_PBP_COLUMNS
+from sportsdataverse.analytics.rolling_windows import FOOTBALL_PBP_COLUMNS
 
 from cfb_data_build.cli import DERIVED
 from cfb_data_build.derived import BUILDERS, SPECS, build_rolling_windows

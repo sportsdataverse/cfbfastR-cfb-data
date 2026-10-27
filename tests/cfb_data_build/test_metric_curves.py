@@ -11,7 +11,7 @@ from pathlib import Path
 
 import polars as pl
 import pytest
-from sportsdataverse.metric_curves import OUTPUT_SCHEMA
+from sportsdataverse.analytics.metric_curves import OUTPUT_SCHEMA
 
 from cfb_data_build.cli import DERIVED
 from cfb_data_build.config import PKG_FUNCTION

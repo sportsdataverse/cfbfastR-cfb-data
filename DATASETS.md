@@ -1659,7 +1659,7 @@ ridge model over team/opponent indicators (home-field-aware) then averaged per s
 
 **Deserved wins and luck (Paper Index)** — the season sum of each game's
 `paper_share` from [cfb_paper_index_games](#cfb_paper_index_games), rolled up by sdv-py
-`sportsdataverse.paper_index.deserved_wins`. Python-only; the last seven columns of the
+`sportsdataverse.analytics.paper_index.deserved_wins`. Python-only; the last seven columns of the
 table:
 
 | col_name | col_type | col_description |
@@ -2122,7 +2122,7 @@ _Release tag: `cfb_defense_vs_position`_
 
 Who won each game on paper: one row per team per scored game, keyed
 `(game_id, team_id)` (stage 67, `python/cfb_data_build/paper_index.py`). The rows are
-sdv-py `sportsdataverse.paper_index.paper_index_games` over the season's `cfb/pbp`,
+sdv-py `sportsdataverse.analytics.paper_index.paper_index_games` over the season's `cfb/pbp`,
 unchanged; this producer adds `paper_index_span`. The model is Game on Paper's Paper
 Index: eight performance margins through an intercept-free logistic, so an even game
 reads 50/50. The weights were fitted there and are not refitted here.

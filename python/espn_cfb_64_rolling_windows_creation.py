@@ -3,7 +3,7 @@
 Thin entrypoint. The build lives in ``cfb_data_build``; this file exists so
 the directory listing is the pipeline and each dataset is runnable on its own.
 Computed at build time from the committed ``cfb/pbp`` history and the unified
-schedule (``sportsdataverse.rolling_windows``), so the installed sdv-py
+schedule (``sportsdataverse.analytics.rolling_windows``), so the installed sdv-py
 defines the windows and baselines.
 
 Example:

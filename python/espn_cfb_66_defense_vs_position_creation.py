@@ -5,7 +5,7 @@ Thin entrypoint. The build lives in ``cfb_data_build``; this file exists so
 the directory listing is the pipeline and each dataset is runnable on its own.
 Computed at build time from ONE season of the committed ``cfb/pbp``,
 ``cfb/cfb_rosters`` and ``cfb/cfb_schedules``
-(``sportsdataverse.defense_vs_position``), so the installed sdv-py defines the
+(``sportsdataverse.analytics.defense_vs_position``), so the installed sdv-py defines the
 play populations and the position groups. Seasons before 2014 are not built.
 
 Example:

@@ -331,3 +331,9 @@ def test_drive_start_follows_the_first_snap_orientation_and_skips_placeholders()
     )
     out = df.select(s=drive_start_yards_to_goal())["s"].to_list()
     assert out == [75.0, 75.0, 75.0, 68.0, 70.0]  # was [75, 75, 25, 0, None]
+
+
+def test_line_yards_use_the_standard_per_yard_band(tables):
+    """R843-3: sdv-py's band (losses 120%, 0-4 100%, 5-10 50%, cap 7). Home U's carries are
+    -2, 5 and -1: the 5-yard carry is 4 + 0.5 = 4.5 line yards (the old band said 2.5)."""
+    assert _team(tables, "1")["line_yards_off"] == pytest.approx((-2.4 + 4.5 - 1.2) / 3)

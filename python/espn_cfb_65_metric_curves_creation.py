@@ -4,7 +4,7 @@
 Thin entrypoint. The build lives in ``cfb_data_build``; this file exists so
 the directory listing is the pipeline and each dataset is runnable on its own.
 Computed at build time from ONE season of the committed ``cfb/pbp``
-(``sportsdataverse.metric_curves``), so the installed sdv-py defines the
+(``sportsdataverse.analytics.metric_curves``), so the installed sdv-py defines the
 bucket edges and the attempt populations.
 
 Example:

@@ -157,7 +157,21 @@ for i in $(seq "${START_YEAR}" "${END_YEAR}"); do
       }
     }
 
-    run_py "$PY_FIRST" --publish
+    if [ "${CFB_GATE:-0}" = 1 ]; then
+      # G-CFB-1 (REPROCESS run #2): build pbp + adv_team unpublished, gate them, and publish
+      # pbp only on PASS. A FAIL restores both and skips the season's publishes and data commit
+      # (the season log is still committed below). Needs CFB_FINAL_CACHE = cfb-raw's cfb/json/final.
+      if ! { run_py "$PY_FIRST" && run_py adv_team --no-fetch \
+          && (cd python && "$PY" -m cfb_data_build.gate --base ../cfb --finals "$CFB_FINAL_CACHE" -s "$i" --publish); }; then
+        # a raise inside publish_dataset can follow a finished upload: say so, don't claim nothing went
+        echo "::error ::G-CFB-1 gate or its pbp publish failed for season $i: nothing else published (if the gate PASSED, check the espn_cfb_pbp release)"
+        git checkout -- cfb/pbp cfb/adv_team
+        echo "RSCRIPT_RC=1" > "/tmp/_rc_${i}"
+        exit 1
+      fi
+    else
+      run_py "$PY_FIRST" --publish
+    fi
     # Head-coach roster for the coach_tendencies stage: the vendored CSV only
     # knows the seasons it was refreshed for, so refresh this one from CFBD.
     # The module resolves CFBD_API_KEY itself (env, then ~/.Renviron), so the

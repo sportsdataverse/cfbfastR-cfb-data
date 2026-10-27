@@ -4,10 +4,12 @@ planted defect is counted -- a gate never seen to fail is decoration (see test_c
 
 from __future__ import annotations
 
+import json
+
 import polars as pl
 import pytest
 
-from cfb_data_build.gate import _adv_team_checks, _checks
+from cfb_data_build.gate import _adv_team_checks, _checks, _finals_with_plays
 
 #: Two games; a kickoff touchback, a pre-2014 XP row and two carries (a gain and a loss).
 CLEAN = {
@@ -79,3 +81,18 @@ def test_adv_team_yards_per_dropback():
     }
     frame = pl.DataFrame({"yards_per_dropback": [6.1, None]})
     assert _adv_team_checks(frame) == {"yards_per_dropback_missing": 1}
+    empty = pl.DataFrame({"yards_per_dropback": []}, schema={"yards_per_dropback": pl.Float64})
+    assert _adv_team_checks(empty) == {"adv_team_missing": 1}
+
+
+def test_finals_count(tmp_path):
+    finals = tmp_path / "cfb" / "json" / "final"
+    finals.mkdir(parents=True)
+    assert _finals_with_plays(finals, 2025) is None  # no master: the caller fails the season
+    pl.DataFrame(
+        {"season": [2025] * 4, "id": [1, 2, 3, 4], "status_type_completed": [True, True, True, False]}
+    ).write_parquet(tmp_path / "cfb" / "cfb_schedule_master.parquet")
+    (finals / "1.json").write_text(json.dumps({"plays": [{"id": 1}]}))
+    (finals / "2.json").write_text(json.dumps({"plays": []}))  # current but empty
+    # game 3 completed with no final; game 4 not played yet
+    assert _finals_with_plays(finals, 2025) == (1, 1)

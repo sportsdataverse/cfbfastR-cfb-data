@@ -79,33 +79,38 @@ def _adv_team_checks(adv_team: pl.DataFrame | None) -> dict[str, int]:
     """#740: every team row of the season's adv_team (advBoxScore.team) carries yards_per_dropback."""
     if adv_team is None:
         return {"adv_team_missing": 1}
+    if adv_team.height == 0:
+        return {"adv_team_missing": 1}
     if "yards_per_dropback" not in adv_team.columns:
-        return {"yards_per_dropback_missing": adv_team.height or 1}
+        return {"yards_per_dropback_missing": adv_team.height}
     return {"yards_per_dropback_missing": adv_team["yards_per_dropback"].null_count()}
 
 
-def _finals_with_plays(finals: Path, season: int) -> int | None:
-    """The season's cfb-raw finals that carry plays (an empty-but-current final has none).
+def _finals_with_plays(finals: Path, season: int) -> tuple[int, int] | None:
+    """``(finals with plays, completed games with no readable final)`` for the season.
+
+    An empty-but-current final has no plays. A completed game whose final is absent or
+    unreadable would drop out of the pbp build AND this count alike, so it is counted apart.
 
     The finals directory is flat (one ``{game_id}.json`` per game, every season), so the
     season's ids come from cfb-raw's ``cfb/cfb_schedule_master.parquet`` beside it; ``None``
-    when that file is absent (a ``.cache/cfb_final`` download cache has no master).
+    when that file is absent (a ``.cache/cfb_final`` download cache has no master), which
+    the caller counts as a failure.
     """
     master = finals.parent.parent / "cfb_schedule_master.parquet"
     if not master.exists():
         return None
-    ids = pl.read_parquet(master, columns=["season", "id"]).filter(pl.col("season") == season)["id"]
-    n = 0
-    for gid in ids.to_list():
-        f = finals / f"{gid}.json"
-        if not f.exists():
-            continue
+    games = pl.read_parquet(master, columns=["season", "id", "status_type_completed"]).filter(
+        pl.col("season") == season
+    )
+    n = lost = 0
+    for gid, completed in games.select("id", pl.col("status_type_completed").fill_null(False)).iter_rows():
         try:
-            if json.loads(f.read_text()).get("plays"):
+            if json.loads((finals / f"{gid}.json").read_text()).get("plays"):
                 n += 1
         except (OSError, ValueError):
-            continue
-    return n
+            lost += bool(completed)
+    return n, lost
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -131,11 +136,12 @@ def main(argv: list[str] | None = None) -> int:
         counts |= _adv_team_checks(pl.read_parquet(at) if at.exists() else None)
         if args.finals:
             have = pbp["game_id"].n_unique()
-            want = _finals_with_plays(Path(args.finals), season)
-            if want is None:
-                print(f"{season}: no cfb_schedule_master.parquet beside {args.finals}, game count skipped")
+            finals = _finals_with_plays(Path(args.finals), season)
+            if finals is None:  # no master to count against: fail, never publish unchecked
+                counts["finals_master_missing"] = 1
             else:
-                counts["games_short_of_finals"] = max(want - have, 0)
+                counts["games_short_of_finals"] = max(finals[0] - have, 0)
+                counts["completed_games_without_final"] = finals[1]
         bad = {k: v for k, v in counts.items() if v}
         ok &= not bad
         print(

@@ -139,3 +139,9 @@ overwrite, never write a zero-row asset. It **reuses** the injuries stage's
 
 ## Reference
 Data dictionary: `DATASETS.md`. Plan: `cfbfastR-cfb-raw/docs/superpowers/plans/2026-06-03-cfbfastR-cfb-data.md`.
+
+## Alt-source crosswalk fill (droplet cron)
+
+`bash scripts/cron_alt_fill.sh -s YYYY [-e YYYY] [-n]` runs on the droplet, not in a workflow:
+`/mnt/sdv_repos/bin/alt_daily.sh` (12:45 ET) calls it after parsing the season's CBS / Fox / Yahoo
+box scores into `cfbfastR-cfb-alt-data`. It rebuilds that season's ESPN <-> CBS / Fox / Yahoo player crosswalk (`python/build_cfb_players_crosswalk.py`, offline), publishes to the `cfb_crosswalk` tag only the parquets whose sha256 changed, then commits them. `-n` builds into a temp tree; no commit, no publish.

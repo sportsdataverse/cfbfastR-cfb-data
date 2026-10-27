@@ -10,6 +10,9 @@ parquet/csv/rds. Sibling of `cfbfastR-cfb-raw` (Python/uv).
 - `bash scripts/cron_daily_cfb.sh` — the daily build as the droplet cron runs it (chained after
   each cfbfastR-cfb-raw scrape; the only automatic producer since 2026-09-29 — `daily_cfb.yml`
   is a manual fallback). Log: `logs/cron_daily_cfb_data_YYYYMMDD.log`, ends with `EXIT=`.
+- `CFB_GATE=1 bash scripts/cron_daily_cfb.sh -s YYYY -e YYYY` — reprocess republish: builds pbp +
+  adv_team unpublished, runs G-CFB-1 (`python -m cfb_data_build.gate`), publishes only on PASS; a
+  FAIL publishes and commits nothing for that season.
 - `Rscript R/releases_init.R` — one-time release-tag creation on both publish repos.
 - `uv run python python/espn_injuries_daily_snapshot.py [-l nfl ...] [--publish]` — daily
   ESPN injuries snapshot, all 8 leagues (see "ESPN injuries" below). Build-only by default.

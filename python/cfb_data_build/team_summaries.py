@@ -308,25 +308,20 @@ def add_derived_metrics(plays: pl.DataFrame) -> pl.DataFrame:
         .otherwise(None),
     )
     df = df.with_columns(
+        # sdv-py's standard per-yard band (R843-3): losses 120%, yards 0-4 100%, yards 5-10 50%
+        # (cap 7); the second level takes the other half of 5-10 and open field the rest, so
+        # the three parts sum to the carry. It read 0.5 * yds for 5-10 (7 yards -> 3.5) and 0 past 10.
         line_yards=pl.when((pl.col("rush") == 1) & (pl.col("yds_rushed") < 0))
         .then(1.2 * pl.col("adj_rush_yardage"))
-        .when(
-            (pl.col("rush") == 1)
-            & (pl.col("yds_rushed") >= 0)
-            & (pl.col("yds_rushed") <= 4)
-        )
+        .when((pl.col("rush") == 1) & (pl.col("yds_rushed") <= 4))
         .then(pl.col("adj_rush_yardage"))
-        .when(
-            (pl.col("rush") == 1)
-            & (pl.col("yds_rushed") >= 5)
-            & (pl.col("yds_rushed") <= 10)
-        )
-        .then(0.5 * pl.col("adj_rush_yardage"))
-        .when((pl.col("rush") == 1) & (pl.col("yds_rushed") >= 11))
-        .then(pl.lit(0.0))
+        .when((pl.col("rush") == 1) & (pl.col("yds_rushed") <= 10))
+        .then(4 + 0.5 * (pl.col("adj_rush_yardage") - 4))
+        .when((pl.col("rush") == 1) & (pl.col("yds_rushed") > 10))
+        .then(pl.lit(7.0))
         .otherwise(None),
-        second_level_yards=pl.when((pl.col("rush") == 1) & (pl.col("yds_rushed") >= 5))
-        .then(0.5 * (pl.col("adj_rush_yardage") - 5))
+        second_level_yards=pl.when((pl.col("rush") == 1) & (pl.col("yds_rushed") >= 4))
+        .then(0.5 * (pl.col("adj_rush_yardage") - 4))
         .when(pl.col("rush") == 1)
         .then(pl.lit(0.0))
         .otherwise(None),

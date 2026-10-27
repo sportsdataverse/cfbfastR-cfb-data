@@ -613,15 +613,18 @@ build_team_summaries_season <- function(yr, publish = TRUE) {
                 (rush == 1) & (yds_rushed <= 10) ~ yds_rushed,
                 .default = NA_real_
             ),
+            # sdv-py's standard per-yard band (R843-3): losses 120%, 0-4 100%, 5-10 50% (cap 7);
+            # the second level takes the other half of 5-10, open field the rest, so the parts
+            # sum to the carry. It read 0.5 * yds for 5-10 (7 yards -> 3.5) and 0 past 10.
             line_yards = dplyr::case_when(
                 (rush == 1) & (yds_rushed < 0) ~ (1.2 * adj_rush_yardage),
-                (rush == 1) & (yds_rushed >= 0) & (yds_rushed <= 4) ~ adj_rush_yardage,
-                (rush == 1) & (yds_rushed >= 5) & (yds_rushed <= 10) ~ (0.5 * adj_rush_yardage),
-                (rush == 1) & (yds_rushed >= 11) ~ 0,
+                (rush == 1) & (yds_rushed <= 4) ~ adj_rush_yardage,
+                (rush == 1) & (yds_rushed <= 10) ~ (4 + 0.5 * (adj_rush_yardage - 4)),
+                (rush == 1) & (yds_rushed > 10) ~ 7,
                 .default = NA_real_
             ),
             second_level_yards = dplyr::case_when(
-                (rush == 1) & (yds_rushed >= 5) ~ (0.5 * (adj_rush_yardage - 5)),
+                (rush == 1) & (yds_rushed >= 4) ~ (0.5 * (adj_rush_yardage - 4)),
                 (rush == 1) ~ 0,
                 .default = NA_real_
             ),

@@ -248,7 +248,7 @@ requires-dist = [
     { name = "requests", specifier = ">=2.28" },
     { name = "scikit-learn", specifier = ">=1.2" },
     { name = "scipy", specifier = ">=1.10" },
-    { name = "sportsdataverse", git = "https://github.com/sportsdataverse/sportsdataverse-py?rev=c2031afbc72a0e892a19e56a0c03dd1425f76c40" },
+    { name = "sportsdataverse", git = "https://github.com/sportsdataverse/sportsdataverse-py?rev=377094931b9c1eee56dabc75b89436354748c0d6" },
     { name = "tqdm", specifier = ">=4.66" },
     { name = "xgboost", specifier = ">=2.0" },
 ]
@@ -2848,8 +2848,8 @@ wheels = [
 
 [[package]]
 name = "sportsdataverse"
-version = "0.1.5"
-source = { git = "https://github.com/sportsdataverse/sportsdataverse-py?rev=c2031afbc72a0e892a19e56a0c03dd1425f76c40#c2031afbc72a0e892a19e56a0c03dd1425f76c40" }
+version = "0.2.0b1"
+source = { git = "https://github.com/sportsdataverse/sportsdataverse-py?rev=377094931b9c1eee56dabc75b89436354748c0d6#377094931b9c1eee56dabc75b89436354748c0d6" }
 dependencies = [
     { name = "beautifulsoup4" },
     { name = "lxml" },

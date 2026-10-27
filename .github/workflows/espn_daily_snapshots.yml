@@ -71,7 +71,7 @@ jobs:
       - name: Install sportsdataverse from git (pinned)
         run: |
           uv pip install \
-            "sportsdataverse @ git+https://github.com/sportsdataverse/sportsdataverse-py.git@c2031afbc72a0e892a19e56a0c03dd1425f76c40"
+            "sportsdataverse @ git+https://github.com/sportsdataverse/sportsdataverse-py.git@377094931b9c1eee56dabc75b89436354748c0d6"
 
       # Every `uv run` passes --no-sync: a bare `uv run` re-syncs from uv.lock
       # and silently reverts the git install above.

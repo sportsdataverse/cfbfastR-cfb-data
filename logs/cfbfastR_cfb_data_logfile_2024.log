@@ -1,16 +1,29 @@
   pos_team: 100.0% of rows resolved to a team name
   def_pos_team: 100.0% of rows resolved to a team name
-pbp 2024: 163567 rows from 966 games
+pbp 2024: 163565 rows from 966 games
+  pos_team: 100.0% of rows resolved to a team name
+adv_team 2024: 1892 rows from 966 games
+2024: PASS first_half_kickoff_team_varies=0 receives_2h_kickoff_after_half=0 kickoff_touchback_spot=0 touchback_return_not_25=0 line_yards_parts=0 yards_per_dropback_missing=0 games_short_of_finals=0 completed_games_without_final=0
+G-CFB-1: PASS
 2024: 152 coach-seasons, 130 cleanly attributed
 play_participants 2024: 151764 rows from 966 games
+espn_cfb_play_participants: 1 unchanged asset(s) skipped, 2 uploaded
 team_box 2024: 1932 rows from 966 games
+espn_cfb_team_box: 1 unchanged asset(s) skipped, 2 uploaded
 player_box 2024: 78993 rows from 966 games
+espn_cfb_player_box: 3 unchanged asset(s) skipped, 0 uploaded
 drives 2024: 22419 rows from 966 games
+espn_cfb_drives: 1 unchanged asset(s) skipped, 2 uploaded
 game_rosters 2024: 231077 rows from 966 games
+espn_cfb_game_rosters: 1 unchanged asset(s) skipped, 2 uploaded
 betting 2024: 966 rows from 966 games
+espn_cfb_betting: 1 unchanged asset(s) skipped, 2 uploaded
 schedules 2024: 966 rows from 966 games
+espn_cfb_schedules: 1 unchanged asset(s) skipped, 2 uploaded
 linescores 2024: 7862 rows from 966 games
+espn_cfb_linescores: 1 unchanged asset(s) skipped, 2 uploaded
   power_index 2024: 1838 rows, 7 cols
+espn_cfb_power_index: 1 unchanged asset(s) skipped, 2 uploaded
 
 === power_index: 0 failures ===
 injuries 2024: 0 rows from 966 games
@@ -19,9 +32,9 @@ adv_team 2024: 1892 rows from 966 games
   pos_team: 100.0% of rows resolved to a team name
 adv_passing 2024: 2952 rows from 966 games
   pos_team: 100.0% of rows resolved to a team name
-adv_rushing 2024: 9960 rows from 966 games
+adv_rushing 2024: 9951 rows from 966 games
   pos_team: 100.0% of rows resolved to a team name
-adv_receiving 2024: 16006 rows from 966 games
+adv_receiving 2024: 16004 rows from 966 games
   def_pos_team: 100.0% of rows resolved to a team name
 adv_defensive 2024: 1892 rows from 966 games
   pos_team: 100.0% of rows resolved to a team name
@@ -31,13 +44,13 @@ adv_drives 2024: 1892 rows from 966 games
   pos_team: 100.0% of rows resolved to a team name
 adv_situational 2024: 1892 rows from 966 games
   def_pos_team: 100.0% of rows resolved to a team name
-adv_defensive_players 2024: 5570 rows from 966 games
+adv_defensive_players 2024: 5596 rows from 966 games
   pos_team: 100.0% of rows resolved to a team name
-adv_specialists 2024: 9353 rows from 966 games
+adv_specialists 2024: 7194 rows from 966 games
   pos_team: 100.0% of rows resolved to a team name
-adv_player_usage 2024: 19842 rows from 966 games
+adv_player_usage 2024: 19830 rows from 966 games
   pos_team: 100.0% of rows resolved to a team name
-adv_position_group_usage 2024: 7491 rows from 966 games
+adv_position_group_usage 2024: 7492 rows from 966 games
   def_pos_team: 100.0% of rows resolved to a team name
 adv_tackles 2024: 32814 rows from 966 games
   def_pos_team: 100.0% of rows resolved to a team name
@@ -47,7 +60,7 @@ adv_team_usage 2024: 1892 rows from 966 games
   pos_team: 100.0% of rows resolved to a team name
 adv_drive_scripting 2024: 3784 rows from 966 games
   pos_team: 100.0% of rows resolved to a team name
-usage_players 2024: 4164 rows from 966 games
+usage_players 2024: 4151 rows from 966 games
   pos_team: 100.0% of rows resolved to a team name
 usage_position_groups 2024: 1050 rows from 966 games
   def_pos_team: 100.0% of rows resolved to a team name
@@ -59,34 +72,37 @@ usage_teams 2024: 235 rows from 966 games
   pos_team: 100.0% of rows resolved to a team name
 usage_drive_scripting 2024: 470 rows from 966 games
   pos_team: 100.0% of rows resolved to a team name
-adv_st_kickers 2024: 3342 rows from 966 games
+adv_st_kickers 2024: 3341 rows from 966 games
   pos_team: 100.0% of rows resolved to a team name
 adv_st_punters 2024: 2015 rows from 966 games
   pos_team: 100.0% of rows resolved to a team name
 adv_st_returners 2024: 3145 rows from 966 games
   def_pos_team: 100.0% of rows resolved to a team name
-adv_st_blocks 2024: 85 rows from 966 games
+adv_st_blocks 2024: 84 rows from 966 games
   pos_team: 100.0% of rows resolved to a team name
 adv_st_team 2024: 1892 rows from 966 games
   pos_team: 100.0% of rows resolved to a team name
-usage_st_kickers 2024: 881 rows from 966 games
+usage_st_kickers 2024: 880 rows from 966 games
   pos_team: 100.0% of rows resolved to a team name
 usage_st_punters 2024: 332 rows from 966 games
   pos_team: 100.0% of rows resolved to a team name
 usage_st_returners 2024: 1082 rows from 966 games
   def_pos_team: 100.0% of rows resolved to a team name
-usage_st_blocks 2024: 81 rows from 966 games
+usage_st_blocks 2024: 80 rows from 966 games
   pos_team: 100.0% of rows resolved to a team name
 usage_st_team 2024: 235 rows from 966 games
-  adv_team_gamelog 2024: 1892 rows, 90 cols
+  adv_team_gamelog 2024: 1892 rows, 92 cols
 
 === gamelog: 0 failures ===
-  team_opponent_splits 2024: 1892 rows, 13 cols
+  team_opponent_splits 2024: 1892 rows, 19 cols
 
 === team_opponent_splits: 0 failures ===
   metric_curves 2024: 7379 rows, 14 cols
 
 === metric_curves: 0 failures ===
+  paper_index_games 2024: 1890 rows, 17 cols
+
+=== paper_index_games: 0 failures ===
 qa 2024: 966 rows from 966 games
   cfb_schedules 2024: 3801 rows, 43 cols, fbs_game=799, fbs_participant=920, unplayed=1, ranked_sides=346
 
@@ -97,120 +113,142 @@ team_tendencies 2024: 235 rows from 966 games
   pos_team: 100.0% of rows resolved to a team name
 coach_tendencies 2024: 130 rows from 966 games
 cfb_rosters 2024: 27477 rows from 966/966 games | position 100.0% | division 100.0% | cfbd_recruit_ids 75.9% of 22837 cfbd athletes
+espn_cfb_rosters: 1 unchanged asset(s) skipped, 2 uploaded
 
 === cfb_rosters: 0 failures ===
+[summaries 2024] receiving: 77.2% of incompletions name no receiver (> 30%); per-target rates null
 [summaries 2024] percentiles: 99 rows
 [summaries 2024] team_summaries: 134 rows
 [summaries 2024] passing: 548 rows
 [summaries 2024] rushing: 1644 rows
 [summaries 2024] receiving: 2113 rows
-[summaries 2024] league_averages: 824 rows
+[summaries 2024] league_averages: 848 rows
   rolling_windows 2024: 27108 rows, 20 cols
 
 === rolling_windows: 0 failures ===
   cfb_ratings_weekly 2024: 2079 rows, 19 cols, 16 weekly snapshots
 
 === ratings_weekly: 0 failures ===
+[summaries 2024] receiving: 78.6% of incompletions name no receiver (> 30%); per-target rates null
 [summaries 2024] percentiles: 99 rows
 [summaries 2024] team_summaries: 75 rows
 [summaries 2024] passing: 112 rows
 [summaries 2024] rushing: 414 rows
 [summaries 2024] receiving: 593 rows
-[summaries 2024] league_averages: 824 rows
+[summaries 2024] league_averages: 818 rows
+[summaries 2024] receiving: 86.0% of incompletions name no receiver (> 30%); per-target rates null
 [summaries 2024] percentiles: 99 rows
 [summaries 2024] team_summaries: 130 rows
 [summaries 2024] passing: 206 rows
 [summaries 2024] rushing: 754 rows
 [summaries 2024] receiving: 1076 rows
-[summaries 2024] league_averages: 824 rows
+[summaries 2024] league_averages: 848 rows
+[summaries 2024] receiving: 86.8% of incompletions name no receiver (> 30%); per-target rates null
 [summaries 2024] percentiles: 99 rows
 [summaries 2024] team_summaries: 133 rows
 [summaries 2024] passing: 266 rows
 [summaries 2024] rushing: 892 rows
 [summaries 2024] receiving: 1331 rows
-[summaries 2024] league_averages: 824 rows
+[summaries 2024] league_averages: 848 rows
+[summaries 2024] receiving: 88.6% of incompletions name no receiver (> 30%); per-target rates null
 [summaries 2024] percentiles: 99 rows
 [summaries 2024] team_summaries: 133 rows
 [summaries 2024] passing: 301 rows
 [summaries 2024] rushing: 1012 rows
 [summaries 2024] receiving: 1480 rows
-[summaries 2024] league_averages: 824 rows
+[summaries 2024] league_averages: 848 rows
+[summaries 2024] receiving: 87.2% of incompletions name no receiver (> 30%); per-target rates null
 [summaries 2024] percentiles: 99 rows
 [summaries 2024] team_summaries: 134 rows
 [summaries 2024] passing: 322 rows
 [summaries 2024] rushing: 1095 rows
 [summaries 2024] receiving: 1578 rows
-[summaries 2024] league_averages: 824 rows
+[summaries 2024] league_averages: 848 rows
+[summaries 2024] receiving: 87.8% of incompletions name no receiver (> 30%); per-target rates null
 [summaries 2024] percentiles: 99 rows
 [summaries 2024] team_summaries: 134 rows
 [summaries 2024] passing: 344 rows
 [summaries 2024] rushing: 1173 rows
 [summaries 2024] receiving: 1651 rows
-[summaries 2024] league_averages: 824 rows
+[summaries 2024] league_averages: 848 rows
+[summaries 2024] receiving: 87.5% of incompletions name no receiver (> 30%); per-target rates null
 [summaries 2024] percentiles: 99 rows
 [summaries 2024] team_summaries: 134 rows
 [summaries 2024] passing: 362 rows
 [summaries 2024] rushing: 1241 rows
 [summaries 2024] receiving: 1713 rows
-[summaries 2024] league_averages: 824 rows
+[summaries 2024] league_averages: 848 rows
+[summaries 2024] receiving: 88.3% of incompletions name no receiver (> 30%); per-target rates null
 [summaries 2024] percentiles: 99 rows
 [summaries 2024] team_summaries: 134 rows
 [summaries 2024] passing: 386 rows
 [summaries 2024] rushing: 1310 rows
 [summaries 2024] receiving: 1760 rows
-[summaries 2024] league_averages: 824 rows
+[summaries 2024] league_averages: 848 rows
+[summaries 2024] receiving: 87.0% of incompletions name no receiver (> 30%); per-target rates null
 [summaries 2024] percentiles: 99 rows
 [summaries 2024] team_summaries: 134 rows
 [summaries 2024] passing: 411 rows
 [summaries 2024] rushing: 1367 rows
 [summaries 2024] receiving: 1830 rows
-[summaries 2024] league_averages: 824 rows
+[summaries 2024] league_averages: 848 rows
+[summaries 2024] receiving: 87.4% of incompletions name no receiver (> 30%); per-target rates null
 [summaries 2024] percentiles: 99 rows
 [summaries 2024] team_summaries: 134 rows
 [summaries 2024] passing: 432 rows
 [summaries 2024] rushing: 1411 rows
 [summaries 2024] receiving: 1868 rows
-[summaries 2024] league_averages: 824 rows
+[summaries 2024] league_averages: 848 rows
+[summaries 2024] receiving: 85.6% of incompletions name no receiver (> 30%); per-target rates null
 [summaries 2024] percentiles: 99 rows
 [summaries 2024] team_summaries: 134 rows
 [summaries 2024] passing: 446 rows
 [summaries 2024] rushing: 1455 rows
 [summaries 2024] receiving: 1911 rows
-[summaries 2024] league_averages: 824 rows
+[summaries 2024] league_averages: 848 rows
+[summaries 2024] receiving: 83.8% of incompletions name no receiver (> 30%); per-target rates null
 [summaries 2024] percentiles: 99 rows
 [summaries 2024] team_summaries: 134 rows
 [summaries 2024] passing: 466 rows
 [summaries 2024] rushing: 1501 rows
 [summaries 2024] receiving: 1958 rows
-[summaries 2024] league_averages: 824 rows
+[summaries 2024] league_averages: 848 rows
+[summaries 2024] receiving: 81.6% of incompletions name no receiver (> 30%); per-target rates null
 [summaries 2024] percentiles: 99 rows
 [summaries 2024] team_summaries: 134 rows
 [summaries 2024] passing: 495 rows
 [summaries 2024] rushing: 1545 rows
 [summaries 2024] receiving: 2008 rows
-[summaries 2024] league_averages: 824 rows
+[summaries 2024] league_averages: 848 rows
+[summaries 2024] receiving: 80.2% of incompletions name no receiver (> 30%); per-target rates null
 [summaries 2024] percentiles: 99 rows
 [summaries 2024] team_summaries: 134 rows
 [summaries 2024] passing: 517 rows
 [summaries 2024] rushing: 1582 rows
 [summaries 2024] receiving: 2040 rows
-[summaries 2024] league_averages: 824 rows
+[summaries 2024] league_averages: 848 rows
+[summaries 2024] receiving: 79.8% of incompletions name no receiver (> 30%); per-target rates null
 [summaries 2024] percentiles: 99 rows
 [summaries 2024] team_summaries: 134 rows
 [summaries 2024] passing: 521 rows
 [summaries 2024] rushing: 1586 rows
 [summaries 2024] receiving: 2042 rows
-[summaries 2024] league_averages: 824 rows
+[summaries 2024] league_averages: 848 rows
+[summaries 2024] receiving: 79.7% of incompletions name no receiver (> 30%); per-target rates null
 [summaries 2024] percentiles: 99 rows
 [summaries 2024] team_summaries: 134 rows
 [summaries 2024] passing: 521 rows
 [summaries 2024] rushing: 1587 rows
 [summaries 2024] receiving: 2043 rows
-[summaries 2024] league_averages: 824 rows
-  cfb_team_summaries_weekly 2024: 2079 rows, 782 cols, 16 weekly snapshots
+[summaries 2024] league_averages: 848 rows
+  cfb_team_summaries_weekly 2024: 2079 rows, 789 cols, 16 weekly snapshots
 
 === team_summaries_weekly: 0 failures ===
+  defense_vs_position 2024: 933 rows, 25 cols
+
+=== defense_vs_position: 0 failures ===
   cfb_matchup_features 2024: 1719 rows, 45 cols
+cfb_matchup_features: 1 unchanged asset(s) skipped, 2 uploaded
 
 === matchup_features: 0 failures ===
 /mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/matchup_side.py:371: UserWarning: matchup reference 2024: spellings that matched no CFBD school QB starters: ['St. Francis (PA) Red Flash']; coach continuity: ['Sam Houston State']; returning production: ['USF']
@@ -227,4 +265,17 @@ cfb_rosters 2024: 27477 rows from 966/966 games | position 100.0% | division 100
   cfb_returning_production 2024: 229 rows
 
 === returning_production: 0 failures ===
+  cfb_team_portal 2024: 236 rows
+
+=== team_portal: 0 failures ===
+2026-10-27 21:39:28,669 INFO === season 2024 ===
+2026-10-27 21:39:30,909 INFO wrote cfb_teams_crosswalk_2024.parquet (829 rows, 11 cols)
+2026-10-27 21:39:42,703 INFO wrote cfb_schedule_crosswalk_2024.parquet (1672 rows, 11 cols)
+2026-10-27 21:39:42,705 INFO wrote manifest cfb_crosswalk_in_data_repo.csv (41 rows)
+2026-10-27 21:39:42,705 INFO built 3 artifact(s) under cfb/crosswalk/parquet
+2026-10-27 21:39:43,136 INFO uploading 3 of 3 asset(s) to sportsdataverse/sportsdataverse-data@cfb_crosswalk (one at a time)
+2026-10-27 21:39:44,450 INFO   uploaded cfb_teams_crosswalk_2024.parquet
+2026-10-27 21:39:45,662 INFO   uploaded cfb_schedule_crosswalk_2024.parquet
+2026-10-27 21:39:46,729 INFO   uploaded cfb_crosswalk_in_data_repo.csv
+2026-10-27 21:39:51,263 INFO published to sportsdataverse/sportsdataverse-data@cfb_crosswalk
 pushed: CFB Data Updated (Start: 2024 End: 2024) (attempt 1)

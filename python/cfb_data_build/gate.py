@@ -76,14 +76,25 @@ def _checks(pbp: pl.DataFrame, season: int) -> dict[str, int]:
 
 
 def _adv_team_checks(adv_team: pl.DataFrame | None) -> dict[str, int]:
-    """#740: every team row of the season's adv_team (advBoxScore.team) carries yards_per_dropback."""
+    """#740: every team row with a dropback carries yards_per_dropback.
+
+    A team that never dropped back (Air Force threw no pass and took no sack v UNLV, 401310752,
+    2021) has no rate to report: ``passes_rate == 0`` rows are exempt. A null ``passes_rate``
+    still counts, so a broken passes column cannot hide a missing rate.
+    """
     if adv_team is None:
         return {"adv_team_missing": 1}
     if adv_team.height == 0:
         return {"adv_team_missing": 1}
     if "yards_per_dropback" not in adv_team.columns:
         return {"yards_per_dropback_missing": adv_team.height}
-    return {"yards_per_dropback_missing": adv_team["yards_per_dropback"].null_count()}
+    dropped_back = (
+        pl.col("passes_rate").is_null() | (pl.col("passes_rate") > 0)
+        if "passes_rate" in adv_team.columns
+        else pl.lit(True)
+    )
+    missing = adv_team.filter(pl.col("yards_per_dropback").is_null() & dropped_back).height
+    return {"yards_per_dropback_missing": missing}
 
 
 def _finals_with_plays(finals: Path, season: int) -> tuple[int, int] | None:

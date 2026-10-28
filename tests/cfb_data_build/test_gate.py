@@ -81,6 +81,11 @@ def test_adv_team_yards_per_dropback():
     }
     frame = pl.DataFrame({"yards_per_dropback": [6.1, None]})
     assert _adv_team_checks(frame) == {"yards_per_dropback_missing": 1}
+    # zero dropbacks has no rate: exempt; a null passes_rate still counts
+    no_dropbacks = pl.DataFrame({"yards_per_dropback": [6.1, None], "passes_rate": [0.4, 0.0]})
+    assert _adv_team_checks(no_dropbacks) == {"yards_per_dropback_missing": 0}
+    unknown = pl.DataFrame({"yards_per_dropback": [None, None], "passes_rate": [0.0, None]})
+    assert _adv_team_checks(unknown) == {"yards_per_dropback_missing": 1}
     empty = pl.DataFrame({"yards_per_dropback": []}, schema={"yards_per_dropback": pl.Float64})
     assert _adv_team_checks(empty) == {"adv_team_missing": 1}
 

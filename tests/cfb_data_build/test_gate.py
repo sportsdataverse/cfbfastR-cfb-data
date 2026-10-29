@@ -22,6 +22,7 @@ CLEAN = {
     "kickoff_tb": [True, False, False, False, False],
     "yds_kickoff_return": [None, None, None, None, None],
     "type.text": ["Kickoff", "Extra Point Good", "Rush", "Rush", "Pass"],
+    "text": ["kickoff", "PAT good", "12 yd run", "2 yd loss", "pass"],
     "xp_attempt": [False, True, False, False, False],
     "rush": [False, False, True, True, False],
     "yds_rushed": [None, None, 12.0, -2.0, None],
@@ -64,6 +65,18 @@ def test_clean_season_passes():
 )
 def test_each_defect_is_counted(check, season, override):
     assert _checks(_pbp(**override), season)[check] == 1
+
+
+def test_pre2014_failed_two_point_try_is_not_an_xp():
+    # the pre-2014 feed types a failed 2-pt try "Extra Point Missed"; it is not an xp_attempt
+    failed_2pt = _pbp(
+        type__text=(1, "Extra Point Missed"),
+        text=(1, "Aaron Murray pass attempt failed ."),
+        xp_attempt=(1, False),
+    )
+    assert _checks(failed_2pt, 2011)["pre2014_xp_not_flagged"] == 0
+    missed_kick = _pbp(type__text=(1, "Extra Point Missed"), xp_attempt=(1, False))
+    assert _checks(missed_kick, 2011)["pre2014_xp_not_flagged"] == 1
 
 
 def test_2012_touchback_returns_to_the_25():

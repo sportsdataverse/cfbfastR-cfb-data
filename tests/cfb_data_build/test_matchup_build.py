@@ -160,3 +160,24 @@ def test_fetch_cfbd_games_rejects_an_error_body(
         schedules_unified.fetch_cfbd_games(2025)
     monkeypatch.setattr(schedules_unified, "_get", lambda *a, **k: "[]")
     assert schedules_unified.fetch_cfbd_games(2025) == []
+
+
+def test_builders_skip_seasons_below_the_pbp_floor(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """The pbp release starts in 2014 and stage 42 reads the prior season: 2013 /
+    2014 must be skipped, not failed (they failed the 2014-and-earlier reprocess)."""
+    from cfb_data_build.derived import build_derived
+
+    def boom(*_a: object, **_k: object) -> pl.DataFrame:
+        raise AssertionError("builder called below the floor")
+
+    monkeypatch.setattr(matchup_build, "build_matchup_features", boom)
+    monkeypatch.setattr(matchup_build, "build_matchup_line_season", boom)
+    assert build_derived("matchup_features", 2013, 2013, dry_run=True) == []
+    assert build_derived("matchup_line", 2014, 2014, dry_run=True) == []
+    out = capsys.readouterr().out
+    assert "cfb_matchup_features 2013: 0 rows, skipped" in out
+    assert "cfb_matchup_line 2014: 0 rows, skipped" in out
+    # at the floor the real builder runs
+    assert build_derived("matchup_line", 2015, 2015, dry_run=True) == [(2015, "AssertionError")]

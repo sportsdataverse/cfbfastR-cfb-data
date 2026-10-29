@@ -685,13 +685,24 @@ def _report_gaps(
         )
 
 
+#: first season of the ``cfbfastR_cfb_pbp`` release the matchup stages read
+#: (``load_cfb_pbp_r`` raises SeasonNotFoundError below it). Stage 42 also reads
+#: the prior season, so its floor is one later. Below a floor the builder returns
+#: an empty frame and ``build_derived`` skips the season instead of failing it.
+MATCHUP_PBP_FLOOR = 2014
+
+
 def _build_matchup_features(season: int, *, base: str = "cfb") -> pl.DataFrame:
+    if season < MATCHUP_PBP_FLOOR:
+        return pl.DataFrame()
     from cfb_data_build.matchup_build import build_matchup_features
 
     return build_matchup_features(season, base=base)
 
 
 def _build_matchup_line(season: int, *, base: str = "cfb") -> pl.DataFrame:
+    if season < MATCHUP_PBP_FLOOR + 1:
+        return pl.DataFrame()
     from cfb_data_build.matchup_build import build_matchup_line_season
 
     return build_matchup_line_season(season, base=base)

@@ -75,6 +75,14 @@ def test_pre2014_failed_two_point_try_is_not_an_xp():
         xp_attempt=(1, False),
     )
     assert _checks(failed_2pt, 2011)["pre2014_xp_not_flagged"] == 0
+    combined = _pbp(
+        type__text=(1, "Extra Point Good"),
+        text=(1, "Chris Stevens returned fumble 30 yards for a TOUCHDOWN. Ryan Perkins extra point GOOD."),
+        xp_attempt=(1, False),
+    )
+    assert _checks(combined, 2011)["pre2014_xp_not_flagged"] == 0
+    unenriched = _pbp(type__text=(1, "Extra Point Good"), xp_attempt=(1, None), period=(1, None))
+    assert _checks(unenriched, 2011)["pre2014_xp_not_flagged"] == 0
     missed_kick = _pbp(type__text=(1, "Extra Point Missed"), xp_attempt=(1, False))
     assert _checks(missed_kick, 2011)["pre2014_xp_not_flagged"] == 1
 

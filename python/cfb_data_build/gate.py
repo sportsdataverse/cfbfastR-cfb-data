@@ -28,6 +28,9 @@ _TOUCHBACK_CUT = 2012
 _XP_TEXT = (
     r"(?i)^(extra point|pat|kick attempt)\b|\bextra point (good|missed|blocked|no good)"
 )
+#: ...except a failed two-point try, which the pre-2014 feed also types "Extra Point Missed"
+#: ("Aaron Murray pass attempt failed ."): 135 rows in 2013, and not an xp_attempt.
+_FAILED_2PT_TEXT = r"(?i)\b(pass|rush) attempt failed\b"
 
 
 def _checks(pbp: pl.DataFrame, season: int) -> dict[str, int]:
@@ -63,6 +66,7 @@ def _checks(pbp: pl.DataFrame, season: int) -> dict[str, int]:
     if season < 2014:
         out["pre2014_xp_not_flagged"] = pbp.filter(
             pl.col("type.text").fill_null("").str.contains(_XP_TEXT)
+            & ~pl.col("text").fill_null("").str.contains(_FAILED_2PT_TEXT)
             & (pl.col("xp_attempt") != True).fill_null(True)  # noqa: E712
         ).height
     # the three line-yards parts sum to the carry on every gain (R843-2)

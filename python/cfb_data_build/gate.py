@@ -31,6 +31,9 @@ _XP_TEXT = (
 #: ...except a failed two-point try, which the pre-2014 feed also types "Extra Point Missed"
 #: ("Aaron Murray pass attempt failed ."): 135 rows in 2013, and not an xp_attempt.
 _FAILED_2PT_TEXT = r"(?i)\b(pass|rush) attempt failed\b"
+#: ...or a return TD with the try folded into its text ("returned fumble 30 yards for a
+#: TOUCHDOWN. Ryan Perkins extra point GOOD."): the row is the scoring play, not a standalone XP.
+_COMBINED_TD_TEXT = r"(?i)\btouchdown\b"
 
 
 def _checks(pbp: pl.DataFrame, season: int) -> dict[str, int]:
@@ -67,6 +70,10 @@ def _checks(pbp: pl.DataFrame, season: int) -> dict[str, int]:
         out["pre2014_xp_not_flagged"] = pbp.filter(
             pl.col("type.text").fill_null("").str.contains(_XP_TEXT)
             & ~pl.col("text").fill_null("").str.contains(_FAILED_2PT_TEXT)
+            & ~pl.col("text").fill_null("").str.contains(_COMBINED_TD_TEXT)
+            # an unenriched game (corrupt feed, every derived column null) is not an
+            # xp_attempt defect; those games exist in every era and are tracked apart
+            & pl.col("period").is_not_null()
             & (pl.col("xp_attempt") != True).fill_null(True)  # noqa: E712
         ).height
     # the three line-yards parts sum to the carry on every gain (R843-2)

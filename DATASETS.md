@@ -1967,6 +1967,11 @@ kept, FCS opponents and bowls included; "FBS only" is a consumer filter. Ids are
 | epa_per_rush | double | Offensive EPA per rush play (`adv_team_gamelog.EPA_rushing_per_play`). |
 | success_rate_pass | double | Offensive EPA success rate on pass plays (`adv_situational.EPA_success_pass_rate`); null when the game has no situational row for the team. |
 | success_rate_rush | double | Offensive EPA success rate on rush plays (`adv_situational.EPA_success_rush_rate`); null when the game has no situational row for the team. |
+| is_conference_game | logical | ESPN's `conferenceCompetition` flag (schedule master `conference_competition`): false for conference title games, bowls and the CFP; null before 2014, when ESPN did not set it. |
+| neutral_site | logical | The game was at a neutral site (`is_home` is then the listed home side). |
+| opponent_fbs | logical | The opponent was FBS that season (`cfb_teams.is_fbs`); null if ESPN lists no such team. |
+| game_date | date | Kickoff's calendar day in US/Eastern. |
+| win | logical | `points_for > points_against`; null when the game has no final score. |
 
 _Release tag: `cfb_team_opponent_splits`_
 

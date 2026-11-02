@@ -474,10 +474,23 @@ TEAM_OPPONENT_SPLITS_SCHEMA: dict[str, pl.DataType] = {
     "epa_per_rush": pl.Float64,
     "success_rate_pass": pl.Float64,
     "success_rate_rush": pl.Float64,
+    # game-set filters (GOP S6): ESPN's conferenceCompetition, the gamelog's
+    # neutral_site / win, the opponent's cfb_teams.is_fbs, the US/Eastern kickoff day
+    "is_conference_game": pl.Boolean,
+    "neutral_site": pl.Boolean,
+    "opponent_fbs": pl.Boolean,
+    "game_date": pl.Date,
+    "win": pl.Boolean,
 }
 
+#: ESPN sets ``conferenceCompetition`` from 2014 on; 2004-2013 carry it false on
+#: every game (two exceptions in 2008), so those seasons get a null flag
+CONFERENCE_FLAG_FIRST_SEASON = 2014
 
-def build_team_opponent_splits(season: int, *, base: str = "cfb") -> pl.DataFrame:
+
+def build_team_opponent_splits(
+    season: int, *, base: str = "cfb", schedule_path: "Path | None" = None
+) -> pl.DataFrame:
     """One row per team-GAME: opponent, EPA/play, success rate, pass/rush splits and points.
 
     A projection, not a new aggregation: ``adv_team_gamelog`` gives the game
@@ -495,12 +508,28 @@ def build_team_opponent_splits(season: int, *, base: str = "cfb") -> pl.DataFram
     adv_team's: ``pos_team_id`` when present (``pos_team`` is then the name),
     else the id itself in ``pos_team`` (older assets). Unlike there, the cast
     is strict: an id that will not parse raises rather than nulling a join key.
+
+    The game-set columns: ``is_conference_game`` is the schedule master's
+    ``conference_competition`` (ESPN's flag: false for conference title games and
+    the CFP, null before :data:`CONFERENCE_FLAG_FIRST_SEASON`); ``opponent_fbs``
+    is ``cfb_teams.is_fbs`` for the season (null for an opponent ESPN does not
+    list); ``game_date`` is the kickoff's US/Eastern calendar day. A missing
+    cfb_teams parquet raises, like a missing situational one; a missing schedule
+    master skips the season, as it does gamelog.
     """
     root = Path(base)
     gamelog = (
         root / "adv_team_gamelog" / "parquet" / f"adv_team_gamelog_{season}.parquet"
     )
     if not gamelog.exists():
+        return pl.DataFrame(schema=TEAM_OPPONENT_SPLITS_SCHEMA)
+    if not schedule_master_available(schedule_path):
+        # gamelog's contract: no master, no build (and no red job)
+        print(
+            f"  team_opponent_splits {season}: skipped -- no cfbfastR-cfb-raw "
+            f"schedule master at {_schedule_master()} (set CFB_RAW_ROOT)",
+            flush=True,
+        )
         return pl.DataFrame(schema=TEAM_OPPONENT_SPLITS_SCHEMA)
     gl = pl.read_parquet(gamelog).select(
         *(
@@ -526,6 +555,33 @@ def build_team_opponent_splits(season: int, *, base: str = "cfb") -> pl.DataFram
         pl.col("rushes").cast(pl.Int64).alias("rush_plays"),
         pl.col("EPA_passing_per_play").alias("epa_per_pass"),
         pl.col("EPA_rushing_per_play").alias("epa_per_rush"),
+        "neutral_site",
+        "win",
+        pl.col("start_date")
+        .str.to_datetime("%Y-%m-%dT%H:%MZ", time_zone="UTC")
+        .dt.convert_time_zone("America/New_York")
+        .dt.date()
+        .alias("game_date"),
+    )
+    sched = pl.read_parquet(
+        schedule_path if schedule_path is not None else _schedule_master()
+    ).filter(pl.col("season") == season)
+    conf = sched.select(
+        pl.col("game_id").cast(pl.Int64),
+        pl.when(pl.lit(season >= CONFERENCE_FLAG_FIRST_SEASON))
+        .then(pl.col("conference_competition"))
+        .alias("is_conference_game"),
+    ).unique(subset=["game_id"])
+    teams = pl.read_parquet(
+        root / "cfb_teams" / "parquet" / f"cfb_teams_{season}.parquet"
+    ).select(
+        pl.col("team_id").cast(pl.Int64).alias("opponent_id"),
+        pl.col("is_fbs").alias("opponent_fbs"),
+    )
+    assert gl.schema["game_id"] == conf.schema["game_id"] == pl.Int64
+    assert gl.schema["opponent_id"] == teams.schema["opponent_id"] == pl.Int64
+    gl = gl.join(conf, on="game_id", how="left", validate="m:1").join(
+        teams, on="opponent_id", how="left", validate="m:1"
     )
     sit = pl.read_parquet(
         root / "adv_situational" / "parquet" / f"adv_situational_{season}.parquet"

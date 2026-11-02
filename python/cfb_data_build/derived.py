@@ -514,7 +514,8 @@ def build_team_opponent_splits(
     ``conference_competition`` (ESPN's flag: false for conference title games and
     the CFP, null before :data:`CONFERENCE_FLAG_FIRST_SEASON`); ``opponent_fbs``
     is ``cfb_teams.is_fbs`` for the season (null for an opponent ESPN does not
-    list); ``game_date`` is the kickoff's US/Eastern calendar day. A missing
+    list); ``game_date`` is the kickoff's US/Eastern calendar day. From 2014 a
+    gamelog game with no schedule-master row raises (a stale master). A missing
     cfb_teams parquet raises, like a missing situational one; a missing schedule
     master skips the season, as it does gamelog.
     """
@@ -581,6 +582,15 @@ def build_team_opponent_splits(
     )
     assert gl.schema["game_id"] == conf.schema["game_id"] == pl.Int64
     assert gl.schema["opponent_id"] == teams.schema["opponent_id"] == pl.Int64
+    if season >= CONFERENCE_FLAG_FIRST_SEASON:
+        # like the stale-situational guard: a game the master lacks would publish
+        # a null conference flag in a season where ESPN sets it
+        unscheduled = gl.join(conf, on="game_id", how="anti")["game_id"].n_unique()
+        if unscheduled:
+            raise ValueError(
+                f"team_opponent_splits {season}: {unscheduled} games have no schedule "
+                f"master row (stale cfb_schedule_master?)"
+            )
     gl = gl.join(conf, on="game_id", how="left", validate="m:1").join(
         teams, on="opponent_id", how="left", validate="m:1"
     )

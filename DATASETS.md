@@ -1971,7 +1971,7 @@ kept, FCS opponents and bowls included; "FBS only" is a consumer filter. Ids are
 | neutral_site | logical | The game was at a neutral site (`is_home` is then the listed home side). |
 | opponent_fbs | logical | The opponent was FBS that season (`cfb_teams.is_fbs`); null if ESPN lists no such team. |
 | game_date | date | Kickoff's calendar day in US/Eastern. |
-| win | logical | `points_for > points_against`; null when the game has no final score. |
+| win | logical | `points_for > points_against`: true for a win, false for a loss; null when the game has no final score or the score is tied. |
 
 _Release tag: `cfb_team_opponent_splits`_
 

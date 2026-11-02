@@ -423,7 +423,7 @@ def test_game_set_columns_come_from_espn_flags_cfb_teams_and_the_kickoff(tmp_pat
         _gamelog(
             [
                 _row(1, 333, 61, 0.21, 70, 24, 17),
-                _row(2, 333, 2, 0.05, 64, 10, 13, home=False),
+                _row(2, 333, 2, 0.05, 64, 10, 13, home=False) | {"neutral_site": True},
             ]
         ),
         _situational([(1, 333, 0.47), (2, 333, 0.41)]),
@@ -434,7 +434,7 @@ def test_game_set_columns_come_from_espn_flags_cfb_teams_and_the_kickoff(tmp_pat
     assert out["is_conference_game"].to_list() == [True, False]
     assert out["opponent_fbs"].to_list() == [True, False]
     assert out["win"].to_list() == [True, False]
-    assert out["neutral_site"].to_list() == [False, False]
+    assert out["neutral_site"].to_list() == [False, True]
     assert out["game_date"].to_list() == [dt.date(2025, 8, 30)] * 2
 
 
@@ -475,3 +475,19 @@ def test_no_schedule_master_skips_the_season_like_gamelog(tmp_path):
     out = build_team_opponent_splits(SEASON, base=base)
     assert out.height == 0
     assert out.schema == pl.Schema(TEAM_OPPONENT_SPLITS_SCHEMA)
+
+
+def test_a_game_the_schedule_master_lacks_raises_once_espn_sets_the_flag(tmp_path):
+    base = _write(
+        tmp_path,
+        _gamelog(
+            [
+                _row(1, 333, 61, 0.21, 70, 24, 17),
+                _row(2, 333, 2, 0.05, 64, 10, 13, home=False),
+            ]
+        ),
+        _situational([(1, 333, 0.47), (2, 333, 0.41)]),
+        conference={1: True},
+    )
+    with pytest.raises(ValueError, match="1 games have no schedule master row"):
+        build_team_opponent_splits(SEASON, base=base)

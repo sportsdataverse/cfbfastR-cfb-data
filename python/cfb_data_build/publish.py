@@ -213,8 +213,11 @@ RELEASE_NOTES: dict[str, str] = {
     "cfb_team_opponent_splits": (
         "College Football by-opponent team-game splits: ONE ROW PER TEAM PER "
         "GAME with season, season_type, week, game_id, team_id, opponent_id, "
-        "opponent, is_home, points_for, points_against, plays, epa_per_play and "
-        "success_rate. A projection of espn_cfb_adv_team_gamelog plus "
+        "opponent, is_home, points_for, points_against, plays, epa_per_play, "
+        "success_rate, the pass/rush splits, and the game-set flags "
+        "is_conference_game (ESPN's, null before 2014; false for title games and "
+        "the CFP), neutral_site, opponent_fbs, game_date (US/Eastern) and win. "
+        "A projection of espn_cfb_adv_team_gamelog plus "
         "espn_cfb_adv_situational's EPA success rate; every game is kept, FCS "
         "opponents and bowls included. `epa_per_play` has 0.01 resolution (the "
         "upstream gamelog rounds it). `season_type` includes 4 (all-star games) "

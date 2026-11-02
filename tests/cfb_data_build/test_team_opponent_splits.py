@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import datetime as dt
+import os
 import re
 from pathlib import Path
 
@@ -45,6 +47,9 @@ def _gamelog(rows: list[dict], *, id_dtype=pl.Int64) -> pl.DataFrame:
             "rushes": pl.Int64,
             "EPA_passing_per_play": pl.Float64,
             "EPA_rushing_per_play": pl.Float64,
+            "start_date": pl.Utf8,
+            "neutral_site": pl.Boolean,
+            "win": pl.Boolean,
         },
     )
 
@@ -71,6 +76,10 @@ def _row(game_id, team_id, opponent_id, epa, plays, pf, pa, *, home=True) -> dic
         "rushes": plays - plays // 2,
         "EPA_passing_per_play": epa + 0.1,
         "EPA_rushing_per_play": epa - 0.1,
+        # 00:30 UTC on the 31st is the evening of the 30th in US/Eastern
+        "start_date": "2025-08-31T00:30Z",
+        "neutral_site": False,
+        "win": pf > pa,
     }
 
 
@@ -113,14 +122,60 @@ def _situational(
 
 
 def _write(
-    base: Path, gamelog: pl.DataFrame | None, situational: pl.DataFrame | None
+    base: Path,
+    gamelog: pl.DataFrame | None,
+    situational: pl.DataFrame | None,
+    *,
+    conference: dict[int, bool] | None = None,
+    fbs: dict[int, bool] | None = None,
 ) -> str:
-    for name, df in (("adv_team_gamelog", gamelog), ("adv_situational", situational)):
+    """The two adv_* parquets, plus the schedule master (``CFB_RAW_ROOT``, see
+    :func:`_raw_root`) and ``cfb_teams``. ``conference`` maps game -> ESPN's
+    ``conference_competition`` (default: every gamelog game, False); ``fbs`` maps
+    team -> ``is_fbs`` (default: every gamelog team and opponent, True)."""
+    ids = (
+        set()
+        if gamelog is None
+        else {*gamelog["team_id"].to_list(), *gamelog["opponent_id"].to_list()}
+    )
+    games = set() if gamelog is None else set(gamelog["game_id"].to_list())
+    conference = conference or dict.fromkeys(games, False)
+    fbs = fbs or dict.fromkeys(ids, True)
+    sched = pl.DataFrame(
+        {
+            "game_id": list(conference),
+            "season": [SEASON] * len(conference),
+            "conference_competition": list(conference.values()),
+        },
+        schema={
+            "game_id": pl.Int32,
+            "season": pl.Int32,
+            "conference_competition": pl.Boolean,
+        },
+    )
+    teams = pl.DataFrame(
+        {"team_id": list(fbs), "is_fbs": list(fbs.values())},
+        schema={"team_id": pl.Int64, "is_fbs": pl.Boolean},
+    )
+    master = base / "_raw" / "cfb"
+    master.mkdir(parents=True)
+    sched.write_parquet(master / "cfb_schedule_master.parquet")
+    for name, df in (
+        ("adv_team_gamelog", gamelog),
+        ("adv_situational", situational),
+        ("cfb_teams", teams),
+    ):
         if df is not None:
             p = base / name / "parquet"
             p.mkdir(parents=True)
             df.write_parquet(p / f"{name}_{SEASON}.parquet")
     return str(base)
+
+
+@pytest.fixture(autouse=True)
+def _raw_root(tmp_path, monkeypatch):
+    """The builder finds the schedule master under ``CFB_RAW_ROOT``; :func:`_write` puts it there."""
+    monkeypatch.setenv("CFB_RAW_ROOT", str(tmp_path / "_raw"))
 
 
 def test_one_row_carries_the_gamelog_points_and_epa_and_the_situational_success_rate(
@@ -236,13 +291,25 @@ def test_a_missing_situational_parquet_raises(tmp_path):
 REAL = REPO / "cfb"
 
 
+def _schedule_master_default() -> Path:
+    """The master :func:`_schedule_master` finds with ``CFB_RAW_ROOT`` unset (at collection time it is)."""
+    root = os.environ.get("CFB_RAW_ROOT")
+    if root:
+        return Path(root) / "cfb" / "cfb_schedule_master.parquet"
+    return REPO.parent / "cfbfastR-cfb-raw" / "cfb" / "cfb_schedule_master.parquet"
+
+
 @pytest.mark.skipif(
-    not (REAL / "adv_team" / "parquet" / f"adv_team_{SEASON}.parquet").exists(),
-    reason="needs the committed 2025 adv_* parquets",
+    not (REAL / "adv_team" / "parquet" / f"adv_team_{SEASON}.parquet").exists()
+    or not _schedule_master_default().exists(),
+    reason="needs the committed 2025 adv_* parquets and the cfb-raw schedule master",
 )
-def test_real_2025_pass_rush_splits_reproduce_adv_team_and_situational_per_game():
+def test_real_2025_pass_rush_splits_reproduce_adv_team_and_situational_per_game(
+    monkeypatch,
+):
     """Real 2025 data: every team-game's pass/rush split equals adv_team's, and the
     plays-weighted season EPA per play still reproduces adv_team's (Alabama = 333)."""
+    monkeypatch.delenv("CFB_RAW_ROOT")  # the real schedule master (sibling checkout)
     out = build_team_opponent_splits(SEASON, base=str(REAL))
     assert out.schema == pl.Schema(TEAM_OPPONENT_SPLITS_SCHEMA)
     adv = pl.read_parquet(REAL / "adv_team" / "parquet" / f"adv_team_{SEASON}.parquet")
@@ -331,6 +398,9 @@ def test_the_contract_dtypes():
         assert s[c] == pl.Float64, c
     assert s["epa_per_play"] == s["success_rate"] == pl.Float64
     assert s["is_home"] == pl.Boolean and s["opponent"] == pl.Utf8
+    for c in ("is_conference_game", "neutral_site", "opponent_fbs", "win"):
+        assert s[c] == pl.Boolean, c
+    assert s["game_date"] == pl.Date
 
 
 def test_registered_as_a_derived_dataset_that_runs_after_gamelog():
@@ -343,3 +413,81 @@ def test_registered_as_a_derived_dataset_that_runs_after_gamelog():
     sh = (REPO / "scripts" / "daily_cfb_processor.sh").read_text()
     order = re.search(r'^PY_DERIVED="([^"]*)"', sh, re.M).group(1).split()
     assert order.index("team_opponent_splits") > order.index("gamelog")
+
+
+def test_game_set_columns_come_from_espn_flags_cfb_teams_and_the_kickoff(tmp_path):
+    """S6's filters: ESPN's conference flag per game, the opponent's FBS status, the
+    gamelog's neutral_site / win, and the kickoff's US/Eastern calendar day."""
+    base = _write(
+        tmp_path,
+        _gamelog(
+            [
+                _row(1, 333, 61, 0.21, 70, 24, 17),
+                _row(2, 333, 2, 0.05, 64, 10, 13, home=False) | {"neutral_site": True},
+            ]
+        ),
+        _situational([(1, 333, 0.47), (2, 333, 0.41)]),
+        conference={1: True, 2: False},
+        fbs={333: True, 61: True, 2: False},
+    )
+    out = build_team_opponent_splits(SEASON, base=base).sort("game_id")
+    assert out["is_conference_game"].to_list() == [True, False]
+    assert out["opponent_fbs"].to_list() == [True, False]
+    assert out["win"].to_list() == [True, False]
+    assert out["neutral_site"].to_list() == [False, True]
+    assert out["game_date"].to_list() == [dt.date(2025, 8, 30)] * 2
+
+
+def test_before_espn_set_the_conference_flag_it_is_null_not_false(tmp_path):
+    rows = [_row(1, 333, 61, 0.21, 70, 24, 17) | {"season": 2013}]
+    sit = _situational([(1, 333, 0.47)]).with_columns(season=pl.lit(2013, pl.Int64))
+    base = _write(tmp_path, _gamelog(rows), sit, conference={1: False})
+    # _write files everything under SEASON; the builder reads by its season argument
+    for name in ("adv_team_gamelog", "adv_situational", "cfb_teams"):
+        d = tmp_path / name / "parquet"
+        (d / f"{name}_{SEASON}.parquet").rename(d / f"{name}_2013.parquet")
+    master = tmp_path / "_raw" / "cfb" / "cfb_schedule_master.parquet"
+    pl.read_parquet(master).with_columns(season=pl.lit(2013, pl.Int32)).write_parquet(
+        master
+    )
+    out = build_team_opponent_splits(2013, base=base)
+    assert out.height == 1 and out["is_conference_game"].to_list() == [None]
+
+
+def test_an_opponent_cfb_teams_does_not_list_gets_a_null_opponent_fbs(tmp_path):
+    base = _write(
+        tmp_path,
+        _gamelog([_row(1, 333, 61, 0.21, 70, 24, 17)]),
+        _situational([(1, 333, 0.47)]),
+        fbs={333: True},
+    )
+    out = build_team_opponent_splits(SEASON, base=base)
+    assert out.height == 1 and out["opponent_fbs"].to_list() == [None]
+
+
+def test_no_schedule_master_skips_the_season_like_gamelog(tmp_path):
+    base = _write(
+        tmp_path,
+        _gamelog([_row(1, 333, 61, 0.21, 70, 24, 17)]),
+        _situational([(1, 333, 0.47)]),
+    )
+    (tmp_path / "_raw" / "cfb" / "cfb_schedule_master.parquet").unlink()
+    out = build_team_opponent_splits(SEASON, base=base)
+    assert out.height == 0
+    assert out.schema == pl.Schema(TEAM_OPPONENT_SPLITS_SCHEMA)
+
+
+def test_a_game_the_schedule_master_lacks_raises_once_espn_sets_the_flag(tmp_path):
+    base = _write(
+        tmp_path,
+        _gamelog(
+            [
+                _row(1, 333, 61, 0.21, 70, 24, 17),
+                _row(2, 333, 2, 0.05, 64, 10, 13, home=False),
+            ]
+        ),
+        _situational([(1, 333, 0.47), (2, 333, 0.41)]),
+        conference={1: True},
+    )
+    with pytest.raises(ValueError, match="1 games have no schedule master row"):
+        build_team_opponent_splits(SEASON, base=base)

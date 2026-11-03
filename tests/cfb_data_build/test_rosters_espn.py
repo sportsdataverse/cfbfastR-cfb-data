@@ -485,3 +485,34 @@ def test_an_empty_roster_is_never_written_to_the_cache(roster_cache):
     )
     assert _players(docs) == {UNPLAYED: 0}
     assert not (roster_cache / f"{UNPLAYED}.json").exists()
+
+
+# ------------------------------------- position: payloads that ship it expanded
+#
+# From week 9 of 2026 some raw payloads carry ESPN's position object expanded
+# (401856733: ``position_abbreviation`` / ``position_name`` / ``position_leaf`` ...)
+# while the rest still ship only ``position_href`` (401856634). Mixing the two in
+# one season gave every href-only row NULL abbreviation/name/leaf: the payload's
+# columns shadowed the reference's in the join. 2026 shipped 13,320 of 26,094 rows
+# that way. Both docs are real rows; ``reference/positions.json`` is the real file.
+EXPANDED = 401856733
+
+
+def test_expanded_position_payload_does_not_shadow_the_reference(divisions):
+    raw = str(ROSTER_FIXTURES / "raw")
+    docs = R.fetch_game_rosters([STALE, EXPANDED], raw, cache_dir=None, workers=1)
+    assert _players(docs) == {STALE: 6, EXPANDED: 6}
+    out = R.derive_rosters(R.roster_rows(docs), R.load_positions(raw), divisions)
+    assert out.height == 12
+    assert out.filter(pl.col("position_id") != 0).height == 12
+    for col in ("position_abbreviation", "position_name", "position_leaf", "position"):
+        assert out.get_column(col).null_count() == 0, col
+    # href-only rows resolve exactly like the expanded ones do.
+    ol = out.filter(pl.col("position_id") == 45).select(
+        "team_id", "position_abbreviation", "position_name", "position_leaf"
+    )
+    assert set(ol.rows()) == {
+        (151, "OL", "Offensive Lineman", True),  # href-only payload
+        (142, "OL", "Offensive Lineman", True),  # expanded payload
+    }
+    assert out.schema["position_leaf"] == pl.Boolean

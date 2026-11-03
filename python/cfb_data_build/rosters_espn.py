@@ -542,7 +542,11 @@ def derive_rosters(
     )
     df = latest.join(counts, on=["team_id", "athlete_id"], how="left")
 
-    df = df.with_columns(
+    # The reference owns every resolved position column. Some 2026 payloads ship
+    # ESPN's position object expanded (position_abbreviation, position_name, ...);
+    # left in, those columns shadow the reference's in the join and every
+    # href-only row in the season comes out null.
+    df = df.drop(positions.columns, strict=False).with_columns(
         pl.col("position_href")
         .map_elements(_position_id, return_dtype=pl.Int64)
         .alias("position_id")

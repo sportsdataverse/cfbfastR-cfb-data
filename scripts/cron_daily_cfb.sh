@@ -8,9 +8,11 @@
 #   bash scripts/cron_daily_cfb.sh [-s YYYY -e YYYY]   # default: current season
 #
 # Guards, each from a real failure:
-# - the git_pull sweep's lock: that sweep runs `pull --rebase --autostash` over
-#   every repo every 4h; mid-build it stashes the outputs out from under the
-#   job (baseballr-data, 2026-09). Holding its lock makes it skip a round.
+# - the git_pull sweep's lock, held ONLY around the branch check + pull here and
+#   around each commit+push in daily_cfb_processor.sh. The sweep skips a checkout
+#   with tracked changes, so the build itself needs no lock; holding it for the
+#   whole 3-5 h build made every other droplet job that waits on it time out
+#   (publish-current, crosswalks, alt-daily: the 2026-10/11 cron issues).
 # - main + no tracked changes: this runs in the shared checkout, and a branch
 #   or WIP left there would be committed and pushed as data.
 # - uv sync: the driver runs .venv's python directly (_venv.sh), so a merged
@@ -26,6 +28,7 @@ exec 9>/tmp/git_pull_sdv.lock
 flock -w 3600 9 || { echo "::error ::git_pull sweep held its lock for 1h"; echo "EXIT=1"; exit 1; }
 # This shell holds both locks; git children get 8>&- 9>&-. git daemonizes `gc --auto` and
 # credential-cache--daemon, and an inherited fd keeps a lock held after this build exits.
+# Lock 9 (the sweep's) is released right after the pull below; lock 8 (this repo's) stays.
 
 # The processor appends coach_careers output to the season log AFTER committing
 # it; an Actions runner threw that tail away, here it would persist and trip
@@ -39,6 +42,7 @@ if [ "$branch" != main ] || [ -n "$(git status --porcelain --untracked-files=no)
   echo "EXIT=1"; exit 1
 fi
 git pull -q --ff-only 8>&- 9>&- || { echo "::error ::git pull --ff-only failed"; echo "EXIT=1"; exit 1; }
+flock -u 9; exec 9>&-
 uv sync -q --frozen --inexact || { echo "::error ::uv sync failed"; echo "EXIT=1"; exit 1; }
 
 # Same season rule as daily_cfb.yml: the CFB season rolls over on Aug 15.

@@ -108,7 +108,18 @@ ANY_FAILED=0
 # Order matters: stage and commit FIRST so the tree is clean, and only then
 # reconcile with origin. `rebase --merge` rather than `pull --rebase` because
 # git's default am backend base64-encodes every parquet blob it replays.
+#
+# The git_pull sweep's lock is held for the commit+push ONLY (cron_daily_cfb.sh releases it after
+# its pull). A build-long hold starved every other droplet job that waits on the lock (the nine
+# "droplet cron failing" issues, 2026-10/11). The sweep skips a checkout with tracked changes, so
+# the build's dirty tree needs no lock; the commit/rebase/push window does. The subshell keeps the
+# lock and git gets 9>&-, so a daemonized gc / credential cache cannot hold it after we return.
 sdv_commit_push() {
+  command -v flock >/dev/null || { _sdv_commit_push "$@"; return; }   # off the droplet
+  ( flock -w "${GIT_PULL_LOCK_WAIT:-3600}" 9 || { echo "::error ::git_pull sweep held its lock for 1h: $1"; exit 1; }
+    _sdv_commit_push "$@" 9>&- ) 9>"${GIT_PULL_LOCK:-/tmp/git_pull_sdv.lock}"
+}
+_sdv_commit_push() {
   local msg="$1"; shift
   # Rotate any tracked *.log over 50 MiB before staging: GitHub's pre-receive hook rejects a
   # push carrying a blob over 100 MiB, and every later push then carries it too (2026-09-30,

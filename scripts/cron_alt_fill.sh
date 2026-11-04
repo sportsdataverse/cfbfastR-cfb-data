@@ -34,9 +34,10 @@ for season in $(seq "$START" "$END"); do
 done
 [ ${#seasons[@]} -gt 0 ] || { echo "no parsed alt season in $START-$END"; echo "EXIT=0"; exit 0; }
 
-# One writer in this checkout: cron_daily_cfb.sh's build lock. And the git_pull sweep's lock (it
-# would autostash our outputs). Children get 8>&- 9>&- so a daemonized git gc / credential cache
-# cannot keep either lock after this exits.
+# One writer in this checkout: cron_daily_cfb.sh's build lock, held for the whole run. The
+# git_pull sweep's lock is held only around the pull and the commit+push (the sweep skips a
+# checkout with tracked changes; a run-long hold starved the other droplet jobs). Children get
+# 8>&- 9>&- so a daemonized git gc / credential cache cannot keep either lock after this exits.
 exec 8>/tmp/cfbfastR-cfb-data-build.lock
 flock -w 10800 8 || { echo "::error ::cfb build held its lock for 3h"; echo "EXIT=1"; exit 1; }
 exec 9>/tmp/git_pull_sdv.lock
@@ -47,6 +48,7 @@ if [ "$branch" != main ] || [ -n "$(git status --porcelain --untracked-files=no)
   echo "::error ::checkout is on '$branch' or has tracked changes; refusing to fill"; echo "EXIT=1"; exit 1
 fi
 [ "$DRY" = 1 ] || git pull -q --ff-only 8>&- 9>&- || fail "git pull --ff-only failed"
+flock -u 9
 
 source scripts/_venv.sh || fail "no interpreter"
 export PYTHONUNBUFFERED=1 PYTHONIOENCODING=utf-8
@@ -78,6 +80,7 @@ for season in "${seasons[@]}"; do
   f=$XW/${LG}_players_crosswalk_$season.parquet
   [ -f "$f" ] && files+=("$f")   # one missing pathspec makes git add stage nothing
 done
+flock -w 3600 9 || fail "git_pull sweep held its lock for 1h"
 [ ${#files[@]} -gt 0 ] && git add -- "${files[@]}" 8>&- 9>&-
 git diff --cached --quiet && { echo "players crosswalks unchanged"; echo "EXIT=0"; exit 0; }
 git diff --cached --stat

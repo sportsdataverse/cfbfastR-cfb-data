@@ -55,6 +55,11 @@ on:
         required: false
         type: boolean
         default: false
+      dry_run:
+        description: 'Smoke test: train on ~250 finals (3 id slices, 2023-2025), stage the bundle, publish NOTHING, commit nothing'
+        required: false
+        type: boolean
+        default: false
   schedule:
     - cron: '0 6 5 2 *'   # early February — annual post-season retrain on the full history
 
@@ -86,6 +91,7 @@ jobs:
       # the final/ tree (the trainers read final.json via --final-dir). python/ is no
       # longer needed: xQBR's labels are committed here, not scraped by cfb-raw.
       - name: Sparse-checkout cfb-raw finals
+        if: ${{ !inputs.dry_run }}
         uses: actions/checkout@v5
         with:
           repository: sportsdataverse/cfbfastR-cfb-raw
@@ -94,6 +100,22 @@ jobs:
             cfb/json/final
           sparse-checkout-cone-mode: true
           persist-credentials: false   # don't leave external-repo creds on the runner
+
+      # dry run: ~250 finals (ids 401756* = 2025, 401636* = 2024, 401551* = 2023, ~0.9 GB)
+      # instead of the 62 GB tree; blob:none fetches only the matched blobs.
+      - name: Sparse-checkout a slice of cfb-raw finals (dry run)
+        if: ${{ inputs.dry_run }}
+        uses: actions/checkout@v5
+        with:
+          repository: sportsdataverse/cfbfastR-cfb-raw
+          path: _raw
+          filter: blob:none
+          sparse-checkout: |
+            /cfb/json/final/401756*
+            /cfb/json/final/401636*
+            /cfb/json/final/401551*
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
 
       - name: Set up uv
         uses: astral-sh/setup-uv@v8.1.0
@@ -155,7 +177,8 @@ jobs:
       - name: Train CPOE (+ LOSO) and promote cp model
         if: ${{ github.event_name == 'schedule' || !inputs.stages || contains(inputs.stages, 'cpoe') }}
         run: |
-          uv run python -m cfb_model_build.cpoe --final-dir "$FINAL_DIR" --out-dir artifacts/cpoe --seasons $(seq 2004 "$(date +%Y)") --loso
+          first=2004; [ "${{ inputs.dry_run }}" = true ] && first=2023
+          uv run python -m cfb_model_build.cpoe --final-dir "$FINAL_DIR" --out-dir artifacts/cpoe --seasons $(seq "$first" "$(date +%Y)") --loso
           # --variant defaults to both: the game-state model over the full window
           # and the air-yards one over the 2025+ rows that carry throw depth.
           # Promote each pair up to artifacts/ so both sit beside the other models.
@@ -192,20 +215,40 @@ jobs:
           uv run python -m cfb_model_build.pregame_wp train --boxes artifacts/pregame_wp/boxes/ --out artifacts/pregame_wp/
 
       # ---- publish (PAT scoped to this step only) ----
+      # The models go to cfb_model_artifacts, the bundle cfbfastR and sportsdataverse-py read
+      # (cfbfastR-cfb-data#154): bundle names + a MANIFEST rebuilt from the files, uploaded
+      # MANIFEST last, then re-downloaded and checked against it.
       - name: Publish model artifacts + model-PBP
-        if: ${{ inputs.publish != false }}
+        if: ${{ !inputs.dry_run && inputs.publish != false }}
         env:
           GH_TOKEN: ${{ secrets.SDV_GH_TOKEN }}
           GITHUB_PAT: ${{ secrets.SDV_GH_TOKEN }}
         run: |
-          uv run python -m cfb_model_build.cfb_model_publish artifacts --artifacts artifacts --tag espn_cfb_model_artifacts --repo "$PUBLISH_REPO"
+          gh release download cfb_model_artifacts --repo "$PUBLISH_REPO" -p MANIFEST.json -O artifacts/bundle_manifest_prev.json --clobber
+          uv run python -m cfb_model_build.cfb_model_publish artifacts --artifacts artifacts --tag cfb_model_artifacts --repo "$PUBLISH_REPO" --bundle-manifest artifacts/bundle_manifest_prev.json
+          uv run python -m cfb_model_build.cfb_model_publish verify --tag cfb_model_artifacts --repo "$PUBLISH_REPO"
           gh release upload espn_cfb_model_pbp artifacts/model_pbp/cfb_model_pbp_full.parquet --repo "$PUBLISH_REPO" --clobber
+
+      - name: Stage the bundle without publishing (dry run)
+        if: ${{ inputs.dry_run }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download cfb_model_artifacts --repo "$PUBLISH_REPO" -p MANIFEST.json -O artifacts/bundle_manifest_prev.json --clobber
+          uv run python -m cfb_model_build.cfb_model_publish artifacts --artifacts artifacts --tag cfb_model_artifacts --repo "$PUBLISH_REPO" --bundle-manifest artifacts/bundle_manifest_prev.json --dry-run
+      - name: Upload the staged bundle (dry run)
+        if: ${{ inputs.dry_run }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: staged-bundle-dry-run
+          path: python/artifacts/_bundle/
 
       # ---- reports (committed back to this repo) ----
       - name: Regenerate model reports
         run: uv run python -m cfb_model_build.cfb_model_reports --artifacts artifacts --out ../docs/models
 
       - name: Commit reports
+        if: ${{ !inputs.dry_run }}
         working-directory: .
         run: |
           git config --local user.email "action@github.com"

@@ -218,3 +218,34 @@ def test_a_failed_create_of_a_still_missing_release_propagates(tmp_path):
             runner=runner,
             exists_check=lambda tag, repo: False,
         )
+
+
+def test_stage_bundle_renames_and_rebuilds_the_manifest(tmp_path):
+    """Trainer names map to bundle names, entries are recomputed, untrained entries are kept."""
+    import hashlib
+
+    import numpy as np
+    import xgboost as xgb
+
+    from cfb_model_build.cfb_model_publish.artifacts import bundle_name, stage_bundle
+
+    art = tmp_path / "artifacts"
+    art.mkdir()
+    d = xgb.DMatrix(np.array([[0.0, 1.0], [1.0, 0.0]]), label=[0, 1], feature_names=["a", "b"])
+    xgb.train({"objective": "binary:logistic"}, d, num_boost_round=1).save_model(str(art / "ep.ubj"))
+    (art / "ep.json").write_text(json.dumps({"model_type": "ep"}))
+    manifest = tmp_path / "MANIFEST.json"
+    manifest.write_text(json.dumps({"bundle": "cfb_model_artifacts", "assets": {
+        "ep_model.ubj": {"sha256": "old", "bytes": 1}, "wp_ot_reach.ubj": {"sha256": "keep", "bytes": 2}}}))
+
+    files = stage_bundle(art, tmp_path / "out", manifest)
+
+    assert [f.name for f in files] == ["ep_model.ubj", "ep_model.card.json", "MANIFEST.json"]
+    m = json.loads(files[-1].read_text())
+    ubj = m["assets"]["ep_model.ubj"]
+    assert ubj["sha256"] == hashlib.sha256(files[0].read_bytes()).hexdigest()
+    assert ubj["features"] == ["a", "b"] and ubj["objective"] == "binary:logistic"
+    assert ubj["card"] == "ep_model.card.json" and "ep_model.card.json" in m["assets"]
+    assert m["assets"]["wp_ot_reach.ubj"] == {"sha256": "keep", "bytes": 2}
+    assert bundle_name("qbr.gate.json") == "qbr_model.gate.json"
+    assert bundle_name("wp_spread.json") == "wp_spread.card.json"

@@ -34,6 +34,9 @@ if not (GH_RETRY_BACKOFF_S >= 0) or GH_RETRY_BACKOFF_S == float("inf"):
 # Release-notes body used when auto-creating a missing release. Keyed by tag;
 # falls back to a generic note for any other tag.
 _RELEASE_BODY = {
+    "cfb_model_artifacts": (
+        "CFB model bundle read by cfbfastR and sportsdataverse-py: boosters, cards, MANIFEST.json."
+    ),
     "espn_cfb_model_artifacts": (
         "All CFB model artifacts (EP/WP/QBR/CPOE/fourth-down .ubj + RB-eval .pkl) + model cards."
     ),
@@ -237,6 +240,7 @@ def upload_artifacts(
     runner=None,
     exists_check=None,
     stamp: bool = True,
+    files: list | None = None,
 ) -> dict:
     """Upload each discovered model + card to the ``tag`` release on ``repo``.
 
@@ -249,6 +253,8 @@ def upload_artifacts(
             instead of running model discovery. Dataset tags publish parquet +
             a card sidecar, which ``discover_models`` -- which looks for model
             files -- would not find. Omit for the model-artifacts path.
+        files: Upload exactly these, in this order (a staged bundle), instead of
+            discovering them.
         stamp: Upload the release sidecars after the data. Pass False when
             adding assets to a tag another dataset owns (rb_eval on
             ``espn_cfb_model_pbp``): its ``timestamp.txt`` dates model_pbp,
@@ -256,11 +262,12 @@ def upload_artifacts(
     """
     run = runner or _gh_runner
     exists = exists_check or _gh_release_exists
-    files = (
-        sorted(Path(artifacts_dir).glob(pattern))
-        if pattern
-        else plan_uploads(artifacts_dir)
-    )
+    if files is None:
+        files = (
+            sorted(Path(artifacts_dir).glob(pattern))
+            if pattern
+            else plan_uploads(artifacts_dir)
+        )
     created_release = False
     if dry_run:
         print(f"[dry-run] would ensure release {repo}:{tag} exists")
@@ -287,3 +294,100 @@ def upload_artifacts(
         "tag": tag,
         "created_release": created_release,
     }
+
+
+# --- the cfb_model_artifacts bundle ------------------------------------------------
+# Both libraries (cfbfastR, sportsdataverse-py) read the cfb_model_artifacts bundle, not
+# espn_cfb_model_artifacts: bundle names (<stem>.card.json, ep_model / qbr_model) and a
+# MANIFEST.json whose every entry is derived from the file itself (cfbfastR-cfb-data#154).
+BUNDLE_TAG = "cfb_model_artifacts"
+#: trainer stem -> bundle stem; every other model keeps its stem
+BUNDLE_STEM = {"ep": "ep_model", "qbr": "qbr_model"}
+
+
+def bundle_name(path) -> str:
+    """The bundle name of one trainer output: ``ep.json`` -> ``ep_model.card.json``."""
+    name = Path(path).name
+    for suffix, out in ((".gate.json", ".gate.json"), (".json", ".card.json"), (".ubj", ".ubj"), (".pkl", ".pkl")):
+        if name.endswith(suffix):
+            stem = name[: -len(suffix)]
+            return BUNDLE_STEM.get(stem, stem) + out
+    raise ValueError(f"not a model, card or gate file: {name}")
+
+
+def _sha256(path) -> str:
+    import hashlib
+
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def _booster_entry(path) -> dict:
+    """The MANIFEST fields MANIFEST.R derives from a booster, read from the file itself."""
+    import json
+
+    import xgboost as xgb
+
+    bst = xgb.Booster()
+    bst.load_model(str(path))
+    learner = json.loads(bst.save_config())["learner"]
+    feats = list(bst.feature_names or [])
+    return {
+        "features": feats,
+        "n_features": len(feats) or int(bst.num_features()),
+        "num_class": int(learner["learner_model_param"].get("num_class", 0)),
+        "objective": learner["objective"]["name"],
+        "base_score": learner["learner_model_param"]["base_score"],
+    }
+
+
+def stage_bundle(artifacts_dir, out_dir, manifest_path) -> list:
+    """Copy the trained models into ``out_dir`` under bundle names and rebuild MANIFEST.json.
+
+    ``manifest_path`` is the bundle's current MANIFEST: entries for assets this run did not
+    train (wp_ot_reach, punt_distribution, ...) are kept as they are; every staged file's entry
+    is recomputed from the file. Returns the files to upload, MANIFEST.json last so a partial
+    upload never advertises hashes that are not up yet.
+    """
+    import json
+    import shutil
+    from datetime import date
+
+    manifest = json.loads(Path(manifest_path).read_text(encoding="utf-8"))
+    assets = manifest.setdefault("assets", {})
+    out = Path(out_dir)
+    out.mkdir(parents=True, exist_ok=True)
+    staged = []
+    for src in plan_uploads(artifacts_dir):  # raises on an ungated QBR model
+        dst = out / bundle_name(src)
+        shutil.copyfile(src, dst)
+        entry = {"sha256": _sha256(dst), "bytes": dst.stat().st_size}
+        if dst.suffix == ".ubj":
+            entry.update(_booster_entry(dst), card=dst.name[: -len(".ubj")] + ".card.json")
+        assets[dst.name] = entry
+        staged.append(dst)
+    today = date.today().isoformat()
+    manifest.update(generated=today, model_version=today.replace("-", "."))
+    mpath = out / "MANIFEST.json"
+    mpath.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    return [*staged, mpath]
+
+
+def verify_bundle(tag: str, repo: str, *, names=None) -> list:
+    """Download the published MANIFEST + assets and return the names whose sha256/bytes differ.
+
+    ``names`` limits the check (default: every asset the MANIFEST lists).
+    """
+    import json
+    import tempfile
+
+    with tempfile.TemporaryDirectory() as tmp:
+        _gh_runner(["release", "download", tag, "--repo", repo, "-p", "MANIFEST.json", "-D", tmp, "--clobber"])
+        assets = json.loads((Path(tmp) / "MANIFEST.json").read_text(encoding="utf-8"))["assets"]
+        bad = []
+        for name in names or sorted(assets):
+            _gh_runner(["release", "download", tag, "--repo", repo, "-p", name, "-D", tmp, "--clobber"])
+            f = Path(tmp) / name
+            want = assets.get(name, {})
+            if not f.exists() or want.get("sha256") != _sha256(f) or want.get("bytes") != f.stat().st_size:
+                bad.append(name)
+        return bad

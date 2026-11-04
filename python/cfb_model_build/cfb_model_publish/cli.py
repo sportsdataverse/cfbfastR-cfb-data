@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import argparse
 
-from .artifacts import upload_artifacts
+from .artifacts import BUNDLE_TAG, stage_bundle, upload_artifacts, verify_bundle
 from .builders import (
     build_ratings,
     build_recruiting,
@@ -29,6 +29,15 @@ def build_parser() -> argparse.ArgumentParser:
     a.add_argument("--tag", default="espn_cfb_model_artifacts")
     a.add_argument("--repo", default="sportsdataverse/sportsdataverse-data")
     a.add_argument("--dry-run", action="store_true")
+    a.add_argument(
+        "--bundle-manifest",
+        help="the bundle's current MANIFEST.json: stage bundle names + a rebuilt MANIFEST into --stage-dir and upload those",
+    )
+    a.add_argument("--stage-dir", default="artifacts/_bundle")
+
+    vb = sub.add_parser("verify", help="re-download a bundle and check every asset against its MANIFEST")
+    vb.add_argument("--tag", default=BUNDLE_TAG)
+    vb.add_argument("--repo", default="sportsdataverse/sportsdataverse-data")
 
     r = sub.add_parser("ratings", help="build + publish opponent-adjusted team ratings")
     r.add_argument(
@@ -79,9 +88,17 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv=None) -> int:
     args = build_parser().parse_args(argv)
+    if args.cmd == "verify":
+        bad = verify_bundle(args.tag, args.repo)
+        print(f"verify {args.repo}:{args.tag}: " + (f"MISMATCH {bad}" if bad else "every asset matches MANIFEST.json"))
+        return 1 if bad else 0
     if args.cmd == "artifacts":
+        files = None
+        if args.bundle_manifest:
+            files = stage_bundle(args.artifacts, args.stage_dir, args.bundle_manifest)
+            print(f"staged {len(files)} bundle files -> {args.stage_dir}")
         res = upload_artifacts(
-            args.artifacts, args.tag, args.repo, dry_run=args.dry_run
+            args.artifacts, args.tag, args.repo, dry_run=args.dry_run, files=files
         )
         created = " (created release)" if res.get("created_release") else ""
         print(

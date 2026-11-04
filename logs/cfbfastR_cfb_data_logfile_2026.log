@@ -1,164 +1,786 @@
   pos_team: 100.0% of rows resolved to a team name
   def_pos_team: 100.0% of rows resolved to a team name
-pbp 2026: 108125 rows from 950 games
-espn_cfb_pbp: 3 unchanged asset(s) skipped, 0 uploaded
+pbp 2026: 108492 rows from 950 games
 2026: 138 coach-seasons, 138 cleanly attributed
-play_participants 2026: 100492 rows from 950 games
-espn_cfb_play_participants: 3 unchanged asset(s) skipped, 0 uploaded
-team_box 2026: 1244 rows from 950 games
-espn_cfb_team_box: 3 unchanged asset(s) skipped, 0 uploaded
-player_box 2026: 53693 rows from 950 games
-espn_cfb_player_box: 3 unchanged asset(s) skipped, 0 uploaded
-drives 2026: 14564 rows from 950 games
-espn_cfb_drives: 3 unchanged asset(s) skipped, 0 uploaded
-game_rosters 2026: 137995 rows from 950 games
-espn_cfb_game_rosters: 3 unchanged asset(s) skipped, 0 uploaded
-betting 2026: 622 rows from 950 games
-espn_cfb_betting: 3 unchanged asset(s) skipped, 0 uploaded
-schedules 2026: 622 rows from 950 games
-espn_cfb_schedules: 3 unchanged asset(s) skipped, 0 uploaded
-linescores 2026: 5042 rows from 950 games
-espn_cfb_linescores: 3 unchanged asset(s) skipped, 0 uploaded
+play_participants 2026: 100841 rows from 950 games
+team_box 2026: 1248 rows from 950 games
+player_box 2026: 53841 rows from 950 games
+drives 2026: 14611 rows from 950 games
+game_rosters 2026: 138439 rows from 950 games
+betting 2026: 624 rows from 950 games
+  gh release upload: transient failure (attempt 1/3, retrying): HTTP 500 (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/701225603)
+  gh release upload: transient failure (attempt 2/3, retrying): HTTP 500 (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/701225603)
+schedules 2026: 624 rows from 950 games
+  gh release upload: transient failure (attempt 1/3, retrying): HTTP 500 (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/701227486)
+  gh release upload: transient failure (attempt 1/3, retrying): HTTP 500 (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/701227659)
+  gh release upload: transient failure (attempt 1/3, retrying): HTTP 500 (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/701227756)
+  gh release upload: transient failure (attempt 1/3, retrying): HTTP 500 (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/701227940)
+linescores 2026: 5060 rows from 950 games
   power_index 2026: 1776 rows, 7 cols
-espn_cfb_power_index: 3 unchanged asset(s) skipped, 0 uploaded
 
 === power_index: 0 failures ===
 injuries 2026: 0 rows from 950 games
+Traceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 280, in main
+    build_dataset(
+    ~~~~~~~~~~~~~^
+        args.dataset,
+        ^^^^^^^^^^^^^
+    ...<8 lines>...
+        include_release_ids=args.include_release_ids,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 441, in build_dataset
+    build_season(
+    ~~~~~~~~~~~~^
+        spec,
+        ^^^^^
+    ...<7 lines>...
+        base=base,
+        ^^^^^^^^^^
+    )
+    ^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 356, in build_season
+    publish_dataset(spec, season, base=base)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 432, in publish_dataset
+    _stamp(spec.tag, run, repo)
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 268, in _stamp
+    upload_release_sidecars(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        tag, runner=run, pkg_function=PKG_FUNCTION.get(tag), repo=repo
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/sportsdataverse/release.py", line 492, in upload_release_sidecars
+    runner(["release", "upload", tag, str(sidecar), "--repo", repo, "--clobber"])
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 329, in gh_retry
+    raise subprocess.CalledProcessError(proc.returncode, ["gh", *args], proc.stdout, err)
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_adv_team', '/tmp/sdv_sidecars_xgl7c7f0/package_function.txt', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
   pos_team: 100.0% of rows resolved to a team name
-adv_team 2026: 1244 rows from 950 games
-espn_cfb_adv_team: 3 unchanged asset(s) skipped, 0 uploaded
+adv_team 2026: 1248 rows from 950 games
+::warning ::cfb_data_build adv_team for season 2026 exited with code 1
+ASSET MISSING: espn_cfb_adv_passing:adv_passing_2026.rds was deleted by --clobber and not re-uploaded; consumers get a 404 until the next publish
+Traceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 280, in main
+    build_dataset(
+    ~~~~~~~~~~~~~^
+        args.dataset,
+        ^^^^^^^^^^^^^
+    ...<8 lines>...
+        include_release_ids=args.include_release_ids,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 441, in build_dataset
+    build_season(
+    ~~~~~~~~~~~~^
+        spec,
+        ^^^^^
+    ...<7 lines>...
+        base=base,
+        ^^^^^^^^^^
+    )
+    ^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 356, in build_season
+    publish_dataset(spec, season, base=base)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 425, in publish_dataset
+    run(["release", "upload", spec.tag, str(f), "--repo", repo, "--clobber"])
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/publish.py", line 329, in gh_retry
+    raise subprocess.CalledProcessError(proc.returncode, ["gh", *args], proc.stdout, err)
+subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'espn_cfb_adv_passing', '../cfb/adv_passing/rds/adv_passing_2026.rds', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
   pos_team: 100.0% of rows resolved to a team name
-adv_passing 2026: 2054 rows from 950 games
-espn_cfb_adv_passing: 3 unchanged asset(s) skipped, 0 uploaded
+adv_passing 2026: 2059 rows from 950 games
+::warning ::cfb_data_build adv_passing for season 2026 exited with code 1
   pos_team: 100.0% of rows resolved to a team name
-adv_rushing 2026: 6918 rows from 950 games
-espn_cfb_adv_rushing: 3 unchanged asset(s) skipped, 0 uploaded
+adv_rushing 2026: 6937 rows from 950 games
+  gh release upload: transient failure (attempt 1/3, retrying): HTTP 502: Server Error (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/701239329)
+  gh release upload: transient failure (attempt 1/3, retrying): HTTP 500 (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/701239445)
+  gh release upload: transient failure (attempt 2/3, retrying): HTTP 502: Server Error (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/701239445)
+  gh release upload: transient failure (attempt 1/3, retrying): HTTP 500 (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/701239767)
   pos_team: 100.0% of rows resolved to a team name
-adv_receiving 2026: 12219 rows from 950 games
-espn_cfb_adv_receiving: 3 unchanged asset(s) skipped, 0 uploaded
+adv_receiving 2026: 12249 rows from 950 games
+  gh release upload: transient failure (attempt 1/3, retrying): HTTP 502: Server Error (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/701241854)
   def_pos_team: 100.0% of rows resolved to a team name
-adv_defensive 2026: 1244 rows from 950 games
-espn_cfb_adv_defensive: 3 unchanged asset(s) skipped, 0 uploaded
+adv_defensive 2026: 1248 rows from 950 games
   pos_team: 100.0% of rows resolved to a team name
-adv_turnover 2026: 1244 rows from 950 games
-espn_cfb_adv_turnover: 3 unchanged asset(s) skipped, 0 uploaded
+adv_turnover 2026: 1248 rows from 950 games
+  gh release upload: transient failure (attempt 1/3, retrying): HTTP 502: Server Error (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/701245845)
   pos_team: 100.0% of rows resolved to a team name
-adv_drives 2026: 1244 rows from 950 games
-espn_cfb_adv_drives: 3 unchanged asset(s) skipped, 0 uploaded
+adv_drives 2026: 1248 rows from 950 games
   pos_team: 100.0% of rows resolved to a team name
-adv_situational 2026: 1244 rows from 950 games
-espn_cfb_adv_situational: 3 unchanged asset(s) skipped, 0 uploaded
+adv_situational 2026: 1248 rows from 950 games
+  gh release upload: transient failure (attempt 1/3, retrying): HTTP 502: Server Error (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/701251386)
   def_pos_team: 100.0% of rows resolved to a team name
-adv_defensive_players 2026: 7699 rows from 950 games
-espn_cfb_adv_defensive_players: 3 unchanged asset(s) skipped, 0 uploaded
+adv_defensive_players 2026: 7724 rows from 950 games
   pos_team: 100.0% of rows resolved to a team name
-adv_specialists 2026: 5562 rows from 950 games
-espn_cfb_adv_specialists: 3 unchanged asset(s) skipped, 0 uploaded
+adv_specialists 2026: 5581 rows from 950 games
   pos_team: 100.0% of rows resolved to a team name
-adv_player_usage 2026: 14868 rows from 950 games
-espn_cfb_adv_player_usage: 3 unchanged asset(s) skipped, 0 uploaded
+adv_player_usage 2026: 14908 rows from 950 games
+  gh release upload: transient failure (attempt 1/3, retrying): HTTP 502: Server Error (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/701271602)
   pos_team: 100.0% of rows resolved to a team name
-adv_position_group_usage 2026: 4961 rows from 950 games
-espn_cfb_adv_position_group_usage: 3 unchanged asset(s) skipped, 0 uploaded
+adv_position_group_usage 2026: 4978 rows from 950 games
   def_pos_team: 100.0% of rows resolved to a team name
-adv_tackles 2026: 26185 rows from 950 games
-espn_cfb_adv_tackles: 3 unchanged asset(s) skipped, 0 uploaded
+adv_tackles 2026: 26259 rows from 950 games
   def_pos_team: 100.0% of rows resolved to a team name
-adv_position_group_tackles 2026: 4731 rows from 950 games
-espn_cfb_adv_position_group_tackles: 3 unchanged asset(s) skipped, 0 uploaded
+adv_position_group_tackles 2026: 4746 rows from 950 games
   pos_team: 100.0% of rows resolved to a team name
-adv_team_usage 2026: 1244 rows from 950 games
-espn_cfb_adv_team_usage: 3 unchanged asset(s) skipped, 0 uploaded
+adv_team_usage 2026: 1248 rows from 950 games
+  gh release upload: transient failure (attempt 1/3, retrying): HTTP 502: Server Error (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/701329238)
+  gh release upload: transient failure (attempt 1/3, retrying): HTTP 500 (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/701329337)
+  gh release upload: transient failure (attempt 1/3, retrying): HTTP 500 (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/701329566)
   pos_team: 100.0% of rows resolved to a team name
-adv_drive_scripting 2026: 2488 rows from 950 games
-espn_cfb_adv_drive_scripting: 3 unchanged asset(s) skipped, 0 uploaded
+adv_drive_scripting 2026: 2496 rows from 950 games
   pos_team: 100.0% of rows resolved to a team name
-usage_players 2026: 4308 rows from 950 games
-espn_cfb_usage_players: 3 unchanged asset(s) skipped, 0 uploaded
+usage_players 2026: 4309 rows from 950 games
   pos_team: 100.0% of rows resolved to a team name
 usage_position_groups 2026: 1034 rows from 950 games
-espn_cfb_usage_position_groups: 3 unchanged asset(s) skipped, 0 uploaded
   def_pos_team: 100.0% of rows resolved to a team name
-usage_tackles 2026: 8085 rows from 950 games
-espn_cfb_usage_tackles: 3 unchanged asset(s) skipped, 0 uploaded
+usage_tackles 2026: 8088 rows from 950 games
   def_pos_team: 100.0% of rows resolved to a team name
 usage_position_group_tackles 2026: 1332 rows from 950 games
-espn_cfb_usage_position_group_tackles: 3 unchanged asset(s) skipped, 0 uploaded
   pos_team: 100.0% of rows resolved to a team name
 usage_teams 2026: 236 rows from 950 games
-espn_cfb_usage_teams: 3 unchanged asset(s) skipped, 0 uploaded
+  gh release upload: transient failure (attempt 1/3, retrying): HTTP 502: Server Error (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/698073296)
   pos_team: 100.0% of rows resolved to a team name
 usage_drive_scripting 2026: 472 rows from 950 games
-espn_cfb_usage_drive_scripting: 3 unchanged asset(s) skipped, 0 uploaded
   pos_team: 100.0% of rows resolved to a team name
-adv_st_kickers 2026: 3284 rows from 950 games
-espn_cfb_adv_st_kickers: 3 unchanged asset(s) skipped, 0 uploaded
+adv_st_kickers 2026: 3296 rows from 950 games
   pos_team: 100.0% of rows resolved to a team name
-adv_st_punters 2026: 1326 rows from 950 games
-espn_cfb_adv_st_punters: 3 unchanged asset(s) skipped, 0 uploaded
+adv_st_punters 2026: 1331 rows from 950 games
   pos_team: 100.0% of rows resolved to a team name
-adv_st_returners 2026: 1876 rows from 950 games
-espn_cfb_adv_st_returners: 3 unchanged asset(s) skipped, 0 uploaded
+adv_st_returners 2026: 1881 rows from 950 games
   def_pos_team: 100.0% of rows resolved to a team name
 adv_st_blocks 2026: 87 rows from 950 games
 espn_cfb_adv_st_blocks: 3 unchanged asset(s) skipped, 0 uploaded
-  pos_team: 100.0% of rows resolved to a team name
-adv_st_team 2026: 1244 rows from 950 games
-espn_cfb_adv_st_team: 3 unchanged asset(s) skipped, 0 uploaded
-  pos_team: 100.0% of rows resolved to a team name
-usage_st_kickers 2026: 979 rows from 950 games
-espn_cfb_usage_st_kickers: 3 unchanged asset(s) skipped, 0 uploaded
-  pos_team: 100.0% of rows resolved to a team name
-usage_st_punters 2026: 329 rows from 950 games
-espn_cfb_usage_st_punters: 3 unchanged asset(s) skipped, 0 uploaded
-  pos_team: 100.0% of rows resolved to a team name
-usage_st_returners 2026: 792 rows from 950 games
-espn_cfb_usage_st_returners: 3 unchanged asset(s) skipped, 0 uploaded
-  def_pos_team: 100.0% of rows resolved to a team name
-usage_st_blocks 2026: 85 rows from 950 games
-espn_cfb_usage_st_blocks: 3 unchanged asset(s) skipped, 0 uploaded
-  pos_team: 100.0% of rows resolved to a team name
-usage_st_team 2026: 236 rows from 950 games
-espn_cfb_usage_st_team: 3 unchanged asset(s) skipped, 0 uploaded
-  adv_team_gamelog 2026: 1244 rows, 92 cols
-espn_cfb_adv_team_gamelog: 3 unchanged asset(s) skipped, 0 uploaded
+Traceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 280, in main
+    build_dataset(
+    ~~~~~~~~~~~~~^
+        args.dataset,
+        ^^^^^^^^^^^^^
+    ...<8 lines>...
+        include_release_ids=args.include_release_ids,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 441, in build_dataset
+    build_season(
+    ~~~~~~~~~~~~^
+        spec,
+        ^^^^^
+    ...<7 lines>...
+        base=base,
+        ^^^^^^^^^^
+    )
+    ^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 348, in build_season
+    df = _resolve_team_names(df, season, schedule)
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 85, in _resolve_team_names
+    names = _team_names(schedule, season)
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 67, in _team_names
+    names = pl.concat(sides).drop_nulls("team_id").unique(subset=["team_id"]).collect()
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/_utils/expired.py", line 114, in wrapper
+    return function(*args, **kwargs)
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/frame.py", line 2225, in collect
+    return engine_.collect(
+           ~~~~~~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<2 lines>...
+        post_opt_callback=post_opt_callback,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
+    return wrap_df(ldf.collect(self.name, callback))
+                   ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 1.591743946s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+  <head>
+    <title>501 Unsupported client range</title>
+  </head>
+  <body>
+    <h1>Error 501 Unsupported client range</h1>
+    <p>Unsupported client range</p>
+    <h3>Error 54113</h3>
+    <p>Details: cache-ewr-kewr1740023-EWR 1793799016 3568974993</p>
+    <hr>
+    <p>Varnish cache server</p>
+  </body>
+</html>
+ (path: https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet)
+::warning ::cfb_data_build adv_st_team for season 2026 exited with code 1
+Traceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 280, in main
+    build_dataset(
+    ~~~~~~~~~~~~~^
+        args.dataset,
+        ^^^^^^^^^^^^^
+    ...<8 lines>...
+        include_release_ids=args.include_release_ids,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 441, in build_dataset
+    build_season(
+    ~~~~~~~~~~~~^
+        spec,
+        ^^^^^
+    ...<7 lines>...
+        base=base,
+        ^^^^^^^^^^
+    )
+    ^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 320, in build_season
+    ids = season_game_ids(schedule, [season])
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_ingest/schedule.py", line 18, in season_game_ids
+    return lf.collect().get_column("game_id").cast(pl.Int64).to_list()
+           ~~~~~~~~~~^^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/_utils/expired.py", line 114, in wrapper
+    return function(*args, **kwargs)
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/frame.py", line 2225, in collect
+    return engine_.collect(
+           ~~~~~~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<2 lines>...
+        post_opt_callback=post_opt_callback,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
+    return wrap_df(ldf.collect(self.name, callback))
+                   ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 2.888876384s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+  <head>
+    <title>501 Unsupported client range</title>
+  </head>
+  <body>
+    <h1>Error 501 Unsupported client range</h1>
+    <p>Unsupported client range</p>
+    <h3>Error 54113</h3>
+    <p>Details: cache-lga-kjfk8660024-LGA 1793799028 2342423954</p>
+    <hr>
+    <p>Varnish cache server</p>
+  </body>
+</html>
+ (path: https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet)
+::warning ::cfb_data_build usage_st_kickers for season 2026 exited with code 1
+Traceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 280, in main
+    build_dataset(
+    ~~~~~~~~~~~~~^
+        args.dataset,
+        ^^^^^^^^^^^^^
+    ...<8 lines>...
+        include_release_ids=args.include_release_ids,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 441, in build_dataset
+    build_season(
+    ~~~~~~~~~~~~^
+        spec,
+        ^^^^^
+    ...<7 lines>...
+        base=base,
+        ^^^^^^^^^^
+    )
+    ^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 320, in build_season
+    ids = season_game_ids(schedule, [season])
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_ingest/schedule.py", line 18, in season_game_ids
+    return lf.collect().get_column("game_id").cast(pl.Int64).to_list()
+           ~~~~~~~~~~^^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/_utils/expired.py", line 114, in wrapper
+    return function(*args, **kwargs)
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/frame.py", line 2225, in collect
+    return engine_.collect(
+           ~~~~~~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<2 lines>...
+        post_opt_callback=post_opt_callback,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
+    return wrap_df(ldf.collect(self.name, callback))
+                   ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 2.184294354s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+  <head>
+    <title>501 Unsupported client range</title>
+  </head>
+  <body>
+    <h1>Error 501 Unsupported client range</h1>
+    <p>Unsupported client range</p>
+    <h3>Error 54113</h3>
+    <p>Details: cache-ewr-kewr1740048-EWR 1793799038 1559501371</p>
+    <hr>
+    <p>Varnish cache server</p>
+  </body>
+</html>
+ (path: https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet)
+::warning ::cfb_data_build usage_st_punters for season 2026 exited with code 1
+Traceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 280, in main
+    build_dataset(
+    ~~~~~~~~~~~~~^
+        args.dataset,
+        ^^^^^^^^^^^^^
+    ...<8 lines>...
+        include_release_ids=args.include_release_ids,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 441, in build_dataset
+    build_season(
+    ~~~~~~~~~~~~^
+        spec,
+        ^^^^^
+    ...<7 lines>...
+        base=base,
+        ^^^^^^^^^^
+    )
+    ^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 320, in build_season
+    ids = season_game_ids(schedule, [season])
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_ingest/schedule.py", line 18, in season_game_ids
+    return lf.collect().get_column("game_id").cast(pl.Int64).to_list()
+           ~~~~~~~~~~^^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/_utils/expired.py", line 114, in wrapper
+    return function(*args, **kwargs)
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/frame.py", line 2225, in collect
+    return engine_.collect(
+           ~~~~~~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<2 lines>...
+        post_opt_callback=post_opt_callback,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
+    return wrap_df(ldf.collect(self.name, callback))
+                   ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 5.807915619s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+  <head>
+    <title>501 Unsupported client range</title>
+  </head>
+  <body>
+    <h1>Error 501 Unsupported client range</h1>
+    <p>Unsupported client range</p>
+    <h3>Error 54113</h3>
+    <p>Details: cache-lga-kjfk8660055-LGA 1793799049 2069127553</p>
+    <hr>
+    <p>Varnish cache server</p>
+  </body>
+</html>
+ (path: https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet)
+::warning ::cfb_data_build usage_st_returners for season 2026 exited with code 1
+Traceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 280, in main
+    build_dataset(
+    ~~~~~~~~~~~~~^
+        args.dataset,
+        ^^^^^^^^^^^^^
+    ...<8 lines>...
+        include_release_ids=args.include_release_ids,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 441, in build_dataset
+    build_season(
+    ~~~~~~~~~~~~^
+        spec,
+        ^^^^^
+    ...<7 lines>...
+        base=base,
+        ^^^^^^^^^^
+    )
+    ^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 320, in build_season
+    ids = season_game_ids(schedule, [season])
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_ingest/schedule.py", line 18, in season_game_ids
+    return lf.collect().get_column("game_id").cast(pl.Int64).to_list()
+           ~~~~~~~~~~^^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/_utils/expired.py", line 114, in wrapper
+    return function(*args, **kwargs)
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/frame.py", line 2225, in collect
+    return engine_.collect(
+           ~~~~~~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<2 lines>...
+        post_opt_callback=post_opt_callback,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
+    return wrap_df(ldf.collect(self.name, callback))
+                   ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 8.537762652s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+  <head>
+    <title>501 Unsupported client range</title>
+  </head>
+  <body>
+    <h1>Error 501 Unsupported client range</h1>
+    <p>Unsupported client range</p>
+    <h3>Error 54113</h3>
+    <p>Details: cache-ewr-kewr1740060-EWR 1793799065 310104663</p>
+    <hr>
+    <p>Varnish cache server</p>
+  </body>
+</html>
+ (path: https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet)
+::warning ::cfb_data_build usage_st_blocks for season 2026 exited with code 1
+Traceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 280, in main
+    build_dataset(
+    ~~~~~~~~~~~~~^
+        args.dataset,
+        ^^^^^^^^^^^^^
+    ...<8 lines>...
+        include_release_ids=args.include_release_ids,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 441, in build_dataset
+    build_season(
+    ~~~~~~~~~~~~^
+        spec,
+        ^^^^^
+    ...<7 lines>...
+        base=base,
+        ^^^^^^^^^^
+    )
+    ^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 320, in build_season
+    ids = season_game_ids(schedule, [season])
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_ingest/schedule.py", line 18, in season_game_ids
+    return lf.collect().get_column("game_id").cast(pl.Int64).to_list()
+           ~~~~~~~~~~^^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/_utils/expired.py", line 114, in wrapper
+    return function(*args, **kwargs)
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/frame.py", line 2225, in collect
+    return engine_.collect(
+           ~~~~~~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<2 lines>...
+        post_opt_callback=post_opt_callback,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
+    return wrap_df(ldf.collect(self.name, callback))
+                   ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 2.489216317s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+  <head>
+    <title>501 Unsupported client range</title>
+  </head>
+  <body>
+    <h1>Error 501 Unsupported client range</h1>
+    <p>Unsupported client range</p>
+    <h3>Error 54113</h3>
+    <p>Details: cache-ewr-kewr1740096-EWR 1793799073 4242851124</p>
+    <hr>
+    <p>Varnish cache server</p>
+  </body>
+</html>
+ (path: https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet)
+::warning ::cfb_data_build usage_st_team for season 2026 exited with code 1
+  adv_team_gamelog 2026: 1248 rows, 92 cols
 
 === gamelog: 0 failures ===
-  team_opponent_splits 2026: 1244 rows, 24 cols
-cfb_team_opponent_splits: 3 unchanged asset(s) skipped, 0 uploaded
+  team_opponent_splits 2026: 1248 rows, 24 cols
 
 === team_opponent_splits: 0 failures ===
-  metric_curves 2026: 16541 rows, 14 cols
-cfb_metric_curves: 3 unchanged asset(s) skipped, 0 uploaded
+  metric_curves 2026: 16554 rows, 14 cols
 
 === metric_curves: 0 failures ===
-  paper_index_games 2026: 1240 rows, 17 cols
+  paper_index_games 2026: 1244 rows, 17 cols
 
 === paper_index_games: 0 failures ===
-qa 2026: 622 rows from 950 games
+Traceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 280, in main
+    build_dataset(
+    ~~~~~~~~~~~~~^
+        args.dataset,
+        ^^^^^^^^^^^^^
+    ...<8 lines>...
+        include_release_ids=args.include_release_ids,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 441, in build_dataset
+    build_season(
+    ~~~~~~~~~~~~^
+        spec,
+        ^^^^^
+    ...<7 lines>...
+        base=base,
+        ^^^^^^^^^^
+    )
+    ^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 320, in build_season
+    ids = season_game_ids(schedule, [season])
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_ingest/schedule.py", line 18, in season_game_ids
+    return lf.collect().get_column("game_id").cast(pl.Int64).to_list()
+           ~~~~~~~~~~^^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/_utils/expired.py", line 114, in wrapper
+    return function(*args, **kwargs)
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/frame.py", line 2225, in collect
+    return engine_.collect(
+           ~~~~~~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<2 lines>...
+        post_opt_callback=post_opt_callback,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
+    return wrap_df(ldf.collect(self.name, callback))
+                   ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 6.000580084s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+  <head>
+    <title>501 Unsupported client range</title>
+  </head>
+  <body>
+    <h1>Error 501 Unsupported client range</h1>
+    <p>Unsupported client range</p>
+    <h3>Error 54113</h3>
+    <p>Details: cache-ewr-kewr1740056-EWR 1793799146 3082195245</p>
+    <hr>
+    <p>Varnish cache server</p>
+  </body>
+</html>
+ (path: https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet)
+::warning ::cfb_data_build qa for season 2026 exited with code 1
   cfb_schedules 2026: 3678 rows, 43 cols, fbs_game=761, fbs_participant=888, unplayed=0, ranked_sides=298
 
 === cfb_schedules: 0 failures ===
-  pos_team: 100.0% of rows resolved to a team name
-team_tendencies 2026: 236 rows from 950 games
-espn_cfb_team_tendencies: 3 unchanged asset(s) skipped, 0 uploaded
-  coaches: 138 attributed team-seasons for 2026
-  pos_team: 100.0% of rows resolved to a team name
-coach_tendencies 2026: 138 rows from 950 games
-espn_cfb_coach_tendencies: 3 unchanged asset(s) skipped, 0 uploaded
-cfb_rosters 2026: 26094 rows from 948/950 games | position 100.0% | division 100.0% | cfbd_recruit_ids 92.0% of 29305 cfbd athletes
-espn_cfb_rosters: 3 unchanged asset(s) skipped, 0 uploaded
+Traceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 280, in main
+    build_dataset(
+    ~~~~~~~~~~~~~^
+        args.dataset,
+        ^^^^^^^^^^^^^
+    ...<8 lines>...
+        include_release_ids=args.include_release_ids,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 441, in build_dataset
+    build_season(
+    ~~~~~~~~~~~~^
+        spec,
+        ^^^^^
+    ...<7 lines>...
+        base=base,
+        ^^^^^^^^^^
+    )
+    ^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 320, in build_season
+    ids = season_game_ids(schedule, [season])
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_ingest/schedule.py", line 18, in season_game_ids
+    return lf.collect().get_column("game_id").cast(pl.Int64).to_list()
+           ~~~~~~~~~~^^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/_utils/expired.py", line 114, in wrapper
+    return function(*args, **kwargs)
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/frame.py", line 2225, in collect
+    return engine_.collect(
+           ~~~~~~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<2 lines>...
+        post_opt_callback=post_opt_callback,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
+    return wrap_df(ldf.collect(self.name, callback))
+                   ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 3.2758759s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+  <head>
+    <title>501 Unsupported client range</title>
+  </head>
+  <body>
+    <h1>Error 501 Unsupported client range</h1>
+    <p>Unsupported client range</p>
+    <h3>Error 54113</h3>
+    <p>Details: cache-lga-kjfk8660070-LGA 1793799172 730133159</p>
+    <hr>
+    <p>Varnish cache server</p>
+  </body>
+</html>
+ (path: https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet)
+::warning ::cfb_data_build team_tendencies for season 2026 exited with code 1
+Traceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/__main__.py", line 6, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/cli.py", line 280, in main
+    build_dataset(
+    ~~~~~~~~~~~~~^
+        args.dataset,
+        ^^^^^^^^^^^^^
+    ...<8 lines>...
+        include_release_ids=args.include_release_ids,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 441, in build_dataset
+    build_season(
+    ~~~~~~~~~~~~^
+        spec,
+        ^^^^^
+    ...<7 lines>...
+        base=base,
+        ^^^^^^^^^^
+    )
+    ^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/build.py", line 320, in build_season
+    ids = season_game_ids(schedule, [season])
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_ingest/schedule.py", line 18, in season_game_ids
+    return lf.collect().get_column("game_id").cast(pl.Int64).to_list()
+           ~~~~~~~~~~^^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/_utils/expired.py", line 114, in wrapper
+    return function(*args, **kwargs)
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/frame.py", line 2225, in collect
+    return engine_.collect(
+           ~~~~~~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<2 lines>...
+        post_opt_callback=post_opt_callback,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
+    return wrap_df(ldf.collect(self.name, callback))
+                   ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 2.281086179s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+  <head>
+    <title>501 Unsupported client range</title>
+  </head>
+  <body>
+    <h1>Error 501 Unsupported client range</h1>
+    <p>Unsupported client range</p>
+    <h3>Error 54113</h3>
+    <p>Details: cache-lga-kjfk8660028-LGA 1793799179 2774266285</p>
+    <hr>
+    <p>Varnish cache server</p>
+  </body>
+</html>
+ (path: https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet)
+::warning ::cfb_data_build coach_tendencies for season 2026 exited with code 1
+cfb_rosters 2026: FAILED OSError('object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 4.781053466s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: \n<?xml version="1.0" encoding="utf-8"?>\n<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"\n "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">\n<html>\n  <head>\n    <title>501 Unsupported client range</title>\n  </head>\n  <body>\n    <h1>Error 501 Unsupported client range</h1>\n    <p>Unsupported client range</p>\n    <h3>Error 54113</h3>\n    <p>Details: cache-ewr-kewr1740029-EWR 1793799194 284566245</p>\n    <hr>\n    <p>Varnish cache server</p>\n  </body>\n</html>\n (path: https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet)')
 
-=== cfb_rosters: 0 failures ===
-espn_cfb_percentiles: 3 unchanged asset(s) skipped, 0 uploaded
+=== cfb_rosters: 1 failures ===
+  2026: OSError('object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 4.781053466s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: \n<?xml version="1.0" encoding="utf-8"?>\n<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"\n "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">\n<html>\n  <head>\n    <title>501 Unsupported client range</title>\n  </head>\n  <body>\n    <h1>Error 501 Unsupported client range</h1>\n    <p>Unsupported client range</p>\n    <h3>Error 54113</h3>\n    <p>Details: cache-ewr-kewr1740029-EWR 1793799194 284566245</p>\n    <hr>\n    <p>Varnish cache server</p>\n  </body>\n</html>\n (path: https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet)')
+::warning ::cfb_data_build cfb_rosters for season 2026 exited with code 1
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 138 rows
 [summaries 2026] passing: 435 rows
-[summaries 2026] rushing: 1384 rows
+[summaries 2026] rushing: 1385 rows
 [summaries 2026] receiving: 2102 rows
 [summaries 2026] league_averages: 890 rows
-  rolling_windows 2026: 26790 rows, 20 cols
-cfb_rolling_windows: 3 unchanged asset(s) skipped, 0 uploaded
+  rolling_windows 2026: 26794 rows, 20 cols
 
 === rolling_windows: 0 failures ===
   cfb_ratings_weekly 2026: 1197 rows, 19 cols, 9 weekly snapshots
@@ -225,6 +847,7 @@ cfb_rolling_windows: 3 unchanged asset(s) skipped, 0 uploaded
 
 === defense_vs_position: 0 failures ===
   cfb_matchup_features 2026: 1649 rows, 45 cols
+cfb_matchup_features: 3 unchanged asset(s) skipped, 0 uploaded
 
 === matchup_features: 0 failures ===
 /mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/matchup_features.py:507: UserWarning: Comparisons with None always result in null. Consider using `.is_null()` or `.is_not_null()`.
@@ -246,13 +869,13 @@ cfb_recruits: 1 unchanged asset(s) skipped, 0 uploaded
 cfb_team_portal: 1 unchanged asset(s) skipped, 0 uploaded
 
 === team_portal: 0 failures ===
-2026-11-03 09:12:43,476 INFO === season 2026 ===
-2026-11-03 09:12:45,428 INFO wrote cfb_teams_crosswalk_2026.parquet (828 rows, 11 cols)
-2026-11-03 09:12:56,684 INFO wrote cfb_schedule_crosswalk_2026.parquet (1672 rows, 11 cols)
-2026-11-03 09:12:56,690 INFO wrote manifest cfb_crosswalk_in_data_repo.csv (45 rows)
-2026-11-03 09:12:56,690 INFO built 3 artifact(s) under cfb/crosswalk/parquet
-2026-11-03 09:12:57,077 INFO uploading 2 of 3 asset(s) to sportsdataverse/sportsdataverse-data@cfb_crosswalk (one at a time)
-2026-11-03 09:12:58,637 INFO   uploaded cfb_schedule_crosswalk_2026.parquet
-2026-11-03 09:13:00,083 INFO   uploaded cfb_crosswalk_in_data_repo.csv
-2026-11-03 09:13:06,781 INFO published to sportsdataverse/sportsdataverse-data@cfb_crosswalk
+2026-11-04 08:50:27,106 INFO === season 2026 ===
+2026-11-04 08:50:29,420 INFO wrote cfb_teams_crosswalk_2026.parquet (828 rows, 11 cols)
+2026-11-04 08:50:40,873 INFO wrote cfb_schedule_crosswalk_2026.parquet (1672 rows, 11 cols)
+2026-11-04 08:50:40,876 INFO wrote manifest cfb_crosswalk_in_data_repo.csv (45 rows)
+2026-11-04 08:50:40,876 INFO built 3 artifact(s) under cfb/crosswalk/parquet
+2026-11-04 08:50:41,293 INFO uploading 2 of 3 asset(s) to sportsdataverse/sportsdataverse-data@cfb_crosswalk (one at a time)
+2026-11-04 08:50:42,990 INFO   uploaded cfb_schedule_crosswalk_2026.parquet
+2026-11-04 08:50:44,623 INFO   uploaded cfb_crosswalk_in_data_repo.csv
+2026-11-04 08:50:51,301 INFO published to sportsdataverse/sportsdataverse-data@cfb_crosswalk
 pushed: CFB Data Updated (Start: 2026 End: 2026) (attempt 1)

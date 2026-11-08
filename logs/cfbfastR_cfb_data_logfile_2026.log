@@ -47,7 +47,7 @@ Traceback (most recent call last):
   File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
     return wrap_df(ldf.collect(self.name, callback))
                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 10.590913138s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 2.953934266s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -59,7 +59,7 @@ OSError: object-store error: Generic HTTP error: Error performing GET https://ra
     <h1>Error 501 Unsupported client range</h1>
     <p>Unsupported client range</p>
     <h3>Error 54113</h3>
-    <p>Details: cache-lga-kjfk8660026-LGA 1794089212 243172168</p>
+    <p>Details: cache-ewr-kewr1740035-EWR 1794101531 2923121082</p>
     <hr>
     <p>Varnish cache server</p>
   </body>
@@ -113,7 +113,7 @@ Traceback (most recent call last):
   File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
     return wrap_df(ldf.collect(self.name, callback))
                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 2.154889462s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 3.230165653s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -125,7 +125,7 @@ OSError: object-store error: Generic HTTP error: Error performing GET https://ra
     <h1>Error 501 Unsupported client range</h1>
     <p>Unsupported client range</p>
     <h3>Error 54113</h3>
-    <p>Details: cache-lga-kjfk8660031-LGA 1794089223 198795213</p>
+    <p>Details: cache-lga-kjfk8660058-LGA 1794101550 4051838193</p>
     <hr>
     <p>Varnish cache server</p>
   </body>
@@ -178,7 +178,7 @@ Traceback (most recent call last):
   File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
     return wrap_df(ldf.collect(self.name, callback))
                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 2.745960725s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 3.667352792s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -190,7 +190,7 @@ OSError: object-store error: Generic HTTP error: Error performing GET https://ra
     <h1>Error 501 Unsupported client range</h1>
     <p>Unsupported client range</p>
     <h3>Error 54113</h3>
-    <p>Details: cache-lga-kjfk8660071-LGA 1794089231 3559188685</p>
+    <p>Details: cache-ewr-kewr1740057-EWR 1794101560 1259881231</p>
     <hr>
     <p>Varnish cache server</p>
   </body>
@@ -243,7 +243,7 @@ Traceback (most recent call last):
   File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
     return wrap_df(ldf.collect(self.name, callback))
                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 1.367193022s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 6.828149679s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -255,7 +255,7 @@ OSError: object-store error: Generic HTTP error: Error performing GET https://ra
     <h1>Error 501 Unsupported client range</h1>
     <p>Unsupported client range</p>
     <h3>Error 54113</h3>
-    <p>Details: cache-lga-kjfk8660026-LGA 1794089239 243816296</p>
+    <p>Details: cache-ewr-kewr1740076-EWR 1794101573 4117439578</p>
     <hr>
     <p>Varnish cache server</p>
   </body>
@@ -308,7 +308,7 @@ Traceback (most recent call last):
   File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
     return wrap_df(ldf.collect(self.name, callback))
                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 7.436980004s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 3.658732289s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -320,7 +320,7 @@ OSError: object-store error: Generic HTTP error: Error performing GET https://ra
     <h1>Error 501 Unsupported client range</h1>
     <p>Unsupported client range</p>
     <h3>Error 54113</h3>
-    <p>Details: cache-lga-kjfk8660064-LGA 1794089252 3842473180</p>
+    <p>Details: cache-lga-kjfk8660077-LGA 1794101583 3887409643</p>
     <hr>
     <p>Varnish cache server</p>
   </body>
@@ -373,7 +373,7 @@ Traceback (most recent call last):
   File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
     return wrap_df(ldf.collect(self.name, callback))
                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 4.073551755s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 2.120206621s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -385,7 +385,7 @@ OSError: object-store error: Generic HTTP error: Error performing GET https://ra
     <h1>Error 501 Unsupported client range</h1>
     <p>Unsupported client range</p>
     <h3>Error 54113</h3>
-    <p>Details: cache-ewr-kewr1740093-EWR 1794089261 3862453366</p>
+    <p>Details: cache-ewr-kewr1740056-EWR 1794101592 2833863113</p>
     <hr>
     <p>Varnish cache server</p>
   </body>
@@ -438,7 +438,7 @@ Traceback (most recent call last):
   File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
     return wrap_df(ldf.collect(self.name, callback))
                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 4.665917929s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 2.581709718s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -450,7 +450,7 @@ OSError: object-store error: Generic HTTP error: Error performing GET https://ra
     <h1>Error 501 Unsupported client range</h1>
     <p>Unsupported client range</p>
     <h3>Error 54113</h3>
-    <p>Details: cache-lga-kjfk8660044-LGA 1794089273 3479773723</p>
+    <p>Details: cache-lga-kjfk8660071-LGA 1794101602 3844466217</p>
     <hr>
     <p>Varnish cache server</p>
   </body>
@@ -503,7 +503,7 @@ Traceback (most recent call last):
   File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
     return wrap_df(ldf.collect(self.name, callback))
                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 1.892915572s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 1.416741639s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -515,7 +515,7 @@ OSError: object-store error: Generic HTTP error: Error performing GET https://ra
     <h1>Error 501 Unsupported client range</h1>
     <p>Unsupported client range</p>
     <h3>Error 54113</h3>
-    <p>Details: cache-lga-kjfk8660055-LGA 1794089280 2586323012</p>
+    <p>Details: cache-lga-kjfk8660030-LGA 1794101612 3549735640</p>
     <hr>
     <p>Varnish cache server</p>
   </body>
@@ -568,7 +568,7 @@ Traceback (most recent call last):
   File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
     return wrap_df(ldf.collect(self.name, callback))
                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 3.848410263s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 1.67074103s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -580,7 +580,7 @@ OSError: object-store error: Generic HTTP error: Error performing GET https://ra
     <h1>Error 501 Unsupported client range</h1>
     <p>Unsupported client range</p>
     <h3>Error 54113</h3>
-    <p>Details: cache-lga-kjfk8660027-LGA 1794089290 3794745217</p>
+    <p>Details: cache-lga-kjfk8660052-LGA 1794101620 1113646875</p>
     <hr>
     <p>Varnish cache server</p>
   </body>
@@ -638,7 +638,7 @@ Traceback (most recent call last):
   File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
     return wrap_df(ldf.collect(self.name, callback))
                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 3.344517704s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 2.439188573s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -650,7 +650,7 @@ OSError: object-store error: Generic HTTP error: Error performing GET https://ra
     <h1>Error 501 Unsupported client range</h1>
     <p>Unsupported client range</p>
     <h3>Error 54113</h3>
-    <p>Details: cache-lga-kjfk8660030-LGA 1794089319 3262283107</p>
+    <p>Details: cache-ewr-kewr1740024-EWR 1794101639 126800354</p>
     <hr>
     <p>Varnish cache server</p>
   </body>
@@ -703,7 +703,7 @@ Traceback (most recent call last):
   File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
     return wrap_df(ldf.collect(self.name, callback))
                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 6.949495466s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 3.604581869s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -715,7 +715,7 @@ OSError: object-store error: Generic HTTP error: Error performing GET https://ra
     <h1>Error 501 Unsupported client range</h1>
     <p>Unsupported client range</p>
     <h3>Error 54113</h3>
-    <p>Details: cache-ewr-kewr1740086-EWR 1794089334 4003307447</p>
+    <p>Details: cache-ewr-kewr1740065-EWR 1794101651 3438825191</p>
     <hr>
     <p>Varnish cache server</p>
   </body>
@@ -768,7 +768,7 @@ Traceback (most recent call last):
   File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
     return wrap_df(ldf.collect(self.name, callback))
                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 2.147128457s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 7.319135304s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -780,7 +780,7 @@ OSError: object-store error: Generic HTTP error: Error performing GET https://ra
     <h1>Error 501 Unsupported client range</h1>
     <p>Unsupported client range</p>
     <h3>Error 54113</h3>
-    <p>Details: cache-ewr-kewr1740021-EWR 1794089346 106322242</p>
+    <p>Details: cache-lga-kjfk8660021-LGA 1794101664 859824431</p>
     <hr>
     <p>Varnish cache server</p>
   </body>
@@ -833,7 +833,7 @@ Traceback (most recent call last):
   File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
     return wrap_df(ldf.collect(self.name, callback))
                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 2.943155977s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 1.965244995s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -845,7 +845,7 @@ OSError: object-store error: Generic HTTP error: Error performing GET https://ra
     <h1>Error 501 Unsupported client range</h1>
     <p>Unsupported client range</p>
     <h3>Error 54113</h3>
-    <p>Details: cache-ewr-kewr1740029-EWR 1794089359 4210706460</p>
+    <p>Details: cache-lga-kjfk8660034-LGA 1794101672 280290898</p>
     <hr>
     <p>Varnish cache server</p>
   </body>
@@ -898,7 +898,7 @@ Traceback (most recent call last):
   File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
     return wrap_df(ldf.collect(self.name, callback))
                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 2.00599715s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 2.071161213s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -910,7 +910,7 @@ OSError: object-store error: Generic HTTP error: Error performing GET https://ra
     <h1>Error 501 Unsupported client range</h1>
     <p>Unsupported client range</p>
     <h3>Error 54113</h3>
-    <p>Details: cache-lga-kjfk8660063-LGA 1794089369 4249724497</p>
+    <p>Details: cache-lga-kjfk8660045-LGA 1794101681 341726944</p>
     <hr>
     <p>Varnish cache server</p>
   </body>
@@ -963,7 +963,7 @@ Traceback (most recent call last):
   File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
     return wrap_df(ldf.collect(self.name, callback))
                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 2.416096185s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 4.960341815s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -975,7 +975,7 @@ OSError: object-store error: Generic HTTP error: Error performing GET https://ra
     <h1>Error 501 Unsupported client range</h1>
     <p>Unsupported client range</p>
     <h3>Error 54113</h3>
-    <p>Details: cache-lga-kjfk8660020-LGA 1794089377 185370942</p>
+    <p>Details: cache-ewr-kewr1740054-EWR 1794101693 4283231203</p>
     <hr>
     <p>Varnish cache server</p>
   </body>
@@ -1028,7 +1028,7 @@ Traceback (most recent call last):
   File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
     return wrap_df(ldf.collect(self.name, callback))
                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 3.288969647s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 2.654215869s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -1040,7 +1040,7 @@ OSError: object-store error: Generic HTTP error: Error performing GET https://ra
     <h1>Error 501 Unsupported client range</h1>
     <p>Unsupported client range</p>
     <h3>Error 54113</h3>
-    <p>Details: cache-lga-kjfk8660060-LGA 1794089390 752836134</p>
+    <p>Details: cache-ewr-kewr1740063-EWR 1794101702 2724873532</p>
     <hr>
     <p>Varnish cache server</p>
   </body>
@@ -1093,7 +1093,7 @@ Traceback (most recent call last):
   File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
     return wrap_df(ldf.collect(self.name, callback))
                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 1.457222367s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 3.047074772s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -1105,7 +1105,7 @@ OSError: object-store error: Generic HTTP error: Error performing GET https://ra
     <h1>Error 501 Unsupported client range</h1>
     <p>Unsupported client range</p>
     <h3>Error 54113</h3>
-    <p>Details: cache-lga-kjfk8660054-LGA 1794089399 3656019987</p>
+    <p>Details: cache-lga-kjfk8660033-LGA 1794101713 1395604975</p>
     <hr>
     <p>Varnish cache server</p>
   </body>
@@ -1158,7 +1158,7 @@ Traceback (most recent call last):
   File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
     return wrap_df(ldf.collect(self.name, callback))
                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 3.03525647s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 2.243917459s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -1170,7 +1170,7 @@ OSError: object-store error: Generic HTTP error: Error performing GET https://ra
     <h1>Error 501 Unsupported client range</h1>
     <p>Unsupported client range</p>
     <h3>Error 54113</h3>
-    <p>Details: cache-ewr-kewr1740054-EWR 1794089409 4091109454</p>
+    <p>Details: cache-ewr-kewr1740033-EWR 1794101722 59381628</p>
     <hr>
     <p>Varnish cache server</p>
   </body>
@@ -1223,7 +1223,7 @@ Traceback (most recent call last):
   File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
     return wrap_df(ldf.collect(self.name, callback))
                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 1.578590129s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 5.577948101s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -1235,7 +1235,7 @@ OSError: object-store error: Generic HTTP error: Error performing GET https://ra
     <h1>Error 501 Unsupported client range</h1>
     <p>Unsupported client range</p>
     <h3>Error 54113</h3>
-    <p>Details: cache-lga-kjfk8660021-LGA 1794089416 584369420</p>
+    <p>Details: cache-lga-kjfk8660067-LGA 1794101733 119511129</p>
     <hr>
     <p>Varnish cache server</p>
   </body>
@@ -1288,7 +1288,7 @@ Traceback (most recent call last):
   File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
     return wrap_df(ldf.collect(self.name, callback))
                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 2.390511186s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 5.074259596s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -1300,7 +1300,7 @@ OSError: object-store error: Generic HTTP error: Error performing GET https://ra
     <h1>Error 501 Unsupported client range</h1>
     <p>Unsupported client range</p>
     <h3>Error 54113</h3>
-    <p>Details: cache-ewr-kewr1740024-EWR 1794089430 4231504235</p>
+    <p>Details: cache-ewr-kewr1740076-EWR 1794101746 4120105993</p>
     <hr>
     <p>Varnish cache server</p>
   </body>
@@ -1353,7 +1353,7 @@ Traceback (most recent call last):
   File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
     return wrap_df(ldf.collect(self.name, callback))
                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 1.945155314s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 3.141657162s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -1365,7 +1365,7 @@ OSError: object-store error: Generic HTTP error: Error performing GET https://ra
     <h1>Error 501 Unsupported client range</h1>
     <p>Unsupported client range</p>
     <h3>Error 54113</h3>
-    <p>Details: cache-lga-kjfk8660025-LGA 1794089438 3861025155</p>
+    <p>Details: cache-ewr-kewr1740037-EWR 1794101755 3547593365</p>
     <hr>
     <p>Varnish cache server</p>
   </body>
@@ -1418,7 +1418,7 @@ Traceback (most recent call last):
   File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
     return wrap_df(ldf.collect(self.name, callback))
                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 5.337333371s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 3.739286236s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -1430,7 +1430,7 @@ OSError: object-store error: Generic HTTP error: Error performing GET https://ra
     <h1>Error 501 Unsupported client range</h1>
     <p>Unsupported client range</p>
     <h3>Error 54113</h3>
-    <p>Details: cache-ewr-kewr1740060-EWR 1794089450 296221836</p>
+    <p>Details: cache-lga-kjfk8660020-LGA 1794101770 464458336</p>
     <hr>
     <p>Varnish cache server</p>
   </body>
@@ -1483,7 +1483,7 @@ Traceback (most recent call last):
   File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
     return wrap_df(ldf.collect(self.name, callback))
                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 2.683391615s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 1.673096016s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -1495,7 +1495,7 @@ OSError: object-store error: Generic HTTP error: Error performing GET https://ra
     <h1>Error 501 Unsupported client range</h1>
     <p>Unsupported client range</p>
     <h3>Error 54113</h3>
-    <p>Details: cache-ewr-kewr1740035-EWR 1794089461 2731565945</p>
+    <p>Details: cache-ewr-kewr1740077-EWR 1794101778 826160190</p>
     <hr>
     <p>Varnish cache server</p>
   </body>
@@ -1548,7 +1548,7 @@ Traceback (most recent call last):
   File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
     return wrap_df(ldf.collect(self.name, callback))
                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 1.973609376s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 9.38693507s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -1560,7 +1560,7 @@ OSError: object-store error: Generic HTTP error: Error performing GET https://ra
     <h1>Error 501 Unsupported client range</h1>
     <p>Unsupported client range</p>
     <h3>Error 54113</h3>
-    <p>Details: cache-lga-kjfk8660048-LGA 1794089470 3565889471</p>
+    <p>Details: cache-ewr-kewr1740027-EWR 1794101796 3153611914</p>
     <hr>
     <p>Varnish cache server</p>
   </body>
@@ -1613,7 +1613,7 @@ Traceback (most recent call last):
   File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
     return wrap_df(ldf.collect(self.name, callback))
                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 2.911160893s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 2.976800421s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -1625,7 +1625,7 @@ OSError: object-store error: Generic HTTP error: Error performing GET https://ra
     <h1>Error 501 Unsupported client range</h1>
     <p>Unsupported client range</p>
     <h3>Error 54113</h3>
-    <p>Details: cache-lga-kjfk8660020-LGA 1794089482 187688128</p>
+    <p>Details: cache-ewr-kewr1740033-EWR 1794101806 60662929</p>
     <hr>
     <p>Varnish cache server</p>
   </body>
@@ -1678,7 +1678,7 @@ Traceback (most recent call last):
   File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
     return wrap_df(ldf.collect(self.name, callback))
                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 4.54135247s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 3.015962877s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -1690,7 +1690,7 @@ OSError: object-store error: Generic HTTP error: Error performing GET https://ra
     <h1>Error 501 Unsupported client range</h1>
     <p>Unsupported client range</p>
     <h3>Error 54113</h3>
-    <p>Details: cache-lga-kjfk8660036-LGA 1794089492 137380269</p>
+    <p>Details: cache-ewr-kewr1740094-EWR 1794101818 3472592487</p>
     <hr>
     <p>Varnish cache server</p>
   </body>
@@ -1743,7 +1743,7 @@ Traceback (most recent call last):
   File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
     return wrap_df(ldf.collect(self.name, callback))
                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 3.033447551s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 2.126456424s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -1755,7 +1755,7 @@ OSError: object-store error: Generic HTTP error: Error performing GET https://ra
     <h1>Error 501 Unsupported client range</h1>
     <p>Unsupported client range</p>
     <h3>Error 54113</h3>
-    <p>Details: cache-lga-kjfk8660078-LGA 1794089501 4160392841</p>
+    <p>Details: cache-ewr-kewr1740054-EWR 1794101828 4285316516</p>
     <hr>
     <p>Varnish cache server</p>
   </body>
@@ -1808,7 +1808,7 @@ Traceback (most recent call last):
   File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
     return wrap_df(ldf.collect(self.name, callback))
                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 1.681343214s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 2.590759482s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -1820,7 +1820,7 @@ OSError: object-store error: Generic HTTP error: Error performing GET https://ra
     <h1>Error 501 Unsupported client range</h1>
     <p>Unsupported client range</p>
     <h3>Error 54113</h3>
-    <p>Details: cache-ewr-kewr1740054-EWR 1794089511 4092713078</p>
+    <p>Details: cache-lga-kjfk8660042-LGA 1794101856 3015726181</p>
     <hr>
     <p>Varnish cache server</p>
   </body>
@@ -1873,7 +1873,7 @@ Traceback (most recent call last):
   File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
     return wrap_df(ldf.collect(self.name, callback))
                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 1.775181489s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 2.577247335s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -1885,7 +1885,7 @@ OSError: object-store error: Generic HTTP error: Error performing GET https://ra
     <h1>Error 501 Unsupported client range</h1>
     <p>Unsupported client range</p>
     <h3>Error 54113</h3>
-    <p>Details: cache-lga-kjfk8660057-LGA 1794089519 4249440579</p>
+    <p>Details: cache-ewr-kewr1740082-EWR 1794101864 4285291116</p>
     <hr>
     <p>Varnish cache server</p>
   </body>
@@ -1938,7 +1938,7 @@ Traceback (most recent call last):
   File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
     return wrap_df(ldf.collect(self.name, callback))
                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 2.220833598s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 1.544470431s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -1950,7 +1950,7 @@ OSError: object-store error: Generic HTTP error: Error performing GET https://ra
     <h1>Error 501 Unsupported client range</h1>
     <p>Unsupported client range</p>
     <h3>Error 54113</h3>
-    <p>Details: cache-ewr-kewr1740090-EWR 1794089535 1048973753</p>
+    <p>Details: cache-ewr-kewr1740027-EWR 1794101871 3154743888</p>
     <hr>
     <p>Varnish cache server</p>
   </body>
@@ -2003,7 +2003,7 @@ Traceback (most recent call last):
   File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
     return wrap_df(ldf.collect(self.name, callback))
                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 5.077867529s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 1.759262878s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -2015,7 +2015,7 @@ OSError: object-store error: Generic HTTP error: Error performing GET https://ra
     <h1>Error 501 Unsupported client range</h1>
     <p>Unsupported client range</p>
     <h3>Error 54113</h3>
-    <p>Details: cache-ewr-kewr1740092-EWR 1794089548 2100705811</p>
+    <p>Details: cache-ewr-kewr1740040-EWR 1794101878 3154494833</p>
     <hr>
     <p>Varnish cache server</p>
   </body>
@@ -2068,7 +2068,7 @@ Traceback (most recent call last):
   File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
     return wrap_df(ldf.collect(self.name, callback))
                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 1.806998024s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 4.291133453s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -2080,7 +2080,7 @@ OSError: object-store error: Generic HTTP error: Error performing GET https://ra
     <h1>Error 501 Unsupported client range</h1>
     <p>Unsupported client range</p>
     <h3>Error 54113</h3>
-    <p>Details: cache-lga-kjfk8660044-LGA 1794089559 3485943687</p>
+    <p>Details: cache-ewr-kewr1740044-EWR 1794101889 607050173</p>
     <hr>
     <p>Varnish cache server</p>
   </body>
@@ -2133,7 +2133,7 @@ Traceback (most recent call last):
   File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
     return wrap_df(ldf.collect(self.name, callback))
                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 2.358053935s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 1.897515066s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -2145,7 +2145,7 @@ OSError: object-store error: Generic HTTP error: Error performing GET https://ra
     <h1>Error 501 Unsupported client range</h1>
     <p>Unsupported client range</p>
     <h3>Error 54113</h3>
-    <p>Details: cache-ewr-kewr1740066-EWR 1794089568 3812416115</p>
+    <p>Details: cache-lga-kjfk8660046-LGA 1794101898 3856867768</p>
     <hr>
     <p>Varnish cache server</p>
   </body>
@@ -2198,7 +2198,7 @@ Traceback (most recent call last):
   File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
     return wrap_df(ldf.collect(self.name, callback))
                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 2.603194576s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 2.146663843s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -2210,7 +2210,7 @@ OSError: object-store error: Generic HTTP error: Error performing GET https://ra
     <h1>Error 501 Unsupported client range</h1>
     <p>Unsupported client range</p>
     <h3>Error 54113</h3>
-    <p>Details: cache-ewr-kewr1740071-EWR 1794089576 2273089510</p>
+    <p>Details: cache-ewr-kewr1740095-EWR 1794101905 2027746026</p>
     <hr>
     <p>Varnish cache server</p>
   </body>
@@ -2263,7 +2263,7 @@ Traceback (most recent call last):
   File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
     return wrap_df(ldf.collect(self.name, callback))
                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 2.224296948s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 6.534196712s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -2275,7 +2275,7 @@ OSError: object-store error: Generic HTTP error: Error performing GET https://ra
     <h1>Error 501 Unsupported client range</h1>
     <p>Unsupported client range</p>
     <h3>Error 54113</h3>
-    <p>Details: cache-ewr-kewr1740052-EWR 1794089584 3895888374</p>
+    <p>Details: cache-ewr-kewr1740050-EWR 1794101918 1560121443</p>
     <hr>
     <p>Varnish cache server</p>
   </body>
@@ -2328,7 +2328,7 @@ Traceback (most recent call last):
   File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
     return wrap_df(ldf.collect(self.name, callback))
                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 3.838774962s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 2.00525155s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -2340,7 +2340,7 @@ OSError: object-store error: Generic HTTP error: Error performing GET https://ra
     <h1>Error 501 Unsupported client range</h1>
     <p>Unsupported client range</p>
     <h3>Error 54113</h3>
-    <p>Details: cache-lga-kjfk8660030-LGA 1794089596 3268531876</p>
+    <p>Details: cache-lga-kjfk8660041-LGA 1794101926 1649902366</p>
     <hr>
     <p>Varnish cache server</p>
   </body>
@@ -2393,7 +2393,7 @@ Traceback (most recent call last):
   File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
     return wrap_df(ldf.collect(self.name, callback))
                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 6.297559011s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 1.868300224s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -2405,7 +2405,7 @@ OSError: object-store error: Generic HTTP error: Error performing GET https://ra
     <h1>Error 501 Unsupported client range</h1>
     <p>Unsupported client range</p>
     <h3>Error 54113</h3>
-    <p>Details: cache-ewr-kewr1740059-EWR 1794089608 1135668089</p>
+    <p>Details: cache-ewr-kewr1740057-EWR 1794101934 1265697157</p>
     <hr>
     <p>Varnish cache server</p>
   </body>
@@ -2458,7 +2458,7 @@ Traceback (most recent call last):
   File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
     return wrap_df(ldf.collect(self.name, callback))
                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 3.706653468s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 2.010363093s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -2470,7 +2470,7 @@ OSError: object-store error: Generic HTTP error: Error performing GET https://ra
     <h1>Error 501 Unsupported client range</h1>
     <p>Unsupported client range</p>
     <h3>Error 54113</h3>
-    <p>Details: cache-lga-kjfk8660027-LGA 1794089619 3802327323</p>
+    <p>Details: cache-ewr-kewr1740040-EWR 1794101942 3155470704</p>
     <hr>
     <p>Varnish cache server</p>
   </body>
@@ -2523,7 +2523,7 @@ Traceback (most recent call last):
   File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
     return wrap_df(ldf.collect(self.name, callback))
                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 1.553162629s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 2.213013815s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -2535,7 +2535,7 @@ OSError: object-store error: Generic HTTP error: Error performing GET https://ra
     <h1>Error 501 Unsupported client range</h1>
     <p>Unsupported client range</p>
     <h3>Error 54113</h3>
-    <p>Details: cache-lga-kjfk8660072-LGA 1794089627 1246181392</p>
+    <p>Details: cache-lga-kjfk8660057-LGA 1794101950 234763969</p>
     <hr>
     <p>Varnish cache server</p>
   </body>
@@ -2588,7 +2588,7 @@ Traceback (most recent call last):
   File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
     return wrap_df(ldf.collect(self.name, callback))
                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 2.207009195s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 5.393881491s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -2600,7 +2600,7 @@ OSError: object-store error: Generic HTTP error: Error performing GET https://ra
     <h1>Error 501 Unsupported client range</h1>
     <p>Unsupported client range</p>
     <h3>Error 54113</h3>
-    <p>Details: cache-ewr-kewr1740038-EWR 1794089637 4060583739</p>
+    <p>Details: cache-lga-kjfk8660075-LGA 1794101960 3331438073</p>
     <hr>
     <p>Varnish cache server</p>
   </body>
@@ -2653,7 +2653,7 @@ Traceback (most recent call last):
   File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
     return wrap_df(ldf.collect(self.name, callback))
                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 1.841751865s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 3.857140387s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -2665,7 +2665,7 @@ OSError: object-store error: Generic HTTP error: Error performing GET https://ra
     <h1>Error 501 Unsupported client range</h1>
     <p>Unsupported client range</p>
     <h3>Error 54113</h3>
-    <p>Details: cache-lga-kjfk8660033-LGA 1794089644 1111314695</p>
+    <p>Details: cache-ewr-kewr1740067-EWR 1794101973 3721673137</p>
     <hr>
     <p>Varnish cache server</p>
   </body>
@@ -2718,7 +2718,7 @@ Traceback (most recent call last):
   File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
     return wrap_df(ldf.collect(self.name, callback))
                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 1.639618264s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 3.882300709s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -2730,7 +2730,7 @@ OSError: object-store error: Generic HTTP error: Error performing GET https://ra
     <h1>Error 501 Unsupported client range</h1>
     <p>Unsupported client range</p>
     <h3>Error 54113</h3>
-    <p>Details: cache-lga-kjfk8660031-LGA 1794089651 208634346</p>
+    <p>Details: cache-ewr-kewr1740049-EWR 1794101983 1474188243</p>
     <hr>
     <p>Varnish cache server</p>
   </body>
@@ -2798,7 +2798,7 @@ Traceback (most recent call last):
   File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
     return wrap_df(ldf.collect(self.name, callback))
                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 5.706341342s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 5.95791401s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -2810,7 +2810,7 @@ OSError: object-store error: Generic HTTP error: Error performing GET https://ra
     <h1>Error 501 Unsupported client range</h1>
     <p>Unsupported client range</p>
     <h3>Error 54113</h3>
-    <p>Details: cache-lga-kjfk8660020-LGA 1794089691 192231445</p>
+    <p>Details: cache-lga-kjfk8660066-LGA 1794102022 2978419556</p>
     <hr>
     <p>Varnish cache server</p>
   </body>
@@ -2866,7 +2866,7 @@ Traceback (most recent call last):
   File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
     return wrap_df(ldf.collect(self.name, callback))
                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 3.025509384s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 4.647822087s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -2878,7 +2878,7 @@ OSError: object-store error: Generic HTTP error: Error performing GET https://ra
     <h1>Error 501 Unsupported client range</h1>
     <p>Unsupported client range</p>
     <h3>Error 54113</h3>
-    <p>Details: cache-lga-kjfk8660056-LGA 1794089712 472177472</p>
+    <p>Details: cache-ewr-kewr1740085-EWR 1794102050 405754077</p>
     <hr>
     <p>Varnish cache server</p>
   </body>
@@ -2931,7 +2931,7 @@ Traceback (most recent call last):
   File "/mnt/sdv_repos/cfbfastR-cfb-data/.venv/lib/python3.13/site-packages/polars/lazyframe/engine.py", line 408, in collect
     return wrap_df(ldf.collect(self.name, callback))
                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 2.705863692s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
+OSError: object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 2.454998839s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: 
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -2943,17 +2943,17 @@ OSError: object-store error: Generic HTTP error: Error performing GET https://ra
     <h1>Error 501 Unsupported client range</h1>
     <p>Unsupported client range</p>
     <h3>Error 54113</h3>
-    <p>Details: cache-lga-kjfk8660025-LGA 1794089723 3867349838</p>
+    <p>Details: cache-ewr-kewr1740036-EWR 1794102059 1310411103</p>
     <hr>
     <p>Varnish cache server</p>
   </body>
 </html>
  (path: https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet)
 ::warning ::cfb_data_build coach_tendencies for season 2026 exited with code 1
-cfb_rosters 2026: FAILED OSError('object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 2.60805502s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: \n<?xml version="1.0" encoding="utf-8"?>\n<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"\n "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">\n<html>\n  <head>\n    <title>501 Unsupported client range</title>\n  </head>\n  <body>\n    <h1>Error 501 Unsupported client range</h1>\n    <p>Unsupported client range</p>\n    <h3>Error 54113</h3>\n    <p>Details: cache-ewr-kewr1740057-EWR 1794089732 1072955442</p>\n    <hr>\n    <p>Varnish cache server</p>\n  </body>\n</html>\n (path: https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet)')
+cfb_rosters 2026: FAILED OSError('object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 11.110614291s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: \n<?xml version="1.0" encoding="utf-8"?>\n<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"\n "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">\n<html>\n  <head>\n    <title>501 Unsupported client range</title>\n  </head>\n  <body>\n    <h1>Error 501 Unsupported client range</h1>\n    <p>Unsupported client range</p>\n    <h3>Error 54113</h3>\n    <p>Details: cache-lga-kjfk8660067-LGA 1794102078 127887800</p>\n    <hr>\n    <p>Varnish cache server</p>\n  </body>\n</html>\n (path: https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet)')
 
 === cfb_rosters: 1 failures ===
-  2026: OSError('object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 2.60805502s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: \n<?xml version="1.0" encoding="utf-8"?>\n<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"\n "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">\n<html>\n  <head>\n    <title>501 Unsupported client range</title>\n  </head>\n  <body>\n    <h1>Error 501 Unsupported client range</h1>\n    <p>Unsupported client range</p>\n    <h3>Error 54113</h3>\n    <p>Details: cache-ewr-kewr1740057-EWR 1794089732 1072955442</p>\n    <hr>\n    <p>Varnish cache server</p>\n  </body>\n</html>\n (path: https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet)')
+  2026: OSError('object-store error: Generic HTTP error: Error performing GET https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet in 11.110614291s, after 10 retries, max_retries: 10, retry_timeout: 180s  - Server returned non-2xx status code: 501 Not Implemented: \n<?xml version="1.0" encoding="utf-8"?>\n<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"\n "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">\n<html>\n  <head>\n    <title>501 Unsupported client range</title>\n  </head>\n  <body>\n    <h1>Error 501 Unsupported client range</h1>\n    <p>Unsupported client range</p>\n    <h3>Error 54113</h3>\n    <p>Details: cache-lga-kjfk8660067-LGA 1794102078 127887800</p>\n    <hr>\n    <p>Varnish cache server</p>\n  </body>\n</html>\n (path: https://raw.githubusercontent.com/sportsdataverse/cfbfastR-cfb-raw/main/cfb/cfb_schedule_master.parquet)')
 ::warning ::cfb_data_build cfb_rosters for season 2026 exited with code 1
 espn_cfb_percentiles: 3 unchanged asset(s) skipped, 0 uploaded
 [summaries 2026] percentiles: 99 rows
@@ -3052,14 +3052,38 @@ cfb_recruits: 1 unchanged asset(s) skipped, 0 uploaded
 cfb_team_portal: 1 unchanged asset(s) skipped, 0 uploaded
 
 === team_portal: 0 failures ===
-2026-11-07 17:32:55,975 INFO === season 2026 ===
-2026-11-07 17:32:57,925 INFO wrote cfb_teams_crosswalk_2026.parquet (826 rows, 11 cols)
-2026-11-07 17:33:07,282 INFO wrote cfb_schedule_crosswalk_2026.parquet (1672 rows, 11 cols)
-2026-11-07 17:33:07,284 INFO wrote manifest cfb_crosswalk_in_data_repo.csv (45 rows)
-2026-11-07 17:33:07,285 INFO built 3 artifact(s) under cfb/crosswalk/parquet
-2026-11-07 17:33:07,750 INFO uploading 3 of 3 asset(s) to sportsdataverse/sportsdataverse-data@cfb_crosswalk (one at a time)
-2026-11-07 17:33:08,875 INFO   uploaded cfb_teams_crosswalk_2026.parquet
-2026-11-07 17:33:09,988 INFO   uploaded cfb_schedule_crosswalk_2026.parquet
-2026-11-07 17:33:11,253 INFO   uploaded cfb_crosswalk_in_data_repo.csv
-2026-11-07 17:33:16,487 INFO published to sportsdataverse/sportsdataverse-data@cfb_crosswalk
+2026-11-07 20:58:14,717 INFO === season 2026 ===
+2026-11-07 20:58:16,875 INFO wrote cfb_teams_crosswalk_2026.parquet (826 rows, 11 cols)
+2026-11-07 20:58:28,389 INFO wrote cfb_schedule_crosswalk_2026.parquet (1672 rows, 11 cols)
+2026-11-07 20:58:28,390 INFO === rosters (current snapshot, season 2026) ===
+2026-11-07 20:58:34,180 INFO season 2026 rosters: 25/477 teams fetched (21 with players)
+2026-11-07 20:58:39,684 INFO season 2026 rosters: 50/477 teams fetched (43 with players)
+2026-11-07 20:58:45,422 INFO season 2026 rosters: 75/477 teams fetched (65 with players)
+2026-11-07 20:58:51,240 INFO season 2026 rosters: 100/477 teams fetched (87 with players)
+2026-11-07 20:58:56,843 INFO season 2026 rosters: 125/477 teams fetched (111 with players)
+2026-11-07 20:59:02,899 INFO season 2026 rosters: 150/477 teams fetched (135 with players)
+2026-11-07 20:59:08,629 INFO season 2026 rosters: 175/477 teams fetched (157 with players)
+2026-11-07 20:59:14,515 INFO season 2026 rosters: 200/477 teams fetched (179 with players)
+2026-11-07 20:59:19,697 INFO season 2026 rosters: 225/477 teams fetched (204 with players)
+2026-11-07 20:59:25,431 INFO season 2026 rosters: 250/477 teams fetched (226 with players)
+2026-11-07 20:59:30,673 INFO season 2026 rosters: 275/477 teams fetched (249 with players)
+2026-11-07 20:59:36,033 INFO season 2026 rosters: 300/477 teams fetched (273 with players)
+2026-11-07 20:59:41,557 INFO season 2026 rosters: 325/477 teams fetched (296 with players)
+2026-11-07 20:59:46,742 INFO season 2026 rosters: 350/477 teams fetched (318 with players)
+2026-11-07 20:59:52,303 INFO season 2026 rosters: 375/477 teams fetched (342 with players)
+2026-11-07 20:59:58,019 INFO season 2026 rosters: 400/477 teams fetched (366 with players)
+2026-11-07 21:00:04,174 INFO season 2026 rosters: 425/477 teams fetched (389 with players)
+2026-11-07 21:00:10,992 INFO season 2026 rosters: 450/477 teams fetched (413 with players)
+2026-11-07 21:00:16,988 INFO season 2026 rosters: 475/477 teams fetched (435 with players)
+2026-11-07 21:00:17,505 INFO season 2026 rosters: 477/477 teams fetched (437 with players)
+2026-11-07 21:00:17,572 INFO wrote cfb_rosters_crosswalk.parquet (45720 rows, 14 cols)
+2026-11-07 21:00:17,604 INFO wrote cfb_rosters_crosswalk_2026.parquet (45720 rows, 15 cols)
+2026-11-07 21:00:17,608 INFO wrote manifest cfb_crosswalk_in_data_repo.csv (45 rows)
+2026-11-07 21:00:17,608 INFO built 5 artifact(s) under cfb/crosswalk/parquet
+2026-11-07 21:00:18,038 INFO uploading 4 of 5 asset(s) to sportsdataverse/sportsdataverse-data@cfb_crosswalk (one at a time)
+2026-11-07 21:00:19,417 INFO   uploaded cfb_schedule_crosswalk_2026.parquet
+2026-11-07 21:00:20,867 INFO   uploaded cfb_rosters_crosswalk.parquet
+2026-11-07 21:00:22,488 INFO   uploaded cfb_rosters_crosswalk_2026.parquet
+2026-11-07 21:00:23,708 INFO   uploaded cfb_crosswalk_in_data_repo.csv
+2026-11-07 21:00:28,893 INFO published to sportsdataverse/sportsdataverse-data@cfb_crosswalk
 pushed: CFB Data Updated (Start: 2026 End: 2026) (attempt 1)

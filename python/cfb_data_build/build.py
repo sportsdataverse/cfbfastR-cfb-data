@@ -16,7 +16,7 @@ from typing import Any
 
 import polars as pl
 from cfb_data_ingest.fetch import fetch_final
-from cfb_data_ingest.schedule import SCHEDULE_URL, season_game_ids
+from cfb_data_ingest.schedule import default_schedule, season_game_ids
 
 from cfb_data_build import reshapers
 from cfb_data_build.coaches import team_coaches
@@ -51,7 +51,7 @@ def _team_names(schedule_path_or_url: str | Path | None, season: int) -> pl.Data
     match nothing).
     """
     src = (
-        str(schedule_path_or_url) if schedule_path_or_url is not None else SCHEDULE_URL
+        str(schedule_path_or_url) if schedule_path_or_url is not None else default_schedule()
     )
     cached = _TEAM_NAME_CACHE.get((src, season))
     if cached is not None:
@@ -340,7 +340,7 @@ def build_season(
         df = team_tendencies(df, _context_schedule(season, base))
     elif spec.tendencies == "coach":
         coaches = require_coaches(
-            team_coaches(season, schedule if schedule is not None else SCHEDULE_URL),
+            team_coaches(season, schedule if schedule is not None else default_schedule()),
             season,
         )
         print(f"  coaches: {coaches.height} attributed team-seasons for {season}")

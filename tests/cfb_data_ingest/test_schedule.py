@@ -46,3 +46,20 @@ def test_season_completed_games_unknown_season_is_zero(tmp_path):
 
     p = _master(tmp_path / "m.parquet", [(1, 2025, True)])
     assert season_completed_games(p, 1999) == 0
+
+
+def test_default_schedule_prefers_local_raw_checkout(tmp_path, monkeypatch):
+    """The cron reads the local master: the raw URL 501s polars range reads."""
+    from cfb_data_ingest.schedule import SCHEDULE_URL, default_schedule
+
+    local = tmp_path / "cfb" / "cfb_schedule_master.parquet"
+    local.parent.mkdir()
+    pl.DataFrame({"game_id": [7], "season": [2026]}).write_parquet(local)
+    monkeypatch.setenv("CFB_RAW_ROOT", str(tmp_path))
+    assert default_schedule() == str(local)
+    assert season_game_ids(None, [2026]) == [7]
+
+    monkeypatch.setenv("CFB_RAW_ROOT", str(tmp_path / "missing"))
+    assert default_schedule() == SCHEDULE_URL
+    monkeypatch.delenv("CFB_RAW_ROOT")
+    assert default_schedule() == SCHEDULE_URL

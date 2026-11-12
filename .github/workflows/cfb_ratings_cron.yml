@@ -64,11 +64,11 @@ jobs:
       # all — the module landed after 0.0.71, same as the nfl-data producer
       # surface. Install from git until a release carries it.
       # TODO: re-pin to a PyPI release once one ships `cfb_ratings`.
-      # pinned 2026-10-21 until REPROCESS runs #1/#2 (sdv-py quality program, WB-nfl-2)
-      - name: Install sportsdataverse from git (pinned)
+      # tracks sdv-py main since 2026-11-12 (owner call), same as uv.lock
+      - name: Install sportsdataverse from git (main)
         run: |
           uv pip install \
-            "sportsdataverse @ git+https://github.com/sportsdataverse/sportsdataverse-py.git@377094931b9c1eee56dabc75b89436354748c0d6"
+            "sportsdataverse @ git+https://github.com/sportsdataverse/sportsdataverse-py.git@main"
 
       # Canary. Every `uv run` below MUST pass --no-sync: a bare `uv run`
       # re-syncs the environment from uv.lock and silently REVERTS the git

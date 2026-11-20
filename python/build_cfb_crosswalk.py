@@ -97,6 +97,22 @@ def build_schedule(season: int) -> pl.DataFrame:
     return cfb_schedule_crosswalk(season)  # week omitted -> whole season
 
 
+def coverage_collapsed(new: pl.DataFrame, path: Path, col: str) -> bool:
+    """True when ``path`` already holds ``col`` ids and ``new`` carries under half as many.
+
+    A provider outage builds a frame whose id column is all null. Yahoo switched its
+    editorial API off on 2026-11-20 ("scream test", ahead of end-of-life) and sdv-py
+    reads a 404 week as an empty week, so a rebuild replaced every Yahoo game id in
+    the published schedule crosswalk with nothing. Seasons Yahoo never covered hold
+    no ids, so they are never guarded.
+    """
+    if not path.exists() or col not in pl.read_parquet_schema(path):
+        return False
+    old_n = pl.read_parquet(path, columns=[col])[col].is_not_null().sum()
+    new_n = new[col].is_not_null().sum() if col in new.columns else 0
+    return old_n > 0 and new_n * 2 < old_n
+
+
 def build_rosters(season: int, teams_xwalk: pl.DataFrame, workers: int) -> pl.DataFrame:
     """Fan the per-team roster crosswalk over every ESPN<->Fox team-id pair.
 
@@ -240,6 +256,14 @@ def main(argv: Optional[List[str]] = None) -> int:
     seasons = range(args.start_year, args.end_year + 1)
     manifest: List[dict] = []
     produced: List[Path] = []
+    guarded: List[str] = []
+
+    def collapsed(df: pl.DataFrame, p: Path, col: str) -> bool:
+        if not coverage_collapsed(df, p, col):
+            return False
+        logger.error("%s: %s coverage collapsed vs the file on disk; kept the old file", p.name, col)
+        guarded.append(p.name)
+        return True
 
     # teams + schedule are genuinely per-season and loop over the -s/-e range.
     for season in seasons:
@@ -248,8 +272,8 @@ def main(argv: Optional[List[str]] = None) -> int:
         if "teams" in args.datasets:
             try:
                 teams_df = build_teams(season)
-                if teams_df.height:
-                    p = args.out_dir / f"cfb_teams_crosswalk_{season}.parquet"
+                p = args.out_dir / f"cfb_teams_crosswalk_{season}.parquet"
+                if teams_df.height and not collapsed(teams_df, p, "yahoo_team_id"):
                     write_parquet(teams_df, p)
                     produced.append(p)
                     manifest.append(_row("teams", season, teams_df, "cfb_teams_crosswalk()"))
@@ -259,8 +283,10 @@ def main(argv: Optional[List[str]] = None) -> int:
         if "schedule" in args.datasets:
             try:
                 sched = build_schedule(season)
-                if sched.height:
-                    p = args.out_dir / f"cfb_schedule_crosswalk_{season}.parquet"
+                p = args.out_dir / f"cfb_schedule_crosswalk_{season}.parquet"
+                if sched.height and collapsed(sched, p, "yahoo_game_id"):
+                    pass
+                elif sched.height:
                     write_parquet(sched, p)
                     produced.append(p)
                     manifest.append(_row("schedule", season, sched, "cfb_schedule_crosswalk()"))
@@ -296,7 +322,7 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     if not produced:
         logger.error("no artifacts produced; nothing to write or upload")
-        return 1
+        return 0 if guarded else 1  # a guard keeping the good file is not a failed season
 
     produced.append(update_manifest(manifest, args.out_dir, args.upload, args.release_tag, args.repo))
 

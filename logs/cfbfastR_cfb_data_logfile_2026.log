@@ -1,127 +1,97 @@
   pos_team: 100.0% of rows resolved to a team name
   def_pos_team: 100.0% of rows resolved to a team name
-pbp 2026: 140332 rows from 970 games
+pbp 2026: 142832 rows from 970 games
 2026: 138 coach-seasons, 138 cleanly attributed
-play_participants 2026: 130389 rows from 970 games
-team_box 2026: 1634 rows from 970 games
-player_box 2026: 69261 rows from 970 games
-drives 401862833: can only concatenate list (not "dict") to list
-drives 401860920: can only concatenate list (not "dict") to list
-drives 401858534: can only concatenate list (not "dict") to list
-drives 401858302: can only concatenate list (not "dict") to list
-drives 401856865: can only concatenate list (not "dict") to list
-drives 401864544: can only concatenate list (not "dict") to list
-drives 401856753: can only concatenate list (not "dict") to list
-drives 401858307: can only concatenate list (not "dict") to list
-drives 401856751: can only concatenate list (not "dict") to list
-drives 401858306: can only concatenate list (not "dict") to list
-drives 401858308: can only concatenate list (not "dict") to list
-drives 401860918: can only concatenate list (not "dict") to list
-drives 401862836: can only concatenate list (not "dict") to list
-drives 2026: 18836 rows from 970 games
-game_rosters 2026: 178413 rows from 970 games
-betting 2026: 817 rows from 970 games
-schedules 2026: 817 rows from 970 games
-linescores 2026: 6568 rows from 970 games
+play_participants 2026: 132686 rows from 970 games
+team_box 2026: 1644 rows from 970 games
+player_box 2026: 70234 rows from 970 games
+drives 2026: 19278 rows from 970 games
+game_rosters 2026: 182654 rows from 970 games
+betting 2026: 822 rows from 970 games
+schedules 2026: 822 rows from 970 games
+linescores 2026: 6668 rows from 970 games
   power_index 2026: 1776 rows, 7 cols
-espn_cfb_power_index: 3 unchanged asset(s) skipped, 0 uploaded
 
 === power_index: 0 failures ===
 injuries 2026: 0 rows from 970 games
   pos_team: 100.0% of rows resolved to a team name
-adv_team 2026: 1632 rows from 970 games
+adv_team 2026: 1644 rows from 970 games
   pos_team: 100.0% of rows resolved to a team name
-adv_passing 2026: 2642 rows from 970 games
+adv_passing 2026: 2671 rows from 970 games
   pos_team: 100.0% of rows resolved to a team name
-adv_rushing 2026: 9549 rows from 970 games
+adv_rushing 2026: 9683 rows from 970 games
   pos_team: 100.0% of rows resolved to a team name
-adv_receiving 2026: 15719 rows from 970 games
+adv_receiving 2026: 15935 rows from 970 games
   def_pos_team: 100.0% of rows resolved to a team name
-adv_defensive 2026: 1632 rows from 970 games
+adv_defensive 2026: 1644 rows from 970 games
   pos_team: 100.0% of rows resolved to a team name
-adv_turnover 2026: 1632 rows from 970 games
+adv_turnover 2026: 1644 rows from 970 games
   pos_team: 100.0% of rows resolved to a team name
-adv_drives 2026: 1632 rows from 970 games
+adv_drives 2026: 1644 rows from 970 games
   pos_team: 100.0% of rows resolved to a team name
-adv_situational 2026: 1632 rows from 970 games
+adv_situational 2026: 1644 rows from 970 games
   def_pos_team: 100.0% of rows resolved to a team name
-adv_defensive_players 2026: 9986 rows from 970 games
+adv_defensive_players 2026: 10145 rows from 970 games
   pos_team: 100.0% of rows resolved to a team name
-adv_specialists 2026: 7257 rows from 970 games
+adv_specialists 2026: 7375 rows from 970 games
   pos_team: 100.0% of rows resolved to a team name
-adv_player_usage 2026: 19013 rows from 970 games
+adv_player_usage 2026: 19260 rows from 970 games
   pos_team: 100.0% of rows resolved to a team name
-adv_position_group_usage 2026: 6515 rows from 970 games
+adv_position_group_usage 2026: 6585 rows from 970 games
   def_pos_team: 100.0% of rows resolved to a team name
-adv_tackles 2026: 33757 rows from 970 games
+adv_tackles 2026: 34208 rows from 970 games
   def_pos_team: 100.0% of rows resolved to a team name
-adv_position_group_tackles 2026: 6204 rows from 970 games
+adv_position_group_tackles 2026: 6272 rows from 970 games
   pos_team: 100.0% of rows resolved to a team name
-adv_team_usage 2026: 1632 rows from 970 games
+adv_team_usage 2026: 1644 rows from 970 games
   pos_team: 100.0% of rows resolved to a team name
-adv_drive_scripting 2026: 3254 rows from 970 games
+adv_drive_scripting 2026: 3288 rows from 970 games
   pos_team: 100.0% of rows resolved to a team name
-usage_players 2026: 4496 rows from 970 games
-espn_cfb_usage_players: 3 unchanged asset(s) skipped, 0 uploaded
+usage_players 2026: 4512 rows from 970 games
   pos_team: 100.0% of rows resolved to a team name
-usage_position_groups 2026: 1079 rows from 970 games
-espn_cfb_usage_position_groups: 3 unchanged asset(s) skipped, 0 uploaded
+usage_position_groups 2026: 1080 rows from 970 games
   def_pos_team: 100.0% of rows resolved to a team name
-usage_tackles 2026: 8551 rows from 970 games
-espn_cfb_usage_tackles: 3 unchanged asset(s) skipped, 0 uploaded
+usage_tackles 2026: 8568 rows from 970 games
   def_pos_team: 100.0% of rows resolved to a team name
-usage_position_group_tackles 2026: 1399 rows from 970 games
-espn_cfb_usage_position_group_tackles: 3 unchanged asset(s) skipped, 0 uploaded
+usage_position_group_tackles 2026: 1402 rows from 970 games
   pos_team: 100.0% of rows resolved to a team name
 usage_teams 2026: 238 rows from 970 games
-espn_cfb_usage_teams: 3 unchanged asset(s) skipped, 0 uploaded
   pos_team: 100.0% of rows resolved to a team name
 usage_drive_scripting 2026: 476 rows from 970 games
-espn_cfb_usage_drive_scripting: 3 unchanged asset(s) skipped, 0 uploaded
   pos_team: 100.0% of rows resolved to a team name
-adv_st_kickers 2026: 4260 rows from 970 games
-espn_cfb_adv_st_kickers: 3 unchanged asset(s) skipped, 0 uploaded
+adv_st_kickers 2026: 4312 rows from 970 games
   pos_team: 100.0% of rows resolved to a team name
-adv_st_punters 2026: 1725 rows from 970 games
-espn_cfb_adv_st_punters: 3 unchanged asset(s) skipped, 0 uploaded
+adv_st_punters 2026: 1749 rows from 970 games
   pos_team: 100.0% of rows resolved to a team name
-adv_st_returners 2026: 2454 rows from 970 games
-espn_cfb_adv_st_returners: 3 unchanged asset(s) skipped, 0 uploaded
+adv_st_returners 2026: 2491 rows from 970 games
   def_pos_team: 100.0% of rows resolved to a team name
-adv_st_blocks 2026: 110 rows from 970 games
-espn_cfb_adv_st_blocks: 3 unchanged asset(s) skipped, 0 uploaded
+adv_st_blocks 2026: 112 rows from 970 games
   pos_team: 100.0% of rows resolved to a team name
-adv_st_team 2026: 1632 rows from 970 games
-espn_cfb_adv_st_team: 3 unchanged asset(s) skipped, 0 uploaded
+adv_st_team 2026: 1644 rows from 970 games
   pos_team: 100.0% of rows resolved to a team name
-usage_st_kickers 2026: 1069 rows from 970 games
-espn_cfb_usage_st_kickers: 3 unchanged asset(s) skipped, 0 uploaded
+usage_st_kickers 2026: 1076 rows from 970 games
   pos_team: 100.0% of rows resolved to a team name
-usage_st_punters 2026: 350 rows from 970 games
-espn_cfb_usage_st_punters: 3 unchanged asset(s) skipped, 0 uploaded
+usage_st_punters 2026: 351 rows from 970 games
   pos_team: 100.0% of rows resolved to a team name
-usage_st_returners 2026: 880 rows from 970 games
-espn_cfb_usage_st_returners: 3 unchanged asset(s) skipped, 0 uploaded
+usage_st_returners 2026: 884 rows from 970 games
   def_pos_team: 100.0% of rows resolved to a team name
-usage_st_blocks 2026: 107 rows from 970 games
-espn_cfb_usage_st_blocks: 3 unchanged asset(s) skipped, 0 uploaded
+usage_st_blocks 2026: 109 rows from 970 games
   pos_team: 100.0% of rows resolved to a team name
 usage_st_team 2026: 238 rows from 970 games
-espn_cfb_usage_st_team: 3 unchanged asset(s) skipped, 0 uploaded
-  adv_team_gamelog 2026: 1632 rows, 94 cols
+  adv_team_gamelog 2026: 1644 rows, 94 cols
 
 === gamelog: 0 failures ===
-  team_opponent_splits 2026: 1632 rows, 24 cols
+  team_opponent_splits 2026: 1644 rows, 24 cols
 
 === team_opponent_splits: 0 failures ===
-  metric_curves 2026: 17570 rows, 14 cols
+  metric_curves 2026: 17633 rows, 14 cols
 
 === metric_curves: 0 failures ===
-  paper_index_games 2026: 1602 rows, 17 cols
+  paper_index_games 2026: 1640 rows, 17 cols
 
 === paper_index_games: 0 failures ===
-qa 2026: 817 rows from 970 games
-  cfb_schedules 2026: 3735 rows, 43 cols, fbs_game=761, fbs_participant=888, unplayed=0, ranked_sides=298
+qa 2026: 822 rows from 970 games
+  cfb_schedules 2026: 3758 rows, 43 cols, fbs_game=768, fbs_participant=895, unplayed=0, ranked_sides=302
 
 === cfb_schedules: 0 failures ===
   pos_team: 100.0% of rows resolved to a team name
@@ -130,17 +100,16 @@ team_tendencies 2026: 238 rows from 970 games
   pos_team: 100.0% of rows resolved to a team name
 coach_tendencies 2026: 138 rows from 970 games
 cfb_rosters 2026: 26320 rows from 968/970 games | position 100.0% | division 100.0% | cfbd_recruit_ids 91.8% of 29305 cfbd athletes
-espn_cfb_rosters: 3 unchanged asset(s) skipped, 0 uploaded
 
 === cfb_rosters: 0 failures ===
-  !! 2026: 1 of 689 games have an implausible mean EPA/play (|mean| > 0.5) -- suspect corrupt end-state yardlines; worst +0.66 in game 401860911
+  !! 2026: 1 of 695 games have an implausible mean EPA/play (|mean| > 0.5) -- suspect corrupt end-state yardlines; worst +0.66 in game 401860911
 [summaries 2026] percentiles: 99 rows
 [summaries 2026] team_summaries: 138 rows
-[summaries 2026] passing: 504 rows
-[summaries 2026] rushing: 1512 rows
-[summaries 2026] receiving: 2244 rows
+[summaries 2026] passing: 509 rows
+[summaries 2026] rushing: 1524 rows
+[summaries 2026] receiving: 2256 rows
 [summaries 2026] league_averages: 890 rows
-  rolling_windows 2026: 28368 rows, 20 cols
+  rolling_windows 2026: 28468 rows, 20 cols
 
 === rolling_windows: 0 failures ===
   cfb_ratings_weekly 2026: 1473 rows, 19 cols, 11 weekly snapshots
@@ -220,13 +189,12 @@ espn_cfb_rosters: 3 unchanged asset(s) skipped, 0 uploaded
   defense_vs_position 2026: 950 rows, 25 cols
 
 === defense_vs_position: 0 failures ===
-  cfb_matchup_features 2026: 1649 rows, 45 cols
-cfb_matchup_features: 3 unchanged asset(s) skipped, 0 uploaded
+  cfb_matchup_features 2026: 1663 rows, 45 cols
 
 === matchup_features: 0 failures ===
 /mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/matchup_features.py:507: UserWarning: Comparisons with None always result in null. Consider using `.is_null()` or `.is_not_null()`.
   prior = secs.filter(pl.col("play_date") < date)["sec_since_prev"]
-  cfb_matchup_line 2026: 761 rows, 268 cols
+  cfb_matchup_line 2026: 768 rows, 268 cols
 
 === matchup_line: 0 failures ===
   cfb_recruits 2026: 4453 rows
@@ -243,38 +211,38 @@ cfb_recruits: 1 unchanged asset(s) skipped, 0 uploaded
 cfb_team_portal: 1 unchanged asset(s) skipped, 0 uploaded
 
 === team_portal: 0 failures ===
-2026-11-22 02:11:49,904 INFO === season 2026 ===
-2026-11-22 02:11:50,432 INFO wrote cfb_teams_crosswalk_2026.parquet (828 rows, 11 cols)
-2026-11-22 02:12:00,629 INFO wrote cfb_schedule_crosswalk_2026.parquet (1673 rows, 11 cols)
-2026-11-22 02:12:00,629 INFO === rosters (current snapshot, season 2026) ===
-2026-11-22 02:12:06,796 INFO season 2026 rosters: 25/477 teams fetched (22 with players)
-2026-11-22 02:12:12,398 INFO season 2026 rosters: 50/477 teams fetched (46 with players)
-2026-11-22 02:12:17,285 INFO season 2026 rosters: 75/477 teams fetched (71 with players)
-2026-11-22 02:12:22,650 INFO season 2026 rosters: 100/477 teams fetched (94 with players)
-2026-11-22 02:12:27,373 INFO season 2026 rosters: 125/477 teams fetched (117 with players)
-2026-11-22 02:12:32,056 INFO season 2026 rosters: 150/477 teams fetched (142 with players)
-2026-11-22 02:12:36,835 INFO season 2026 rosters: 175/477 teams fetched (163 with players)
-2026-11-22 02:12:42,655 INFO season 2026 rosters: 200/477 teams fetched (188 with players)
-2026-11-22 02:12:47,984 INFO season 2026 rosters: 225/477 teams fetched (212 with players)
-2026-11-22 02:12:53,089 INFO season 2026 rosters: 250/477 teams fetched (236 with players)
-2026-11-22 02:12:58,520 INFO season 2026 rosters: 275/477 teams fetched (260 with players)
-2026-11-22 02:13:03,850 INFO season 2026 rosters: 300/477 teams fetched (284 with players)
-2026-11-22 02:13:08,832 INFO season 2026 rosters: 325/477 teams fetched (309 with players)
-2026-11-22 02:13:14,253 INFO season 2026 rosters: 350/477 teams fetched (333 with players)
-2026-11-22 02:13:18,913 INFO season 2026 rosters: 375/477 teams fetched (356 with players)
-2026-11-22 02:13:24,019 INFO season 2026 rosters: 400/477 teams fetched (381 with players)
-2026-11-22 02:13:28,781 INFO season 2026 rosters: 425/477 teams fetched (405 with players)
-2026-11-22 02:13:34,290 INFO season 2026 rosters: 450/477 teams fetched (428 with players)
-2026-11-22 02:13:38,885 INFO season 2026 rosters: 475/477 teams fetched (448 with players)
-2026-11-22 02:13:39,179 INFO season 2026 rosters: 477/477 teams fetched (450 with players)
-2026-11-22 02:13:39,219 INFO wrote cfb_rosters_crosswalk.parquet (47829 rows, 14 cols)
-2026-11-22 02:13:39,246 INFO wrote cfb_rosters_crosswalk_2026.parquet (47829 rows, 15 cols)
-2026-11-22 02:13:39,249 INFO wrote manifest cfb_crosswalk_in_data_repo.csv (45 rows)
-2026-11-22 02:13:39,249 INFO built 5 artifact(s) under cfb/crosswalk/parquet
-2026-11-22 02:13:39,615 INFO uploading 4 of 5 asset(s) to sportsdataverse/sportsdataverse-data@cfb_crosswalk (one at a time)
-2026-11-22 02:13:40,771 INFO   uploaded cfb_schedule_crosswalk_2026.parquet
-2026-11-22 02:13:42,014 INFO   uploaded cfb_rosters_crosswalk.parquet
-2026-11-22 02:13:43,263 INFO   uploaded cfb_rosters_crosswalk_2026.parquet
-2026-11-22 02:13:44,332 INFO   uploaded cfb_crosswalk_in_data_repo.csv
-2026-11-22 02:13:49,021 INFO published to sportsdataverse/sportsdataverse-data@cfb_crosswalk
+2026-11-22 09:42:08,554 INFO === season 2026 ===
+2026-11-22 09:42:09,140 INFO wrote cfb_teams_crosswalk_2026.parquet (828 rows, 11 cols)
+2026-11-22 09:42:20,826 INFO wrote cfb_schedule_crosswalk_2026.parquet (1673 rows, 11 cols)
+2026-11-22 09:42:20,826 INFO === rosters (current snapshot, season 2026) ===
+2026-11-22 09:42:27,189 INFO season 2026 rosters: 25/477 teams fetched (22 with players)
+2026-11-22 09:42:32,724 INFO season 2026 rosters: 50/477 teams fetched (44 with players)
+2026-11-22 09:42:38,464 INFO season 2026 rosters: 75/477 teams fetched (69 with players)
+2026-11-22 09:42:43,469 INFO season 2026 rosters: 100/477 teams fetched (92 with players)
+2026-11-22 09:42:47,887 INFO season 2026 rosters: 125/477 teams fetched (114 with players)
+2026-11-22 09:42:54,189 INFO season 2026 rosters: 150/477 teams fetched (137 with players)
+2026-11-22 09:42:59,819 INFO season 2026 rosters: 175/477 teams fetched (161 with players)
+2026-11-22 09:43:05,334 INFO season 2026 rosters: 200/477 teams fetched (184 with players)
+2026-11-22 09:43:10,403 INFO season 2026 rosters: 225/477 teams fetched (207 with players)
+2026-11-22 09:43:15,706 INFO season 2026 rosters: 250/477 teams fetched (232 with players)
+2026-11-22 09:43:20,751 INFO season 2026 rosters: 275/477 teams fetched (256 with players)
+2026-11-22 09:43:26,045 INFO season 2026 rosters: 300/477 teams fetched (280 with players)
+2026-11-22 09:43:31,047 INFO season 2026 rosters: 325/477 teams fetched (305 with players)
+2026-11-22 09:43:36,625 INFO season 2026 rosters: 350/477 teams fetched (329 with players)
+2026-11-22 09:43:42,020 INFO season 2026 rosters: 375/477 teams fetched (354 with players)
+2026-11-22 09:43:47,606 INFO season 2026 rosters: 400/477 teams fetched (378 with players)
+2026-11-22 09:43:52,587 INFO season 2026 rosters: 425/477 teams fetched (402 with players)
+2026-11-22 09:43:58,322 INFO season 2026 rosters: 450/477 teams fetched (423 with players)
+2026-11-22 09:44:04,354 INFO season 2026 rosters: 475/477 teams fetched (448 with players)
+2026-11-22 09:44:04,747 INFO season 2026 rosters: 477/477 teams fetched (450 with players)
+2026-11-22 09:44:04,788 INFO wrote cfb_rosters_crosswalk.parquet (47829 rows, 14 cols)
+2026-11-22 09:44:04,818 INFO wrote cfb_rosters_crosswalk_2026.parquet (47829 rows, 15 cols)
+2026-11-22 09:44:04,822 INFO wrote manifest cfb_crosswalk_in_data_repo.csv (45 rows)
+2026-11-22 09:44:04,822 INFO built 5 artifact(s) under cfb/crosswalk/parquet
+2026-11-22 09:44:05,198 INFO uploading 4 of 5 asset(s) to sportsdataverse/sportsdataverse-data@cfb_crosswalk (one at a time)
+2026-11-22 09:44:06,705 INFO   uploaded cfb_schedule_crosswalk_2026.parquet
+2026-11-22 09:44:07,961 INFO   uploaded cfb_rosters_crosswalk.parquet
+2026-11-22 09:44:09,297 INFO   uploaded cfb_rosters_crosswalk_2026.parquet
+2026-11-22 09:44:10,523 INFO   uploaded cfb_crosswalk_in_data_repo.csv
+2026-11-22 09:44:16,194 INFO published to sportsdataverse/sportsdataverse-data@cfb_crosswalk
 pushed: CFB Data Updated (Start: 2026 End: 2026) (attempt 1)

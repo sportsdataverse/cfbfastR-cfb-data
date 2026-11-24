@@ -38,6 +38,19 @@ _TWO_PT_TRY_TEXT = r"(?i)\b(pass|rush) attempt\b"
 _COMBINED_TD_TEXT = r"(?i)\btouchdown\b"
 
 
+#: Derived columns that a truncated or corrupt feed leaves null on every row. A game counts as
+#: unenriched only when ALL of those present are null throughout, so a game with EPA but no XP
+#: flags is still an xp_attempt defect, not an exemption.
+_DERIVED = ("xp_attempt", "pos_team", "EPA")
+
+
+def _unenriched_expr(pbp: pl.DataFrame) -> pl.Expr:
+    cols = [c for c in _DERIVED if c in pbp.columns]
+    if not cols:
+        return pl.lit(False)
+    return pl.all_horizontal([pl.col(c).is_null() for c in cols]).all().over("game_id")
+
+
 def _checks(pbp: pl.DataFrame, season: int) -> dict[str, int]:
     rush = pl.col("rush") == True  # noqa: E712
     yds = pl.col("yds_rushed")
@@ -78,7 +91,7 @@ def _checks(pbp: pl.DataFrame, season: int) -> dict[str, int]:
             # _unenriched_games. A truncated feed keeps `period` (313230077, 2011: 49 plays, Q1
             # only) but nulls xp_attempt on every row, so test the whole game, not the row.
             & pl.col("period").is_not_null()
-            & ~pl.col("xp_attempt").is_null().all().over("game_id")
+            & ~_unenriched_expr(pbp)
             & (pl.col("xp_attempt") != True).fill_null(True)  # noqa: E712
         ).height
     # the three line-yards parts sum to the carry on every gain (R843-2)
@@ -97,14 +110,9 @@ def _unenriched_games(pbp: pl.DataFrame) -> int:
     Informational, never a failure: the checks above exempt these games, so this count is what
     keeps them visible in the gate line instead of silently passing.
     """
-    if "xp_attempt" not in pbp.columns:
+    if not any(c in pbp.columns for c in _DERIVED):
         return 0
-    return (
-        pbp.group_by("game_id")
-        .agg(pl.col("xp_attempt").is_null().all().alias("none"))
-        .filter(pl.col("none") == True)  # noqa: E712
-        .height
-    )
+    return pbp.filter(_unenriched_expr(pbp))["game_id"].n_unique()
 
 
 def _adv_team_checks(adv_team: pl.DataFrame | None) -> dict[str, int]:

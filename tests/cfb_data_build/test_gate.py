@@ -24,6 +24,8 @@ CLEAN = {
     "type.text": ["Kickoff", "Extra Point Good", "Rush", "Rush", "Pass"],
     "text": ["kickoff", "PAT good", "12 yd run", "2 yd loss", "pass"],
     "xp_attempt": [False, True, False, False, False],
+    "pos_team": ["10", "10", "10", "20", "20"],
+    "EPA": [0.1, 0.9, 0.4, -0.2, 0.3],
     "rush": [False, False, True, True, False],
     "yds_rushed": [None, None, 12.0, -2.0, None],
     "line_yards": [None, None, 7.0, -2.4, None],
@@ -100,7 +102,9 @@ def test_pre2014_converted_two_point_try_is_not_an_xp():
 def test_a_truncated_unenriched_game_is_exempt_but_reported():
     # 313230077 (2011): 49 plays, Q1 only -- `period` is set but every derived column is null
     trunc = _pbp(type__text=(1, "Extra Point Good"), xp_attempt=(1, None))
-    trunc = trunc.with_columns(pl.when(pl.col("game_id") == 1).then(None).otherwise(pl.col("xp_attempt")).alias("xp_attempt"))
+    trunc = trunc.with_columns(
+        pl.when(pl.col("game_id") == 1).then(None).otherwise(pl.col(c)).alias(c) for c in ("xp_attempt", "pos_team", "EPA")
+    )
     assert trunc.filter(pl.col("game_id") == 1)["period"].null_count() == 0
     assert _checks(trunc, 2011)["pre2014_xp_not_flagged"] == 0
     assert _unenriched_games(trunc) == 1
@@ -108,6 +112,12 @@ def test_a_truncated_unenriched_game_is_exempt_but_reported():
     one_null = _pbp(type__text=(1, "Extra Point Good"), xp_attempt=(1, None))
     assert _checks(one_null, 2011)["pre2014_xp_not_flagged"] == 1
     assert _unenriched_games(one_null) == 0
+    # xp_attempt null on every row but EPA populated: an XP-flag defect, never an exemption
+    no_flags = _pbp(type__text=(1, "Extra Point Good")).with_columns(
+        pl.when(pl.col("game_id") == 1).then(None).otherwise(pl.col("xp_attempt")).alias("xp_attempt")
+    )
+    assert _checks(no_flags, 2011)["pre2014_xp_not_flagged"] == 1
+    assert _unenriched_games(no_flags) == 0
 
 
 def test_2012_touchback_returns_to_the_25():

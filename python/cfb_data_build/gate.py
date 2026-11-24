@@ -28,12 +28,27 @@ _TOUCHBACK_CUT = 2012
 _XP_TEXT = (
     r"(?i)^(extra point|pat|kick attempt)\b|\bextra point (good|missed|blocked|no good)"
 )
-#: ...except a failed two-point try, which the pre-2014 feed also types "Extra Point Missed"
-#: ("Aaron Murray pass attempt failed ."): 135 rows in 2013, and not an xp_attempt.
-_FAILED_2PT_TEXT = r"(?i)\b(pass|rush) attempt failed\b"
+#: ...except a two-point try, which the pre-2014 feed also types "Extra Point Missed" when it
+#: fails ("Aaron Murray pass attempt failed ."; 135 rows in 2013) and "Extra Point Good" when it
+#: converts ("Kellen Clemens pass attempt to Garren Strong good.", "Terre Whitehead rush attempt
+#: good.", 252440248 in 2005). Neither is an xp_attempt; a kicked try never says pass/rush attempt.
+_TWO_PT_TRY_TEXT = r"(?i)\b(pass|rush) attempt\b"
 #: ...or a return TD with the try folded into its text ("returned fumble 30 yards for a
 #: TOUCHDOWN. Ryan Perkins extra point GOOD."): the row is the scoring play, not a standalone XP.
 _COMBINED_TD_TEXT = r"(?i)\btouchdown\b"
+
+
+#: Derived columns that a truncated or corrupt feed leaves null on every row. A game counts as
+#: unenriched only when ALL of those present are null throughout, so a game with EPA but no XP
+#: flags is still an xp_attempt defect, not an exemption.
+_DERIVED = ("xp_attempt", "pos_team", "EPA")
+
+
+def _unenriched_expr(pbp: pl.DataFrame) -> pl.Expr:
+    cols = [c for c in _DERIVED if c in pbp.columns]
+    if not cols:
+        return pl.lit(False)
+    return pl.all_horizontal([pl.col(c).is_null() for c in cols]).all().over("game_id")
 
 
 def _checks(pbp: pl.DataFrame, season: int) -> dict[str, int]:
@@ -69,11 +84,14 @@ def _checks(pbp: pl.DataFrame, season: int) -> dict[str, int]:
     if season < 2014:
         out["pre2014_xp_not_flagged"] = pbp.filter(
             pl.col("type.text").fill_null("").str.contains(_XP_TEXT)
-            & ~pl.col("text").fill_null("").str.contains(_FAILED_2PT_TEXT)
+            & ~pl.col("text").fill_null("").str.contains(_TWO_PT_TRY_TEXT)
             & ~pl.col("text").fill_null("").str.contains(_COMBINED_TD_TEXT)
-            # an unenriched game (corrupt feed, every derived column null) is not an
-            # xp_attempt defect; those games exist in every era and are tracked apart
+            # an unenriched game (corrupt or truncated feed, every derived column null) is not
+            # an xp_attempt defect; those games exist in every era and are reported apart by
+            # _unenriched_games. A truncated feed keeps `period` (313230077, 2011: 49 plays, Q1
+            # only) but nulls xp_attempt on every row, so test the whole game, not the row.
             & pl.col("period").is_not_null()
+            & ~_unenriched_expr(pbp)
             & (pl.col("xp_attempt") != True).fill_null(True)  # noqa: E712
         ).height
     # the three line-yards parts sum to the carry on every gain (R843-2)
@@ -84,6 +102,17 @@ def _checks(pbp: pl.DataFrame, season: int) -> dict[str, int]:
         rush & (yds >= 0) & ((parts - yds).abs() > 1e-6).fill_null(True)
     ).height
     return out
+
+
+def _unenriched_games(pbp: pl.DataFrame) -> int:
+    """Games whose derived columns are null on every row (corrupt or truncated feeds).
+
+    Informational, never a failure: the checks above exempt these games, so this count is what
+    keeps them visible in the gate line instead of silently passing.
+    """
+    if not any(c in pbp.columns for c in _DERIVED):
+        return 0
+    return pbp.filter(_unenriched_expr(pbp))["game_id"].n_unique()
 
 
 def _adv_team_checks(adv_team: pl.DataFrame | None) -> dict[str, int]:
@@ -169,6 +198,7 @@ def main(argv: list[str] | None = None) -> int:
         print(
             f"{season}: {'PASS' if not bad else 'FAIL'} "
             + " ".join(f"{k}={v}" for k, v in counts.items())
+            + f" | info: unenriched_games={_unenriched_games(pbp)}"
         )
         if args.publish and not bad:
             from cfb_data_build.config import REGISTRY

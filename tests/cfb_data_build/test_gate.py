@@ -9,7 +9,7 @@ import json
 import polars as pl
 import pytest
 
-from cfb_data_build.gate import _adv_team_checks, _checks, _finals_with_plays
+from cfb_data_build.gate import _adv_team_checks, _checks, _finals_with_plays, _unenriched_games
 
 #: Two games; a kickoff touchback, a pre-2014 XP row and two carries (a gain and a loss).
 CLEAN = {
@@ -24,6 +24,8 @@ CLEAN = {
     "type.text": ["Kickoff", "Extra Point Good", "Rush", "Rush", "Pass"],
     "text": ["kickoff", "PAT good", "12 yd run", "2 yd loss", "pass"],
     "xp_attempt": [False, True, False, False, False],
+    "pos_team": ["10", "10", "10", "20", "20"],
+    "EPA": [0.1, 0.9, 0.4, -0.2, 0.3],
     "rush": [False, False, True, True, False],
     "yds_rushed": [None, None, 12.0, -2.0, None],
     "line_yards": [None, None, 7.0, -2.4, None],
@@ -85,6 +87,37 @@ def test_pre2014_failed_two_point_try_is_not_an_xp():
     assert _checks(unenriched, 2011)["pre2014_xp_not_flagged"] == 0
     missed_kick = _pbp(type__text=(1, "Extra Point Missed"), xp_attempt=(1, False))
     assert _checks(missed_kick, 2011)["pre2014_xp_not_flagged"] == 1
+
+
+def test_pre2014_converted_two_point_try_is_not_an_xp():
+    # 252440248 (2005): a converted 2-pt try is typed "Extra Point Good"
+    for text in ("Kellen Clemens pass attempt to Garren Strong good.", "Terre Whitehead rush attempt good."):
+        good_2pt = _pbp(type__text=(1, "Extra Point Good"), text=(1, text), xp_attempt=(1, False))
+        assert _checks(good_2pt, 2005)["pre2014_xp_not_flagged"] == 0, text
+    # a kicked try is still checked
+    kick = _pbp(type__text=(1, "Extra Point Good"), text=(1, "Jim Smith extra point GOOD."), xp_attempt=(1, False))
+    assert _checks(kick, 2005)["pre2014_xp_not_flagged"] == 1
+
+
+def test_a_truncated_unenriched_game_is_exempt_but_reported():
+    # 313230077 (2011): 49 plays, Q1 only -- `period` is set but every derived column is null
+    trunc = _pbp(type__text=(1, "Extra Point Good"), xp_attempt=(1, None))
+    trunc = trunc.with_columns(
+        pl.when(pl.col("game_id") == 1).then(None).otherwise(pl.col(c)).alias(c) for c in ("xp_attempt", "pos_team", "EPA")
+    )
+    assert trunc.filter(pl.col("game_id") == 1)["period"].null_count() == 0
+    assert _checks(trunc, 2011)["pre2014_xp_not_flagged"] == 0
+    assert _unenriched_games(trunc) == 1
+    # one null xp_attempt in an otherwise enriched game is still a defect
+    one_null = _pbp(type__text=(1, "Extra Point Good"), xp_attempt=(1, None))
+    assert _checks(one_null, 2011)["pre2014_xp_not_flagged"] == 1
+    assert _unenriched_games(one_null) == 0
+    # xp_attempt null on every row but EPA populated: an XP-flag defect, never an exemption
+    no_flags = _pbp(type__text=(1, "Extra Point Good")).with_columns(
+        pl.when(pl.col("game_id") == 1).then(None).otherwise(pl.col("xp_attempt")).alias("xp_attempt")
+    )
+    assert _checks(no_flags, 2011)["pre2014_xp_not_flagged"] == 1
+    assert _unenriched_games(no_flags) == 0
 
 
 def test_2012_touchback_returns_to_the_25():

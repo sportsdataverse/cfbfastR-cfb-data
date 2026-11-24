@@ -246,7 +246,6 @@ cfb_defense_vs_position: 3 unchanged asset(s) skipped, 0 uploaded
 
 === defense_vs_position: 0 failures ===
   cfb_matchup_features 2026: 1663 rows, 45 cols
-cfb_matchup_features: 3 unchanged asset(s) skipped, 0 uploaded
 
 === matchup_features: 0 failures ===
 /mnt/sdv_repos/cfbfastR-cfb-data/python/cfb_data_build/matchup_features.py:507: UserWarning: Comparisons with None always result in null. Consider using `.is_null()` or `.is_not_null()`.
@@ -268,13 +267,11 @@ cfb_recruits: 1 unchanged asset(s) skipped, 0 uploaded
 cfb_team_portal: 1 unchanged asset(s) skipped, 0 uploaded
 
 === team_portal: 0 failures ===
-2026-11-23 08:08:07,019 INFO === season 2026 ===
-2026-11-23 08:08:07,620 INFO wrote cfb_teams_crosswalk_2026.parquet (828 rows, 11 cols)
-2026-11-23 08:08:18,707 INFO wrote cfb_schedule_crosswalk_2026.parquet (1689 rows, 11 cols)
-2026-11-23 08:08:18,710 INFO wrote manifest cfb_crosswalk_in_data_repo.csv (48 rows)
-2026-11-23 08:08:18,710 INFO built 3 artifact(s) under cfb/crosswalk/parquet
-2026-11-23 08:08:19,133 INFO uploading 2 of 3 asset(s) to sportsdataverse/sportsdataverse-data@cfb_crosswalk (one at a time)
-2026-11-23 08:08:20,380 INFO   uploaded cfb_schedule_crosswalk_2026.parquet
-2026-11-23 08:08:21,575 INFO   uploaded cfb_crosswalk_in_data_repo.csv
-2026-11-23 08:08:26,483 INFO published to sportsdataverse/sportsdataverse-data@cfb_crosswalk
+2026-11-24 08:39:56,324 INFO === season 2026 ===
+2026-11-24 08:39:57,000 INFO wrote cfb_teams_crosswalk_2026.parquet (828 rows, 11 cols)
+2026-11-24 08:40:09,387 INFO wrote cfb_schedule_crosswalk_2026.parquet (1689 rows, 11 cols)
+2026-11-24 08:40:09,393 INFO wrote manifest cfb_crosswalk_in_data_repo.csv (50 rows)
+2026-11-24 08:40:09,393 INFO built 3 artifact(s) under cfb/crosswalk/parquet
+2026-11-24 08:40:10,048 INFO uploading 0 of 3 asset(s) to sportsdataverse/sportsdataverse-data@cfb_crosswalk (one at a time)
+2026-11-24 08:40:10,049 INFO published to sportsdataverse/sportsdataverse-data@cfb_crosswalk
 pushed: CFB Data Updated (Start: 2026 End: 2026) (attempt 1)

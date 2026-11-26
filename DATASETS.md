@@ -42,6 +42,7 @@ Expected `col_name | col_type | col_description` for each per-game-compiled **se
 | [cfb_team_portal](#cfb_team_portal) | one row per (season, team) | 9 | `cfb_team_portal` |
 | [cfb_defense_vs_position](#cfb_defense_vs_position) | one row per (season, defense, position group) | 25 | `cfb_defense_vs_position` |
 | [cfb_paper_index_games](#cfb_paper_index_games) | one row per (game, team), scored games only | 17 | `cfb_paper_index_games` |
+| [cfb_team_adjustment_ledger](#cfb_team_adjustment_ledger) | one row per (game, team) the adjusted-EPA fit rates | 27 | `cfb_team_adjustment_ledger` |
 
 > † **Season-level summary datasets.** Unlike every table above (per-game `final`
 > JSON reshaped into a compiled season), these six are produced by
@@ -2160,3 +2161,48 @@ of [team_summaries](#team_summaries).
 Not a model feature: the shares are fitted on who won.
 
 _Release tag: `cfb_paper_index_games`_
+
+### cfb_team_adjustment_ledger
+
+The season Adj EPA/Play of [team_summaries](#team_summaries) laid out game by game: one row
+per (game, team) for every team the fit rates (two or more valid FBS-vs-FBS games), keyed
+`(game_id, team_id)` (stage 68, `python/cfb_data_build/adjustment_ledger.py`). The rows are
+sdv-py `sportsdataverse.cfb.cfb_adjusted_epa_ledger` over the same frame `team_summaries` fits,
+so each team's `contribution` rows sum to its published `net_adj_epa`; the build checks that
+against a fresh fit and fails the season if it misses by more than 1e-9. Plays are FBS-vs-FBS
+passes and rushes that are not garbage time by the score-margin rule, as in the fit.
+
+| col_name | col_type | col_description |
+| --- | --- | --- |
+| season | integer | Season year. |
+| game_id | integer | ESPN game id (Int64). |
+| week | integer | ESPN week; the postseason restarts at 1. |
+| season_type | integer | ESPN season type of the game: 2 regular, 3 postseason. |
+| team_id | integer | ESPN team id (Int64). |
+| pos_team | character | The team's name as the pbp carries it. |
+| opponent_id | integer | ESPN team id of the opponent (Int64). |
+| site | character | `home`, `away` or `neutral` for the team. |
+| off_plays | integer | The team's offensive plays in the fit that game. |
+| def_plays | integer | The team's defensive plays in the fit that game; 0 when it had none (its defense mean skips the game). |
+| raw_off_epa | double | The team's EPA per offensive play that game, on the fit's plays. |
+| raw_def_epa | double | EPA per play the team's defense allowed that game, on the fit's plays. |
+| raw_net_epa | double | `raw_off_epa - raw_def_epa`. |
+| off_strength_faced | double | The opponent's fitted offense, EPA/play. |
+| def_strength_faced | double | The opponent's fitted defense, EPA/play allowed. |
+| schedule_adj | double | `off_strength_faced - def_strength_faced`: what the schedule term adds to the game's raw net. |
+| adj_off_epa | double | `raw_off_epa - def_strength_faced`. |
+| adj_def_epa | double | `raw_def_epa - off_strength_faced`. |
+| adj_net_epa | double | `adj_off_epa - adj_def_epa` = `raw_net_epa + schedule_adj`. |
+| off_weight | double | The game's weight in the season offense mean: 1 / the team's games with offensive plays in the fit. |
+| def_weight | double | The game's weight in the season defense mean: 1 / the team's games with defensive plays in the fit. |
+| raw_contribution | double | The game's raw part of the season value: `off_weight * raw_off_epa - def_weight * raw_def_epa`. |
+| schedule_contribution | double | The game's schedule part: `def_weight * off_strength_faced - off_weight * def_strength_faced`. |
+| contribution | double | `raw_contribution + schedule_contribution`; a team's rows sum to `net_adj_epa`. |
+| net_adj_epa | double | The team's season Adj EPA/Play (the `team_summaries` value), repeated on each row. |
+| loo_net_adj_epa | double | The season value refit as if this game had never been played; null when the team would keep fewer than two valid games. |
+| game_influence | double | `net_adj_epa - loo_net_adj_epa`: how far this game moved the season value. |
+
+The home-field term is fitted but not netted out of a team's own EPA (as in `team_summaries`),
+so the ledger records `site` and has no home term.
+
+_Release tag: `cfb_team_adjustment_ledger`_

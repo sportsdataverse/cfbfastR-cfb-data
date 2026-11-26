@@ -61,3 +61,32 @@ def test_a_ledger_that_misses_its_season_value_fails_the_season(
     monkeypatch.setattr(stage, "cfb_adjusted_epa_ledger", off_by_a_hair)
     with pytest.raises(ValueError, match="contributions miss net_adj_epa"):
         stage.ledger_table(plays, 2025)
+
+
+def test_wired_as_a_derived_dataset_on_its_tag() -> None:
+    from cfb_data_build.cli import DERIVED
+    from cfb_data_build.derived import BUILDERS, SPECS
+
+    assert "adjustment_ledger" in DERIVED
+    assert SPECS["adjustment_ledger"].tag == "cfb_team_adjustment_ledger"
+    assert SPECS["adjustment_ledger"].stem == "cfb_team_adjustment_ledger"
+    assert callable(BUILDERS["adjustment_ledger"])
+
+
+def test_a_season_with_no_plays_is_the_empty_schema(monkeypatch) -> None:
+    import sportsdataverse.cfb as cfb
+
+    monkeypatch.setattr(cfb, "load_cfb_pbp", lambda seasons: pl.DataFrame())
+    out = stage.build_adjustment_ledger(2027)
+    assert out.height == 0 and dict(out.schema) == stage.OUTPUT_SCHEMA
+
+
+def test_a_ledger_missing_a_column_fails_the_season(plays, monkeypatch) -> None:
+    real = stage.cfb_adjusted_epa_ledger
+    monkeypatch.setattr(
+        stage,
+        "cfb_adjusted_epa_ledger",
+        lambda frame: real(frame).drop("game_influence"),
+    )
+    with pytest.raises(ValueError, match="lacks"):
+        stage.ledger_table(plays, 2025)

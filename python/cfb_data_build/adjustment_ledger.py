@@ -82,10 +82,8 @@ def ledger_table(plays: pl.DataFrame, season: int) -> pl.DataFrame:
         season=pl.lit(season, dtype=pl.Int64),
     )
     missing = [c for c in OUTPUT_SCHEMA if c not in out.columns]
-    if missing:
-        out = out.with_columns(
-            pl.lit(None, dtype=OUTPUT_SCHEMA[c]).alias(c) for c in missing
-        )
+    if missing:  # a renamed sdv-py column must fail the season, not publish as nulls
+        raise ValueError(f"adjustment_ledger {season}: the ledger lacks {missing}")
     return out.select(pl.col(c).cast(t) for c, t in OUTPUT_SCHEMA.items())
 
 

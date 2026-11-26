@@ -607,12 +607,24 @@ def walk_forward(
 # ---------------------------------------------------------------------------
 # gate + stage entry point
 # ---------------------------------------------------------------------------
-#: Every threshold below is DERIVED FROM AN OBSERVED VALUE on the 2026-09-02
-#: run (2015-2025, 6,480 games, `hier-eb`), with the observation recorded beside
-#: it. None is a round number chosen for comfort, and none may be lowered: a
-#: build that trips one has regressed against a measurement, not against taste.
-GATE_MAE_MAX = 13.09  # observed 12.828, season-clustered SE 0.130 -> +2 SE
-GATE_BEAT_SHIPPED_MIN = 1.85  # observed +2.142, 95% CI [1.893, 2.398] -> the CI floor
+#: Every threshold below is DERIVED FROM AN OBSERVED VALUE, with the observation
+#: recorded beside it. None is a round number chosen for comfort, and none may be
+#: lowered: a build that trips one has regressed against a measurement, not
+#: against taste. The 2026-09-02 run (2015-2025, 6,480 games, `hier-eb`) set
+#: them. The 2026-11-26 rescore of the same seasons (6,201 leak-free games, on the
+#: assets republished under sportsdataverse-py #1296 / #1300) re-derived the two
+#: that the refit of the shipped surface moved, by the same rules.
+#: MAE ceiling: observed + 2 season-clustered SEs = 12.840 + 2 * 0.125 = 13.089.
+GATE_MAE_MAX = 13.09
+#: Beat-the-shipped floor, against ``gate_baseline`` (the SERVED formula): the
+#: lower bound of compare_oof's 95% paired game bootstrap CI (5,000 draws, seed 0),
+#: as for the old floor. Observed +0.489, CI [0.322, 0.648], season-clustered
+#: p 2e-5, 11/11 seasons. The old 1.85 was that bound against the flat closed form
+#: at the pre-#1296 scale (23.69), which no longer ships. The 2005-2013
+#: re-registration (ClaudeCowork specs/2026-11-26-cfb-hierarchical-reregistration-
+#: design.md) measured +0.932 [0.732, 1.142] there. That decides the model's
+#: candidacy, not this floor: a gate's threshold comes from the seasons the gate scores.
+GATE_BEAT_SHIPPED_MIN = 0.32
 GATE_CAL_SLOPE = (0.80, 1.10)  # observed 0.92 (shipped 0.91, market 1.00)
 GATE_MAX_CAL_ERR = 0.10  # observed 0.029; the shipped surface is 0.430
 GATE_SEASONS_WON_MIN = 0.80  # observed 11/11 vs shipped, 8/9 vs the lean GBM
@@ -620,16 +632,32 @@ GATE_TAU_RANGE = (0.5, 40.0)  # observed 4.81-15.63 across 250 as-of fits
 GATE_P_SEASON_MAX = 0.05  # the pre-registered win condition; observed 0.0000
 
 
-def assert_hierarchical_gate(oof: pl.DataFrame, shipped_pred: np.ndarray) -> dict:
-    """Fail the build when the fit has regressed against the measured run.
+def gate_baseline(frame: pl.DataFrame) -> np.ndarray:
+    """The shipped surface the gate must beat: the margin sportsdataverse-py SERVES.
 
-    Asserts on the OUTPUT (the predictions), never on "the code ran" -- the
-    failure class this repo keeps hitting is a component reporting success while
-    doing nothing.
+    That is ``cfb_game_predict``'s formula, the games-played slope curve on
+    ``rt_adj_net`` plus ``hfa_points`` off neutral sites, from
+    ``CFB_CONSTANTS["modern"]``. It is NOT ``backtest.shipped_margin``: that is
+    the flat ``net_points_scale * (diff + 2 * hfa_epa)`` form, which nothing
+    serves and which scores about 0.15 MAE worse on 2015-2025.
+    """
+    from sportsdataverse.cfb.cfb_prediction_constants import CFB_CONSTANTS
+
+    from .fit_pregame import from_constants
+
+    return from_constants(CFB_CONSTANTS["modern"]).predict(frame, use_curve=True)
+
+
+def gate_metrics(oof: pl.DataFrame) -> dict:
+    """The numbers the gate reads, without judging them.
+
+    ``oof`` carries game_id, season, margin, home_won, pred_margin (the
+    hierarchical arm) and the as-of rating columns ``gate_baseline`` needs.
     """
     from .metrics import margin_metrics, norm_cdf, wp_metrics
     from .significance import compare_oof
 
+    base = gate_baseline(oof)
     y = oof["margin"].to_numpy().astype(float)
     p = oof["pred_margin"].to_numpy().astype(float)
     m = margin_metrics(p, y)
@@ -637,20 +665,34 @@ def assert_hierarchical_gate(oof: pl.DataFrame, shipped_pred: np.ndarray) -> dic
     w = wp_metrics(norm_cdf(p, sd), oof["home_won"].to_numpy())
     cmp = compare_oof(
         oof.select("game_id", "season", "margin").with_columns(
-            pl.Series("pred_margin", shipped_pred)
+            pl.Series("pred_margin", base)
         ),
-        oof,
+        oof.select("game_id", "season", "margin", "pred_margin"),
         name_a="shipped",
         name_b="hierarchical",
     )
-    got = {
+    # compare_oof counts the BETTER model's seasons; the gate wants the hierarchical side
+    hier_won = cmp.seasons_won if cmp.diff > 0 else cmp.n_seasons - cmp.seasons_won
+    return {
         "mae": m["mae"],
+        "baseline_mae": cmp.mae_a,
         "cal_slope": m["calibration_slope"],
         "max_cal_err": w["max_cal_err"],
         "beat_shipped": cmp.diff,
-        "seasons_won_frac": cmp.seasons_won / max(cmp.n_seasons, 1),
+        "seasons_won_frac": hier_won / max(cmp.n_seasons, 1),
         "p_season": cmp.p_season,
     }
+
+
+def assert_hierarchical_gate(oof: pl.DataFrame) -> dict:
+    """Fail the build when the fit has regressed against the measured run.
+
+    Asserts on the OUTPUT (the predictions), never on "the code ran" -- the
+    failure class this repo keeps hitting is a component reporting success while
+    doing nothing. The baseline is computed here, from ``oof``'s rating columns,
+    so a caller cannot hand the gate a weaker one.
+    """
+    got = gate_metrics(oof)
     fail = []
     if got["mae"] > GATE_MAE_MAX:
         fail.append(f"MAE {got['mae']:.3f} > {GATE_MAE_MAX}")
@@ -721,7 +763,10 @@ def scorecard(joined: pl.DataFrame, seasons: list[int], hist: pl.DataFrame) -> s
         )
     arms = {
         "constant": _oof(const.to_numpy()),
-        "shipped": _oof(shipped_margin(joined)),
+        "shipped": _oof(gate_baseline(joined)),  # the served formula the gate reads
+        "shipped_flat": _oof(
+            shipped_margin(joined)
+        ),  # backtest's flat form, for continuity
         "hierarchical": _oof(joined["pred_margin"].to_numpy()),
     }
     out = [f"=== scorecard on {joined.height} identical games ==="]
@@ -795,12 +840,7 @@ def run(
     joined = frame.join(
         preds.select("game_id", "pred_margin"), on="game_id", how="inner"
     )
-    from .backtest import shipped_margin
-
-    got = assert_hierarchical_gate(
-        joined.select("game_id", "season", "margin", "home_won", "pred_margin"),
-        shipped_margin(joined),
-    )
+    got = assert_hierarchical_gate(joined)
     print(f"hierarchical gate PASSED on {joined.height} games: {got}")
     print(scorecard(joined, seasons, hist))
 

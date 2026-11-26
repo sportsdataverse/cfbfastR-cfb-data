@@ -103,8 +103,11 @@ Fresh `CFB_HM_CACHE`, same assets and venv as the pregame refit above.
     vs the served formula: MAE 12.62 vs 13.55, delta -0.93 [-1.14, -0.73], season-clustered p 0.0002, 9/9 seasons,
     calibration slope 0.95, max calibration error 0.053 (`cfb_higher_models.rereg_hierarchical`, `8b3daef09`).
     It stays a candidate, not wired.
-  - Follow-up, not done: repoint the beat-shipped clause at the served formula with a floor of 0.73 (that CI floor),
-    and re-derive the MAE ceiling.
+  - Gate fixed 2026-11-26: the beat-shipped clause now reads the served formula (`hierarchical.gate_baseline`).
+    Its floor is 0.32, the CI lower bound on 2015-2025, the seasons the gate scores (observed +0.489
+    [0.322, 0.648], 11/11 seasons). The MAE ceiling re-derives to 13.09 (12.840 + 2 x 0.125). The 2005-2013
+    figure of 0.73 decides candidacy only. `tests/test_hierarchical.py` fails if the clause is pointed back at the
+    flat `backtest.shipped_margin`.
   - Metrics come from the gate's own code, with the raise caught so every number prints (a one-off wrapper, not
     committed).
 - Market closing line on 6,070 of those games: MAE 12.30. Shipped scores 13.51 there, hierarchical 12.88.

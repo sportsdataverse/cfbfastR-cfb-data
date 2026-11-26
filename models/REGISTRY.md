@@ -98,6 +98,9 @@ Fresh `CFB_HM_CACHE`, same assets and venv as the pregame refit above.
     it now scores MAE 13.47 / Brier 0.1950 on these games, from the 23.69 scale to the 40.37 one (#1296 / #1300).
   - The threshold is not lowered. Re-registering the clause against the new shipped surface, or retiring it, is an
     owner call. Until then stage 34 `hierarchical` exits non-zero by design.
+  - **Status: PENDING RE-REGISTRATION** (owner, 2026-11-26). It stays a candidate, not wired. The new test is
+    pre-registered in ClaudeCowork `specs/2026-11-26-cfb-hierarchical-reregistration-design.md`: 2005-2013 vs
+    the served formula, run by `cfb_higher_models.rereg_hierarchical`.
   - Metrics come from the gate's own code, with the raise caught so every number prints (a one-off wrapper, not
     committed).
 - Market closing line on 6,070 of those games: MAE 12.30. Shipped scores 13.51 there, hierarchical 12.88.

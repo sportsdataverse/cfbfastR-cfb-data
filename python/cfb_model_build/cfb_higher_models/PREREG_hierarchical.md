@@ -213,3 +213,12 @@ pre-registered baseline overstated that margin by about 0.7 MAE. Replacing the b
 (and re-deriving this gate against it) is a separate follow-up; this addendum does not
 move it.
 
+**2026-11-26: that follow-up landed.** `assert_hierarchical_gate` now computes its own baseline with
+`gate_baseline`, the served formula, from the frame's rating columns. Two thresholds were re-derived on the
+2015-2025 rescore (6,201 games, the assets republished under sportsdataverse-py #1296 / #1300), by the rules above:
+- the beat-shipped floor: 1.85 -> **0.32**, the CI lower bound of the observed +0.489 [0.322, 0.648];
+- the MAE ceiling: 12.840 + 2 x 0.125 = 13.09, unchanged.
+
+A separate pre-registered re-test on 2005-2013, which nothing had scored, passed. The hierarchical model beat the
+served formula by 0.932 [0.732, 1.142] in 9/9 seasons (ClaudeCowork
+`specs/2026-11-26-cfb-hierarchical-reregistration-design.md`). It stays a candidate and is not wired.

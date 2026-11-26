@@ -75,28 +75,62 @@ def test_pooling_actually_shrinks(corpus):
     assert 0.5 < fit.tau_team < 40.0, f"tau_team {fit.tau_team} is degenerate"
 
 
+FIXTURE = (
+    Path(__file__).parent
+    / "fixtures"
+    / "hierarchical_gate"
+    / "frame_2024_sample.parquet"
+)
+
+
 def test_the_gate_can_actually_fail():
     """A gate that cannot fail is not a gate.
 
-    Feed the gate the SHIPPED predictions in the hierarchical slot: it must
-    reject them. Uses the committed EB run when present, and otherwise a frame
-    where the two arms are identical (beat_shipped == 0), which must also fail.
+    Feed the gate the served baseline's own predictions in the hierarchical slot
+    (beat_shipped == 0): it must reject them.
     """
-    from cfb_model_build.cfb_higher_models.backtest import shipped_margin
     from cfb_model_build.cfb_higher_models.hierarchical import (
         assert_hierarchical_gate,
+        gate_baseline,
     )
 
-    cached = Path(".cache/higher_models/frame_2014_2025.parquet")
-    if not cached.exists():
-        pytest.skip("real game frame absent")
-    frame = pl.read_parquet(cached).filter(pl.col("season") > 2014)
-    ship = shipped_margin(frame)
-    oof = frame.select("game_id", "season", "margin", "home_won").with_columns(
-        pl.Series("pred_margin", ship)
+    frame = pl.read_parquet(FIXTURE)
+    oof = frame.with_columns(pl.Series("pred_margin", gate_baseline(frame)))
+    with pytest.raises(RuntimeError, match="beats shipped by 0.000"):
+        assert_hierarchical_gate(oof)
+
+
+def test_gate_baseline_is_the_served_formula_not_the_flat_one():
+    """The beat-shipped clause must read the margin sportsdataverse-py serves.
+
+    Its floor (0.32) was measured against the games-played curve. Pointed back at
+    backtest.shipped_margin (the flat form, about 0.15 MAE worse on 2015-2025), the
+    clause would hand the hierarchical arm a weaker opponent.
+    """
+    from sportsdataverse.cfb.cfb_prediction_constants import CFB_CONSTANTS
+
+    from cfb_model_build.cfb_higher_models.backtest import shipped_margin
+    from cfb_model_build.cfb_higher_models.fit_pregame import from_constants
+    from cfb_model_build.cfb_higher_models.hierarchical import (
+        gate_baseline,
+        gate_metrics,
     )
-    with pytest.raises(RuntimeError, match="hierarchical gate FAILED"):
-        assert_hierarchical_gate(oof, ship)
+
+    frame = pl.read_parquet(FIXTURE)
+    served = from_constants(CFB_CONSTANTS["modern"]).predict(frame, use_curve=True)
+    flat = shipped_margin(frame)
+    y = frame["margin"].to_numpy()
+    # the fixture can tell the two formulas apart
+    assert np.max(np.abs(served - flat)) > 1.0
+    np.testing.assert_array_equal(gate_baseline(frame), served)
+    # end to end: with the flat margins in the hierarchical slot, the gate's
+    # baseline MAE is the served one, and beat_shipped is served minus flat
+    got = gate_metrics(frame.with_columns(pl.Series("pred_margin", flat)))
+    assert got["baseline_mae"] == pytest.approx(np.mean(np.abs(served - y)))
+    assert got["beat_shipped"] == pytest.approx(
+        np.mean(np.abs(served - y)) - np.mean(np.abs(flat - y))
+    )
+    assert got["beat_shipped"] != pytest.approx(0.0, abs=1e-6)
 
 
 def test_constant_baseline_cannot_see_its_own_season():
@@ -138,3 +172,29 @@ def test_constant_baseline_cannot_see_its_own_season():
         "the constant arm for pre-2024 seasons moved when 2024 outcomes changed "
         "-- it is reading the future"
     )
+
+
+def test_the_floor_matches_the_constants_it_was_measured_against():
+    """GATE_BEAT_SHIPPED_MIN was measured against today's served constants.
+
+    The baseline reads CFB_CONSTANTS live, so an sdv-py refit moves it silently,
+    which is how the old 1.85 went stale. Fail loudly instead.
+    """
+    from sportsdataverse.cfb.cfb_prediction_constants import CFB_CONSTANTS
+
+    from cfb_model_build.cfb_higher_models.hierarchical import GATE_BASELINE_CONSTANTS
+
+    c = CFB_CONSTANTS["modern"]
+    got = {k: round(getattr(c, k), 4) for k in GATE_BASELINE_CONSTANTS}
+    assert got == GATE_BASELINE_CONSTANTS, (
+        "the served constants moved: re-derive GATE_BEAT_SHIPPED_MIN (and GATE_BASELINE_CONSTANTS) "
+        "on the gate's seasons"
+    )
+
+
+def test_gate_baseline_refuses_a_frame_without_games_played():
+    from cfb_model_build.cfb_higher_models.hierarchical import gate_baseline
+
+    frame = pl.read_parquet(FIXTURE).drop("valid_games_home")
+    with pytest.raises(ValueError, match="valid_games_home"):
+        gate_baseline(frame)

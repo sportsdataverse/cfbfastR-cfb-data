@@ -123,7 +123,8 @@ models:
 # above). Stage 70 emits reports ABOUT the others.
 #
 # 2026-09-02: stage 34 gained `hierarchical` — a gated, pre-registered team-strength
-# model that beats the shipped pregame surface by 2.14 MAE. It is still NOT listed
+# model that beat the shipped pregame surface by 2.14 MAE then (0.49 against the served formula on
+# the 2026-11-26 rescore, 0.93 out of sample on 2005-2013). It is still NOT listed
 # here, and that is the rule working, not an oversight: the exemption's condition is
 # publication, not quality. The day it publishes a tag it needs BOTH a registry row
 # and an entry above, in the same commit — this lockstep test is what will say so.

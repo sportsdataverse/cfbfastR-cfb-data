@@ -86,6 +86,22 @@ Output: `models/pregame_fit.json`, which `sportsdataverse_sha` now stamps.
 - The season `cfb_ratings` republish also caught up to reprocess runs #3/#4 (adj_st_epa, fei_*, off_pace). The old
   assets dated from 2026-09-29. Owner decision: republish them anyway.
 
+**2026-11-26 — stage 34 rescored on the margin-rule republish: the hierarchical gate fails one clause.**
+Fresh `CFB_HM_CACHE`, same assets and venv as the pregame refit above.
+
+- `backtest` (2021-2025, 2,942 as-of games), the shipped closed form: MAE 13.08, Brier 0.1988, accuracy 0.693,
+  max calibration error 0.077.
+- `hierarchical` (walk-forward 2015-2025, 6,201 games): MAE 12.84, calibration slope 0.92, max calibration error
+  0.025, 11 of 11 seasons won, season-clustered p < 0.0001. Five clauses pass.
+  - `beat_shipped` fails: 0.635 MAE [0.463, 0.807] < 1.85. On 2026-09-28 it was 1.92.
+  - The hierarchical model reads final scores only and is unchanged (12.84 then and now). The shipped surface moved:
+    it now scores MAE 13.47 / Brier 0.1950 on these games, from the 23.69 scale to the 40.37 one (#1296 / #1300).
+  - The threshold is not lowered. Re-registering the clause against the new shipped surface, or retiring it, is an
+    owner call. Until then stage 34 `hierarchical` exits non-zero by design.
+  - Metrics come from the gate's own code, with the raise caught so every number prints (a one-off wrapper, not
+    committed).
+- Market closing line on 6,070 of those games: MAE 12.30. Shipped scores 13.51 there, hierarchical 12.88.
+
 **2026-09-28 — pregame closed form re-fit after the CFB pbp reprocess: within tolerance, constants kept.**
 Same recipe, fresh `CFB_HM_CACHE`, own venv on sportsdataverse `e0ce88136` (includes sdv-py #613).
 Inputs: `cfb_team_summaries_weekly` 2014-2025 assets 2026-09-28 05:01-22:52Z, `cfb_ratings_weekly`

@@ -9,6 +9,7 @@ dependencies = [
     # merged but unreleased. uv.lock previously pinned an older main commit, so
     # the venv silently built on pre-fix code.
     # tracks sdv-py main since 2026-11-12 (owner call); the reprocess stamp carries the locked sha, so a re-lock re-stales finals
+    # 2026-11-26: locked to bcce2e681e (sdv-py #1300: adjusted EPA drops garbage time by score margin in the fit and own EPA); no cfb-raw bump, pbp unchanged
     "sportsdataverse @ git+https://github.com/sportsdataverse/sportsdataverse-py@main",
     "pandas>=2.0",
     "polars>=1.0",
@@ -30,6 +31,7 @@ dependencies = [
 # which is NOT on PyPI (latest published is 0.0.71). Track git main like the other
 # -data producers so cfb_data_build can emit .rds.
 # tracks sdv-py main since 2026-11-12 (owner call); the reprocess stamp carries the locked sha, so a re-lock re-stales finals
+# 2026-11-26: locked to bcce2e681e (sdv-py #1300: adjusted EPA drops garbage time by score margin in the fit and own EPA); no cfb-raw bump, pbp unchanged
 sportsdataverse = { git = "https://github.com/sportsdataverse/sportsdataverse-py", branch = "main" }
 
 [dependency-groups]

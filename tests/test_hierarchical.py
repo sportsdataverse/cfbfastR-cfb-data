@@ -172,3 +172,29 @@ def test_constant_baseline_cannot_see_its_own_season():
         "the constant arm for pre-2024 seasons moved when 2024 outcomes changed "
         "-- it is reading the future"
     )
+
+
+def test_the_floor_matches_the_constants_it_was_measured_against():
+    """GATE_BEAT_SHIPPED_MIN was measured against today's served constants.
+
+    The baseline reads CFB_CONSTANTS live, so an sdv-py refit moves it silently,
+    which is how the old 1.85 went stale. Fail loudly instead.
+    """
+    from sportsdataverse.cfb.cfb_prediction_constants import CFB_CONSTANTS
+
+    from cfb_model_build.cfb_higher_models.hierarchical import GATE_BASELINE_CONSTANTS
+
+    c = CFB_CONSTANTS["modern"]
+    got = {k: round(getattr(c, k), 4) for k in GATE_BASELINE_CONSTANTS}
+    assert got == GATE_BASELINE_CONSTANTS, (
+        "the served constants moved: re-derive GATE_BEAT_SHIPPED_MIN (and GATE_BASELINE_CONSTANTS) "
+        "on the gate's seasons"
+    )
+
+
+def test_gate_baseline_refuses_a_frame_without_games_played():
+    from cfb_model_build.cfb_higher_models.hierarchical import gate_baseline
+
+    frame = pl.read_parquet(FIXTURE).drop("valid_games_home")
+    with pytest.raises(ValueError, match="valid_games_home"):
+        gate_baseline(frame)

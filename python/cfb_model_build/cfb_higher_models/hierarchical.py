@@ -624,9 +624,14 @@ GATE_MAE_MAX = 13.09
 #: re-registration (ClaudeCowork specs/2026-11-26-cfb-hierarchical-reregistration-
 #: design.md) measured +0.932 [0.732, 1.142] there. That decides the model's
 #: candidacy, not this floor: a gate's threshold comes from the seasons the gate scores.
+#: The served constants were fit on 2014-2023 (and #1300's rule chosen on 2014-2025),
+#: so the baseline is in-sample on most gate seasons. That makes the bar harder, not
+#: easier, and likely explains 0.49 here vs 0.93 out of sample. The floor is tied to
+#: those constants: ``GATE_BASELINE_CONSTANTS`` pins them, and a test fails when they move.
 GATE_BEAT_SHIPPED_MIN = 0.32
-GATE_CAL_SLOPE = (0.80, 1.10)  # observed 0.92 (shipped 0.91, market 1.00)
-GATE_MAX_CAL_ERR = 0.10  # observed 0.029; the shipped surface is 0.430
+GATE_BASELINE_CONSTANTS = {"net_points_scale": 40.3653, "hfa_points": 2.7625}
+GATE_CAL_SLOPE = (0.80, 1.10)  # observed 0.92 (0.92 again on the 2026-11-26 rescore)
+GATE_MAX_CAL_ERR = 0.10  # observed 0.029 (0.025 on the 2026-11-26 rescore)
 GATE_SEASONS_WON_MIN = 0.80  # observed 11/11 vs shipped, 8/9 vs the lean GBM
 GATE_TAU_RANGE = (0.5, 40.0)  # observed 4.81-15.63 across 250 as-of fits
 GATE_P_SEASON_MAX = 0.05  # the pre-registered win condition; observed 0.0000
@@ -645,6 +650,12 @@ def gate_baseline(frame: pl.DataFrame) -> np.ndarray:
 
     from .fit_pregame import from_constants
 
+    # without games played, predict() falls back to week - 1, which is not the served curve
+    missing = {"valid_games_home", "valid_games_away"} - set(frame.columns)
+    if missing:
+        raise ValueError(
+            f"gate_baseline needs {sorted(missing)} to score the served curve"
+        )
     return from_constants(CFB_CONSTANTS["modern"]).predict(frame, use_curve=True)
 
 

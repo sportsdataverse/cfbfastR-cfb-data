@@ -31,6 +31,7 @@ dependencies = [
 # -data producers so cfb_data_build can emit .rds.
 # tracks sdv-py main since 2026-11-12 (owner call); the reprocess stamp is cfb-raw's (its finals carry its locked sha), so a re-lock here re-stales nothing
 # 2026-11-26: locked to bcce2e681e for sdv-py #1300 (adjusted EPA drops garbage time by score margin, fit and own EPA); cfb-raw stays at 12555e0354
+# 2026-11-26: locked to bb1f71d3f9 for sdv-py #1335 (cfb_adjusted_epa_ledger, read by stage 68); cfb-raw stays at 12555e0354
 sportsdataverse = { git = "https://github.com/sportsdataverse/sportsdataverse-py", branch = "main" }
 
 [dependency-groups]

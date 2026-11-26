@@ -59,17 +59,38 @@ def test_decide_needs_both_baselines_on_both_metrics() -> None:
 
 def test_game_ids_follow_the_kept_rows() -> None:
     plays = pl.DataFrame(json.loads(FIX.read_text()), infer_schema_length=None)
-    plays = plays.with_columns(
-        pl.Series("_gid", np.arange(plays.height) + 400_000_000, dtype=pl.Int64)
+    gid = np.arange(plays.height) + 400_000_000
+    plays = plays.with_columns(pl.Series("_gid", gid, dtype=pl.Int64))
+    raw = dict(
+        zip(plays["_gid"].to_list(), plays["start.distance"].to_list(), strict=True)
     )
-    X, y = fd_features(plays)
-    Xg, _ = fd_features(
-        plays.with_columns(
-            pl.col("_gid").cast(pl.Float64).alias("start.pos_team_spread")
-        )
-    )
-    assert len(Xg) == len(X) and np.array_equal(
-        X["distance"].to_numpy(), Xg["distance"].to_numpy()
-    )
-    kept = set(Xg["posteam_spread"].astype(np.int64))
-    assert kept <= set(plays["_gid"].to_list()) and len(kept) == len(X)
+    for one_hot in (False, True):
+        X, y, games = g.holdout_frame(plays, one_hot=one_hot)
+        assert len(games) == len(X) == len(y) > 0
+        # row order is kept, and each kept row's id points back at a raw row with its distance
+        assert np.all(np.diff(games) > 0)
+        assert [raw[int(k)] for k in games] == X["distance"].tolist()
+        # the rows the gate scores are exactly fd_features' rows
+        X0, y0 = fd_features(plays, era_onehot=one_hot)
+        assert X.equals(X0) and np.array_equal(y, y0)
+
+
+def test_first_down_boundary_is_gain_at_least_distance() -> None:
+    dist = np.array([5, 5])
+    probs = np.zeros((2, g.FD_NUM_CLASS))
+    probs[0, 5 + g.FD_LABEL_OFFSET] = 1.0  # gain exactly the distance: converts
+    probs[1, 4 + g.FD_LABEL_OFFSET] = 1.0  # one yard short: does not
+    assert g.p_first_down(probs, dist).tolist() == [1.0, 0.0]
+    labels = np.array([5, 4]) + g.FD_LABEL_OFFSET
+    assert g.first_down_event(labels, dist).tolist() == [1.0, 0.0]
+
+
+def test_run_refuses_a_second_look(tmp_path) -> None:
+    (tmp_path / g.GATE).write_text("{}")
+    assert g.run(tmp_path, tmp_path / "x", tmp_path / "y", tmp_path) == 2
+
+
+def test_run_refuses_inputs_other_than_the_preregistered(tmp_path) -> None:
+    for name in (g.MANIFEST, "pbp.parquet", "fd.ubj"):
+        (tmp_path / name).write_text("not the registered file")
+    assert g.run(tmp_path, tmp_path / "pbp.parquet", tmp_path / "fd.ubj", tmp_path) == 2

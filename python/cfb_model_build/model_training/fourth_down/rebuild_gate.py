@@ -44,6 +44,7 @@ from .constants import (
     FD_FEATURES,
     FD_FEATURES_ERA_ONEHOT,
     FD_FIRST_DOWN_PENALTY_COLS,
+    FD_LABEL_OFFSET,
     FD_NROUNDS,
     FD_NUM_CLASS,
     FD_PARAMS,
@@ -64,8 +65,15 @@ UPPER_PCT = 98.75  # one-sided 2.5% over two candidates
 CAL_MARGIN = 0.005
 CAL_BIN = 0.05
 MIN_PLAYS, MIN_GAMES = 15_000, 500
-GAINS = np.arange(FD_NUM_CLASS) - 10
+GAINS = np.arange(FD_NUM_CLASS) - FD_LABEL_OFFSET
 MANIFEST = "fd_rebuild_holdout.json"
+GATE = "fd_rebuild.gate.json"
+# The pre-registered inputs (specs/2026-11-25-cfb-fd-model-rebuild-prereg.md): ``run`` refuses any other.
+PREREG_SHA256 = {
+    "holdout_manifest": "0f406c3a1797dff9d70ae5ca80b24987019dd76550480fc7cfdfcda4c5aa91fc",
+    "pbp": "48d7e7c8561b33a8fdbdd4f1f53938b92b265e2d066ab52c2283f425e89bb9f9",
+    "shipped": "31db81a09e6b03e4986df9cd5a401efee8fbc963588d1bf205ef1dc31b936504",
+}
 
 
 def sha256(path: Path) -> str:
@@ -103,7 +111,30 @@ def holdout_plays(final_dir: Path, game_ids: list[int]) -> pl.DataFrame:
 
 
 def p_first_down(probs: np.ndarray, distance: np.ndarray) -> np.ndarray:
+    """P(gain >= distance) from the 76-class yards distribution."""
     return (probs * (GAINS[None, :] >= distance[:, None])).sum(axis=1)
+
+
+def first_down_event(labels: np.ndarray, distance: np.ndarray) -> np.ndarray:
+    """1.0 where the realised gain (class label minus the offset) reaches the distance."""
+    return ((np.asarray(labels) - FD_LABEL_OFFSET) >= distance).astype(float)
+
+
+def holdout_frame(plays: pl.DataFrame, *, one_hot: bool):
+    """``fd_features`` rows plus each kept row's game id.
+
+    fd_features filters but keeps row order and only selects ``start.pos_team_spread`` (its
+    filters read homeTeamSpread / overUnder), so a copy carrying the game id there yields the
+    game of each kept row.
+    """
+    X, y = fd_features(plays, era_onehot=one_hot)
+    Xg, _ = fd_features(
+        plays.with_columns(
+            pl.col("_gid").cast(pl.Float64).alias("start.pos_team_spread")
+        ),
+        era_onehot=one_hot,
+    )
+    return X, y, Xg["posteam_spread"].to_numpy().astype(np.int64)
 
 
 def cal_err(p: np.ndarray, y: np.ndarray) -> float:
@@ -180,20 +211,26 @@ def freeze(final_dir: Path, out_dir: Path) -> int:
 
 
 def run(final_dir: Path, pbp: Path, shipped: Path, out_dir: Path) -> int:
+    # one look: refuse a second run and any input other than the pre-registered ones
+    if (out_dir / GATE).exists():
+        print(
+            f"{out_dir / GATE} exists: the gate has run; a rebuild needs a new pre-registration"
+        )
+        return 2
+    got = {
+        "holdout_manifest": sha256(out_dir / MANIFEST),
+        "pbp": sha256(pbp),
+        "shipped": sha256(shipped),
+    }
+    if got != PREREG_SHA256:
+        print(
+            "inputs differ from the pre-registration:",
+            {k: v for k, v in got.items() if v != PREREG_SHA256[k]},
+        )
+        return 2
     manifest = json.loads((out_dir / MANIFEST).read_text(encoding="utf-8"))
     plays = holdout_plays(final_dir, manifest["game_ids"])
-    rows = {}
-    for one_hot in (False, True):
-        X, y = fd_features(plays, era_onehot=one_hot)
-        # fd_features filters but keeps row order and only selects start.pos_team_spread (its filters
-        # read homeTeamSpread / overUnder), so a copy carrying the game id there yields each kept row's game
-        Xg, _ = fd_features(
-            plays.with_columns(
-                pl.col("_gid").cast(pl.Float64).alias("start.pos_team_spread")
-            ),
-            era_onehot=one_hot,
-        )
-        rows[one_hot] = (X, y, Xg["posteam_spread"].to_numpy().astype(np.int64))
+    rows = {one_hot: holdout_frame(plays, one_hot=one_hot) for one_hot in (False, True)}
     (Xo, yo, go), (Xh, yh, gh) = rows[False], rows[True]
     assert np.array_equal(yo, yh) and np.array_equal(go, gh), (
         "the two encodings kept different rows"
@@ -213,7 +250,7 @@ def run(final_dir: Path, pbp: Path, shipped: Path, out_dir: Path) -> int:
     if len(yh) < MIN_PLAYS or n_games < MIN_GAMES:
         record["chosen"] = None
         record["below_floor"] = True
-        (out_dir / "fd_rebuild.gate.json").write_text(
+        (out_dir / GATE).write_text(
             json.dumps(record, indent=2) + "\n", encoding="utf-8", newline="\n"
         )
         print(
@@ -221,8 +258,13 @@ def run(final_dir: Path, pbp: Path, shipped: Path, out_dir: Path) -> int:
         )
         return 3
     dist = Xh["distance"].to_numpy()
-    event = ((yh - 10) >= dist).astype(float)
+    event = first_down_event(yh, dist)
     train = pl.read_parquet(pbp)
+    if "game_id" in train.columns:
+        leaked = train.filter(
+            pl.col("game_id").cast(pl.Int64).is_in(manifest["game_ids"])
+        ).height
+        assert leaked == 0, f"{leaked} training rows are holdout games"
     models = {"A": xgb.Booster(model_file=str(shipped))}
     for name, (one_hot, seasons) in ARMS.items():
         models[name] = fit(train, one_hot, seasons)
@@ -254,7 +296,7 @@ def run(final_dir: Path, pbp: Path, shipped: Path, out_dir: Path) -> int:
     out_dir.mkdir(parents=True, exist_ok=True)
     for name in ARMS:
         models[name].save_model(str(out_dir / f"fd_rebuild_{name}.ubj"))
-    (out_dir / "fd_rebuild.gate.json").write_text(
+    (out_dir / GATE).write_text(
         json.dumps(record, indent=2) + "\n", encoding="utf-8", newline="\n"
     )
     print(

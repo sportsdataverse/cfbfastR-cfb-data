@@ -97,3 +97,18 @@ def test_a_season_where_no_team_has_two_games_is_the_empty_schema(plays) -> None
     one_game = plays.filter(pl.col("game_id") == plays["game_id"].min())
     out = stage.ledger_table(one_game, 2025)
     assert out.height == 0 and dict(out.schema) == stage.OUTPUT_SCHEMA
+
+
+def test_the_daily_driver_builds_the_ledger_right_after_summaries() -> None:
+    # it must read the same pbp + schedule releases as summaries: after PY_UNIFIED_SCHEDULES and the summaries publish
+    sh = (
+        Path(__file__).resolve().parents[2] / "scripts" / "daily_cfb_processor.sh"
+    ).read_text(encoding="utf-8")
+    assert 'PY_LEDGER="adjustment_ledger"' in sh
+    summaries = sh.index("    run_py summaries --publish\n")
+    ledger = sh.index(
+        'for ds in $PY_LEDGER; do run_py "$ds" --no-fetch --publish; done'
+    )
+    schedules = sh.index("for ds in $PY_UNIFIED_SCHEDULES; do")
+    assert schedules < summaries < ledger
+    assert "adjustment_ledger" not in sh[sh.index('PY_DERIVED="') :].split("\n", 1)[0]

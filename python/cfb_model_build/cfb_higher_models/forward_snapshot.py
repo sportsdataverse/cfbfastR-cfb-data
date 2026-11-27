@@ -54,20 +54,41 @@ def _slot(df: pl.DataFrame) -> pl.Expr:
     )
 
 
+CORPUS_COLUMNS = [
+    "game_id",
+    "season",
+    "week",
+    "season_type",
+    "fbs_participant",
+    "home_id",
+    "away_id",
+    "neutral_site",
+    "home_conference",
+    "away_conference",
+    "home_points",
+    "away_points",
+]
+
+
+def asof_corpus(sched: pl.DataFrame, season: int, t: int) -> pl.DataFrame:
+    """Every completed game BEFORE the slot: earlier seasons, then this season's t' < t.
+
+    The EM's variance components average over the whole team universe, so a corpus that grew
+    after the snapshot (later games, new opponents, a corrected score) would move theta. The
+    snapshot commits this frame beside itself, and the forward check reruns parity on it.
+    """
+    return sched.filter(
+        pl.col("home_points").is_not_null()
+        & pl.col("away_points").is_not_null()
+        & ((pl.col("season") < season) | (_slot(sched) < t))
+    ).select(CORPUS_COLUMNS)
+
+
 def hierarchical_margins(
     sched: pl.DataFrame, season: int, t: int, slate: pl.DataFrame
 ) -> tuple[np.ndarray, dict]:
     """As-of margins for ``slate`` (home_id, away_id, neutral_site) from games before slot ``t``."""
-    # The corpus is every completed game BEFORE the slot: earlier seasons, then this season's
-    # t' < t. The EM's variance components average over the whole team universe, so a corpus
-    # that grew after the snapshot (later games, new opponents) would move theta; this one is
-    # recomputable later from the same release.
-    done = sched.filter(
-        pl.col("home_points").is_not_null()
-        & pl.col("away_points").is_not_null()
-        & ((pl.col("season") < season) | (_slot(sched) < t))
-    )
-    corpus = build_corpus(done)
+    corpus = build_corpus(asof_corpus(sched, season, t))
     prev = np.zeros(corpus.n_teams)
     for s in range(FIRST_SEASON, season):
         ts = corpus.games.filter(pl.col("season") == s)["t"]
@@ -80,6 +101,8 @@ def hierarchical_margins(
     )
     if missing:
         raise ValueError(f"teams with no completed game in the corpus: {missing}")
+    if slate["neutral_site"].null_count():
+        raise ValueError("a slate game has a null neutral_site")
     h = np.array([tix[int(x)] for x in slate["home_id"].to_list()])
     a = np.array([tix[int(x)] for x in slate["away_id"].to_list()])
     nz = slate["neutral_site"].cast(pl.Float64).to_numpy()
@@ -119,8 +142,16 @@ def served_margins(season: int, t: int, slate: pl.DataFrame) -> pl.DataFrame:
     )
 
 
-def snapshot(season: int, t: int) -> pl.DataFrame:
+def snapshot(season: int, t: int) -> tuple[pl.DataFrame, pl.DataFrame, list[int]]:
+    """(snapshot, its as-of corpus, game_ids skipped for an undetermined team)."""
     sched = _schedule(list(range(FIRST_SEASON, season + 1)))
+    corpus = asof_corpus(sched, season, t)
+    known = set(
+        pl.concat([corpus["home_id"], corpus["away_id"]])
+        .drop_nulls()
+        .cast(pl.Int64)
+        .to_list()
+    )
     slate = sched.filter(
         (pl.col("season") == season)
         & pl.col("season_type").is_in(["regular", "postseason"])
@@ -133,9 +164,14 @@ def snapshot(season: int, t: int) -> pl.DataFrame:
         pl.col("away_id").cast(pl.Int64),
         pl.col("neutral_site").cast(pl.Boolean),
     )
+    # A postseason matchup still to be decided (a CFP round) has an id no completed game carries,
+    # or none: it is skipped here, listed, and predicted by a later snapshot of the same slot.
+    ok = pl.col("home_id").is_in(list(known)) & pl.col("away_id").is_in(list(known))
+    skipped = slate.filter(~ok.fill_null(False))["game_id"].to_list()
+    slate = slate.filter(ok.fill_null(False))
     if slate.is_empty():
-        raise ValueError(f"no {season} games in slot t={t}")
-    margin, fitinfo = hierarchical_margins(sched, season, t, slate)
+        raise ValueError(f"no {season} games with both teams known in slot t={t}")
+    margin, fitinfo = hierarchical_margins(corpus, season, t, slate)
     sdv = json.loads(
         distribution("sportsdataverse").read_text("direct_url.json") or "{}"
     )
@@ -146,7 +182,7 @@ def snapshot(season: int, t: int) -> pl.DataFrame:
         pl.lit(fitinfo["hfa"]).alias("hier_hfa"),
         pl.lit(sdv.get("vcs_info", {}).get("commit_id")).alias("sdv_commit"),
     ).join(served_margins(season, t, slate), on="game_id", how="left")
-    return out.sort("kickoff", "game_id")
+    return out.sort("kickoff", "game_id"), corpus, skipped
 
 
 def main(argv=None) -> int:
@@ -158,13 +194,22 @@ def main(argv=None) -> int:
         required=True,
         help="slot: regular week, or 100 + postseason week",
     )
+    ap.add_argument(
+        "--part",
+        type=int,
+        default=0,
+        help="a later snapshot of the same slot (CFP rounds), written as _t<t>_<part>",
+    )
     args = ap.parse_args(argv)
-    df = snapshot(args.season, args.t)
+    df, corpus, skipped = snapshot(args.season, args.t)
     OUT.mkdir(parents=True, exist_ok=True)
-    path = OUT / f"{args.season}_t{args.t}.parquet"
+    stem = f"{args.season}_t{args.t}" + (f"_{args.part}" if args.part else "")
+    path = OUT / f"{stem}.parquet"
     df.write_parquet(path)
+    corpus.write_parquet(OUT / f"{stem}_corpus.parquet")
     print(
-        f"{path}: {df.height} games; served missing {df['served_margin'].null_count()}"
+        f"{path}: {df.height} games; served missing {df['served_margin'].null_count()}; "
+        f"skipped (team undetermined): {skipped}"
     )
     print(
         df.select("kickoff", "home_id", "away_id", "hier_margin", "served_margin").head(

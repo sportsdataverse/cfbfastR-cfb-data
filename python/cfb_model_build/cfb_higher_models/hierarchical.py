@@ -697,6 +697,8 @@ def gate_metrics(oof: pl.DataFrame) -> dict:
         "seasons_won_frac": hier_won / max(cmp.n_seasons, 1),
         "p_season": cmp.p_season,
         "n_games": oof.height,
+        # the win-probability spread these metrics use; sdv-py serves it as HIER_MARGIN_SD
+        "margin_sd": sd,
     }
 
 

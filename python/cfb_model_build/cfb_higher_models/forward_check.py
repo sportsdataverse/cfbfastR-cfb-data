@@ -173,7 +173,13 @@ def main(argv=None) -> int:
         corpus_name = name.replace(".parquet", "_corpus.parquet")
         csha, _ = _published(corpus_name, pushes)
         t = int(snap["asof_t"][0])
-        worst = max(worst, parity(_read(csha, corpus_name), season, t, snap, rw))
+        corpus = _read(csha, corpus_name)
+        leak = corpus.filter((pl.col("season") == season) & (_slot(corpus) >= t)).height
+        if leak:
+            raise RuntimeError(
+                f"{corpus_name} holds {leak} game(s) at or after slot {t}"
+            )
+        worst = max(worst, parity(corpus, season, t, snap, rw))
         rows.append(
             snap.with_columns(
                 pl.lit(pub).alias("published"), pl.lit(name).alias("snapshot")
@@ -212,6 +218,11 @@ def main(argv=None) -> int:
         )
         .filter(pl.col("start_date") > T0)
     )
+    # the final schedule's kickoff must also follow the publish time: a game moved earlier after
+    # its snapshot no longer counts
+    valid = valid.join(
+        window.select("game_id", "start_date"), on="game_id", how="inner"
+    ).filter(pl.col("start_date") > pl.col("published"))
     missed = window.join(valid.select("game_id"), on="game_id", how="anti")[
         "game_id"
     ].to_list()

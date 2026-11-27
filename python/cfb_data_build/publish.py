@@ -210,6 +210,26 @@ RELEASE_NOTES: dict[str, str] = {
         "evaluated). NOT A FEATURE: the shares are fitted on who won, so "
         "they describe results and must not enter a predictive model."
     ),
+    "cfb_team_adjustment_ledger": (
+        "College Football adjusted-EPA ledger: ONE ROW PER TEAM PER GAME the "
+        "opponent-adjusted EPA fit rates (`game_id`, `team_id`, `opponent_id`, "
+        "all Int64), laying out the season `net_adj_epa` of "
+        "espn_cfb_team_summaries game by game "
+        "(`sportsdataverse.cfb.cfb_adjusted_epa_ledger`): the team's raw net "
+        "EPA per play on the fit's plays, the opponent's fitted offense and "
+        "defense (`off_strength_faced` / `def_strength_faced`), the schedule "
+        "term they add (`schedule_adj`), the adjusted values, the game's weight "
+        "in each season mean and its `contribution`, split into "
+        "`raw_contribution` + `schedule_contribution`. A team's contributions "
+        "sum to its published `net_adj_epa` (the build fails a season that "
+        "misses by more than 1e-9). `loo_net_adj_epa` refits the season as if "
+        "the game had never been played and `game_influence` is how far the "
+        "game moved the value; both null when the team would keep fewer than "
+        "two valid games. Plays: FBS-vs-FBS passes and rushes that are not "
+        "garbage time by the score-margin rule. The fitted home-field term is "
+        "not netted out of a team's own EPA, so there is no home term; `site` "
+        "records home / away / neutral."
+    ),
     "cfb_team_opponent_splits": (
         "College Football by-opponent team-game splits: ONE ROW PER TEAM PER "
         "GAME with season, season_type, week, game_id, team_id, opponent_id, "

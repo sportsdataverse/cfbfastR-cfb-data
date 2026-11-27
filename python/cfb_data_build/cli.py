@@ -24,6 +24,7 @@ from cfb_data_build.config import REGISTRY
 #   metric_curves            cfb_metric_curves -- rate curves along a continuous axis (sdv-py metric_curves), stage 65
 #   defense_vs_position      cfb_defense_vs_position -- what each defense allowed to QB/RB/WR/TE (sdv-py defense_vs_position), stage 66
 #   paper_index_games        cfb_paper_index_games -- each team's deserved-win share per scored game (sdv-py paper_index), stage 67
+#   adjustment_ledger        cfb_team_adjustment_ledger -- team_summaries' Adj EPA/Play game by game (sdv-py cfb_adjusted_epa_ledger), stage 68
 DERIVED = (
     "gamelog",
     "team_opponent_splits",
@@ -35,6 +36,7 @@ DERIVED = (
     "metric_curves",
     "defense_vs_position",
     "paper_index_games",
+    "adjustment_ledger",
 )
 
 # ESPN Football Power Index. Separate from DERIVED because these are fetched from

@@ -161,6 +161,7 @@ KNOWN_UNPAIRED.update(
 #   defense_vs_position  derived, cli.DERIVED; reads cfb/pbp + cfb_rosters +
 #                    cfb_schedules (stage 66)
 #   paper_index_games  derived, cli.DERIVED; reads cfb/pbp (stage 67)
+#   adjustment_ledger  derived, cli.DERIVED; reads the pbp + schedule releases (stage 68)
 NON_DATASET_STAGES: set[str] = {
     "adv_box",
     "team_summaries",
@@ -171,6 +172,7 @@ NON_DATASET_STAGES: set[str] = {
     "metric_curves",
     "defense_vs_position",
     "paper_index_games",
+    "adjustment_ledger",
 }
 # --------------------------------------------------------------------------
 # End repo-specific data. Everything below is the shared engine.

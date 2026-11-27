@@ -91,6 +91,9 @@ SPECS: dict[str, DatasetSpec] = {
     "paper_index_games": DatasetSpec(
         "paper_index_games", "cfb_paper_index_games", "cfb_paper_index_games"
     ),
+    "adjustment_ledger": DatasetSpec(
+        "adjustment_ledger", "cfb_team_adjustment_ledger", "cfb_team_adjustment_ledger"
+    ),
     "team_opponent_splits": DatasetSpec(
         "team_opponent_splits", "cfb_team_opponent_splits", "cfb_team_opponent_splits"
     ),
@@ -896,6 +899,12 @@ def _build_paper_index_games(season: int, *, base: str = "cfb") -> pl.DataFrame:
     return build_paper_index_games(season, base=base)
 
 
+def _build_adjustment_ledger(season: int, *, base: str = "cfb") -> pl.DataFrame:
+    from cfb_data_build.adjustment_ledger import build_adjustment_ledger
+
+    return build_adjustment_ledger(season, base=base)
+
+
 BUILDERS = {
     "gamelog": build_gamelog,
     "ratings_weekly": build_ratings_weekly,
@@ -906,6 +915,7 @@ BUILDERS = {
     "metric_curves": build_metric_curves,
     "defense_vs_position": _build_defense_vs_position,
     "paper_index_games": _build_paper_index_games,
+    "adjustment_ledger": _build_adjustment_ledger,
     "team_opponent_splits": build_team_opponent_splits,
 }
 

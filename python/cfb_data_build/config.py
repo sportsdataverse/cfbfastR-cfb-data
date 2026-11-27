@@ -432,7 +432,7 @@ PKG_FUNCTION: dict[str, str] = {
     "cfb_metric_curves": "python/espn_cfb_65_metric_curves_creation.py",
     "cfb_defense_vs_position": "python/espn_cfb_66_defense_vs_position_creation.py",
     "cfb_paper_index_games": "python/espn_cfb_67_paper_index_games_creation.py",
-    # no loader at the pinned sdv-py yet (load_cfb_team_adjustment_ledger comes next); sdv-db reads the asset
+    # the sdv-py loader load_cfb_team_adjustment_ledger (#1349) is newer than this repo's pin; sdv-db reads the asset
     "cfb_team_adjustment_ledger": "python/espn_cfb_68_adjustment_ledger_creation.py",
     # no loader yet; consumers read sdv-db cfb.team_opponent_splits
     "cfb_team_opponent_splits": "python/cfb_data_build/derived.py",

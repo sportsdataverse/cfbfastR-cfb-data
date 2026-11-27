@@ -90,3 +90,10 @@ def test_a_ledger_missing_a_column_fails_the_season(plays, monkeypatch) -> None:
     )
     with pytest.raises(ValueError, match="lacks"):
         stage.ledger_table(plays, 2025)
+
+
+def test_a_season_where_no_team_has_two_games_is_the_empty_schema(plays) -> None:
+    # one game: both teams have a single valid game, so the fit rates nobody yet (an opening week)
+    one_game = plays.filter(pl.col("game_id") == plays["game_id"].min())
+    out = stage.ledger_table(one_game, 2025)
+    assert out.height == 0 and dict(out.schema) == stage.OUTPUT_SCHEMA

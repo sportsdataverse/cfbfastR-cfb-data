@@ -2169,7 +2169,9 @@ per (game, team) for every team the fit rates (two or more valid FBS-vs-FBS game
 `(game_id, team_id)` (stage 68, `python/cfb_data_build/adjustment_ledger.py`). The rows are
 sdv-py `sportsdataverse.cfb.cfb_adjusted_epa_ledger` over the same frame `team_summaries` fits,
 so each team's `contribution` rows sum to its published `net_adj_epa`; the build checks that
-against a fresh fit and fails the season if it misses by more than 1e-9. Plays are FBS-vs-FBS
+against a fresh fit and fails the season if it misses by more than 1e-9. The equality with the published
+`net_adj_epa` holds when both tables are built from the same play-by-play release (the build reads the release
+current at run time; an in-progress season built on a different day can differ). Plays are FBS-vs-FBS
 passes and rushes that are not garbage time by the score-margin rule, as in the fit.
 
 | col_name | col_type | col_description |

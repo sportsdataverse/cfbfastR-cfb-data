@@ -65,6 +65,10 @@ def ledger_table(plays: pl.DataFrame, season: int) -> pl.DataFrame:
     """
     ledger = cfb_adjusted_epa_ledger(plays)
     season_fit = cfb_adjusted_epa(plays).select("team_id", expected="net_adj_epa")
+    if (
+        ledger.height == 0 and season_fit.height == 0
+    ):  # early season: no team has two valid games yet
+        return pl.DataFrame(schema=OUTPUT_SCHEMA)
     sums = ledger.group_by("team_id").agg(total=pl.col("contribution").sum())
     assert sums.schema["team_id"] == season_fit.schema["team_id"]
     joined = season_fit.join(sums, on="team_id", how="full", coalesce=True)
@@ -102,4 +106,6 @@ def build_adjustment_ledger(season: int, *, base: str = "cfb") -> pl.DataFrame:
         return pl.DataFrame(schema=OUTPUT_SCHEMA)
     schedule = load_cfb_schedule(seasons=[season])
     plays = add_derived_metrics(prepare_plays_input(pbp, schedule, season))
+    if plays.height == 0:  # e.g. only FBS-vs-FCS games so far: nothing to fit
+        return pl.DataFrame(schema=OUTPUT_SCHEMA)
     return ledger_table(plays, season)

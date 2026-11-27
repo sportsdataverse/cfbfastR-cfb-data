@@ -253,7 +253,14 @@ for i in $(seq "${START_YEAR}" "${END_YEAR}"); do
     echo "RSCRIPT_RC=$SEASON_RC" > "/tmp/_rc_${i}"
     # the tee pipeline runs this block in a subshell, so a push failure is
     # carried out through a sentinel like the season rc above
-    sdv_commit_push "CFB Data Updated (Start: $i End: $i)" cfb data/cfb_coach_seasons.csv || echo "PUSH_FAILED=1" > "/tmp/_push_${i}"
+    # The season's files were written before any refused publish raised, so the repo copy needs the
+    # same pin check as the releases (cfb_data_build.pin_guard; incident 2026-11-26).
+    if (cd python && "$PY" -m cfb_data_build.pin_guard); then
+      sdv_commit_push "CFB Data Updated (Start: $i End: $i)" cfb data/cfb_coach_seasons.csv || echo "PUSH_FAILED=1" > "/tmp/_push_${i}"
+    else
+      echo "::error ::stale sportsdataverse-py pin: season $i NOT committed; rerun cron_daily_cfb.sh -s $i -e $i"
+      echo "PUSH_FAILED=1" > "/tmp/_push_${i}"
+    fi
   } 2>&1 | tee "$TMPLOG"
 
   RSCRIPT_RC=$(sed 's/RSCRIPT_RC=//' "/tmp/_rc_${i}" 2>/dev/null); rm -f "/tmp/_rc_${i}"

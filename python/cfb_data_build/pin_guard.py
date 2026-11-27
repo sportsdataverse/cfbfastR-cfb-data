@@ -20,11 +20,12 @@ import re
 import subprocess
 import sys
 import time
+import tomllib
 from pathlib import Path
 
 REPO = "sportsdataverse/cfbfastR-cfb-data"
 LOCK = Path(__file__).resolve().parents[2] / "uv.lock"
-_PIN = re.compile(r"sportsdataverse-py\?branch=main#([0-9a-f]{40})")
+_SHA = re.compile(r"sportsdataverse-py(?:\.git)?\?[^#]*#([0-9a-f]{40})$")
 _TTL_S = 600  # re-read main's lock at most every 10 min, so a mid-build merge is caught
 _cache: dict[str, tuple[float, str]] = {}
 
@@ -34,9 +35,21 @@ class StalePinError(RuntimeError):
 
 
 def locked_commit(lock_text: str) -> str:
-    m = _PIN.search(lock_text)
+    """The commit of the ONE git-sourced sportsdataverse package in a uv.lock."""
+    pkgs = [
+        p
+        for p in tomllib.loads(lock_text).get("package", [])
+        if p.get("name") == "sportsdataverse"
+    ]
+    if len(pkgs) != 1:
+        raise StalePinError(
+            f"uv.lock has {len(pkgs)} sportsdataverse packages; expected exactly one"
+        )
+    m = _SHA.search(str(pkgs[0].get("source", {}).get("git", "")))
     if not m:
-        raise StalePinError("no sportsdataverse-py git pin found in uv.lock")
+        raise StalePinError(
+            "uv.lock's sportsdataverse is not pinned to a sportsdataverse-py git commit"
+        )
     return m.group(1)
 
 
@@ -59,21 +72,25 @@ def remote_lock_text() -> str:
     hit = _cache.get("main")
     if hit and now - hit[0] < _TTL_S:
         return hit[1]
-    text = subprocess.run(
-        [
-            "gh",
-            "api",
-            "-H",
-            "Accept: application/vnd.github.raw",
-            f"repos/{REPO}/contents/uv.lock?ref=main",
-        ],
-        check=True,
-        capture_output=True,
-        text=True,
-        timeout=60,
-    ).stdout
-    _cache["main"] = (now, text)
-    return text
+    args = [
+        "gh",
+        "api",
+        "-H",
+        "Accept: application/vnd.github.raw",
+        f"repos/{REPO}/contents/uv.lock?ref=main",
+    ]
+    for attempt in range(
+        1, 4
+    ):  # a network blip must not fail a publish that gh_retry would retry
+        proc = subprocess.run(args, capture_output=True, text=True, timeout=60)
+        if proc.returncode == 0:
+            _cache["main"] = (now, proc.stdout)
+            return proc.stdout
+        if attempt < 3:
+            time.sleep(5 * attempt)
+    raise StalePinError(
+        f"cannot read main's uv.lock via gh: {(proc.stderr or '').strip()[:300]}"
+    )
 
 
 def check(
@@ -109,24 +126,36 @@ def check(
     return have
 
 
-def require_current_pin() -> None:
-    """Raise unless publishing is allowed; honours CFB_SKIP_PIN_CHECK=1."""
+def _skipped() -> bool:
     if os.environ.get("CFB_SKIP_PIN_CHECK") == "1":
         print(
             "pin_guard: CFB_SKIP_PIN_CHECK=1, sportsdataverse-py pin NOT checked",
             flush=True,
         )
-        return
-    check()
+        return True
+    return False
 
 
-if __name__ == "__main__":
+def require_current_pin() -> None:
+    """Raise unless publishing is allowed; honours CFB_SKIP_PIN_CHECK=1."""
+    if not _skipped():
+        check()
+
+
+def main() -> int:
+    if _skipped():
+        return 0
     try:
         sha = check()
     except (StalePinError, subprocess.SubprocessError, OSError) as e:
         print(f"::error ::pin_guard: {e}", flush=True)
-        sys.exit(1)
+        return 1
     print(
         f"pin_guard: sportsdataverse-py {sha[:10]} matches this checkout's and main's uv.lock",
         flush=True,
     )
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -47,7 +47,9 @@ uv sync -q --frozen --inexact || { echo "::error ::uv sync failed"; echo "EXIT=1
 # The venv must run the sdv-py that both this checkout's and main's uv.lock pin. Every
 # publish re-checks main's pin too (cfb_data_build.pin_guard): 2026-11-26 a build that
 # pulled 5 min before a pin bump merged published a season on the old engine.
-(cd python && ../.venv/bin/python -m cfb_data_build.pin_guard) ||
+# shellcheck source=scripts/_venv.sh
+source scripts/_venv.sh || { echo "EXIT=1"; exit 1; }
+(cd python && "$PY" -m cfb_data_build.pin_guard) 8>&- ||
   { echo "::error ::stale sportsdataverse-py pin; refusing to build"; echo "EXIT=1"; exit 1; }
 
 # Same season rule as daily_cfb.yml: the CFB season rolls over on Aug 15.

@@ -49,6 +49,10 @@ def test_publish_dataset_refuses_before_any_upload(tmp_path, monkeypatch):
 
     calls: list[list[str]] = []
     monkeypatch.setattr(publish, "gh_retry", lambda args: calls.append(args))
+    # were the guard removed, the listing would go to the network: keep it hermetic
+    monkeypatch.setattr(
+        publish, "_release_digests", lambda t, r: calls.append(["list", t]) or {}
+    )
     monkeypatch.setattr(pin_guard, "installed_commit", lambda: OTHER)
     monkeypatch.setattr(pin_guard, "remote_lock_text", lambda: LOCK)
     monkeypatch.delenv("CFB_SKIP_PIN_CHECK", raising=False)
@@ -63,3 +67,51 @@ def test_skip_env_is_explicit(monkeypatch, capsys):
     monkeypatch.setenv("CFB_SKIP_PIN_CHECK", "1")
     pin_guard.require_current_pin()
     assert "NOT checked" in capsys.readouterr().out
+
+
+def test_upload_artifacts_refuses_before_any_upload(tmp_path, monkeypatch):
+    from cfb_model_build.cfb_model_publish import artifacts
+
+    calls: list[list[str]] = []
+    monkeypatch.setattr(artifacts, "_gh_runner", lambda args: calls.append(args))
+    monkeypatch.setattr(artifacts, "_gh_release_exists", lambda t, r: True)
+    monkeypatch.setattr(pin_guard, "installed_commit", lambda: OTHER)
+    monkeypatch.setattr(pin_guard, "remote_lock_text", lambda: LOCK)
+    monkeypatch.delenv("CFB_SKIP_PIN_CHECK", raising=False)
+    (tmp_path / "x.parquet").write_bytes(b"x")
+    with pytest.raises(pin_guard.StalePinError):
+        artifacts.upload_artifacts(
+            tmp_path, "cfb_ratings", "x/y", files=[tmp_path / "x.parquet"]
+        )
+    assert calls == []
+
+
+def test_crosswalk_upload_refuses_before_any_upload(tmp_path, monkeypatch):
+    import build_cfb_crosswalk as xw
+
+    calls: list[list[str]] = []
+    monkeypatch.setattr(xw, "gh_retry", lambda args: calls.append(args))
+    monkeypatch.setattr(pin_guard, "installed_commit", lambda: OTHER)
+    monkeypatch.setattr(pin_guard, "remote_lock_text", lambda: LOCK)
+    monkeypatch.delenv("CFB_SKIP_PIN_CHECK", raising=False)
+    with pytest.raises(pin_guard.StalePinError):
+        xw.upload_assets(
+            [tmp_path / "a.parquet"], "cfb_crosswalk", "x/y", digests=lambda t, r: {}
+        )
+    assert calls == []
+
+
+def test_lock_with_two_sportsdataverse_entries_is_refused():
+    i = LOCK.index('[[package]]\nname = "sportsdataverse"\n')
+    j = LOCK.index("[[package]]", i + 1)
+    with pytest.raises(pin_guard.StalePinError, match="2 sportsdataverse packages"):
+        pin_guard.locked_commit(LOCK + "\n" + LOCK[i:j])
+
+
+def test_cli_honours_the_override(monkeypatch):
+    monkeypatch.setattr(pin_guard, "installed_commit", lambda: OTHER)
+    monkeypatch.setenv("CFB_SKIP_PIN_CHECK", "1")
+    assert pin_guard.main() == 0
+    monkeypatch.delenv("CFB_SKIP_PIN_CHECK")
+    monkeypatch.setattr(pin_guard, "remote_lock_text", lambda: LOCK)
+    assert pin_guard.main() == 1

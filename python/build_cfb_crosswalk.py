@@ -201,6 +201,11 @@ def upload_assets(paths: List[Path], tag: str, repo: str, *, run=None, digests=_
     """
     if not paths:
         return
+    if run is None:
+        # the real transport: never publish from an sdv-py that main no longer pins
+        from cfb_data_build.pin_guard import require_current_pin
+
+        require_current_pin()
     run = run or gh_retry
     remote = digests(tag, repo)
     if remote is None:

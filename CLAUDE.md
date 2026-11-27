@@ -15,6 +15,10 @@ parquet/csv/rds. Sibling of `cfbfastR-cfb-raw` (Python/uv).
   FAIL publishes nothing and skips that season's data commit (its log is still committed). Run it with
   `CFB_FINAL_CACHE` at cfb-raw's `cfb/json/final` (cron_daily_cfb.sh sets it): the gate fails without
   the schedule master beside it.
+- `cd python && ../.venv/bin/python -m cfb_data_build.pin_guard` — exits 1 unless the venv's sdv-py commit equals
+  this checkout's AND main's uv.lock pin. `cron_daily_cfb.sh` runs it before building, and every real publish
+  (`publish_dataset`, `upload_artifacts`) re-checks main's pin, so a build that pulled before a pin bump merged
+  cannot publish (incident 2026-11-26). `CFB_SKIP_PIN_CHECK=1` overrides, for a pin-bump branch's own republish.
 - `Rscript R/releases_init.R` — one-time release-tag creation on both publish repos.
 - `uv run python python/espn_injuries_daily_snapshot.py [-l nfl ...] [--publish]` — daily
   ESPN injuries snapshot, all 8 leagues (see "ESPN injuries" below). Build-only by default.

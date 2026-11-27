@@ -406,6 +406,11 @@ def publish_dataset(
     release) is injectable for tests; an injected ``exists_check`` alone keeps
     the old probe-and-upload-everything behaviour.
     """
+    if runner is None and not dry_run:
+        # the real transport: never publish from an sdv-py that main no longer pins
+        from cfb_data_build.pin_guard import require_current_pin
+
+        require_current_pin()
     run = runner or gh_retry
     exists = exists_check or _gh_release_exists
     if digests is None:

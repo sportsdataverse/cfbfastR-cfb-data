@@ -198,3 +198,25 @@ def test_gate_baseline_refuses_a_frame_without_games_played():
     frame = pl.read_parquet(FIXTURE).drop("valid_games_home")
     with pytest.raises(ValueError, match="valid_games_home"):
         gate_baseline(frame)
+
+
+def test_the_gate_refuses_a_short_frame(monkeypatch):
+    """Missing games can only flatter every other clause, so too few is a failure of its own."""
+    from cfb_model_build.cfb_higher_models import hierarchical as h
+
+    frame = pl.read_parquet(FIXTURE)
+    oof = frame.with_columns(pl.Series("pred_margin", h.gate_baseline(frame)))
+    with pytest.raises(
+        RuntimeError, match=f"scored {frame.height} games < {h.GATE_MIN_GAMES}"
+    ):
+        h.assert_hierarchical_gate(oof)
+    # at the floor exactly, the count clause is silent (the other clauses still judge the frame)
+    monkeypatch.setattr(h, "GATE_MIN_GAMES", frame.height)
+    with pytest.raises(RuntimeError) as err:
+        h.assert_hierarchical_gate(oof)
+    assert "games <" not in str(err.value)
+    monkeypatch.setattr(h, "GATE_MIN_GAMES", frame.height + 1)
+    with pytest.raises(
+        RuntimeError, match=f"scored {frame.height} games < {frame.height + 1}"
+    ):
+        h.assert_hierarchical_gate(oof)

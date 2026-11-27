@@ -220,5 +220,4 @@ move it.
 - the MAE ceiling: 12.840 + 2 x 0.125 = 13.09, unchanged.
 
 A separate pre-registered re-test on 2005-2013, which nothing had scored, passed. The hierarchical model beat the
-served formula by 0.932 [0.732, 1.142] in 9/9 seasons (ClaudeCowork
-`specs/2026-11-26-cfb-hierarchical-reregistration-design.md`). It stays a candidate and is not wired.
+served formula by 0.932 [0.732, 1.142] in 9/9 seasons (pre-registered in the maintainers' private notes). It stays a candidate and is not wired.

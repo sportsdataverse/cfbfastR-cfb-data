@@ -86,6 +86,19 @@ Output: `models/pregame_fit.json`, which `sportsdataverse_sha` now stamps.
 - The season `cfb_ratings` republish also caught up to reprocess runs #3/#4 (adj_st_epa, fei_*, off_pace). The old
   assets dated from 2026-09-29. Owner decision: republish them anyway.
 
+**2026-11-27 — hierarchical team strength: lineage and status (stage 34; candidate, opt-in in sdv-py).**
+No table row: it publishes no tag, and the manifest lockstep requires a row only for a published model.
+Recorded here instead, as the promotion pre-registration of 2026-11-27 requires.
+
+- **Served as:** sdv-py `cfb_predict_games(model="hierarchical")` with `cfb_hierarchical_ratings`. It refits at call
+  time with no artifact; its constants are `HIER_MARGIN_SD` 16.15 (the `margin_sd` that `gate_metrics` returns) and
+  the priors.
+- **Data:** completed games before the slot, the carryover chain from 2014; gate scored on 2015-2025 walk-forward (6,201 games), out-of-sample re-test 2005-2013 (4,774).
+- **Fitting script:** `python -m cfb_model_build.cfb_higher_models hierarchical` (`hierarchical.py`, method `eb`); re-test `cfb_higher_models.rereg_hierarchical`; forward check `cfb_higher_models.forward_snapshot` (+ `forward_check` at the window's end).
+- **Gate:** `assert_hierarchical_gate`: MAE <= 13.09, beats the served formula by >= 0.32, calibration slope in [0.80, 1.10], max calibration error <= 0.10, seasons won >= 0.80, season-clustered p < 0.05, scored games >= 5,890 (measured 12.84 / 0.489 / 0.92 / 0.025 / 11/11 / 2e-5 / 6,201).
+- **Last scored:** 2026-11-26 (rescore).
+- **Status:** status: CANDIDATE, opt-in, not the default. The measured numbers come from the reference walk-forward, whose one corpus spans the run; the served before-the-slot version (and the deterministic conference tie-break of 2026-11-27) is not rescored historically, which a default switch requires first. Rescore at each season end (re-derive `HIER_MARGIN_SD` and the gate floors on the gate seasons); 2026 forward check (pre-registered 2026-11-27, snapshots in `models/hierarchical_forward/`) before any default switch
+
 **2026-11-26 — stage 34 rescored on the margin-rule republish: the hierarchical gate fails one clause.**
 Fresh `CFB_HM_CACHE`, same assets and venv as the pregame refit above.
 
@@ -98,8 +111,7 @@ Fresh `CFB_HM_CACHE`, same assets and venv as the pregame refit above.
     it now scores MAE 13.47 / Brier 0.1950 on these games, from the 23.69 scale to the 40.37 one (#1296 / #1300).
   - The threshold is not lowered. Re-registering the clause against the new shipped surface, or retiring it, is an
     owner call. Until then stage 34 `hierarchical` exits non-zero by design.
-  - **Re-registered 2026-11-26: PASS.** Pre-registered in ClaudeCowork
-    `specs/2026-11-26-cfb-hierarchical-reregistration-design.md` (pushed before the run). Scored 2005-2013, 4,774 games,
+  - **Re-registered 2026-11-26: PASS.** Pre-registered in the maintainers' private notes (pushed before the run). Scored 2005-2013, 4,774 games,
     vs the served formula: MAE 12.62 vs 13.55, delta -0.93 [-1.14, -0.73], season-clustered p 0.0002, 9/9 seasons,
     calibration slope 0.95, max calibration error 0.053 (`cfb_higher_models.rereg_hierarchical`, `8b3daef09`).
     It stays a candidate, not wired.
@@ -194,8 +206,7 @@ MAE vs the shipped surface's 14.97, the lean 60-feature GBM's 13.06, and the clo
 the day one of its models is published, and not before" and this model publishes nothing —
 no tag, no asset. It also has no stored fitted constants (`tau_team`, HFA and the carryover
 `rho` are estimated per fit), so there is nothing here that could go stale the way
-`_RIDGE_LAMBDA = 325` did. Full report:
-`ClaudeCowork/ledgers/2026-09-02-next-ten/reports/cfb-hierarchical.md`.
+`_RIDGE_LAMBDA = 325` did. The full report is in the maintainers' private notes.
 
 **2026-10-04 (paper_index: Game on Paper's Paper Index, deserved-win share and luck) — published, recorded here instead of a table row.**
 The table is locked row-for-row to `models/manifest.yaml`, whose entries name a `cfb_model_*`

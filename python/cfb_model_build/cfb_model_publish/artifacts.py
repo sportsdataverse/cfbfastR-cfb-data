@@ -260,6 +260,11 @@ def upload_artifacts(
             ``espn_cfb_model_pbp``): its ``timestamp.txt`` dates model_pbp,
             and restamping it would claim that dataset moved.
     """
+    if runner is None and not dry_run:
+        # the real transport: never publish from an sdv-py that main no longer pins
+        from cfb_data_build.pin_guard import require_current_pin
+
+        require_current_pin()
     run = runner or _gh_runner
     exists = exists_check or _gh_release_exists
     if files is None:

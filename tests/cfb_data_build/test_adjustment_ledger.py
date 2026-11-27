@@ -97,3 +97,23 @@ def test_a_season_where_no_team_has_two_games_is_the_empty_schema(plays) -> None
     one_game = plays.filter(pl.col("game_id") == plays["game_id"].min())
     out = stage.ledger_table(one_game, 2025)
     assert out.height == 0 and dict(out.schema) == stage.OUTPUT_SCHEMA
+
+
+def test_the_daily_driver_builds_the_ledger_right_after_summaries() -> None:
+    # it must read the same pbp + schedule releases as summaries: after PY_UNIFIED_SCHEDULES and the summaries publish
+    import re
+
+    sh = (
+        Path(__file__).resolve().parents[2] / "scripts" / "daily_cfb_processor.sh"
+    ).read_text(encoding="utf-8")
+    assert re.search(r'(?m)^PY_LEDGER="adjustment_ledger"$', sh)
+    line = lambda pattern: re.search(pattern, sh, re.M).start()  # noqa: E731  (anchored: a commented-out line fails)
+    schedules = line(r"^    for ds in \$PY_UNIFIED_SCHEDULES; do")
+    summaries = line(r"^    run_py summaries --publish$")
+    ledger = line(
+        r'^    for ds in \$PY_LEDGER; do run_py "\$ds" --no-fetch --publish; done$'
+    )
+    assert schedules < summaries < ledger
+    assert "adjustment_ledger" not in re.search(r'(?m)^PY_DERIVED="([^"]*)"', sh).group(
+        1
+    )

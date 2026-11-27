@@ -73,6 +73,10 @@ PY_WEEKLY="rolling_windows ratings_weekly team_summaries_weekly defense_vs_posit
 # chain published above plus CFBD /games + /lines (needs CFBD_API_KEY); the line
 # also reads the PRIOR season's release for its prev_* block. No final.json.
 PY_MATCHUP="matchup_features matchup_line"
+# The adjusted-EPA ledger (stage 68) lays out the summaries' net_adj_epa game by game and must
+# sum to it, so it reads the same pbp + schedule releases right after summaries publishes (not
+# from PY_DERIVED, which runs before PY_UNIFIED_SCHEDULES and would read the prior schedule).
+PY_LEDGER="adjustment_ledger"
 # Roster continuity. `recruits`/`team_talent` read the 247 raw store in
 # cfbfastR-cfb-raw; `returning_production` reads the ESPN player box and
 # `team_portal` diffs the published ESPN season rosters (S-1 vs S) -- neither
@@ -210,6 +214,7 @@ for i in $(seq "${START_YEAR}" "${END_YEAR}"); do
     # rebuild fixed that -- load_cfb_pbp(2025) now returns 165,850 rows / 956
     # games and the Python driver builds all 6 tables for 2025. R retired here.
     run_py summaries --publish
+    for ds in $PY_LEDGER; do run_py "$ds" --no-fetch --publish; done
 
     for ds in $PY_WEEKLY; do run_py "$ds" --no-fetch --publish; done
     for ds in $PY_MATCHUP; do run_py "$ds" --publish; done

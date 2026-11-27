@@ -1,7 +1,6 @@
 """Re-registration test of the hierarchical team-strength model against the NEW shipped surface.
 
-Pre-registered in ClaudeCowork ``specs/2026-11-26-cfb-hierarchical-reregistration-design.md``,
-which was committed before this script was ever run. It scores 2005-2013 (2004 only seeds the
+Pre-registered on 2026-11-26 in the maintainers' private notes, which was committed before this script was ever run. It scores 2005-2013 (2004 only seeds the
 carryover prior). No fit or gate scored those seasons for this question.
 
     cd python && CFB_HM_CACHE=<fresh dir> python -m cfb_model_build.cfb_higher_models.rereg_hierarchical

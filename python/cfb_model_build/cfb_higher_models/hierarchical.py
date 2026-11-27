@@ -621,8 +621,7 @@ GATE_MAE_MAX = 13.09
 #: as for the old floor. Observed +0.489, CI [0.322, 0.648], season-clustered
 #: p 2e-5, 11/11 seasons. The old 1.85 was that bound against the flat closed form
 #: at the pre-#1296 scale (23.69), which no longer ships. The 2005-2013
-#: re-registration (ClaudeCowork specs/2026-11-26-cfb-hierarchical-reregistration-
-#: design.md) measured +0.932 [0.732, 1.142] there. That decides the model's
+#: re-registration (pre-registered in the maintainers' private notes) measured +0.932 [0.732, 1.142] there. That decides the model's
 #: candidacy, not this floor: a gate's threshold comes from the seasons the gate scores.
 #: The served constants were fit on 2014-2023 (and #1300's rule chosen on 2014-2025),
 #: so the baseline is in-sample on most gate seasons. That makes the bar harder, not
@@ -635,6 +634,11 @@ GATE_MAX_CAL_ERR = 0.10  # observed 0.029 (0.025 on the 2026-11-26 rescore)
 GATE_SEASONS_WON_MIN = 0.80  # observed 11/11 vs shipped, 8/9 vs the lean GBM
 GATE_TAU_RANGE = (0.5, 40.0)  # observed 4.81-15.63 across 250 as-of fits
 GATE_P_SEASON_MAX = 0.05  # the pre-registered win condition; observed 0.0000
+#: Fewest scored games the gate accepts: 95% of the 6,201 observed on 2015-2025 (2026-11-26;
+#: the 2026-09-02 run had 6,200 leak-free). Fewer means games went missing upstream, which
+#: can only make every other clause easier to pass. Set by the 2026-11-27 promotion
+#: pre-registration.
+GATE_MIN_GAMES = 5890
 
 
 def gate_baseline(frame: pl.DataFrame) -> np.ndarray:
@@ -692,6 +696,7 @@ def gate_metrics(oof: pl.DataFrame) -> dict:
         "beat_shipped": cmp.diff,
         "seasons_won_frac": hier_won / max(cmp.n_seasons, 1),
         "p_season": cmp.p_season,
+        "n_games": oof.height,
     }
 
 
@@ -705,6 +710,8 @@ def assert_hierarchical_gate(oof: pl.DataFrame) -> dict:
     """
     got = gate_metrics(oof)
     fail = []
+    if got["n_games"] < GATE_MIN_GAMES:
+        fail.append(f"scored {got['n_games']} games < {GATE_MIN_GAMES}")
     if got["mae"] > GATE_MAE_MAX:
         fail.append(f"MAE {got['mae']:.3f} > {GATE_MAE_MAX}")
     if got["beat_shipped"] < GATE_BEAT_SHIPPED_MIN:
